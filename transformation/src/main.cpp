@@ -30,6 +30,7 @@ int main( int argc, const char* argv[] )
       ("help,h", "Produce this help message")
       ("inputVideo,i", po::value<std::string>(), "path to the input video")
       ("outputVideo,o", po::value<std::string>(), "path to the output video")
+      ("nbFrames,n", po::value<int>(), "number Of Frame to process (if <= 0 process the whole video) [default 0]")
       ;
 
    po::variables_map vm;
@@ -50,23 +51,20 @@ int main( int argc, const char* argv[] )
 
       auto pathToInputVideo = vm["inputVideo"].as<std::string>();
       auto pathToOutputVideo = vm["outputVideo"].as<std::string>();
+      int nbFrames = vm.count("nbFrames") && vm["nbFrames"].as<int>() > 0 ? vm["nbFrames"].as<int>() : 0;
+
 
       //TEST
       cv::VideoCapture cap(pathToInputVideo);
       //cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), cap.get(CV_CAP_PROP_FPS), cv::Size(cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
-      cv::VideoWriter vwriter;
+      unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
+      LayoutCubeMap lcm(cubeEdge);
+      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
       cv::Mat img;
       int count = 0;
-      bool open = false;
       while (cap.read(img))
       {
-          if (!open)
-          {
-            int cubeSize = 0.5*img.cols/3;
-            vwriter.open(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(3*cubeSize, 2*cubeSize));
-            open = true;
-          }
           Equirectangular pict(img);
           std::cout << "Read image" << std::endl;
           //cv::Mat resizeImg;
@@ -75,14 +73,14 @@ int main( int argc, const char* argv[] )
           //pict2.ImgShow("Test");
           //cv::waitKey(0);
           //cv::destroyAllWindows();
-          CubeMap cm(CubeMap::FromEquirectangular(pict));
+          CubeMap cm(CubeMap::FromEquirectangular(pict, lcm));
           //cv::resize(cm.GetMat(), resizeImg, cv::Size(1200,600));
           //CubeMap cm2(resizeImg);
           //cm2.ImgShow("CubeMap");
           //cv::waitKey(0);
           //cv::destroyAllWindows();
           vwriter << cm.GetMat();
-          if (count++ == 50)
+          if (++count == nbFrames)
           {
               break;
           }
