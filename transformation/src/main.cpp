@@ -57,8 +57,8 @@ int main( int argc, const char* argv[] )
       //TEST
       cv::VideoCapture cap(pathToInputVideo);
       //cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), cap.get(CV_CAP_PROP_FPS), cv::Size(cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
-      unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
-      LayoutCubeMap lcm(cubeEdge);
+      //unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
+      LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
       cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
       cv::Mat img;
