@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include <cmath>
 #include <boost/range/iterator_range.hpp>
+#include "picture.hpp"
 
 namespace IMT {
 class Layout
@@ -23,6 +24,9 @@ class Layout
             float phi = std::acos(cartP.z / rho);
             return cv::Point3f(rho, theta, phi);
         }
+   
+        /*Return the coordinate of the 2d layout that correspond to the point on the sphere in shperical coordinate (1, theta, phi)*/
+        virtual CoordF fromSphereTo2d(float theta, float phi) const = 0;
 
         unsigned int GetWidth(void) const {return m_outWidth;}
         unsigned int GetHeight(void) const {return m_outHeight;}

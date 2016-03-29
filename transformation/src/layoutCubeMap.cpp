@@ -57,3 +57,8 @@ cv::Point3f LayoutCubeMap::from2dTo3d(unsigned int i, unsigned int j) const
     Face f = from2dToFace(i,j);
     return Get3dPoint(i%m_cubeEdge, j%m_cubeEdge, 2.0f, m_cubeEdge, m_cubeEdge, f);
 }
+
+CoordF LayoutCubeMap::fromSphereTo2d(float theta, float phi) const
+{
+   return CoordF();
+}

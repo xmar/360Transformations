@@ -12,6 +12,8 @@ class LayoutCubeMap: public Layout
             Layout(outWidth, 2*outWidth/3), m_cubeEdge(outWidth/3) {}
 
         virtual cv::Point3f from2dTo3d(unsigned int i, unsigned int j) const override;       
+
+        virtual CoordF fromSphereTo2d(float theta, float phi) const override;
         
         Face from2dToFace(unsigned int i, unsigned int j) const;
     private:
