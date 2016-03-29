@@ -12,7 +12,7 @@ class Picture {
     public:
         Picture(void): m_pictMat(){};
         Picture(cv::Mat pictMat): m_pictMat(std::move(pictMat)){};
-        ~Picture(void) = default;
+        virtual ~Picture(void) = default;
 
         Pixel GetInterPixel(CoordF pt) const;
         Pixel GetPixel(CoordI pt) const {return m_pictMat.at<Pixel>(pt);}

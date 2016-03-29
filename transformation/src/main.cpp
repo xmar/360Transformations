@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <array>
+#include <memory>
 
 #include "boost/program_options.hpp"
 #include <boost/config.hpp>
@@ -67,19 +68,24 @@ int main( int argc, const char* argv[] )
       {
           Equirectangular pict(img);
           std::cout << "Read image" << std::endl;
-          //cv::Mat resizeImg;
-          //cv::resize(img, resizeImg, cv::Size(1200,600));
-          //Equirectangular pict2(resizeImg);
-          //pict2.ImgShow("Test");
+          cv::Mat resizeImg;
+          cv::resize(img, resizeImg, cv::Size(1200,600));
+          Equirectangular pict2(resizeImg);
+          pict2.ImgShow("Test");
           //cv::waitKey(0);
           //cv::destroyAllWindows();
-          CubeMap cm(CubeMap::FromEquirectangular(pict, lcm));
-          //cv::resize(cm.GetMat(), resizeImg, cv::Size(1200,600));
-          //CubeMap cm2(resizeImg);
-          //cm2.ImgShow("CubeMap");
+          //CubeMap cm(CubeMap::FromEquirectangular(pict, lcm));
+          auto cm = lcm.FromEquirectangular(pict, cap.get(CV_CAP_PROP_FRAME_WIDTH), 2*cap.get(CV_CAP_PROP_FRAME_WIDTH)/3);
+          cv::resize(cm->GetMat(), resizeImg, cv::Size(1200,600));
+          CubeMap cm2(resizeImg);
+          cm2.ImgShow("CubeMap");
           //cv::waitKey(0);
           //cv::destroyAllWindows();
-          vwriter << cm.GetMat();
+          vwriter << cm->GetMat();
+          auto eq = lcm.ToEquirectangular(*cm, 1200, 600);
+          eq->ImgShow("Test2");
+          cv::waitKey(0);
+          cv::destroyAllWindows();
           if (++count == nbFrames)
           {
               break;

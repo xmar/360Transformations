@@ -7,15 +7,15 @@ Pixel Equirectangular::GetPixelFromAngle(const CoordF& cf) const
 {
     /* cf is (theta, phi) in radian (theta between [-pi,pi] and phi between [0,pi])
      *theta -> -pi              0                  pi
-     * -pi/2  +-----------------+-------------------+ 0
+     *    0   +-----------------*-------------------+ 0
      *  phi   |                                     | y
      *        |                                     |
      *        |                                     |
-     *  0     |                 +                   |
      *        |                                     |
      *        |                                     |
      *        |                                     |
-     * pi/2   +-----------------+-------------------+ H
+     *        |                                     |
+     *   pi   +-----------------+-------------------+ H
      *   x -> 0                                     W = 2.H
      */
     float theta = cf.x;
@@ -25,7 +25,6 @@ Pixel Equirectangular::GetPixelFromAngle(const CoordF& cf) const
     //    phi -= PI();
     //}
     float x = m_pictMat.cols*(theta + PI())/(2*PI());
-    //float y = m_pictMat.rows*(phi + PI()/2)/(PI());
     float y = m_pictMat.rows*(phi/PI());
     return  GetInterPixel(CoordF(x,y));
 }

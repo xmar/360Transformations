@@ -3,20 +3,24 @@
 #include <opencv2/opencv.hpp>
 #include <cmath>
 #include <boost/range/iterator_range.hpp>
+#include <memory>
 #include "picture.hpp"
 
+
 namespace IMT {
+class Equirectangular;
 class Layout
 {
     /* This virtual class is used to define any kind of output layout */
     public:
         Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight) {};
+        virtual ~Layout(void) = default;
 
         /*Return the 3D coordinate cartesian of the point corresponding to the pixel with coordinate (i,j) on the 2d layout*/
         virtual cv::Point3f from2dTo3d(unsigned int i, unsigned int j) const = 0;        
         
         /* Same as from2dTo3d except it return spherical coordinate */
-        cv::Point3f from2dTo3dSpherical(unsigned int i, unsigned int j)
+        cv::Point3f from2dTo3dSpherical(unsigned int i, unsigned int j) const
         {
             auto cartP = from2dTo3d(i,j);
             float rho = cv::norm(cartP);
@@ -30,6 +34,9 @@ class Layout
 
         unsigned int GetWidth(void) const {return m_outWidth;}
         unsigned int GetHeight(void) const {return m_outHeight;}
+
+        std::shared_ptr<Equirectangular> ToEquirectangular(const Picture& layoutPic, unsigned int width, unsigned int height) const;
+        std::shared_ptr<Picture> FromEquirectangular(const Equirectangular& eq, unsigned int width, unsigned int height) const;
     protected:
         unsigned int m_outWidth;
         unsigned int m_outHeight;

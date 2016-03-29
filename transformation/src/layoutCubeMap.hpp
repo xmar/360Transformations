@@ -16,6 +16,7 @@ class LayoutCubeMap: public Layout
         virtual CoordF fromSphereTo2d(float theta, float phi) const override;
         
         Face from2dToFace(unsigned int i, unsigned int j) const;
+        Face AnglesToFace(float theta, float phi) const;
     private:
         unsigned int m_cubeEdge;
 
