@@ -4,15 +4,6 @@
 
 using namespace IMT;
 
-constexpr bool inIntervalStrict(double x, double a, double b)
-{//true if a < x < b
-    return (a <= b) ? (x > a) && (x < b) : inIntervalStrict(x, b, a);
-}
-constexpr bool inInterval(double x, double a, double b)
-{//true if a < x < b
-    return (x == a) || (x == b) || inIntervalStrict(x ,a ,b);
-}
-
 std::shared_ptr<Equirectangular> Layout::ToEquirectangular(const Picture& layoutPic, unsigned int width, unsigned int height) const
 {
     /* (theta between [-pi,pi] and phi between [0,pi])

@@ -2,20 +2,7 @@
 
 using namespace IMT;
 
-Coord3dCart Rotation(cv::Point3f& coordBefRot, double yaw, double pitch, double roll)
-{
-    double cosY = std::cos(yaw);
-    double sinY = std::sin(yaw);
-    double cosP = std::cos(pitch);
-    double sinP = std::sin(pitch);
-    double cosR = std::cos(roll);
-    double sinR = std::sin(roll);
-    double rotX = coordBefRot.x * cosP * cosY + coordBefRot.y*(cosY*sinP*sinR -sinY*cosR) + coordBefRot.z*(cosY*sinP*cosR + sinY * sinR);
-    double rotY = coordBefRot.x * sinY*cosP + coordBefRot.y * cosY * cosR + coordBefRot.z *( sinY*sinP*cosR - sinR * cosY);
-    double rotZ = coordBefRot.x * (-sinP) - coordBefRot.y * cosP * sinR + coordBefRot.z * cosP * cosR;
 
-    return cv::Point3f(rotX, rotY, rotZ);
-}
 
 Coord3dCart LayoutFlatFixed::from2dTo3d(unsigned int i, unsigned int j) const
 {

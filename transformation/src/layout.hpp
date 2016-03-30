@@ -6,6 +6,7 @@
 #include <memory>
 #include "picture.hpp"
 
+#include "common.hpp"
 
 namespace IMT {
 class Equirectangular;
@@ -23,15 +24,12 @@ class Layout
         virtual Coord3dSpherical from2dTo3dSpherical(unsigned int i, unsigned int j) const
         {
             auto cartP = from2dTo3d(i,j);
-            double rho = cv::norm(cartP);
-            double theta = std::atan2(cartP.y, cartP.x);
-            double phi = std::acos(cartP.z / rho);
-            return cv::Point3f(rho, theta, phi);
+            return CartToSherical(cartP);
         }
    
         /*Return the coordinate of the 2d layout that correspond to the point on the sphere in shperical coordinate (1, theta, phi)*/
         virtual CoordF fromSphereTo2d(double theta, double phi) const = 0;
-        CoordF fromSphereTo2d(const cv::Point3f& sphericalCoord) const { return fromSphereTo2d(sphericalCoord.y, sphericalCoord.z);}
+        CoordF fromSphereTo2d(const Coord3dSpherical& sphericalCoord) const { return fromSphereTo2d(sphericalCoord.y, sphericalCoord.z);}
 
         unsigned int GetWidth(void) const {return m_outWidth;}
         unsigned int GetHeight(void) const {return m_outHeight;}

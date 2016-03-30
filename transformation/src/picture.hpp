@@ -1,15 +1,9 @@
 #pragma once
 
 #include <opencv2/opencv.hpp>
+#include "common.hpp"
 
 namespace IMT {
-    typedef cv::Vec3b Pixel;
-    typedef cv::Point2d CoordF;
-    typedef cv::Point2i CoordI;
-    typedef cv::Point3d Coord3dCart;
-    typedef cv::Point3d Coord3dSpherical;
-
-    constexpr double PI() {return std::atan(1)*4.0;}
 class Picture {
     public:
         Picture(void): m_pictMat(){};

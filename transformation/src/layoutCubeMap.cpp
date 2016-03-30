@@ -2,16 +2,8 @@
 
 using namespace IMT;
 
-constexpr bool inIntervalStrict(double x, double a, double b)
-{//true if a < x < b
-    return (a <= b) ? (x > a) && (x < b) : inIntervalStrict(x, b, a);
-}
-constexpr bool inInterval(double x, double a, double b)
-{//true if a < x < b
-    return (x == a) || (x == b) || inIntervalStrict(x ,a ,b);
-}
 
-static cv::Point3f Get3dPoint(int i, int j, double cubeEdge, int nbRowPixels, int nbColPixels, LayoutCubeMap::Face f)
+static Coord3dCart Get3dPoint(int i, int j, double cubeEdge, int nbRowPixels, int nbColPixels, LayoutCubeMap::Face f)
 {
     double normalizedI = ((2.f*double(i)/nbColPixels)-1.f)*cubeEdge;
     double normalizedJ = ((2.f*double(j)/nbRowPixels)-1.f)*cubeEdge;
