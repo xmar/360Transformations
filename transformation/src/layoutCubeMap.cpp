@@ -2,19 +2,19 @@
 
 using namespace IMT;
 
-constexpr bool inIntervalStrict(float x, float a, float b)
+constexpr bool inIntervalStrict(double x, double a, double b)
 {//true if a < x < b
     return (a <= b) ? (x > a) && (x < b) : inIntervalStrict(x, b, a);
 }
-constexpr bool inInterval(float x, float a, float b)
+constexpr bool inInterval(double x, double a, double b)
 {//true if a < x < b
     return (x == a) || (x == b) || inIntervalStrict(x ,a ,b);
 }
 
-static cv::Point3f Get3dPoint(int i, int j, float cubeEdge, int nbRowPixels, int nbColPixels, LayoutCubeMap::Face f)
+static cv::Point3f Get3dPoint(int i, int j, double cubeEdge, int nbRowPixels, int nbColPixels, LayoutCubeMap::Face f)
 {
-    float normalizedI = ((2.f*float(i)/nbColPixels)-1.f)*cubeEdge;
-    float normalizedJ = ((2.f*float(j)/nbRowPixels)-1.f)*cubeEdge;
+    double normalizedI = ((2.f*double(i)/nbColPixels)-1.f)*cubeEdge;
+    double normalizedJ = ((2.f*double(j)/nbRowPixels)-1.f)*cubeEdge;
     switch (f)
     {
         case LayoutCubeMap::Face::FRONT:
@@ -61,31 +61,31 @@ LayoutCubeMap::Face LayoutCubeMap::from2dToFace(unsigned int i, unsigned int j) 
     }
 }
 
-cv::Point3f LayoutCubeMap::from2dTo3d(unsigned int i, unsigned int j) const
+Coord3dCart LayoutCubeMap::from2dTo3d(unsigned int i, unsigned int j) const
 {
     Face f = from2dToFace(i,j);
     return Get3dPoint(i%m_cubeEdge, j%m_cubeEdge, 2.0f, m_cubeEdge, m_cubeEdge, f);
 }
 
-LayoutCubeMap::Face LayoutCubeMap::AnglesToFace(float theta, float phi) const
+LayoutCubeMap::Face LayoutCubeMap::AnglesToFace(double theta, double phi) const
 {// theta in [-pi, pi] and Phi in [0, pi]
-    if (inInterval(theta, -PI()/4.f, PI()/4.f) && inInterval(phi, PI()/4.f, 3.f*PI()/4.f))
+    if (inInterval(theta, -PI()/4.0, PI()/4.0) && inInterval(phi, PI()/4.0, 3.0*PI()/4.0))
     {
         return Face::FRONT;
     }
-    else if ((inInterval(theta, -PI(), -3.f*PI()/4.f) || inInterval(theta, 3*PI()/4.f, PI())) && inInterval(phi, PI()/4.f, 3.f*PI()/4.f))
+    else if ((inInterval(theta, -PI(), -3.0*PI()/4.0) || inInterval(theta, 3*PI()/4.0, PI())) && inInterval(phi, PI()/4.0, 3.0*PI()/4.0))
     {
         return Face::BACK;
     }
-    else if (inInterval(theta, PI()/4.f, 3.f*PI()/4.f) && inInterval(phi, PI()/4.f, 3.f*PI()/4.f))
+    else if (inInterval(theta, PI()/4.0, 3.0*PI()/4.0) && inInterval(phi, PI()/4.0, 3.0*PI()/4.0))
     {
         return Face::LEFT;
     }
-    else if (inInterval(theta, -3.f*PI()/4.f, -PI()/4.f) && inInterval(phi, PI()/4.f, 3.f*PI()/4.f))
+    else if (inInterval(theta, -3.0*PI()/4.0, -PI()/4.0) && inInterval(phi, PI()/4.0, 3.0*PI()/4.0))
     {
         return Face::RIGHT;
     }
-    else if (inInterval(phi, 0.f, PI()/4.f))
+    else if (inInterval(phi, 0.0, PI()/4.0))
     {
         return Face::BOTTOM;
     }
@@ -95,42 +95,43 @@ LayoutCubeMap::Face LayoutCubeMap::AnglesToFace(float theta, float phi) const
     }
 }
 
-CoordF LayoutCubeMap::fromSphereTo2d(float theta, float phi) const
+
+CoordF LayoutCubeMap::fromSphereTo2d(double theta, double phi) const
 {// theta in [-pi, pi] and Phi in [0, pi]
     auto f = AnglesToFace(theta, phi);
-    float x(0.f), y(0.f), z(0.f);
+    double x(0), y(0), z(0);
     switch (f)
     {
         case Face::FRONT:
             y = std::tan(theta);
             z = std::tan(PI()/2-phi)/std::cos(theta);
-            //std::cout << "FRONT: y = "<<y << " z = " << z << "(i,j)="<< m_cubeEdge*(y+1.f)/2.f << ", " <<m_cubeEdge*(z+1.f)/2.f << std::endl;
-            return CoordF(m_cubeEdge*(y+1.f)/2.f, m_cubeEdge*(z+1.f)/2.f);
+            //std::cout << "FRONT: y = "<<y << " z = " << z << "(i,j)="<< m_cubeEdge*(y+1.0)/2.0 << ", " <<m_cubeEdge*(z+1.0)/2.0 << std::endl;
+            return CoordF(m_cubeEdge*((y+1.0)/2.0), m_cubeEdge*((z+1.0)/2.0));
         case Face::BACK:
             y = std::tan(theta);
             z = -std::tan(PI()/2-phi)/std::cos(theta);
             //std::cout << "BACK" << std::endl;
-            return CoordF(m_cubeEdge*(y+1.f)/2.f, m_cubeEdge*(z+1.f)/2.f+m_cubeEdge);
+            return CoordF(m_cubeEdge*(y+1.0)/2.0, m_cubeEdge*(z+1.0)/2.0+m_cubeEdge);
         case Face::LEFT:
             x = -std::tan(PI()/2-theta);
             z = std::tan(PI()/2-phi)/std::sin(theta);
             //std::cout << "LEFT" << std::endl;
-            return CoordF(m_cubeEdge*(x+1.f)/2.f+m_cubeEdge, m_cubeEdge*(z+1.f)/2.f);
+            return CoordF(m_cubeEdge*(x+1.0)/2.0+m_cubeEdge, m_cubeEdge*(z+1.0)/2.0);
         case Face::RIGHT:
             x = -std::tan(PI()/2-theta);
             z = -std::tan(PI()/2-phi)/std::sin(theta);
             //std::cout << "RIGHT" << std::endl;
-            return CoordF(m_cubeEdge*(x+1.f)/2.f+m_cubeEdge, m_cubeEdge*(z+1.f)/2.f+m_cubeEdge);
+            return CoordF(m_cubeEdge*(x+1.0)/2.0+m_cubeEdge, m_cubeEdge*(z+1.0)/2.0+m_cubeEdge);
         case Face::TOP:
-            x = std::cos(theta)*std::tan(phi);
+            x = -std::cos(theta)*std::tan(phi);
             y = std::sin(theta)*std::tan(phi);
             //std::cout << "TOP" << std::endl;
-            return CoordF(m_cubeEdge*(x+1.f)/2.f+2*m_cubeEdge, m_cubeEdge*(y+1.f)/2.f);
+            return CoordF(m_cubeEdge*(y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(x+1.0)/2.0);
         case Face::BOTTOM:
             x = -std::cos(theta)*std::tan(phi); 
-            y = -std::sin(theta)*std::tan(phi);
+            y = std::sin(theta)*std::tan(phi);
             //std::cout << "BOTTOM" << std::endl;
-            return CoordF(m_cubeEdge*(x+1.f)/2.f+2*m_cubeEdge, m_cubeEdge*(y+1.f)/2.f+m_cubeEdge);
+            return CoordF(m_cubeEdge*(y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(x+1.0)/2.0+m_cubeEdge);
     }
     return CoordF();
 }

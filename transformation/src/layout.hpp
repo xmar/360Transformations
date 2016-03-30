@@ -17,20 +17,20 @@ class Layout
         virtual ~Layout(void) = default;
 
         /*Return the 3D coordinate cartesian of the point corresponding to the pixel with coordinate (i,j) on the 2d layout*/
-        virtual cv::Point3f from2dTo3d(unsigned int i, unsigned int j) const = 0;        
+        virtual Coord3dCart from2dTo3d(unsigned int i, unsigned int j) const = 0;        
         
         /* Same as from2dTo3d except it return spherical coordinate */
-        virtual cv::Point3f from2dTo3dSpherical(unsigned int i, unsigned int j) const
+        virtual Coord3dSpherical from2dTo3dSpherical(unsigned int i, unsigned int j) const
         {
             auto cartP = from2dTo3d(i,j);
-            float rho = cv::norm(cartP);
-            float theta = std::atan2(cartP.y, cartP.x);
-            float phi = std::acos(cartP.z / rho);
+            double rho = cv::norm(cartP);
+            double theta = std::atan2(cartP.y, cartP.x);
+            double phi = std::acos(cartP.z / rho);
             return cv::Point3f(rho, theta, phi);
         }
    
         /*Return the coordinate of the 2d layout that correspond to the point on the sphere in shperical coordinate (1, theta, phi)*/
-        virtual CoordF fromSphereTo2d(float theta, float phi) const = 0;
+        virtual CoordF fromSphereTo2d(double theta, double phi) const = 0;
         CoordF fromSphereTo2d(const cv::Point3f& sphericalCoord) const { return fromSphereTo2d(sphericalCoord.y, sphericalCoord.z);}
 
         unsigned int GetWidth(void) const {return m_outWidth;}
