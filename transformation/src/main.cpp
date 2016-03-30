@@ -20,6 +20,8 @@
 #include "picture.hpp"
 #include "equirectangular.hpp"
 #include "cubeMap.hpp"
+#include "layoutEquirectangular.hpp"
+#include "layoutFlatFixed.hpp"
 
 using namespace IMT;
 
@@ -59,7 +61,9 @@ int main( int argc, const char* argv[] )
       cv::VideoCapture cap(pathToInputVideo);
       //cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), cap.get(CV_CAP_PROP_FPS), cv::Size(cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
       //unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
+      LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
+      LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
       cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
       cv::Mat img;
@@ -68,22 +72,29 @@ int main( int argc, const char* argv[] )
       {
           Equirectangular pict(img);
           std::cout << "Read image" << std::endl;
-          cv::Mat resizeImg;
-          cv::resize(img, resizeImg, cv::Size(1200,600));
-          Equirectangular pict2(resizeImg);
-          pict2.ImgShow("Test");
+          pict.ImgShowResize("Test", cv::Size(1200,600));
           //cv::waitKey(0);
           //cv::destroyAllWindows();
           //CubeMap cm(CubeMap::FromEquirectangular(pict, lcm));
-          auto cm = lcm.FromEquirectangular(pict, cap.get(CV_CAP_PROP_FRAME_WIDTH), 2*cap.get(CV_CAP_PROP_FRAME_WIDTH)/3);
-          cv::resize(cm->GetMat(), resizeImg, cv::Size(1200,600));
-          CubeMap cm2(resizeImg);
-          cm2.ImgShow("CubeMap");
-          //cv::waitKey(0);
+          //auto cm = lcm.FromEquirectangular(pict, cap.get(CV_CAP_PROP_FRAME_WIDTH), 2*cap.get(CV_CAP_PROP_FRAME_WIDTH)/3);
+          //cv::resize(cm->GetMat(), resizeImg, cv::Size(1200,600));
+          //CubeMap cm2(resizeImg);
+          //cm2.ImgShow("CubeMap");
+          auto cm = lcm.FromLayout(pict, leq);
+          cm->ImgShowResize("CubeMap2", cv::Size(1200,600));
+
           //cv::destroyAllWindows();
           vwriter << cm->GetMat();
-          auto eq = lcm.ToEquirectangular(*cm, 1200, 600);
-          eq->ImgShow("Test2");
+          auto eq = lcm.ToLayout(*cm, leq);
+          eq->ImgShowResize("Test2", cv::Size(1200,600));
+
+
+          auto ff = lff.FromLayout(pict, leq);
+          ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
+
+          auto ff2 = lff.FromLayout(*cm, lcm);
+          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
+
           cv::waitKey(0);
           cv::destroyAllWindows();
           if (++count == nbFrames)

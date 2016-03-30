@@ -20,6 +20,11 @@ class Picture {
         void ImgShow(std::string txt) const{
           cv::imshow(txt, m_pictMat);
         }
+        void ImgShowResize(std::string txt, cv::Size s) const {
+            cv::Mat resizeImg;
+            cv::resize(m_pictMat, resizeImg, s);
+            cv::imshow(txt, resizeImg);
+        }
         const cv::Mat& GetMat(void) const {return m_pictMat;}
         void SetValue(CoordI pt, Pixel val) { m_pictMat.at<Pixel>(pt) = val; }
     protected:

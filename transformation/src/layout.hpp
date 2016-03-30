@@ -20,7 +20,7 @@ class Layout
         virtual cv::Point3f from2dTo3d(unsigned int i, unsigned int j) const = 0;        
         
         /* Same as from2dTo3d except it return spherical coordinate */
-        cv::Point3f from2dTo3dSpherical(unsigned int i, unsigned int j) const
+        virtual cv::Point3f from2dTo3dSpherical(unsigned int i, unsigned int j) const
         {
             auto cartP = from2dTo3d(i,j);
             float rho = cv::norm(cartP);
@@ -31,12 +31,18 @@ class Layout
    
         /*Return the coordinate of the 2d layout that correspond to the point on the sphere in shperical coordinate (1, theta, phi)*/
         virtual CoordF fromSphereTo2d(float theta, float phi) const = 0;
+        CoordF fromSphereTo2d(const cv::Point3f& sphericalCoord) const { return fromSphereTo2d(sphericalCoord.y, sphericalCoord.z);}
 
         unsigned int GetWidth(void) const {return m_outWidth;}
         unsigned int GetHeight(void) const {return m_outHeight;}
 
         std::shared_ptr<Equirectangular> ToEquirectangular(const Picture& layoutPic, unsigned int width, unsigned int height) const;
         std::shared_ptr<Picture> FromEquirectangular(const Equirectangular& eq, unsigned int width, unsigned int height) const;
+        //transform the layoutPic that is a picture in the current layout into a picture with the layout destLayout with the dimention (width, height)
+        std::shared_ptr<Picture> ToLayout(const Picture& layoutPic, const Layout& destLayout) const;
+        std::shared_ptr<Picture> FromLayout(const Picture& picFromOtherLayout, const Layout& originalLayout) const
+        {return originalLayout.ToLayout(picFromOtherLayout, *this);}
+
     protected:
         unsigned int m_outWidth;
         unsigned int m_outHeight;
