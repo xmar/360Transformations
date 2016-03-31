@@ -22,6 +22,7 @@
 #include "cubeMap.hpp"
 #include "layoutEquirectangular.hpp"
 #include "layoutFlatFixed.hpp"
+#include "layoutPyramidal.hpp"
 
 using namespace IMT;
 
@@ -63,6 +64,7 @@ int main( int argc, const char* argv[] )
       //unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
       LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
+      LayoutPyramidal lp(4.0, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
       cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
@@ -80,20 +82,23 @@ int main( int argc, const char* argv[] )
           //cv::resize(cm->GetMat(), resizeImg, cv::Size(1200,600));
           //CubeMap cm2(resizeImg);
           //cm2.ImgShow("CubeMap");
-          auto cm = lcm.FromLayout(pict, leq);
-          cm->ImgShowResize("CubeMap2", cv::Size(1200,600));
+//          auto cm = lcm.FromLayout(pict, leq);
+//          cm->ImgShowResize("CubeMap2", cv::Size(1200,800));
+//
+//          //cv::destroyAllWindows();
+//          vwriter << cm->GetMat();
+//          auto eq = lcm.ToLayout(*cm, leq);
+//          eq->ImgShowResize("Test2", cv::Size(1200,600));
+//
+//
+//          auto ff = lff.FromLayout(pict, leq);
+//          ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
+//
+//          auto ff2 = lff.FromLayout(*cm, lcm);
+//          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
 
-          //cv::destroyAllWindows();
-          vwriter << cm->GetMat();
-          auto eq = lcm.ToLayout(*cm, leq);
-          eq->ImgShowResize("Test2", cv::Size(1200,600));
-
-
-          auto ff = lff.FromLayout(pict, leq);
-          ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
-
-          auto ff2 = lff.FromLayout(*cm, lcm);
-          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
+          auto p = lp.FromLayout(pict, leq);
+          p->ImgShowResize("Pyramidal", cv::Size(900,300));
 
           cv::waitKey(0);
           cv::destroyAllWindows();

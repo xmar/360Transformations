@@ -11,6 +11,7 @@ typedef cv::Point2d CoordF;
 typedef cv::Point2i CoordI;
 typedef cv::Point3d Coord3dCart;
 typedef cv::Point3d Coord3dSpherical;
+typedef cv::Vec4d Plan;// (a,b,c,d) a.x+b.y+c.z+d=0
 
 constexpr double PI() {return std::atan(1)*4.0;}
 
@@ -41,48 +42,52 @@ inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double p
 
 inline Coord3dSpherical CartToSherical(const Coord3dCart& coordCart)
 {
-   double rho = cv::norm(coordCart);
-   if (rho > 0)
-   {
-      double theta = std::atan2(coordCart.y, coordCart.x); //between (-PI;PI)
-      double phi = std::acos(coordCart.z / rho); //between (0, PI)
-      return Coord3dSpherical(rho, theta, phi);
-   }
-   else
-   {
-      return Coord3dSpherical(0, 0, 0);
-   }
+    double rho = cv::norm(coordCart);
+    if (rho > 0)
+    {
+        double theta = std::atan2(coordCart.y, coordCart.x); //between (-PI;PI)
+        double phi = std::acos(coordCart.z / rho); //between (0, PI)
+        return Coord3dSpherical(rho, theta, phi);
+    }
+    else
+    {
+        return Coord3dSpherical(0, 0, 0);
+    }
 }
 
 inline Coord3dCart SphericalToCart(const Coord3dSpherical& coordSphe)
 {
-   double x = coordSphe.x*std::cos(coordSphe.y)*std::sin(coordSphe.z);
-   double y = coordSphe.x*std::sin(coordSphe.y)*std::sin(coordSphe.z);
-   double z = coordSphe.x*std::cos(coordSphe.z);
-   return Coord3dCart(x,y,z);
+    double x = coordSphe.x*std::cos(coordSphe.y)*std::sin(coordSphe.z);
+    double y = coordSphe.x*std::sin(coordSphe.y)*std::sin(coordSphe.z);
+    double z = coordSphe.x*std::cos(coordSphe.z);
+    return Coord3dCart(x,y,z);
 }
 
-inline Coord3dCart IntersectionPlan(double a, double b, double c, double d, double theta, double phi)
+inline Coord3dCart IntersectionPlan(const Plan& p, double theta, double phi)
 {//Return the cartesian coordinate of the intersaction of the line v(1,theta, phi) in spherical coordinate as the dirtion vector and the plan a.x+b.y+c.z+d = 0
- //if no solution return (0,0,0)
-   double cosT(std::cos(theta)), sinT(std::sin(theta)), cosP(std::cos(phi)), sinP(std::sin(phi));
-   double u = a*cosT*sinP + b*sinT*sinP + c*cosP;
-   if (u != 0)
-   {
-      double x = -d* cosT*sinP / u;
-      double y = -d* sinT*sinP / u;
-      double z = -d* cosP / u;
-      return Coord3dCart(x, y, z);
-   }
-   else
-   {
-      throw std::logic_error("No intersection");
-   }
+    //if no solution return (0,0,0)
+    const double& a = p[0]; 
+    const double& b = p[1];
+    const double& c = p[2];
+    const double& d = p[3];
+    double cosT(std::cos(theta)), sinT(std::sin(theta)), cosP(std::cos(phi)), sinP(std::sin(phi));
+    double u = a*cosT*sinP + b*sinT*sinP + c*cosP;
+    if (u != 0)
+    {
+        double x = -d* cosT*sinP / u;
+        double y = -d* sinT*sinP / u;
+        double z = -d* cosP / u;
+        return Coord3dCart(x, y, z);
+    }
+    else
+    {
+        throw std::logic_error("No intersection");
+    }
 }
 
-inline Coord3dSpherical IntersectionPlanSpherical(double a, double b, double c, double d, double theta, double phi)
+inline Coord3dSpherical IntersectionPlanSpherical(const Plan& p, double theta, double phi)
 {
-   return CartToSherical(IntersectionPlan(a, b, c, d, theta, phi));
+    return CartToSherical(IntersectionPlan(p, theta, phi));
 }
 
 }    
