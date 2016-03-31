@@ -7,7 +7,11 @@ namespace IMT {
 class LayoutPyramidal: public Layout
 {
    public:
-      LayoutPyramidal(double baseEdge,double yaw, double pitch, double roll, unsigned int height): Layout(3*height,height), m_yaw(yaw), m_pitch(pitch), m_roll(roll), m_baseEdge(baseEdge), m_alpha(baseEdge/2.0), m_canonicTopPlan((1-std::pow(m_alpha,2))/(2*m_alpha), 0, 1, (1-3*std::pow(m_alpha,2))/(2*m_alpha)), m_top(m_canonicTopPlan[3]/m_canonicTopPlan[0], 0, 0), m_pyramidHeight(cv::norm(m_top-Coord3dCart(1,0,0))) {}
+      LayoutPyramidal(double baseEdge,double yaw, double pitch, double roll, unsigned int height):
+         Layout(3*height,height), m_yaw(yaw), m_pitch(pitch), m_roll(roll),
+         m_baseEdge(baseEdge), m_alpha(baseEdge/2.0),
+         m_canonicTopPlan((1-std::pow(m_alpha,2))/(2*m_alpha), 0, 1, -(1+std::pow(m_alpha,2))/(2*m_alpha)),
+         m_top(m_canonicTopPlan[3]/m_canonicTopPlan[0], 0, 0), m_pyramidHeight(cv::norm(m_top-Coord3dCart(1,0,0))) {}
       virtual ~LayoutPyramidal(void) = default;
 
 
@@ -41,9 +45,9 @@ class LayoutPyramidal: public Layout
       double m_roll;
       double m_baseEdge;
       double m_alpha;
+      Plan m_canonicTopPlan;// Ton plan in the canonic pyramid
       Coord3dCart m_top; //coordinate of the top of the pyramid
       double m_pyramidHeight; //Height of the pyramid (base to top)
-      Plan m_canonicTopPlan;// Ton plan in the canonic pyramid
 
       double UsePlanEquation(double x) const; //compute the value of z knowing the value of x (for the top plan in the canonic pyramid)
 };

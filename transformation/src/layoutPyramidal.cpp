@@ -21,7 +21,7 @@ double LayoutPyramidal::UsePlanEquation(double x) const //Use the plan equation 
 
 Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
 {
-    if (inInterval(i, m_outHeight, 2*m_outHeight))
+    if (inInterval(i, m_outHeight+1, 2*m_outHeight))
     {//then we are on the base
         i -= m_outHeight;
         Coord3dCart inter(1, (double(i)/m_outHeight-0.5)*m_baseEdge, (double(j)/m_outHeight-0.5)*m_baseEdge);
@@ -33,19 +33,26 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
         double normalizedJ = double(j)/m_outHeight-0.5; //from -0.5 to 0.5
         if (inInterval(normalizedJ, -0.5*normalizedI, 0.5*normalizedI))
         {//Left face
+            normalizedJ /= normalizedI;  
             normalizedI = 1.0-normalizedI;
             double z = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
-            double y = UsePlanEquation(x);
+            double y = -UsePlanEquation(x);
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
         else
         {//top face
             normalizedJ = std::fmod(normalizedJ + 1,1.0);
+
             double y = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
-            double z = UsePlanEquation(x);
+            double z = -UsePlanEquation(x);
             //return Coord3dCart(0,1,1);
+            if(i == m_outHeight/2 && j == 5)//m_outHeight/2)
+            {
+               std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << std::endl;
+               std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
+            }
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
     }
@@ -56,19 +63,19 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
         if (inInterval(normalizedJ, -0.5+0.5*normalizedI, 0.5-0.5*normalizedI))
         {//Right face
             //normalizedI = -normalizedI;
+            normalizedJ /= (1.0-normalizedI);  
             double z = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
-            double y = -UsePlanEquation(x);
+            double y = UsePlanEquation(x);
             //return Coord3dCart(0,0,-1);
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
         else
         {//bottom face
-            normalizedI = 1.0-normalizedI;
             normalizedJ = std::fmod(normalizedJ + 1,1.0);
             double y = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
-            double z = -UsePlanEquation(x);
+            double z = UsePlanEquation(x);
             //return Coord3dCart(0,0,1);
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
