@@ -64,7 +64,7 @@ int main( int argc, const char* argv[] )
       //unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
       LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
-      LayoutPyramidal lp(4, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+      LayoutPyramidal lp(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
       cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;

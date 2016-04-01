@@ -33,11 +33,23 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
         double normalizedJ = double(j)/m_outHeight-0.5; //from -0.5 to 0.5
         if (inInterval(normalizedJ, -0.5*normalizedI, 0.5*normalizedI))
         {//Left face
-            normalizedJ /= normalizedI;  
+            //normalizedJ /= 0.5*normalizedI;  
             normalizedI = 1.0-normalizedI;
             double z = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
             double y = -UsePlanEquation(x);
+            normalizedI = 1.0-normalizedI;
+            if(i == m_outHeight/4 && normalizedJ==0.5*normalizedI)//&& j == m_outHeight/2)
+            {
+               std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << "; Top.x = " << m_top.x << std::endl;
+               std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
+            }
+            if(i == m_outHeight && j==0)//&& j == m_outHeight/2)
+            {
+               std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << "; Top.x = " << m_top.x << std::endl;
+               std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
+            }
+
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
         else
@@ -63,7 +75,7 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
         if (inInterval(normalizedJ, -0.5+0.5*normalizedI, 0.5-0.5*normalizedI))
         {//Right face
             //normalizedI = -normalizedI;
-            normalizedJ /= (1.0-normalizedI);  
+            //normalizedJ /= (1.0-normalizedI);  
             double z = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
             double y = UsePlanEquation(x);
