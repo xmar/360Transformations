@@ -24,7 +24,7 @@ class Layout
         virtual Coord3dSpherical from2dTo3dSpherical(unsigned int i, unsigned int j) const
         {
             auto cartP = from2dTo3d(i,j);
-            return CartToSherical(cartP);
+            return CartToSpherical(cartP);
         }
    
         /*Return the coordinate of the 2d layout that correspond to the point on the sphere in shperical coordinate (1, theta, phi)*/

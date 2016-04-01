@@ -100,6 +100,9 @@ int main( int argc, const char* argv[] )
           auto p = lp.FromLayout(pict, leq);
           p->ImgShowResize("Pyramidal", cv::Size(900,300));
 
+          auto eq2 =  lp.ToLayout(*p, leq);
+          eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
+
           cv::waitKey(0);
           cv::destroyAllWindows();
           if (++count == nbFrames)

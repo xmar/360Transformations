@@ -13,7 +13,7 @@ Coord3dCart LayoutFlatFixed::from2dTo3d(unsigned int i, unsigned int j) const
     double normalizedI = (double(i)/m_outWidth)-0.5f; //between -0.5 and 0.5
     double normalizedJ = (double(j)/m_outHeight)-0.5f; //between -0.5 and 0.5
 
-    cv::Point3f coordBefRot(1.f, normalizedI*maxHDist, normalizedJ*maxVDist);//coordinate in the plan x=1
+    Coord3dCart coordBefRot(1.f, normalizedI*maxHDist, normalizedJ*maxVDist);//coordinate in the plan x=1
      
     return Rotation(coordBefRot, m_yaw, m_pitch, m_roll);
 }
@@ -27,7 +27,7 @@ CoordF LayoutFlatFixed::fromSphereTo2d(double theta, double phi) const
     double z = std::cos(phi) / d;
 
     //Coordination of the intersection =
-    cv::Point3f inter (x ,y , z);
+    Coord3dCart inter (x ,y , z);
     //Go back to the plan x=1
     auto rotInter = Rotation(inter, -m_yaw, -m_pitch, m_roll);
 

@@ -11,7 +11,12 @@ class LayoutPyramidal: public Layout
          Layout(3*height,height), m_yaw(yaw), m_pitch(pitch), m_roll(roll),
          m_baseEdge(baseEdge), m_alpha(baseEdge/2.0),
          m_canonicTopPlan((1-std::pow(m_alpha,2))/(2*m_alpha), 0, 1, -(1+std::pow(m_alpha,2))/(2*m_alpha)),
-         m_top(-m_canonicTopPlan[3]/m_canonicTopPlan[0], 0, 0), m_pyramidHeight(cv::norm(m_top-Coord3dCart(1,0,0))) {}
+         m_top(-m_canonicTopPlan[3]/m_canonicTopPlan[0], 0, 0),
+         m_interTop((1-std::pow(m_alpha,2))/(1+std::pow(m_alpha,2)),0,2*m_alpha/(1+std::pow(m_alpha,2))),
+         m_pyramidHeight(norm(m_top-Coord3dCart(1,0,0))),
+         m_topHeight(norm(m_top-Coord3dCart(1,0,m_alpha))),
+         m_intersectionHeight(norm(m_interTop-Coord3dCart(1,0,m_alpha)))
+         {}
       virtual ~LayoutPyramidal(void) = default;
 
 
@@ -47,7 +52,10 @@ class LayoutPyramidal: public Layout
       double m_alpha;
       Plan m_canonicTopPlan;// Ton plan in the canonic pyramid
       Coord3dCart m_top; //coordinate of the top of the pyramid
+      Coord3dCart m_interTop; //cartesian coordinate of the intersection between the top plan and the unit sphere
       double m_pyramidHeight; //Height of the pyramid (base to top)
+      double m_topHeight; //Height of the top face (from (1, 0, m_alpha) to m_top
+      double m_intersectionHeight; //Distance between (1, 0, m_alpha) and m_interTop
 
       double UsePlanEquation(double x) const; //compute the value of z knowing the value of x (for the top plan in the canonic pyramid)
 };

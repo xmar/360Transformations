@@ -36,35 +36,36 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
             //normalizedJ /= 0.5*normalizedI;  
             normalizedI = 1.0-normalizedI;
             double z = normalizedJ * m_baseEdge;
-            double x = (1.0-normalizedI*m_pyramidHeight);
+            double x = (1.0-normalizedI*m_topHeight);
             double y = -UsePlanEquation(x);
-            normalizedI = 1.0-normalizedI;
-            if(i == m_outHeight/4 && normalizedJ==0.5*normalizedI)//&& j == m_outHeight/2)
-            {
-               std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << "; Top.x = " << m_top.x << std::endl;
-               std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
-            }
-            if(i == m_outHeight && j==0)//&& j == m_outHeight/2)
-            {
-               std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << "; Top.x = " << m_top.x << std::endl;
-               std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
-            }
+            //normalizedI = 1.0-normalizedI;
+            //if(i == m_outHeight/4 && normalizedJ==0.5*normalizedI)//&& j == m_outHeight/2)
+            //{
+            //   std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << "; Top.x = " << m_top.x << std::endl;
+            //   std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
+            //}
+            //if(i == m_outHeight && j==0)//&& j == m_outHeight/2)
+            //{
+            //   std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << "; Top.x = " << m_top.x << std::endl;
+            //   std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
+            //}
 
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
         else
         {//top face
-            normalizedJ = std::fmod(normalizedJ + 1,1.0);
+            normalizedJ = std::fmod(normalizedJ + 1,1.0)-0.5;
 
             double y = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
             double z = -UsePlanEquation(x);
             //return Coord3dCart(0,1,1);
-            if(i == m_outHeight/2 && j == 5)//m_outHeight/2)
-            {
-               std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << std::endl;
-               std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
-            }
+            //if(i == m_outHeight/2 && j == m_outHeight-2)//m_outHeight/2)
+            //{
+            //    std::cout << "TOP" << std::endl;
+            //   std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << std::endl;
+            //   std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
+            //}
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
     }
@@ -84,11 +85,18 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
         }
         else
         {//bottom face
-            normalizedJ = std::fmod(normalizedJ + 1,1.0);
+            normalizedJ = (std::fmod(normalizedJ + 1,1.0)-0.5);
+            normalizedI = 1.0-normalizedI;
             double y = normalizedJ * m_baseEdge;
             double x = (1.0-normalizedI*m_pyramidHeight);
             double z = UsePlanEquation(x);
             //return Coord3dCart(0,0,1);
+            //if(i == 2*m_outHeight+m_outHeight/2 && j == m_outHeight-1)//m_outHeight/2)
+            //{
+            //    std::cout << "BOTTOM" << std::endl;
+            //   std::cout << "Pyramid Height: "<<m_pyramidHeight << "; alpha= " <<m_alpha << " (a,b,c,d)= " << m_canonicTopPlan[0] <<", "<<m_canonicTopPlan[1]<<", "<<m_canonicTopPlan[2]<<", "<<m_canonicTopPlan[3] << std::endl;
+            //   std::cout << "Left: (i,j)=" <<i <<"; "<<j<<"; (normI,normJ)="<<normalizedI<<"; "<<normalizedJ <<";(x,y,z) = "<<x<<"; "<<y<<"; "<<z<<std::endl;
+            //}
             return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
         }
     }
@@ -100,14 +108,16 @@ CoordF LayoutPyramidal::fromSphereTo2d(double theta, double phi) const
     Coord3dCart inter;
     double minRho = std::numeric_limits<double>::max();
 
-    //TODO do the rotation first ...
+
+    //Transform to the canonic representation
+    Coord3dSpherical p = Rotation(Coord3dSpherical(1, theta, phi), -m_yaw, -m_pitch, -m_roll);  
 
     for (auto testF: get_range<LayoutPyramidal::Face>())
     {
         try {
             auto plan = FaceToPlan(testF);
-            auto interSphe = IntersectionPlanSpherical(plan, theta, phi); //raise exception if no intersection
-            if (minRho > interSphe.x) //check direction
+            auto interSphe = IntersectionPlanSpherical(plan, p); //raise exception if no intersection
+            if (minRho > interSphe.x && interSphe.y == p.y) //check direction
             {
                 minRho = interSphe.x;
                 inter = SphericalToCart(interSphe);
