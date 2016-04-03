@@ -89,41 +89,82 @@ LayoutCubeMap::Face LayoutCubeMap::AnglesToFace(double theta, double phi) const
 
 
 CoordF LayoutCubeMap::fromSphereTo2d(double theta, double phi) const
-{// theta in [-pi, pi] and Phi in [0, pi]
-    auto f = AnglesToFace(theta, phi);
-    double x(0), y(0), z(0);
+{
+    auto f = Face::Last;
+    Coord3dCart inter;
+    double minRho = std::numeric_limits<double>::max();
+    Coord3dSpherical p(1, theta, phi);
+
+
+    for (auto testF: get_range<LayoutCubeMap::Face>())
+    {
+        try {
+            auto plan = FaceToPlan(testF);
+            auto interSphe = IntersectionPlanSpherical(plan, p); //raise exception if no intersection
+            if (minRho > interSphe.x && AlmostEqual(interSphe.y, p.y)) //check direction
+            {
+                minRho = interSphe.x;
+                inter = SphericalToCart(interSphe);
+                f = testF;
+            }
+        } catch ( std::logic_error& le )
+        { //no intersection with this face
+            continue;
+        }
+    }
     switch (f)
     {
         case Face::FRONT:
-            y = std::tan(theta);
-            z = std::tan(PI()/2-phi)/std::cos(theta);
-            //std::cout << "FRONT: y = "<<y << " z = " << z << "(i,j)="<< m_cubeEdge*(y+1.0)/2.0 << ", " <<m_cubeEdge*(z+1.0)/2.0 << std::endl;
-            return CoordF(m_cubeEdge*((y+1.0)/2.0), m_cubeEdge*((z+1.0)/2.0));
+            return CoordF(m_cubeEdge*((inter.y+1.0)/2.0), m_cubeEdge*((inter.z+1.0)/2.0));
         case Face::BACK:
-            y = std::tan(theta);
-            z = -std::tan(PI()/2-phi)/std::cos(theta);
-            //std::cout << "BACK" << std::endl;
-            return CoordF(m_cubeEdge*(y+1.0)/2.0, m_cubeEdge*(z+1.0)/2.0+m_cubeEdge);
+            return CoordF(m_cubeEdge*(-inter.y+1.0)/2.0, m_cubeEdge*(inter.z+1.0)/2.0+m_cubeEdge);
         case Face::LEFT:
-            x = -std::tan(PI()/2-theta);
-            z = std::tan(PI()/2-phi)/std::sin(theta);
-            //std::cout << "LEFT" << std::endl;
-            return CoordF(m_cubeEdge*(x+1.0)/2.0+m_cubeEdge, m_cubeEdge*(z+1.0)/2.0);
+            return CoordF(m_cubeEdge*(1.0-inter.x)/2.0+m_cubeEdge, m_cubeEdge*(inter.z+1.0)/2.0);
         case Face::RIGHT:
-            x = -std::tan(PI()/2-theta);
-            z = -std::tan(PI()/2-phi)/std::sin(theta);
-            //std::cout << "RIGHT" << std::endl;
-            return CoordF(m_cubeEdge*(x+1.0)/2.0+m_cubeEdge, m_cubeEdge*(z+1.0)/2.0+m_cubeEdge);
+            return CoordF(m_cubeEdge*(inter.x+1.0)/2.0+m_cubeEdge, m_cubeEdge*(inter.z+1.0)/2.0+m_cubeEdge);
         case Face::TOP:
-            x = -std::cos(theta)*std::tan(phi);
-            y = std::sin(theta)*std::tan(phi);
-            //std::cout << "TOP" << std::endl;
-            return CoordF(m_cubeEdge*(y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(x+1.0)/2.0);
+            return CoordF(m_cubeEdge*(-inter.y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(inter.x+1.0)/2.0);
         case Face::BOTTOM:
-            x = -std::cos(theta)*std::tan(phi); 
-            y = std::sin(theta)*std::tan(phi);
-            //std::cout << "BOTTOM" << std::endl;
-            return CoordF(m_cubeEdge*(y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(x+1.0)/2.0+m_cubeEdge);
+            return CoordF(m_cubeEdge*(inter.y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(-inter.x+1.0)/2.0+m_cubeEdge);
     }
-    return CoordF();
 }
+
+//CoordF LayoutCubeMap::fromSphereTo2d(double theta, double phi) const
+//{// theta in [-pi, pi] and Phi in [0, pi]
+//    auto f = AnglesToFace(theta, phi);
+//    double x(0), y(0), z(0);
+//    switch (f)
+//    {
+//        case Face::FRONT:
+//            y = std::tan(theta);
+//            z = std::tan(PI()/2-phi)/std::cos(theta);
+//            //std::cout << "FRONT: y = "<<y << " z = " << z << "(i,j)="<< m_cubeEdge*(y+1.0)/2.0 << ", " <<m_cubeEdge*(z+1.0)/2.0 << std::endl;
+//            return CoordF(m_cubeEdge*((y+1.0)/2.0), m_cubeEdge*((z+1.0)/2.0));
+//        case Face::BACK:
+//            y = std::tan(theta);
+//            z = -std::tan(PI()/2-phi)/std::cos(theta);
+//            //std::cout << "BACK" << std::endl;
+//            return CoordF(m_cubeEdge*(y+1.0)/2.0, m_cubeEdge*(z+1.0)/2.0+m_cubeEdge);
+//        case Face::LEFT:
+//            x = -std::tan(PI()/2-theta);
+//            z = std::tan(PI()/2-phi)/std::sin(theta);
+//            //std::cout << "LEFT" << std::endl;
+//            return CoordF(m_cubeEdge*(x+1.0)/2.0+m_cubeEdge, m_cubeEdge*(z+1.0)/2.0);
+//        case Face::RIGHT:
+//            x = -std::tan(PI()/2-theta);
+//            z = -std::tan(PI()/2-phi)/std::sin(theta);
+//            //std::cout << "RIGHT" << std::endl;
+//            return CoordF(m_cubeEdge*(x+1.0)/2.0+m_cubeEdge, m_cubeEdge*(z+1.0)/2.0+m_cubeEdge);
+//        case Face::TOP:
+//            x = -std::cos(theta)*std::tan(phi);
+//            y = std::sin(theta)*std::tan(phi);
+//            //std::cout << "TOP" << std::endl;
+//            return CoordF(m_cubeEdge*(y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(x+1.0)/2.0);
+//        case Face::BOTTOM:
+//            x = -std::cos(theta)*std::tan(phi); 
+//            y = std::sin(theta)*std::tan(phi);
+//            //std::cout << "BOTTOM" << std::endl;
+//            return CoordF(m_cubeEdge*(y+1.0)/2.0+2*m_cubeEdge, m_cubeEdge*(x+1.0)/2.0+m_cubeEdge);
+//    }
+//    return CoordF();
+//}

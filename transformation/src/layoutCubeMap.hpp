@@ -17,6 +17,25 @@ class LayoutCubeMap: public Layout
         
         Face from2dToFace(unsigned int i, unsigned int j) const;
         Face AnglesToFace(double theta, double phi) const;
+
+        Plan FaceToPlan(Face f) const
+        {
+           switch (f)
+           {
+              case Face::FRONT:
+                 return Plan(1,0,0,-1);
+              case Face::BACK:
+                 return Plan(1,0,0,1);
+              case Face::TOP:
+                 return Plan(0,0,1,1);
+              case Face::BOTTOM:
+                 return Plan(0,0,1,-1);
+              case Face::LEFT:
+                 return Plan(0,1,0,-1);
+              case Face::RIGHT:
+                 return Plan(0,1,0,1);
+           }
+        }
     private:
         unsigned int m_cubeEdge;
 

@@ -83,20 +83,20 @@ int main( int argc, const char* argv[] )
           //cv::resize(cm->GetMat(), resizeImg, cv::Size(1200,600));
           //CubeMap cm2(resizeImg);
           //cm2.ImgShow("CubeMap");
-//          auto cm = lcm.FromLayout(pict, leq);
-//          cm->ImgShowResize("CubeMap2", cv::Size(1200,800));
-//
-//          //cv::destroyAllWindows();
-//          vwriter << cm->GetMat();
-//          auto eq = lcm.ToLayout(*cm, leq);
-//          eq->ImgShowResize("Test2", cv::Size(1200,600));
-//
-//
-//          auto ff = lff.FromLayout(pict, leq);
-//          ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
-//
-//          auto ff2 = lff.FromLayout(*cm, lcm);
-//          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
+          auto cm = lcm.FromLayout(pict, leq);
+          cm->ImgShowResize("CubeMap2", cv::Size(1200,800));
+
+          //cv::destroyAllWindows();
+          vwriter << cm->GetMat();
+          auto eq = lcm.ToLayout(*cm, leq);
+          eq->ImgShowResize("Test2", cv::Size(1200,600));
+
+
+          auto ff = lff.FromLayout(pict, leq);
+          ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
+
+          auto ff2 = lff.FromLayout(*cm, lcm);
+          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
 
           auto p = lp.FromLayout(pict, leq);
           p->ImgShowResize("Pyramidal", cv::Size(900,300));
