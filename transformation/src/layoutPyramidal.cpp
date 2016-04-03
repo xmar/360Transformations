@@ -104,7 +104,7 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
 
 CoordF LayoutPyramidal::fromSphereTo2d(double theta, double phi) const
 {
-    auto f = Face::Base;
+    auto f = Face::Last;
     Coord3dCart inter;
     double minRho = std::numeric_limits<double>::max();
 
@@ -117,7 +117,7 @@ CoordF LayoutPyramidal::fromSphereTo2d(double theta, double phi) const
         try {
             auto plan = FaceToPlan(testF);
             auto interSphe = IntersectionPlanSpherical(plan, p); //raise exception if no intersection
-            if (minRho > interSphe.x && interSphe.y == p.y) //check direction
+            if (minRho > interSphe.x && AlmostEqual(interSphe.y, p.y)) //check direction
             {
                 minRho = interSphe.x;
                 inter = SphericalToCart(interSphe);
@@ -147,12 +147,19 @@ CoordF LayoutPyramidal::fromSphereTo2d(double theta, double phi) const
         case Face::Top:
             {
                 double normalizedI = m_outHeight*(1.0 - inter.x)/m_pyramidHeight;
-                return CoordF( normalizedI, std::fmod((inter.y/m_baseEdge+0.5)*m_outHeight+m_outHeight,m_outHeight));
+                double normalizedJ = m_outHeight*std::fmod(inter.y/m_baseEdge + 1.0,1.0)-0.5;
+                return CoordF( normalizedI, normalizedJ);
             }
         case Face::Bottom:
             {
-                double normalizedI = m_outHeight*(1.0 - inter.x)/m_pyramidHeight;
-                return CoordF( (m_outHeight-normalizedI)+2*m_outHeight, std::fmod((inter.y/m_baseEdge+0.5)*m_outHeight+m_outHeight,m_outHeight));
+                double normalizedI = m_outHeight*(inter.x - 1.0 + m_pyramidHeight)/m_pyramidHeight;
+                double normalizedJ = m_outHeight*std::fmod(inter.y/m_baseEdge + 1.0,1.0)-0.5;
+                return CoordF( normalizedI+2*m_outHeight, normalizedJ);
+            }
+         case Face::Last:
+            {
+               std::cout << "Error: no intersection detected..." << std::endl;
+               return CoordF(0,0);
             }
 
     }

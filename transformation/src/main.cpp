@@ -65,6 +65,7 @@ int main( int argc, const char* argv[] )
       LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
       LayoutPyramidal lp(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+      LayoutPyramidal lp2(3.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
       cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
@@ -102,6 +103,12 @@ int main( int argc, const char* argv[] )
 
           auto eq2 =  lp.ToLayout(*p, leq);
           eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
+
+          p = lp2.FromLayout(pict, leq);
+          p->ImgShowResize("Pyramidal2", cv::Size(900,300));
+
+          eq2 =  lp2.ToLayout(*p, leq);
+          eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
 
           cv::waitKey(0);
           cv::destroyAllWindows();

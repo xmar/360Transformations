@@ -115,6 +115,12 @@ inline Coord3dSpherical IntersectionPlanSpherical (const Plan& p, const Coord3dC
 { //intersection between the plan p and the line from O to secondPoint;
     return IntersectionPlanSpherical(p, CartToSpherical(secondPoint));
 }
+
+inline bool AlmostEqual(double a, double b)
+{
+   return inIntervalStrict(a, b-0.005f, b+0.005f);
+}
+
 }    
      
      

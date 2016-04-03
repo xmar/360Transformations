@@ -35,11 +35,11 @@ class LayoutPyramidal: public Layout
             case Face::Base:
                return Plan(1,0,0,-1);
             case Face::Top:
-               return Plan( m_canonicTopPlan[0], m_canonicTopPlan[1], m_canonicTopPlan[2], m_canonicTopPlan[3]);
+               return Plan( m_canonicTopPlan[0], -m_canonicTopPlan[1], -m_canonicTopPlan[2], m_canonicTopPlan[3]);
             case Face::Left:
                return Plan( m_canonicTopPlan[0], m_canonicTopPlan[2], -m_canonicTopPlan[1], m_canonicTopPlan[3]);
             case Face::Bottom:
-               return Plan( m_canonicTopPlan[0], -m_canonicTopPlan[1], -m_canonicTopPlan[2], m_canonicTopPlan[3]);
+               return Plan( m_canonicTopPlan[0], m_canonicTopPlan[1], m_canonicTopPlan[2], m_canonicTopPlan[3]);
             case Face::Right:
                return Plan( m_canonicTopPlan[0], -m_canonicTopPlan[2], m_canonicTopPlan[1], m_canonicTopPlan[3]);
          }
