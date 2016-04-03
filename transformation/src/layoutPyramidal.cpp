@@ -36,7 +36,7 @@ Coord3dCart LayoutPyramidal::from2dTo3d(unsigned int i, unsigned int j) const
             //normalizedJ /= 0.5*normalizedI;  
             normalizedI = 1.0-normalizedI;
             double z = normalizedJ * m_baseEdge;
-            double x = (1.0-normalizedI*m_topHeight);
+            double x = (1.0-normalizedI*m_pyramidHeight);
             double y = -UsePlanEquation(x);
             //normalizedI = 1.0-normalizedI;
             //if(i == m_outHeight/4 && normalizedJ==0.5*normalizedI)//&& j == m_outHeight/2)
