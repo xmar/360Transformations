@@ -23,6 +23,7 @@
 #include "layoutEquirectangular.hpp"
 #include "layoutFlatFixed.hpp"
 #include "layoutPyramidal.hpp"
+#include "layoutRhombicdodeca.hpp"
 
 using namespace IMT;
 
@@ -63,9 +64,11 @@ int main( int argc, const char* argv[] )
       //cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), cap.get(CV_CAP_PROP_FPS), cv::Size(cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
       //unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
       LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+      LayoutEquirectangular leq2(cap.get(CV_CAP_PROP_FRAME_WIDTH)/4, cap.get(CV_CAP_PROP_FRAME_HEIGHT)/4);
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
       LayoutPyramidal lp(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutPyramidal lp2(3.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+      LayoutRhombicdodeca lr(cap.get(CV_CAP_PROP_FRAME_HEIGHT)/4);
       LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
       cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
@@ -83,32 +86,38 @@ int main( int argc, const char* argv[] )
           //cv::resize(cm->GetMat(), resizeImg, cv::Size(1200,600));
           //CubeMap cm2(resizeImg);
           //cm2.ImgShow("CubeMap");
-          auto cm = lcm.FromLayout(pict, leq);
-          cm->ImgShowResize("CubeMap2", cv::Size(1200,800));
+          //auto cm = lcm.FromLayout(pict, leq);
+          //cm->ImgShowResize("CubeMap2", cv::Size(1200,800));
 
-          //cv::destroyAllWindows();
-          vwriter << cm->GetMat();
-          auto eq = lcm.ToLayout(*cm, leq);
-          eq->ImgShowResize("Test2", cv::Size(1200,600));
+          ////cv::destroyAllWindows();
+          //vwriter << cm->GetMat();
+          //auto eq = lcm.ToLayout(*cm, leq);
+          //eq->ImgShowResize("Test2", cv::Size(1200,600));
 
 
-          auto ff = lff.FromLayout(pict, leq);
-          ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
+          //auto ff = lff.FromLayout(pict, leq);
+          //ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
 
-          auto ff2 = lff.FromLayout(*cm, lcm);
-          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
+          //auto ff2 = lff.FromLayout(*cm, lcm);
+          //ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
 
-          auto p = lp.FromLayout(pict, leq);
-          p->ImgShowResize("Pyramidal", cv::Size(900,300));
+          //auto p = lp.FromLayout(pict, leq);
+          //p->ImgShowResize("Pyramidal", cv::Size(900,300));
 
-          auto eq2 =  lp.ToLayout(*p, leq);
-          eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
+          //auto eq2 =  lp.ToLayout(*p, leq);
+          //eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
 
-          p = lp2.FromLayout(pict, leq);
-          p->ImgShowResize("Pyramidal2", cv::Size(900,300));
+          //p = lp2.FromLayout(pict, leq);
+          //p->ImgShowResize("Pyramidal2", cv::Size(900,300));
 
-          eq2 =  lp2.ToLayout(*p, leq);
-          eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
+          //eq2 =  lp2.ToLayout(*p, leq);
+          //eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
+
+          auto rhombic = lr.FromLayout(pict, leq);
+          rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
+
+          auto eq4 =  leq2.FromLayout(*rhombic, lr);
+          eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
 
           cv::waitKey(0);
           cv::destroyAllWindows();

@@ -11,11 +11,14 @@ typedef cv::Point2d CoordF;
 typedef cv::Point2i CoordI;
 template <int i>
 struct SpacePoint {
-    template <class ... Args> SpacePoint(Args&&... args): d(std::forward<Args>(args)...), x(d.x), y(d.y), z(d.z){} 
+    template <class ... Args> SpacePoint(Args&&... args): d(std::forward<Args>(args)...), x(d.x), y(d.y), z(d.z) {} 
     SpacePoint<i> operator+(const SpacePoint<i>& sp) {return SpacePoint<i>(d+sp.d);}
     SpacePoint<i> operator-(const SpacePoint<i>& sp) {return SpacePoint<i>(d-sp.d);}
     operator cv::Point3d() const { return d;}
+    operator cv::Point3d&&() { return std::move(d);}
     SpacePoint<i>& operator=(const SpacePoint<i>& sp) { this->d = sp.d; return *this;}
+    SpacePoint<i>& operator=(SpacePoint<i>&& sp) { std::swap(this->d, sp.d); return *this;}
+    template <int j> operator SpacePoint<j>(void);
     cv::Point3d d;
     double& x;
     double& y;
@@ -60,6 +63,10 @@ inline Coord3dCart SphericalToCart(const Coord3dSpherical& coordSphe)
     double z = coordSphe.x*std::cos(coordSphe.z);
     return Coord3dCart(x,y,z);
 }
+
+inline Coord3dCart ConvertCoord(const Coord3dSpherical& coordSphe) {return SphericalToCart(coordSphe);}
+inline Coord3dSpherical ConvertCoord(const Coord3dCart& coordCart) {return CartToSpherical(coordCart);}
+template <int i> template <int j> SpacePoint<i>::operator SpacePoint<j>(void){return ConvertCoord(*this);}
 
 inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double pitch, double roll)
 {
@@ -118,7 +125,7 @@ inline Coord3dSpherical IntersectionPlanSpherical (const Plan& p, const Coord3dC
 
 inline bool AlmostEqual(double a, double b)
 {
-   return inIntervalStrict(a, b-0.005f, b+0.005f);
+   return inIntervalStrict(a, b-0.0005f, b+0.0005f);
 }
 
 }    
