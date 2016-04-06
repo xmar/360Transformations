@@ -1,6 +1,7 @@
 module Rot
 
 function RotMat(v, theta)
+    "v direction vector, theta = rotation angle"
     u = v / norm(v)
     R = zeros(3,3)
     c = cos(theta)
@@ -21,7 +22,7 @@ function RotMat(v, theta)
 end
 
 
-function SolveRot(A,B,C,D,E,F)
+function FindTransMat(A,B,C,D,E,F)
 "Find the rotation matrice R with R*A=D; R*B=E; R*C=F"
     M = zeros(9,9)
     M[1,1:3] = A
