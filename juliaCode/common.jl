@@ -1,4 +1,4 @@
-module Rot
+module Common
 
 function RotMat(v, theta)
     "v direction vector, theta = rotation angle"
@@ -36,12 +36,50 @@ function FindTransMat(A,B,C,D,E,F)
     M[9,7:9] = C
 
     X = [D;E;F]
-    Y = X\M
+    Y = M^-1*X
     R = zeros(3,3)
     R[1,1:3] = Y[1:3]
     R[2,1:3] = Y[4:6]
     R[3,1:3] = Y[7:9]
-    R
+    return R
 end
 
+function FindPlan(A,B,C)
+    "Find the equation of the plan going through the dot A, B and C"
+    M = zeros(4,4)
+
+    M[1,1:3] = A
+    M[1,4] = 1
+    M[2,1:3] = B
+    M[2,4] = 1
+    M[3,1:3] = C
+    M[3,4] = 1
+    M[4,4] = 1
+
+    #|println(M)|#
+
+    X = [0, 0, 0, 1]
+    Y = M^-1*X
+    return Y
+end
+
+function FindPlan(Face, object)
+    counter = 0
+    A = []
+    B = []
+    C = []
+    for s in Face
+        if counter == 0
+            A = object[s]
+        elseif counter == 1
+            B = object[s]
+        elseif counter == 2
+            C = object[s]
+        else
+            continue
+        end
+        counter += 1
+    end
+    return FindPlan(A,B,C)
+end
 end
