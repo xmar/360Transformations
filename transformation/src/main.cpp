@@ -68,7 +68,7 @@ int main( int argc, const char* argv[] )
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
       LayoutPyramidal lp(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutPyramidal lp2(3.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-      LayoutRhombicdodeca lr(cap.get(CV_CAP_PROP_FRAME_HEIGHT)/4);
+      LayoutRhombicdodeca lr(cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2);
       LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
       cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
@@ -118,6 +118,9 @@ int main( int argc, const char* argv[] )
 
           auto eq4 =  leq2.FromLayout(*rhombic, lr);
           eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
+
+          auto ff3 = lff.FromLayout(*rhombic, lr);
+          ff3->ImgShowResize("Flat Fix3", cv::Size(1200,600));
 
           cv::waitKey(0);
           cv::destroyAllWindows();
