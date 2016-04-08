@@ -19,7 +19,8 @@
 
 #include "picture.hpp"
 #include "equirectangular.hpp"
-#include "cubeMap.hpp"
+#include "layoutCubeMap.hpp"
+#include "layoutCubeMap2.hpp"
 #include "layoutEquirectangular.hpp"
 #include "layoutFlatFixed.hpp"
 #include "layoutPyramidal.hpp"
@@ -66,6 +67,7 @@ int main( int argc, const char* argv[] )
       LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutEquirectangular leq2(cap.get(CV_CAP_PROP_FRAME_WIDTH)/4, cap.get(CV_CAP_PROP_FRAME_HEIGHT)/4);
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
+      LayoutCubeMap2 lcm2(cap.get(CV_CAP_PROP_FRAME_WIDTH));
       LayoutPyramidal lp(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutPyramidal lp2(3.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutRhombicdodeca lr(cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2);
@@ -113,14 +115,20 @@ int main( int argc, const char* argv[] )
           //eq2 =  lp2.ToLayout(*p, leq);
           //eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
 
-          auto rhombic = lr.FromLayout(pict, leq);
-          rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
+          //auto rhombic = lr.FromLayout(pict, leq);
+          //rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
 
-          auto eq4 =  leq2.FromLayout(*rhombic, lr);
-          eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
+          //auto eq4 =  leq2.FromLayout(*rhombic, lr);
+          //eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
 
-          auto ff3 = lff.FromLayout(*rhombic, lr);
-          ff3->ImgShowResize("Flat Fix3", cv::Size(1200,600));
+          //auto ff3 = lff.FromLayout(*rhombic, lr);
+          //ff3->ImgShowResize("Flat Fix3", cv::Size(1200,600));
+
+          auto cm2 = lcm2.FromLayout(pict, leq);
+          cm2->ImgShowResize("CubeMap", cv::Size(1200,900));
+
+          auto eq5 = leq2.FromLayout(*cm2, lcm2);
+          eq5->ImgShowResize("CubeMap2ToEq", cv::Size(1200,600));
 
           cv::waitKey(0);
           cv::destroyAllWindows();

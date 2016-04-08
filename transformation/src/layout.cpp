@@ -76,14 +76,17 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
         for (auto j = 0; j < pic->GetMat().rows; ++j)
         {
             auto thisPixel3dPolar = destLayout.from2dTo3dSpherical(i,j); // coordinate of the pixel (i, j) in the output picture in the 3d space
-            auto coordPixelOriginalPic = fromSphereTo2d(thisPixel3dPolar); //coordinate of the corresponding pixel in the input picture
-            if (inInterval(coordPixelOriginalPic.x, 0, layoutPic.GetMat().cols) && inInterval(coordPixelOriginalPic.y, 0, layoutPic.GetMat().rows))
-            {
-                pic->SetValue(CoordI(i,j), layoutPic.GetInterPixel(coordPixelOriginalPic));
-            }
-            else
-            {
+            if (norm(thisPixel3dPolar) != 0)
+            {//Keep the pixel black (i.e. do nothing) if == 0
+                auto coordPixelOriginalPic = fromSphereTo2d(thisPixel3dPolar); //coordinate of the corresponding pixel in the input picture
+                if (inInterval(coordPixelOriginalPic.x, 0, layoutPic.GetMat().cols) && inInterval(coordPixelOriginalPic.y, 0, layoutPic.GetMat().rows))
+                {
+                    pic->SetValue(CoordI(i,j), layoutPic.GetInterPixel(coordPixelOriginalPic));
+                }
+                else
+                {
 //                std::cout << "(i,j)= (" << i << "(max = "<< pic->GetMat().cols << "), "<<j <<") : theta = " << thisPixel3dPolar.y << "; phi=" << thisPixel3dPolar.z << "; iOrr = " << coordPixelOriginalPic.x << "; jOrr = " << coordPixelOriginalPic.y << "Max (i,j)orr = " << layoutPic.GetMat().cols << ", " << layoutPic.GetMat().rows << std::endl;
+                }
             }
         }
     }

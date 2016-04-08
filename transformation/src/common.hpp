@@ -31,11 +31,12 @@ struct SpacePoint {
     double& y;
     double& z;
 };
-template <int i> constexpr double norm(const SpacePoint<i>& sp) {return cv::norm(sp.d);}
 typedef SpacePoint<0> Coord3dCart;
 typedef SpacePoint<1> Coord3dSpherical;
 typedef cv::Vec4d Plan;// (a,b,c,d) a.x+b.y+c.z+d=0
 typedef cv::Mat_<double> RotMat;
+template <int i> constexpr double norm(const SpacePoint<i>& sp) {return cv::norm(sp.d);}
+template <> constexpr double norm(const Coord3dSpherical& sp) {return sp.x;}
 
 constexpr double PI() {return std::atan(1)*4.0;}
 
