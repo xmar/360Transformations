@@ -99,23 +99,23 @@ int main( int argc, const char* argv[] )
 //          auto ff2 = lff.FromLayout(*cm, lcm);
 //          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
 //
-//          auto p = lp.FromLayout(pict, leq);
-//          p->ImgShowResize("Pyramidal", cv::Size(900,300));
-//
-//          auto eq2 =  lp.ToLayout(*p, leq);
-//          eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
-//
-//          p = lp2.FromLayout(pict, leq);
-//          p->ImgShowResize("Pyramidal2", cv::Size(900,300));
-//
-//          eq2 =  lp2.ToLayout(*p, leq);
-//          eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
-//
-//          auto rhombic = lr.FromLayout(pict, leq);
-//          rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
-//
-//          auto eq4 =  leq2.FromLayout(*rhombic, lr);
-//          eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
+          auto p = lp.FromLayout(pict, leq);
+          p->ImgShowResize("Pyramidal", cv::Size(900,300));
+
+          auto eq2 =  lp.ToLayout(*p, leq);
+          eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
+
+          p = lp2.FromLayout(pict, leq);
+          p->ImgShowResize("Pyramidal2", cv::Size(900,300));
+
+          eq2 =  lp2.ToLayout(*p, leq);
+          eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
+
+          auto rhombic = lr.FromLayout(pict, leq);
+          rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
+
+          auto eq4 =  leq.FromLayout(*rhombic, lr);
+          eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
 //
 //          auto ff3 = lff.FromLayout(*rhombic, lr);
 //          ff3->ImgShowResize("Flat Fix3", cv::Size(1200,600));

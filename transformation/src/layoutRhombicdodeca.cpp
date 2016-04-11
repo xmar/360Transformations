@@ -9,12 +9,12 @@ Layout::NormalizedFaceInfo LayoutRhombicdodeca::From2dToNormalizedFaceInfo(const
     CoordF normalizedCoord(double(pixel.x%m_faceHeight) / m_faceHeight, double(pixel.y%m_faceHeight) / m_faceHeight);
     return Layout::NormalizedFaceInfo(normalizedCoord, static_cast<int>(f));
 }
-#define BORDER(x) (MAX(0,MIN(m_faceHeight,x)))
+#define BORDER(x) (MAX(0,MIN(m_faceHeight-1,x)))
 CoordF LayoutRhombicdodeca::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
 {
     auto f = static_cast<Face>(ni.m_faceId);
     double i = BORDER(ni.m_normalizedFaceCoordinate.x*m_faceHeight);
-    double j = BORDER(ni.m_normalizedFaceCoordinate.x*m_faceHeight);
+    double j = BORDER(ni.m_normalizedFaceCoordinate.y*m_faceHeight);
     return CanonicLayoutCoordToLayoutCoord(i, j, f);
 }
 Layout::NormalizedFaceInfo LayoutRhombicdodeca::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
@@ -22,15 +22,14 @@ Layout::NormalizedFaceInfo LayoutRhombicdodeca::From3dToNormalizedFaceInfo(const
     auto f = Face::Last;
     Coord3dCart inter;
     double minRho = std::numeric_limits<double>::max();
-    Coord3dSpherical p(1, sphericalCoord.y, sphericalCoord.z);
 
 
     for (auto testF: get_range<LayoutRhombicdodeca::Face>())
     {
         try {
             auto plan = FaceToPlan(testF);
-            auto interSphe = IntersectionPlanSpherical(plan, p); //raise exception if no intersection
-            if (minRho > interSphe.x && AlmostEqual(interSphe.y, p.y)) //check direction
+            auto interSphe = IntersectionPlanSpherical(plan, sphericalCoord); //raise exception if no intersection
+            if (minRho > interSphe.x && AlmostEqual(interSphe.y, sphericalCoord.y)) //check direction
             {
                 minRho = interSphe.x;
                 inter = SphericalToCart(interSphe);
