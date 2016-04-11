@@ -12,8 +12,10 @@ class LayoutRhombicdodeca: public Layout
 
         enum class Face{ Face1, Face2, Face3, Face4, Face5, Face6, Face7, Face8, Face9, Face10, Face11, Face12, Last, First=Face1 };
 
-        virtual Coord3dCart from2dTo3d(unsigned int i, unsigned int j) const override;        
-        virtual CoordF fromSphereTo2d(double theta, double phi) const override;
+        virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
+        virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
+        virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override;
+        virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override;
 
         Plan FaceToPlan(Face f) const
         {

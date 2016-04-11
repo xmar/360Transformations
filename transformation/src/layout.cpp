@@ -1,71 +1,18 @@
 #include "layout.hpp"
 
-#include "equirectangular.hpp"
 
 using namespace IMT;
 
-std::shared_ptr<Equirectangular> Layout::ToEquirectangular(const Picture& layoutPic, unsigned int width, unsigned int height) const
+Coord3dCart Layout::From2dTo3d(const CoordI& pixelCoord) const
 {
-    /* (theta between [-pi,pi] and phi between [0,pi])
-     *theta -> -pi              0                  pi
-     *    0   +-----------------*-------------------+ 0
-     *  phi   |                                     | y
-     *        |                                     |
-     *        |                                     |
-     *        |                                     |
-     *        |                                     |
-     *        |                                     |
-     *        |                                     |
-     *   pi   +-----------------+-------------------+ H
-     *   x -> 0                                     W = 2.H
-     */
-
-    cv::Mat pic = cv::Mat::zeros(height, width, layoutPic.GetMat().type());
-    auto eq = std::make_shared<Equirectangular>(pic);
-    
-    for (int i = 0; i < width; ++i)
-    {
-        for (int j = 0; j < height; ++j)
-        {
-            double theta = 2*PI()*((double(i)/width)-0.5f);
-            double phi = PI()*double(j)/height;
-           auto coordLayout = fromSphereTo2d(theta, phi);
-            if (coordLayout.x >= 0 && coordLayout.x < layoutPic.GetMat().cols && coordLayout.y >= 0 && coordLayout.y < layoutPic.GetMat().rows)
-            {
-                eq->SetValue(CoordI(i,j), layoutPic.GetInterPixel(coordLayout));
-            }
-            else
-            {
-                eq->SetValue(CoordI(i,j), Pixel(255,255,255));
-            }
-            if (i == 0 && j == 300)
-            {
-                std::cout << "DEBUG: (i,j) = ("<<i<<", "<<j<<"), (theta,phi)=(" << theta <<", "<< phi <<")" <<std::endl;
-                eq->SetValue(CoordI(i,j), Pixel(255,0, 0));
-            }
- 
-        }
-    }  
-
-    return eq;
+    return FromNormalizedInfoTo3d(From2dToNormalizedFaceInfo(pixelCoord));
 }
 
-std::shared_ptr<Picture> Layout::FromEquirectangular(const Equirectangular& eq, unsigned int width, unsigned int height) const
+CoordF Layout::FromSphereTo2d(const Coord3dSpherical& sphericalCoord) const
 {
-    cv::Mat picMat = cv::Mat::zeros(height, width, eq.GetMat().type());
-    auto pic = std::make_shared<Picture>(picMat);
-    for (auto i = 0; i < pic->GetMat().cols; ++i)
-    {
-        for (auto j = 0; j < pic->GetMat().rows; ++j)
-        {
-            auto polarP = from2dTo3dSpherical(i,j);
-            pic->SetValue(CoordI(i,j), eq.GetPixelFromAngle(CoordF(polarP.y,polarP.z)));
-        }
-    }
-    return pic;
-
+    return FromNormalizedInfoTo2d(From3dToNormalizedFaceInfo(sphericalCoord));
 }
-        
+
 std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout& destLayout) const
 {
     cv::Mat picMat = cv::Mat::zeros(destLayout.m_outHeight, destLayout.m_outWidth, layoutPic.GetMat().type());
@@ -75,10 +22,10 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
     {
         for (auto j = 0; j < pic->GetMat().rows; ++j)
         {
-            auto thisPixel3dPolar = destLayout.from2dTo3dSpherical(i,j); // coordinate of the pixel (i, j) in the output picture in the 3d space
+            Coord3dSpherical thisPixel3dPolar = destLayout.From2dTo3d(CoordI(i,j)); // coordinate of the pixel (i, j) in the output picture in the 3d space
             if (norm(thisPixel3dPolar) != 0)
             {//Keep the pixel black (i.e. do nothing) if == 0
-                auto coordPixelOriginalPic = fromSphereTo2d(thisPixel3dPolar); //coordinate of the corresponding pixel in the input picture
+                auto coordPixelOriginalPic = FromSphereTo2d(thisPixel3dPolar); //coordinate of the corresponding pixel in the input picture
                 if (inInterval(coordPixelOriginalPic.x, 0, layoutPic.GetMat().cols) && inInterval(coordPixelOriginalPic.y, 0, layoutPic.GetMat().rows))
                 {
                     pic->SetValue(CoordI(i,j), layoutPic.GetInterPixel(coordPixelOriginalPic));

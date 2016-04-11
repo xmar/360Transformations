@@ -2,27 +2,27 @@
 
 using namespace IMT;
 
-constexpr double rH = 1;
-constexpr double rotYaw = 0;
-constexpr double rotPitch = 0;//0;//0;//0;//0;//0;//0;//0;//0;//PI()/4;
 
-Coord3dCart LayoutRhombicdodeca::from2dTo3d(unsigned int i, unsigned int j) const
+Layout::NormalizedFaceInfo LayoutRhombicdodeca::From2dToNormalizedFaceInfo(const CoordI& pixel) const
 {
-    double normalizedI = double(i%m_faceHeight) / m_faceHeight;//[0, 1]
-    double normalizedJ = double(j%m_faceHeight) / m_faceHeight;//[0, 1]
-    //Coord cart of the point if it is on the Face1
-    Coord3dCart canonicCoordinates = Coord3dCart(1,0,-1) + Coord3dCart(0, -std::sqrt(2)/2, 1) * normalizedI + Coord3dCart(0, std::sqrt(2)/2, 1) * normalizedJ;
-    return Rotation(canonicCoordinates, FaceToRotMat(LayoutToFace(i,j)));
+    auto f = LayoutToFace(pixel.x, pixel.y);
+    CoordF normalizedCoord(double(pixel.x%m_faceHeight) / m_faceHeight, double(pixel.y%m_faceHeight) / m_faceHeight);
+    return Layout::NormalizedFaceInfo(normalizedCoord, static_cast<int>(f));
 }
-
-
-
-CoordF LayoutRhombicdodeca::fromSphereTo2d(double theta, double phi) const
+#define BORDER(x) (MAX(0,MIN(m_faceHeight,x)))
+CoordF LayoutRhombicdodeca::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
+{
+    auto f = static_cast<Face>(ni.m_faceId);
+    double i = BORDER(ni.m_normalizedFaceCoordinate.x*m_faceHeight);
+    double j = BORDER(ni.m_normalizedFaceCoordinate.x*m_faceHeight);
+    return CanonicLayoutCoordToLayoutCoord(i, j, f);
+}
+Layout::NormalizedFaceInfo LayoutRhombicdodeca::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
     auto f = Face::Last;
     Coord3dCart inter;
     double minRho = std::numeric_limits<double>::max();
-    Coord3dSpherical p(1, theta, phi);
+    Coord3dSpherical p(1, sphericalCoord.y, sphericalCoord.z);
 
 
     for (auto testF: get_range<LayoutRhombicdodeca::Face>())
@@ -41,20 +41,23 @@ CoordF LayoutRhombicdodeca::fromSphereTo2d(double theta, double phi) const
             continue;
         }
     }
-    if (f != Face::Last)
-    {
-        Coord3dCart canonicCoordinates = Rotation(inter, FaceToRotMat(f).t()); //do the inverse rotation to go back to Face1
-    
-        double normalizedI = (canonicCoordinates.z -std::sqrt(2)*canonicCoordinates.y +3/2)/2;
-        double normalizedJ = (canonicCoordinates.z +std::sqrt(2)*canonicCoordinates.y +3/2)/2;
 
-        return CanonicLayoutCoordToLayoutCoord(normalizedI*m_faceHeight, normalizedJ*m_faceHeight, f);
-    }
-    else
-    {
-        return CoordF(0,0);
-    }
+    Coord3dCart canonicCoordinates = Rotation(inter, FaceToRotMat(f).t()); //do the inverse rotation to go back to Face1
+
+    double normalizedI = (canonicCoordinates.z -std::sqrt(2)*canonicCoordinates.y +3/2)/2;
+    double normalizedJ = (canonicCoordinates.z +std::sqrt(2)*canonicCoordinates.y +3/2)/2;
+
+    return Layout::NormalizedFaceInfo(CoordF(normalizedI, normalizedJ), static_cast<int>(f));
 }
+Coord3dCart LayoutRhombicdodeca::FromNormalizedInfoTo3d(const Layout::NormalizedFaceInfo& ni) const
+{
+    const double& normalizedI = ni.m_normalizedFaceCoordinate.x;
+    const double& normalizedJ = ni.m_normalizedFaceCoordinate.y;
+    auto f = static_cast<Face>(ni.m_faceId);
+    Coord3dCart canonicCoordinates = Coord3dCart(1,0,-1) + Coord3dCart(0, -std::sqrt(2)/2, 1) * normalizedI + Coord3dCart(0, std::sqrt(2)/2, 1) * normalizedJ;
+    return Rotation(canonicCoordinates, FaceToRotMat(f));
+}
+
 
 RotMat LayoutRhombicdodeca::FaceToRotMat(Face f) const
 {

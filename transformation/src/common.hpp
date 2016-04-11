@@ -12,15 +12,19 @@ typedef cv::Point2d CoordF;
 typedef cv::Point2i CoordI;
 template <int i>
 struct SpacePoint {
-    template <class ... Args> SpacePoint(Args&&... args): d(std::forward<Args>(args)...), x(d.x), y(d.y), z(d.z) {} 
+    template <class ... Args> explicit SpacePoint(Args&&... args): d(std::forward<Args>(args)...), x(d.x), y(d.y), z(d.z) {}
+    template <int j> explicit SpacePoint(const SpacePoint<j>& sp) = delete;
+    template <int j> explicit SpacePoint(SpacePoint<j>&& sp) = delete;
+    SpacePoint(const SpacePoint& sp): d(sp.d), x(d.x), y(d.y), z(d.z) {}
+    SpacePoint(SpacePoint&& sp): d(std::move(sp.d)), x(d.x), y(d.y), z(d.z) {}
     SpacePoint<i> operator+(const SpacePoint<i>& sp) const {return SpacePoint<i>(d+sp.d);}
     SpacePoint<i> operator-(const SpacePoint<i>& sp) const {return SpacePoint<i>(d-sp.d);}
-    SpacePoint<i> operator+(SpacePoint<i>&& sp) const {return sp.d+=d;}
-    SpacePoint<i> operator-(SpacePoint<i>&& sp) const {return -(sp.d-=d);}
+    SpacePoint<i> operator+(SpacePoint<i>&& sp) const {return SpacePoint(sp.d+=d);}
+    SpacePoint<i> operator-(SpacePoint<i>&& sp) const {return SpacePoint(-(sp.d-=d));}
     SpacePoint<i> operator*(const double& s) const {return SpacePoint<i>(d*s);}
     SpacePoint<i> operator/(const double& s) const {return SpacePoint<i>(d/s);}
-    SpacePoint<i>& operator+=(const SpacePoint<i>& sp) { d+=sp.d; return d;}
-    SpacePoint<i>& operator-=(const SpacePoint<i>& sp) { d+=sp.d; return d;}
+    SpacePoint<i>& operator+=(const SpacePoint<i>& sp) { d+=sp.d; return SpacePoint(d);}
+    SpacePoint<i>& operator-=(const SpacePoint<i>& sp) { d+=sp.d; return SpacePoint(d);}
     operator cv::Point3d() const { return d;}
     operator cv::Point3d&&() { return std::move(d);}
     SpacePoint<i>& operator=(const SpacePoint<i>& sp) { this->d = sp.d; return *this;}
@@ -98,7 +102,7 @@ inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double p
     double rotZ = coordBefRot.x * (-sinP) - coordBefRot.y * cosP * sinR + coordBefRot.z * cosP * cosR;
 
     return Coord3dCart(rotX, rotY, rotZ);
-}    
+}
 
 inline Coord3dSpherical Rotation(const Coord3dSpherical& coordBefRot, double yaw, double pitch, double roll)
 { return CartToSpherical(Rotation(SphericalToCart(coordBefRot), yaw, pitch, roll));}
@@ -112,7 +116,7 @@ inline Plan Rotation(const Plan& p, double theta, double phi, double roll)
 inline Coord3dCart IntersectionPlan(const Plan& p, double theta, double phi)
 {//Return the cartesian coordinate of the intersaction of the line v(1,theta, phi) in spherical coordinate as the dirtion vector and the plan a.x+b.y+c.z+d = 0
     //if no solution return (0,0,0)
-    const double& a = p[0]; 
+    const double& a = p[0];
     const double& b = p[1];
     const double& c = p[2];
     const double& d = p[3];
@@ -159,14 +163,14 @@ private:
     enum_type value;
     //typedef typename std::underlying_type<enum_type>::type under;
     typedef int under;
-public:   
+public:
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
     typedef enum_type value_type;
     typedef enum_type reference;
     typedef enum_type* pointer;
     typedef std::random_access_iterator_tag iterator_category;
-    
+
     constexpr enum_iterator() :value() {}
     constexpr enum_iterator(const enum_iterator& rhs) noexcept(true) :value(rhs.value) {}
     constexpr explicit enum_iterator(enum_type value_) noexcept(true) :value(value_) {}
@@ -186,17 +190,17 @@ public:
     constexpr reference operator[](size_type o) const noexcept(true) {return (enum_type)(under(value) + o);}
     constexpr const enum_type* operator->() const noexcept(true) {return &value;}
     constexpr friend bool operator==(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {return lhs.value==rhs.value;}
-    constexpr friend bool operator!=(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {return lhs.value!=rhs.value;} 
+    constexpr friend bool operator!=(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {return lhs.value!=rhs.value;}
     constexpr friend bool operator<(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {return lhs.value<rhs.value;}
     constexpr friend bool operator>(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {return lhs.value>rhs.value;}
     constexpr friend bool operator<=(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {return lhs.value<=rhs.value;}
     constexpr friend bool operator>=(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {return lhs.value>=rhs.value;}
     friend void swap(const enum_iterator& lhs, const enum_iterator& rhs) noexcept(true) {std::swap(lhs.value, rhs.value);}
 };
-template<class enum_type> constexpr boost::iterator_range<enum_iterator<enum_type>> get_range() noexcept(true) 
+template<class enum_type> constexpr boost::iterator_range<enum_iterator<enum_type>> get_range() noexcept(true)
 {return boost::make_iterator_range(enum_iterator<enum_type>(enum_type::First), enum_iterator<enum_type>(enum_type::Last));}
 
 
 
 
-}    
+}

@@ -9,27 +9,23 @@ class LayoutEquirectangular: public Layout
         LayoutEquirectangular(unsigned int width, unsigned int height): Layout(width, height) {}
         virtual ~LayoutEquirectangular(void) = default;
 
-        virtual Coord3dCart from2dTo3d(unsigned int i, unsigned int j) const override
+        virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override
         {
-            auto coordSphe = from2dTo3dSpherical(i, j);
-            auto& theta = coordSphe.y;
-            auto& phi = coordSphe.z;
-            return cv::Point3f(std::cos(theta)*std::sin(phi), std::sin(theta)*std::sin(phi), std::sin(theta));
+            return NormalizedFaceInfo(CoordF(double(pixel.x)/GetWidth(), double(pixel.y)/GetHeight()), 0);
         }
-
-        virtual Coord3dSpherical from2dTo3dSpherical(unsigned int i, unsigned int j) const override
+        virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override
         {
-            double theta = (double(i)/m_outWidth - 0.5)*2.0*PI();
-            double phi = (1.0 - double(j)/m_outHeight)*PI();
-            return cv::Point3f(1.0, theta, phi);
+            return CoordF(ni.m_normalizedFaceCoordinate.x*GetWidth(), ni.m_normalizedFaceCoordinate.y * GetHeight());
         }
-
-        virtual CoordF fromSphereTo2d(double theta, double phi) const override
+        virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            double i = ((theta / (2.0*PI())) +0.5)*m_outWidth;
-            double j = (1.0 - phi / PI())*m_outHeight;
-            return CoordF(i ,j);
+            return NormalizedFaceInfo(CoordF(0.5+sphericalCoord.y/ (2.0*PI()), 1.0 - sphericalCoord.z / PI()), 0);
         }
-
+        virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override
+        {
+            double theta = (ni.m_normalizedFaceCoordinate.x-0.5)*2.0*PI();
+            double phi = (1.0 - ni.m_normalizedFaceCoordinate.y)*PI();
+            return Coord3dSpherical(1, theta, phi);
+        }
 };
 }

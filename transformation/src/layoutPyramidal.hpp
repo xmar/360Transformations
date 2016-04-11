@@ -22,8 +22,10 @@ class LayoutPyramidal: public Layout
 
       enum class Face {Base, Top, Bottom, Right, Left, Last, First = Base};
 
-      virtual Coord3dCart from2dTo3d(unsigned int i, unsigned int j) const override;
-      virtual CoordF fromSphereTo2d(double theta, double phi) const override;
+      virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
+      virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
+      virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override;
+      virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override;
 
       //Face AngleToFace(double theta, double phi) const { AngleToFace(Coord3dSpherical(1,theta,phi));}
       //Face AngleToFace(const Coord3dSpherical& p) const {return AngleToFaceCart(SphericalToCart(p));}
