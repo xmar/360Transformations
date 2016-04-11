@@ -19,12 +19,12 @@ class LayoutEquirectangular: public Layout
         }
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            return NormalizedFaceInfo(CoordF(0.5+sphericalCoord.y/ (2.0*PI()), 1.0 - sphericalCoord.z / PI()), 0);
+            return NormalizedFaceInfo(CoordF(0.5+sphericalCoord.y/ (2.0*PI()), sphericalCoord.z / PI()), 0);
         }
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override
         {
             double theta = (ni.m_normalizedFaceCoordinate.x-0.5)*2.0*PI();
-            double phi = (1.0 - ni.m_normalizedFaceCoordinate.y)*PI();
+            double phi = ni.m_normalizedFaceCoordinate.y*PI();
             return Coord3dSpherical(1, theta, phi);
         }
 };

@@ -17,7 +17,7 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
 {
     cv::Mat picMat = cv::Mat::zeros(destLayout.m_outHeight, destLayout.m_outWidth, layoutPic.GetMat().type());
     auto pic = std::make_shared<Picture>(picMat);
-    #pragma omp parallel for collapse(2) shared(pic, layoutPic, destLayout)
+    //# prag ma omp parallel for collapse(2) shared(pic, layoutPic, destLayout)
     for (auto i = 0; i < pic->GetMat().cols; ++i)
     {
         for (auto j = 0; j < pic->GetMat().rows; ++j)

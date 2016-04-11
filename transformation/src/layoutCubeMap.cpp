@@ -16,11 +16,11 @@ LayoutCubeMapBased::Faces LayoutCubeMap::From2dToFace(unsigned int i, unsigned i
     }
     else if (i < 2*m_cubeEdge && j < m_cubeEdge)
     {
-        return Faces::Left;
+        return Faces::Right;
     }
     else if (i < 2*m_cubeEdge && j < 2*m_cubeEdge)
     {
-        return Faces::Right;
+        return Faces::Left;
     }
     else if (i < 3*m_cubeEdge && j < m_cubeEdge)
     {
@@ -36,7 +36,7 @@ Layout::NormalizedFaceInfo LayoutCubeMap::From2dToNormalizedFaceInfo(const Coord
 {
     auto f = From2dToFace(pixel.x, pixel.y);
     double i = double(pixel.x%m_cubeEdge)/m_cubeEdge;
-    double j = double(pixel.x%m_cubeEdge)/m_cubeEdge;
+    double j = double(pixel.y%m_cubeEdge)/m_cubeEdge;
     return Layout::NormalizedFaceInfo(CoordF(i,j), static_cast<int>(f));
 }
 

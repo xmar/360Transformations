@@ -7,7 +7,7 @@ namespace IMT {
 class LayoutCubeMapBased : public Layout
 {
     public:
-        enum class Faces {Front, Back, Top, Bottom, Left, Right, Black, Last, First=Front};
+        enum class Faces: int {Front, Back, Top, Bottom, Left, Right, Black, Last, First=Front};
         LayoutCubeMapBased(unsigned int outWidth, unsigned int outHeight): Layout(outWidth, outHeight) {};
         virtual ~LayoutCubeMapBased(void) = default;
 
@@ -28,13 +28,13 @@ class LayoutCubeMapBased : public Layout
                 case Faces::Back:
                     return Plan(1,0,0,1);
                 case Faces::Top:
-                    return Plan(0,0,1,1);
-                case Faces::Bottom:
                     return Plan(0,0,-1,1);
+                case Faces::Bottom:
+                    return Plan(0,0,1,1);
                 case Faces::Left:
-                    return Plan(0,-1,0,1);
-                case Faces::Right:
                     return Plan(0,1,0,1);
+                case Faces::Right:
+                    return Plan(0,-1,0,1);
                 case Faces::Black:
                     return Plan(0,0,0,0);
                 case Faces::Last:

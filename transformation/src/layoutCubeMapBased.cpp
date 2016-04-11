@@ -8,7 +8,7 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
     if (f == Faces::Black) {return Coord3dCart(0,0,0);}
     double i = (ni.m_normalizedFaceCoordinate.x - 0.5)*2.f;
     double j = (ni.m_normalizedFaceCoordinate.y - 0.5)*2.f;
-    Coord3dCart point(1, i, j);
+    Coord3dCart point(1, i, -j);
     return Rotation(point, FaceToRotMat(f));
 }
 
@@ -38,7 +38,7 @@ Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const 
             continue;
         }
     }
-    Coord3dCart canonicPoint ( Rotation(inter, FaceToRotMat(f)) );
+    Coord3dCart canonicPoint ( Rotation(inter, FaceToRotMat(f).t()) );
     Layout::NormalizedFaceInfo ni (CoordF((canonicPoint.y+1.0)/2.0, (canonicPoint.z+1.0)/2.0), static_cast<int>(f));
     return ni;
 }
@@ -57,7 +57,7 @@ RotMat LayoutCubeMapBased::FaceToRotMat(Faces f) const
         case Faces::Back:
             m(0,0) = -1;
             m(1,1) = 1;
-            m(2,2) = -1;
+            m(2,2) = 1;
             break;
         case Faces::Left:
             m(0,2) = -1;
@@ -75,8 +75,11 @@ RotMat LayoutCubeMapBased::FaceToRotMat(Faces f) const
             m(2,0) = -1;
             break;
         case Faces::Bottom:
-            m(0,1) = -1;
-            m(1,2) = -1;
+            //m(0,1) = -1;
+            //m(1,2) = -1;
+            //m(2,0) = 1;
+            m(0,2) = -1;
+            m(1,1) = 1;
             m(2,0) = 1;
             break;
         case Faces::Last:
