@@ -40,7 +40,7 @@ Layout::NormalizedFaceInfo LayoutCubeMap::From2dToNormalizedFaceInfo(const Coord
     return Layout::NormalizedFaceInfo(CoordF(i,j), static_cast<int>(f));
 }
 
-#define BORDER(x) (MAX(1.0, MIN(m_cubeEdge,x)))
+#define BORDER(x) (MAX(1.0, MIN(m_cubeEdge-1,x)))
 
 CoordF LayoutCubeMap::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
 {
@@ -52,9 +52,9 @@ CoordF LayoutCubeMap::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& n
             return CoordF(BORDER(m_cubeEdge*coord.x), BORDER(m_cubeEdge*coord.y));
         case LayoutCubeMapBased::Faces::Back:
             return CoordF(BORDER(m_cubeEdge*coord.x), BORDER(m_cubeEdge*coord.y)+m_cubeEdge);
-        case LayoutCubeMapBased::Faces::Left:
-            return CoordF(BORDER(m_cubeEdge*coord.x)+m_cubeEdge, BORDER(m_cubeEdge*coord.y));
         case LayoutCubeMapBased::Faces::Right:
+            return CoordF(BORDER(m_cubeEdge*coord.x)+m_cubeEdge, BORDER(m_cubeEdge*coord.y));
+        case LayoutCubeMapBased::Faces::Left:
             return CoordF(BORDER(m_cubeEdge*coord.x)+m_cubeEdge, BORDER(m_cubeEdge*coord.y)+m_cubeEdge);
         case LayoutCubeMapBased::Faces::Top:
             return CoordF(BORDER(m_cubeEdge*coord.x)+2*m_cubeEdge, BORDER(m_cubeEdge*coord.y));

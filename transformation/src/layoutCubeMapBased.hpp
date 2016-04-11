@@ -31,10 +31,10 @@ class LayoutCubeMapBased : public Layout
                     return Plan(0,0,-1,1);
                 case Faces::Bottom:
                     return Plan(0,0,1,1);
-                case Faces::Left:
-                    return Plan(0,1,0,1);
                 case Faces::Right:
                     return Plan(0,-1,0,1);
+                case Faces::Left:
+                    return Plan(0,1,0,1);
                 case Faces::Black:
                     return Plan(0,0,0,0);
                 case Faces::Last:

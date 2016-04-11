@@ -7,7 +7,7 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
     Faces f = static_cast<Faces>(ni.m_faceId);
     if (f == Faces::Black) {return Coord3dCart(0,0,0);}
     double i = (ni.m_normalizedFaceCoordinate.x - 0.5)*2.f;
-    double j = (ni.m_normalizedFaceCoordinate.y - 0.5)*2.f;
+    double j = (0.5 - ni.m_normalizedFaceCoordinate.y)*2.f;
     Coord3dCart point(1, i, -j);
     return Rotation(point, FaceToRotMat(f));
 }
@@ -52,35 +52,35 @@ RotMat LayoutCubeMapBased::FaceToRotMat(Faces f) const
         case Faces::Front:
             m(0,0) = 1;
             m(1,1) = 1;
-            m(2,2) = 1;
+            m(2,2) = -1;
             break;
         case Faces::Back:
             m(0,0) = -1;
-            m(1,1) = 1;
-            m(2,2) = 1;
+            m(1,1) = -1;
+            m(2,2) = -1;
             break;
         case Faces::Left:
-            m(0,2) = -1;
-            m(1,0) = 1;
-            m(2,1) = -1;
+            m(0,1) = 1;
+            m(1,0) = -1;
+            m(2,2) = -1;
             break;
         case Faces::Right:
-            m(0,2) = -1;
-            m(1,0) = -1;
-            m(2,1) = 1;
+            m(0,1) = -1;
+            m(1,0) = 1;
+            m(2,2) = -1;
             break;
         case Faces::Top:
-            m(0,1) = 1;
-            m(1,2) = -1;
-            m(2,0) = -1;
+            m(0,2) = 1;
+            m(1,1) = -1;
+            m(2,0) = 1;
             break;
         case Faces::Bottom:
             //m(0,1) = -1;
             //m(1,2) = -1;
             //m(2,0) = 1;
             m(0,2) = -1;
-            m(1,1) = 1;
-            m(2,0) = 1;
+            m(1,1) = -1;
+            m(2,0) = -1;
             break;
         case Faces::Last:
         case Faces::Black:

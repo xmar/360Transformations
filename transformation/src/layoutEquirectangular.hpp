@@ -24,7 +24,7 @@ class LayoutEquirectangular: public Layout
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override
         {
             double theta = (ni.m_normalizedFaceCoordinate.x-0.5)*2.0*PI();
-            double phi = ni.m_normalizedFaceCoordinate.y*PI();
+            double phi = (ni.m_normalizedFaceCoordinate.y)*PI();
             return Coord3dSpherical(1, theta, phi);
         }
 };

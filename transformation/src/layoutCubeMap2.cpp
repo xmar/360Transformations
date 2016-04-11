@@ -5,27 +5,27 @@ using namespace IMT;
 LayoutCubeMapBased::Faces LayoutCubeMap2::From2dToFace(unsigned int i, unsigned int j) const
 {
     //From
-	if ( i < m_cubeEdge && j > m_cubeEdge && j < 2*m_cubeEdge)
-    {
-        return Faces::Right;
-    }
-    else if (i > m_cubeEdge && i < 2*m_cubeEdge && j < m_cubeEdge)
-    {
-        return Faces::Top;
-    }
-    else if (i > m_cubeEdge && i < 2*m_cubeEdge && j > m_cubeEdge && j < 2*m_cubeEdge)
-    {
-        return Faces::Front;
-    }
-    else if (i > m_cubeEdge && i < 2*m_cubeEdge && j > 2*m_cubeEdge && j < 3*m_cubeEdge)
-    {
-        return Faces::Bottom;
-    }
-    else if (i > 2*m_cubeEdge && i < 3*m_cubeEdge && j > m_cubeEdge && j < 2*m_cubeEdge)
+	if ( i <= m_cubeEdge && j > m_cubeEdge && j <= 2*m_cubeEdge)
     {
         return Faces::Left;
     }
-    else if (i > 3*m_cubeEdge && i < 4*m_cubeEdge && j > m_cubeEdge && j < 2*m_cubeEdge)
+    else if (i > m_cubeEdge && i <= 2*m_cubeEdge && j <= m_cubeEdge)
+    {
+        return Faces::Top;
+    }
+    else if (i > m_cubeEdge && i <= 2*m_cubeEdge && j > m_cubeEdge && j <= 2*m_cubeEdge)
+    {
+        return Faces::Front;
+    }
+    else if (i > m_cubeEdge && i <= 2*m_cubeEdge && j > 2*m_cubeEdge && j <= 3*m_cubeEdge)
+    {
+        return Faces::Bottom;
+    }
+    else if (i > 2*m_cubeEdge && i <= 3*m_cubeEdge && j > m_cubeEdge && j <= 2*m_cubeEdge)
+    {
+        return Faces::Right;
+    }
+    else if (i > 3*m_cubeEdge && i <= 4*m_cubeEdge && j > m_cubeEdge && j <=2*m_cubeEdge)
     {
         return Faces::Back;
     }
@@ -34,7 +34,7 @@ LayoutCubeMapBased::Faces LayoutCubeMap2::From2dToFace(unsigned int i, unsigned 
     }
 }
 
-#define BORDER(x) (MAX(1.0, MIN(m_cubeEdge,x)))
+#define BORDER(x) (MAX(1.0, MIN(m_cubeEdge-1,x)))
 
 CoordF LayoutCubeMap2::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
 {
@@ -62,7 +62,7 @@ CoordF LayoutCubeMap2::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& 
 
 Layout::NormalizedFaceInfo LayoutCubeMap2::From2dToNormalizedFaceInfo(const CoordI& pixel) const
 {
-    double normalizedI = double(pixel.x)/m_cubeEdge;
-    double normalizedJ = double(pixel.y)/m_cubeEdge;
+    double normalizedI = double(pixel.x%m_cubeEdge)/m_cubeEdge;
+    double normalizedJ = double(pixel.y%m_cubeEdge)/m_cubeEdge;
     return NormalizedFaceInfo(CoordF(normalizedI, normalizedJ), static_cast<int>(From2dToFace(pixel.x, pixel.y)));
 }
