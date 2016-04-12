@@ -11,6 +11,7 @@
 #include <fstream>
 #include <array>
 #include <memory>
+#include <chrono>
 
 #include "boost/program_options.hpp"
 #include <boost/config.hpp>
@@ -23,6 +24,7 @@
 #include "layoutEquirectangular.hpp"
 #include "layoutFlatFixed.hpp"
 #include "layoutPyramidal.hpp"
+#include "layoutPyramidal2.hpp"
 #include "layoutRhombicdodeca.hpp"
 
 using namespace IMT;
@@ -64,33 +66,39 @@ int main( int argc, const char* argv[] )
       //cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), cap.get(CV_CAP_PROP_FPS), cv::Size(cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
       //unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
       LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-      LayoutEquirectangular leq2(cap.get(CV_CAP_PROP_FRAME_WIDTH)/4, cap.get(CV_CAP_PROP_FRAME_HEIGHT)/4);
+      LayoutEquirectangular leq2(cap.get(CV_CAP_PROP_FRAME_WIDTH)/6, cap.get(CV_CAP_PROP_FRAME_HEIGHT)/6);
       LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
       LayoutCubeMap2 lcm2(cap.get(CV_CAP_PROP_FRAME_WIDTH));
       LayoutPyramidal lp(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+      LayoutPyramidal2 lp21(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutPyramidal lp2(3.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+      LayoutPyramidal2 lp22(3.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
       LayoutRhombicdodeca lr(cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2);
       LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
-      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
+      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'),
+                              24,
+                              cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
       cv::Mat img;
       int count = 0;
+      float averageDuration(0.f);
       while (cap.read(img))
       {
+          auto startTime = std::chrono::high_resolution_clock::now();
           Picture pict(img);
           std::cout << "Read image" << std::endl;
           pict.ImgShowResize("Test", cv::Size(1200,600));
           //cv::waitKey(0);
           //cv::destroyAllWindows();
 
-          auto cm = lcm.FromLayout(pict, leq);
-          cm->ImgShowResize("CubeMap", cv::Size(1200,800));
-
-          ////cv::destroyAllWindows();
-          //vwriter << cm->GetMat();
-
-          auto eq = lcm.ToLayout(*cm, leq);
-          eq->ImgShowResize("Test2", cv::Size(1200,600));
+//          auto cm = lcm.FromLayout(pict, leq);
+//          cm->ImgShowResize("CubeMap", cv::Size(1200,800));
+//
+//          ////cv::destroyAllWindows();
+//          //vwriter << cm->GetMat();
+//
+//          auto eq = lcm.ToLayout(*cm, leq2);
+//          eq->ImgShowResize("Test2", cv::Size(1200,600));
 
 
 //          auto ff = lff.FromLayout(pict, leq);
@@ -102,32 +110,50 @@ int main( int argc, const char* argv[] )
           auto p = lp.FromLayout(pict, leq);
           p->ImgShowResize("Pyramidal", cv::Size(900,300));
 
-          auto eq2 =  lp.ToLayout(*p, leq);
+          auto eq2 =  lp.ToLayout(*p, leq2);
           eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
 
           p = lp2.FromLayout(pict, leq);
           p->ImgShowResize("Pyramidal2", cv::Size(900,300));
 
-          eq2 =  lp2.ToLayout(*p, leq);
+          eq2 =  lp2.ToLayout(*p, leq2);
           eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
 
-          auto rhombic = lr.FromLayout(pict, leq);
-          rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
+          auto p2 = lp21.FromLayout(pict, leq);
+          p2->ImgShowResize("Pyramidal21", cv::Size(900,900));
 
-          auto eq4 =  leq.FromLayout(*rhombic, lr);
-          eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
+          eq2 =  lp21.ToLayout(*p2, leq2);
+          eq2->ImgShowResize("Pyramidal21ToEq", cv::Size(1200,600));
+
+          p2 = lp22.FromLayout(pict, leq);
+          p2->ImgShowResize("Pyramidal22", cv::Size(900,900));
+
+          eq2 =  lp22.ToLayout(*p2, leq2);
+          eq2->ImgShowResize("Pyramidal22ToEq", cv::Size(1200,600));
+
+//          auto rhombic = lr.FromLayout(pict, leq);
+//          rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
+//
+//          auto eq4 =  leq2.FromLayout(*rhombic, lr);
+//          eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
 //
 //          auto ff3 = lff.FromLayout(*rhombic, lr);
 //          ff3->ImgShowResize("Flat Fix3", cv::Size(1200,600));
 //
-          auto cm2 = lcm2.FromLayout(pict, leq);
-          cm2->ImgShowResize("CubeMap2", cv::Size(1200,900));
+//          auto cm2 = lcm2.FromLayout(pict, leq);
+//          cm2->ImgShowResize("CubeMap2", cv::Size(1200,900));
 
-          auto eq5 = leq.FromLayout(*cm2, lcm2);
-          eq5->ImgShowResize("CubeMap2ToEq", cv::Size(1200,600));
+//          auto eq5 = leq2.FromLayout(*cm2, lcm2);
+//          eq5->ImgShowResize("CubeMap2ToEq", cv::Size(1200,600));
 
+//          vwriter << cm->GetMat();
           cv::waitKey(0);
           cv::destroyAllWindows();
+          auto endTime = std::chrono::high_resolution_clock::now();
+          auto duration = std::chrono::duration_cast<std::chrono::microseconds>( endTime - startTime ).count();
+          averageDuration = (averageDuration*count + duration)/(count+1);
+          std::cout << "Elapsed time for this picture: "<< float(duration)/1000000.f<< "s "
+          "estimated remaining time = " << (nbFrames-count-1)*averageDuration/1000000.f << "s "  << std::endl;
           if (++count == nbFrames)
           {
               break;
