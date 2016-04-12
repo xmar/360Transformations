@@ -1,0 +1,58 @@
+%\usepackage[nolist]{acronym}
+\usepackage[acronym]{glossaries}                                           
+\newcommand\acro[2]{\newacronym{#1}{#1}{#2}}                               
+\newcommand\acroAlwaysShort[1]{\newglossaryentry{#1}{type=\acronymtype, name={#1}, description={#1}, text={#1}, first={#1}, plural={#1s}, firstplural={#1s}}}
+\newcommand\acroShortSurname[2]{\newglossaryentry{#1}{type=\acronymtype, name={#2}, description={#2}, text={#2}, first={#2}, plural={#2s}, firstplural={#2s}}}
+\newcommand\ac[1]{\gls{#1}}                                                
+\newcommand\acp[1]{\glspl{#1}}                                             
+\newcommand\acs[1]{\glsname{#1}}                                           
+\newcommand\acl[1]{\glsentrylong{#1}}
+
+\acro{ABR}{adaptive bit-rate}
+\acro{DASH}{Dynamic Adaptive Streaming over HTTP}  
+\acro{CDN}{content delivery network}  
+\acro{CDF}{cumulative density function}
+\acro{PDF}{probability density function}  
+\acro{RTP}{real-time protocol}
+\acro{QoE}{Quality of Experience}
+\acro{VQM}{Video Quality Metric}
+\acro{ILP}{integer linear program}
+\acro{HDTV}{high definition television}
+\acro{UGC}{User-Generated Content}
+\acro{MPD}{Media Presentation Description}
+\acro{PSNR}{Peak Signal Noise to Ratio}
+\acro{GPU}{graphics processing unit}
+\acro{CPU}{central processing unit}
+\acro{MS-SSIM}{Multiscale - Structural Similarity}
+\acro{API}{Application Programming Interface}
+\acro{VM}{Virtual Machine}
+\acro{SVC}{Scalable Video Coding}
+\acro{GOP}{Group of Picture}
+\acro{PMU}{Performance Monitoring Unit}
+\acro{LAN}{Local Area Network}
+\acro{AI}{Artificial Intelligence}
+\acro{3D}{Three Dimentional}
+\acro{OS}{Operating System}
+\newglossaryentry{fps}{type=\acronymtype, name={fps}, description={frame per second}, text={frame per second}, first={frame per second (fps)}, plural={fps}, firstplural={frames per second (fps)}}
+\newglossaryentry{p}{type=\acronymtype, name={p}, description={p}, text={~pixel}, first={~pixel (p)}, plural={p}, firstplural={~pixels (p)}}
+\newglossaryentry{s}{type=\acronymtype, name={s}, description={s},
+text={second}, first={second (s)}, plural={s}, firstplural={~seconds (s)}}
+\acroAlwaysShort{TCP}
+\acroAlwaysShort{HTTP}
+\acro{RTT}{Round-Trip Time}
+\acro{AVC}{Advanced Video Coding}
+\acro{HEVC}{High Efficiency Video Coding}
+\acro{ISO}{International Organization for Standardization}
+%\acro{ISOBMFF}{\ac{ISO} base media file format}
+\newglossaryentry{ISOBMFF}{type=\acronymtype, name={ISOBMFF}, description={International Organization for Standardization base media file format}, text={International Organization for Standardization base media file format}, first={International Organization for Standardization base media file format ISO/IEC 14496-12 (ISO BMFF)}, plural={ISO BMFFs}, firstplural={International Organization for Standardization base media file formats (ISO BMFFs)}}
+\acro{MTU}{Maximum Transmission Unit}
+\acro{AQM}{Active Queue Management}
+\acro{I}{intra-predicted}
+\acro{P}{inter-predicted}
+\acro{B}{bidirectional}
+\acro{VQMT}{Video Quality Measurement Tool}
+\acro{EPFL}{Ecole Polytechnique F\'{e}d\'{e}rale de Lausanne}
+\acroShortSurname{YUV}{YUV}
+\acroShortSurname{RGB}{R'G'B'}
+\acro{MSE}{Mean Square Error}
+\acro{CMSE}{Commulative Mean Square Error}
