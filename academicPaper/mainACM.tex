@@ -1,0 +1,174 @@
+
+%\documentclass[10pt,onecolumn,twoside]{IEEEtran} %!PN
+%  \documentclass[10pt,twocolumn,twoside]{IEEEtran} %!PN
+% \documentclass[12pt,onecolumn,twoside,draft]{IEEEtran} %!PN
+%\documentclass[conference]{IEEEtran} %!PN
+%\documentclass[conference]{IEEEtran}
+
+\documentclass{sig-alternate}
+%\documentclass{article}
+%\usepackage{spconf} %ICME conf style
+
+\usepackage{multirow}
+\usepackage{amsfonts}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\input{acronymes.tex} % acronymes + associated packages  are defined in the acronymes.tex file
+\usepackage[english]{babel}
+%\usepackage{cite}
+\usepackage[numbers,sort]{natbib}
+\renewcommand\citet[1]{\citeauthor{#1}~\cite{#1}} % redefine the \citet command to add a ~ space between authors and []
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{stfloats}
+%\usepackage{pst-gantt}
+% \usepackage{algorithm}
+% \usepackage{algorithmic}
+\usepackage[linesnumbered,ruled,vlined,boxed,commentsnumbered]{algorithm2e}
+\usepackage[noend]{algorithmic}
+\usepackage{float}
+\algsetup{linenosize=\tiny}
+%\usepackage{caption}
+%\usepackage{subcaption}
+\usepackage[caption=false]{subfig}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+%\usetikzlibrary{plotmarks}
+\usetikzlibrary{shapes,positioning,calc}
+\usetikzlibrary{decorations,decorations.pathmorphing}
+\usetikzlibrary{external}
+\newcommand{\externaldirectory}{latex.out/}
+\tikzexternalize[prefix=\externaldirectory]
+\tikzexternalize % activate!
+\tikzexternaldisable
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{etoolbox}
+
+\lstset{%
+  backgroundcolor=\color{gray!25},
+  basicstyle=\sffamily \scriptsize,
+  breaklines=true
+}
+
+%SI Units
+\usepackage{siunitx}
+\sisetup{detect-all}
+
+%math tools
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+%Some math declarations
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\parenthesis}{(}{)}
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\DeclarePairedDelimiter{\norm}{|}{|}
+\DeclarePairedDelimiter{\integerInterval}{\llbracket}{\rrbracket}
+\DeclareMathOperator*{\minimize}{minimize}
+
+%Some symbols definitions
+\newcommand{\packetset}{\mathcal P}
+\newcommand{\frameset}{\mathcal F}
+\newcommand{\packetsubset}{\mathcal P'}
+\newcommand{\framesubset}{\mathcal F'}
+
+
+% fix the issue of white character in acronym package
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\@acf{\hskip\z@}{}{}{}
+\patchcmd\@acf{\hskip\z@}{}{}{}
+\makeatother
+
+
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.8}
+
+
+\newbool{NotesActivated}
+\booltrue{NotesActivated}  %comment this line to remove all user comments
+
+%include some macro specific for this paper
+\input{paperSpecificMacro.tex}
+
+\newcommand {\otoprule }{\midrule [\heavyrulewidth]}
+
+\title{Adaptive Delivery for Interactive Omnidirectional Videos}
+
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+\floatstyle{ruled}
+\newfloat{ilp}{ht}{aux}
+\floatname{ilp}{Integer Linear Program}
+
+
+\newbool{doubleBlinded}
+\booltrue{doubleBlinded}  %comment this line to remove all user comments
+
+\makeatletter
+%\def\@name{ \ifdoubleBlinded \phantom{ \fi \emph{Xavier Corbillon$^{\star}$ \quad Florian Boyrivent$^{\star}$
+%\quad Gr\'{e}goire Asselin\,De\,Williencourt$^{\star}$} \ifdoubleBlinded } \fi \\ \ifdoubleBlinded \phantom{ \emph{Gwendal
+%Simon$^{\star}$ \quad G\'{e}raldine Texier$^{\star}$ \quad Jacob
+%Chakareski$^{\dagger}$}\ifdoubleBlinded } \fi}
+%
+%\address{\ifdoubleBlinded \phantom{ \fi $^{\star}$ T\'{e}l\'{e}com Bretagne / IRISA, France \ifdoubleBlinded } \#$144$ \phantom{ \fi\quad
+%$^{\dagger}$ University of Alabama, USA \ifdoubleBlinded } \fi}
+
+\ifdoubleBlinded
+\numberofauthors{1}
+\else
+\numberofauthors{3}
+\fi
+
+\author{ 
+\alignauthor
+\ifdoubleBlinded
+        Paper ID 
+\else
+  Xavier Corbillon\\
+  \affaddr{T\'{e}l\'{e}com Bretagne, IRISA, France}% \\
+\alignauthor
+  Alisa Devlic\\
+  \affaddr{T\'{e}l\'{e}com Bretagne, IRISA, France}% \\
+\alignauthor
+  Gwendal Simon\\
+  \affaddr{T\'{e}l\'{e}com Bretagne, IRISA, France}%\\
+\fi
+}
+
+
+
+\makeatother
+
+%\pgfdeclareimage[width=3cm]{gamer}{plots/game-controller-icon-614x460.png}
+%\pgfdeclareimage[width=1.6cm]{tv}{plots/1411044172_PixelKit_tv_icon.png}
+%\pgfdeclareimage[width=0.8cm]{rack}{plots/1411044156_PixelKit_network_icon.png}
+
+
+\begin{document}
+%\ninept
+
+\maketitle
+
+\input{abstract.tex}
+
+\input{intro.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEbib}
+\bibliographystyle{abbrvnat}  
+%\bibliographystyle{abbrv}  
+\bibliography{biblio}
+
+\end{document}
+

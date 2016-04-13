@@ -71,15 +71,12 @@ RotMat LayoutCubeMapBased::FaceToRotMat(Faces f) const
             break;
         case Faces::Top:
             m(0,2) = 1;
-            m(1,1) = -1;
+            m(1,1) = 1;
             m(2,0) = 1;
             break;
         case Faces::Bottom:
-            //m(0,1) = -1;
-            //m(1,2) = -1;
-            //m(2,0) = 1;
             m(0,2) = -1;
-            m(1,1) = -1;
+            m(1,1) = 1;
             m(2,0) = -1;
             break;
         case Faces::Last:

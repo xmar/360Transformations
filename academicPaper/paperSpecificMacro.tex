@@ -1,0 +1,30 @@
+\newcommand\algoFontSize{8}
+\newcommand{\noteGS}[1] {\ifbool{NotesActivated}{\color{red}\{\textbf{GS:}\textit{{#1}}\}\color{black}}{}}
+\newcommand{\noteXC}[1] {\ifbool{NotesActivated}{\color{YellowOrange}\{\textbf{XC:}\textit{{#1}}\}\color{black}}{}}
+\newcommand{\noteFB}[1] {\ifbool{NotesActivated}{\color{OliveGreen}\{\textbf{FB:}\textit{{#1}}\}\color{black}}{}}
+\newcommand{\noteGA}[1] {\ifbool{NotesActivated}{\color{Blue}\{\textbf{GA:}\textit{{#1}}\}\color{black}}{}}
+\newcommand{\noteGT}[1] {\ifbool{NotesActivated}{\color{Salmon}\{\textbf{GT:}\textit{{#1}}\}\color{black}}{}}
+\newcommand\newpara[1]{\vspace{3pt}\noindent\textbf{#1}.\hspace{0.15cm}}
+\newcommand\newsubpara[1]{\vspace{0.15cm}\noindent\textit{#1}.\hspace{0.15cm}}
+
+%Define names of the Estimation Functions
+\newcommand{\setPositive}{ % STYLE
+   \text{\bf{\scriptsize+}}
+}
+\newcommand{\setNegative}{ % STYLE
+   %\mathbb{\tiny-}
+   \text{\large-}
+}
+\newcommand\constantParam[1]{
+    {\scriptsize \{ #1 \}}
+}
+
+
+%\newcommand\R{\emph{Random}}
+%\newcommand\TR{\emph{Type}}
+%\newcommand\DR{\emph{Dependencies}}
+%\newcommand\SP{\emph{DropSmall}}
+%\newcommand\DSP{\emph{DepDropSmall}}
+%\newcommand\DSM{\emph{DepDropBig}}
+%\newcommand\DTSM{\emph{HybridDropBig}}
+%\newcommand\DTSP{\emph{HybridDropSmall}}
