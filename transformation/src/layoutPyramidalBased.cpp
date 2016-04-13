@@ -30,7 +30,7 @@ Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(cons
             }
         } catch ( std::logic_error& le )
         { //no intersection with this face
-            continue;
+            //continue;
         }
     }
     double normalizedI(0);
