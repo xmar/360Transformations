@@ -28,12 +28,12 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
          * \param yaw double
          * \param pitch double
          * \param roll double
-         * \param height unsigned int  Number of pixel of the height of the global picture
+         * \param pixelBaseEdge unsigned int Number of pixel of the edge of the base
          *
          */
-        LayoutPyramidal2(double baseEdge,double yaw, double pitch, double roll, unsigned int height):
-            LayoutPyramidalBased(baseEdge, yaw, pitch, roll, height, height), m_edge(height/3) {};
-        virtual ~LayoutPyramidal2() = default;
+        LayoutPyramidal2(double baseEdge,double yaw, double pitch, double roll, unsigned int pixelBaseEdge):
+            LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*pixelBaseEdge, 3*pixelBaseEdge), m_edge(pixelBaseEdge) {};
+        virtual ~LayoutPyramidal2(void) = default;
 
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;

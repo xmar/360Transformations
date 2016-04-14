@@ -7,8 +7,10 @@ namespace IMT {
 class LayoutCubeMap: public LayoutCubeMapBased
 {
     public:
-        LayoutCubeMap(unsigned int outWidth):
-        LayoutCubeMapBased(outWidth, 2*outWidth/3), m_cubeEdge(outWidth/3) {}
+        LayoutCubeMap(unsigned int pixelEdge):
+                LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge,
+                           {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}}),
+                m_cubeEdge(pixelEdge) {}
         virtual ~LayoutCubeMap(void) = default;
 
 

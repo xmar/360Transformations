@@ -23,11 +23,11 @@ class LayoutPyramidal: public LayoutPyramidalBased
          * \param yaw double
          * \param pitch double
          * \param roll double
-         * \param height unsigned int Number of pixel of the height of the global picture
+         * \param pixelBaseEdge unsigned int Number of pixel of the edge of the base
          *
          */
-        LayoutPyramidal(double baseEdge,double yaw, double pitch, double roll, unsigned int height):
-        LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*height, height) {}
+        LayoutPyramidal(double baseEdge,double yaw, double pitch, double roll, unsigned int pixelBaseEdge):
+        LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*pixelBaseEdge, pixelBaseEdge) {}
         virtual ~LayoutPyramidal(void) = default;
 
 
