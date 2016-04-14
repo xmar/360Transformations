@@ -1,6 +1,7 @@
 #pragma once
 
 #include "layoutCubeMapBased.hpp"
+#include <memory>
 
 namespace IMT {
 
@@ -13,10 +14,10 @@ class LayoutCubeMap2: public LayoutCubeMapBased
          * \return LayoutCubeMap2 The LayoutCubeMap2 object generated
          *
          */
-	    static LayoutCubeMap2 GenerateLayout(std::array<unsigned int,6> pixelEdges)
+	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(std::array<unsigned int,6> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
-            return LayoutCubeMap2(
+            return std::make_shared<LayoutCubeMap2>(
                 fr.GetRes(Faces::Left)+fr.GetRes(Faces::Front)+fr.GetRes(Faces::Right)+fr.GetRes(Faces::Back),
                 fr.GetRes(Faces::Top)+fr.GetRes(Faces::Front)+fr.GetRes(Faces::Bottom),
                 fr);
@@ -30,6 +31,9 @@ class LayoutCubeMap2: public LayoutCubeMapBased
 		LayoutCubeMap2(unsigned int pixelEdge):
 		            LayoutCubeMapBased(4*pixelEdge, 3*pixelEdge,
                                  {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}}) {}
+        LayoutCubeMap2(unsigned int width, unsigned int height, const FaceResolutions& fr):
+                LayoutCubeMapBased(width, height, fr) {}
+
         virtual ~LayoutCubeMap2(void) = default;
 
 
@@ -38,11 +42,7 @@ class LayoutCubeMap2: public LayoutCubeMapBased
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 
-
-		private:
-            LayoutCubeMap2(unsigned int width, unsigned int height, const FaceResolutions& fr):
-                LayoutCubeMapBased(width, height, fr) {}
-
+        private:
 			unsigned int IStartOffset(LayoutCubeMapBased::Faces f) const;
 
             unsigned int IEndOffset(LayoutCubeMapBased::Faces f) const;
