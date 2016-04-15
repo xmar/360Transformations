@@ -73,11 +73,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
             if (infer)
             {
-                return LayoutCubeMap2::GenerateLayout({{edgeFront*inputWidth/4, edgeBack*inputWidth/4, edgeLeft*inputWidth/4, edgeRight*inputWidth/4, edgeTop*inputWidth/4, edgeBottom*inputWidth/4}});
+                return LayoutCubeMap2::GenerateLayout({{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap2::GenerateLayout({{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+                return LayoutCubeMap2::GenerateLayout({{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "flatFixed")
