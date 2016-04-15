@@ -154,7 +154,7 @@ int main( int argc, const char* argv[] )
             }
             if (displayFinalPict)
             {
-                pictOut->ImgShowResize("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,1200*float(lf.back()->GetHeight())/lf.back()->GetWidth()));
+                pictOut->ImgShowWithLimit("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,900));
             }
             if (!cvVideoWriters.empty())
             {
