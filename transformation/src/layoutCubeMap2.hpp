@@ -17,10 +17,12 @@ class LayoutCubeMap2: public LayoutCubeMapBased
 	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(std::array<unsigned int,6> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
+	        auto maxOffsetTFB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Top), fr.GetRes(Faces::Bottom)));
+	        auto maxOffsetLFRB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Left), MAX(fr.GetRes(Faces::Right), fr.GetRes(Faces::Back))));
             return std::make_shared<LayoutCubeMap2>(
-                fr.GetRes(Faces::Left)+fr.GetRes(Faces::Front)+fr.GetRes(Faces::Right)+fr.GetRes(Faces::Back),
-                fr.GetRes(Faces::Top)+fr.GetRes(Faces::Front)+fr.GetRes(Faces::Bottom),
-                fr);
+                fr.GetRes(Faces::Left)+maxOffsetTFB+fr.GetRes(Faces::Right)+fr.GetRes(Faces::Back),
+                fr.GetRes(Faces::Top)+maxOffsetLFRB+fr.GetRes(Faces::Bottom),
+                fr, maxOffsetTFB, maxOffsetLFRB);
 	    }
 
         /** \brief Layout with the same resolution for each faces
@@ -30,9 +32,10 @@ class LayoutCubeMap2: public LayoutCubeMapBased
          */
 		LayoutCubeMap2(unsigned int pixelEdge):
 		            LayoutCubeMapBased(4*pixelEdge, 3*pixelEdge,
-                                 {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}}) {}
-        LayoutCubeMap2(unsigned int width, unsigned int height, const FaceResolutions& fr):
-                LayoutCubeMapBased(width, height, fr) {}
+                                 {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}})
+                    , m_maxOffsetTFB(pixelEdge), m_maxOffsetLFRB(pixelEdge) {}
+        LayoutCubeMap2(unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
+                LayoutCubeMapBased(width, height, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
 
         virtual ~LayoutCubeMap2(void) = default;
 
@@ -43,12 +46,12 @@ class LayoutCubeMap2: public LayoutCubeMapBased
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 
         private:
+            unsigned int m_maxOffsetTFB;
+            unsigned int m_maxOffsetLFRB;
+
 			unsigned int IStartOffset(LayoutCubeMapBased::Faces f) const;
-
             unsigned int IEndOffset(LayoutCubeMapBased::Faces f) const;
-
             unsigned int JStartOffset(LayoutCubeMapBased::Faces f) const;
-
             unsigned int JEndOffset(LayoutCubeMapBased::Faces f) const;
 
             inline bool InFace(unsigned i, unsigned j, LayoutCubeMapBased::Faces f) const
