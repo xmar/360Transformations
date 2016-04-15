@@ -108,6 +108,7 @@ int main( int argc, const char* argv[] )
             for(auto& lfs: lfsv)
             {
                 layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, isFirst, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
+                layoutFlowVect.back().back()->Init();
                 isFirst = false;
             }
         }
@@ -149,6 +150,7 @@ int main( int argc, const char* argv[] )
             for (unsigned int i = 1; i < lf.size(); ++i)
             {
                 pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
+                lf[i]->NextStep();
             }
             if (displayFinalPict)
             {
