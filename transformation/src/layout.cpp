@@ -1,4 +1,5 @@
 #include "layout.hpp"
+#include <stdexcept>
 
 
 using namespace IMT;
@@ -15,6 +16,10 @@ CoordF Layout::FromSphereTo2d(const Coord3dSpherical& sphericalCoord) const
 
 std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout& destLayout) const
 {
+    if (!m_isInit)
+    {
+        throw std::logic_error("Layout have to be initialized first before using it");
+    }
     cv::Mat picMat = cv::Mat::zeros(destLayout.m_outHeight, destLayout.m_outWidth, layoutPic.GetMat().type());
     auto pic = std::make_shared<Picture>(picMat);
     #pragma omp parallel for collapse(2) shared(pic, layoutPic, destLayout)

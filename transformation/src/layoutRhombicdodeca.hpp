@@ -1,63 +1,67 @@
 #pragma once
-#include "layout.hpp"
+#include "layoutRhombicdodecaBased.hpp"
 #include <stdexcept>
 
 namespace IMT {
 
-class LayoutRhombicdodeca: public Layout
+class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
 {
     public:
-        LayoutRhombicdodeca(unsigned int height): Layout(6*height, 2*height), m_faceHeight(height) {}
+        static std::shared_ptr<LayoutRhombicdodeca> GenerateLayout(std::array<unsigned int,12> pixelEdges)
+	    {
+	        FaceResolutions fr(std::move(pixelEdges));
+            return std::shared_ptr<LayoutRhombicdodeca>( new LayoutRhombicdodeca(std::move(fr)) );
+	    }
+        LayoutRhombicdodeca(unsigned int height): LayoutRhombicdodecaBased({{height,height,height,height,
+            height,height,height,height,height,height,height,height}}), m_colsMaxOffset(), m_rowsMaxOffset() {}
         virtual ~LayoutRhombicdodeca(void) = default;
-
-        enum class Face{ Face1, Face2, Face3, Face4, Face5, Face6, Face7, Face8, Face9, Face10, Face11, Face12, Last, First=Face1 };
 
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
-        virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override;
-        virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override;
 
-        Plan FaceToPlan(Face f) const
+    protected:
+        LayoutRhombicdodeca(FaceResolutions&& fr): LayoutRhombicdodecaBased(fr), m_colsMaxOffset(), m_rowsMaxOffset() {}
+
+        Faces LayoutToFace(unsigned int i, unsigned int j) const;
+
+        CoordF CanonicLayoutCoordToLayoutCoord(double i, double j, Faces f) const;
+
+        virtual void InitImpl(void) override
         {
-            switch(f)
-            {
-                case Face::Face1:
-                    return Plan(-1,0,0,1);
-                case Face::Face2:
-                    return Plan(-1,-std::sqrt(2),-1,2);
-                case Face::Face3:
-                    return Plan(-1,-std::sqrt(2),1,2);
-                case Face::Face4:
-                    return Plan(-1,std::sqrt(2),-1,2);
-                case Face::Face5:
-                    return Plan(-1,std::sqrt(2),1,2);
-                case Face::Face6:
-                    return Plan(0,0,1,1);
-                case Face::Face7:
-                    return Plan(1,std::sqrt(2),1,2);
-                case Face::Face8:
-                    return Plan(1,-std::sqrt(2),1,2);
-                case Face::Face9:
-                    return Plan(1,-std::sqrt(2),-1,2);
-                case Face::Face10:
-                    return Plan(1,std::sqrt(2),-1,2);
-                case Face::Face11:
-                    return Plan(0,0,-1,1);
-                case Face::Face12:
-                    return Plan(1,0,0,1);
-                case Face::Last:
-                    throw std::invalid_argument("FaceToPlan: Last is not a valid face");
-            }
+            m_colsMaxOffset[0] = MAX(GetRes(Faces::Face1), GetRes(Faces::Face2));
+            m_colsMaxOffset[1] = MAX(GetRes(Faces::Face3), GetRes(Faces::Face4));
+            m_colsMaxOffset[2] = MAX(GetRes(Faces::Face5), GetRes(Faces::Face6));
+            m_colsMaxOffset[3] = MAX(GetRes(Faces::Face7), GetRes(Faces::Face8));
+            m_colsMaxOffset[4] = MAX(GetRes(Faces::Face9), GetRes(Faces::Face10));
+            m_colsMaxOffset[5] = MAX(GetRes(Faces::Face11), GetRes(Faces::Face12));
+
+            m_rowsMaxOffset[0] = MAX(GetRes(Faces::Face1), MAX(GetRes(Faces::Face3), MAX(GetRes(Faces::Face5),
+                                   MAX(GetRes(Faces::Face7), MAX(GetRes(Faces::Face9), GetRes(Faces::Face11))))));
+            m_rowsMaxOffset[1] = MAX(GetRes(Faces::Face2), MAX(GetRes(Faces::Face4), MAX(GetRes(Faces::Face6),
+                                   MAX(GetRes(Faces::Face8), MAX(GetRes(Faces::Face10), GetRes(Faces::Face12))))));
+
+            unsigned int totalWidth(0), totalHeight(0);
+            for (auto& w: m_colsMaxOffset) {totalWidth += w;}
+            for (auto& h: m_rowsMaxOffset) {totalWidth += h;}
+            SetWidth(totalWidth);
+            SetHeight(totalHeight);
         }
 
-        RotMat FaceToRotMat(Face f) const; //Rot matrix to transform Face1 into f
+        unsigned int IStartOffset(Faces f) const;
+        unsigned int IEndOffset(Faces f) const;
+        unsigned int JStartOffset(Faces f) const;
+        unsigned int JEndOffset(Faces f) const;
 
-        Face LayoutToFace(unsigned int i, unsigned int j) const;
-
-        CoordF CanonicLayoutCoordToLayoutCoord(double i, double j, Face f) const;
-
+        inline bool InFace(unsigned i, unsigned j, Faces f) const
+        {
+            return inInterval(i, IStartOffset(f), IEndOffset(f)) && inInterval(j, JStartOffset(f), JEndOffset(f));
+        }
     private:
-        unsigned int m_faceHeight;
+        typedef std::array<unsigned int, 6> ColsOffsetArray;
+        typedef std::array<unsigned int, 2> RowsOffsetArray;
+
+        ColsOffsetArray m_colsMaxOffset;
+        RowsOffsetArray m_rowsMaxOffset;
 };
 
 }

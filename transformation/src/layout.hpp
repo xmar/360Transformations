@@ -20,7 +20,8 @@ class Layout
             CoordF m_normalizedFaceCoordinate;
             int m_faceId;
         };
-        Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight) {};
+        Layout(void): m_outWidth(0), m_outHeight(0), m_isInit(false) {};
+        Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight), m_isInit(false) {};
         virtual ~Layout(void) = default;
 
         /*Return the 3D coordinate cartesian of the point corresponding to the pixel with coordinate pixelCoord on the 2d layout*/
@@ -29,9 +30,9 @@ class Layout
         /*Return the coordinate of the 2d layout that correspond to the point on the sphere in shperical coordinate sphericalCoord*/
         CoordF FromSphereTo2d(const Coord3dSpherical& sphericalCoord) const;
 
-        /** \brief Function that can be overide to init the layout object (have to be called before using the layout object). By default do nothing.
+        /** \brief Function called to init the layout object (have to be called before using the layout object). Call the private virtual function InitImpl.
          */
-        virtual void Init(void) {}
+        void Init(void) {InitImpl(); m_isInit = true;}
 
         /** \brief If we need a dynamic layout that evolve with the time, this function should be overide to apply the evolution. By default do nothing.
          */
@@ -85,6 +86,13 @@ class Layout
     protected:
         unsigned int m_outWidth;
         unsigned int m_outHeight;
+        bool m_isInit;
+
+        /** \brief Protected function called by Init to initialized the layout object. Can be override. By default do nothing.
+         */
+        virtual void InitImpl(void) {}
+        void SetWidth(unsigned int w) {m_outWidth = w;}
+        void SetHeight(unsigned int h) {m_outHeight = h;}
     private:
 };
 
