@@ -56,11 +56,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
             if (infer)
             {
-                return std::make_shared<LayoutCubeMap>(edgeFront*inputWidth/4);
+                return LayoutCubeMap::GenerateLayout({{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return std::make_shared<LayoutCubeMap>(edgeFront);
+                return LayoutCubeMap::GenerateLayout({{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "cubeMap2")

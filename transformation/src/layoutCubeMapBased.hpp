@@ -78,6 +78,7 @@ class LayoutCubeMapBased : public Layout
                         case Faces::Left:
                             return m_faces[3];
                         case Faces::Black:
+                            throw std::invalid_argument("GetRes: Black is not a valid face");
                         case Faces::Last:
                             throw std::invalid_argument("GetRes: Last is not a valid face");
                     }

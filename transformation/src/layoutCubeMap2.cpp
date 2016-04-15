@@ -42,7 +42,7 @@ unsigned int LayoutCubeMap2::IEndOffset(LayoutCubeMapBased::Faces f) const
         return GetRes(Faces::Left)+m_maxOffsetTFB+GetRes(Faces::Right)+GetRes(Faces::Back);
     case Faces::Black:
     case Faces::Last:
-        std::invalid_argument("IStartOffset: Last is not a valid face");
+        std::invalid_argument("IEndOffset: Last is not a valid face");
     }
 }
 
@@ -64,7 +64,7 @@ unsigned int LayoutCubeMap2::JStartOffset(LayoutCubeMapBased::Faces f) const
         return GetRes(Faces::Top)+(m_maxOffsetLFRB-GetRes(Faces::Back))/2;
     case Faces::Black:
     case Faces::Last:
-        std::invalid_argument("IStartOffset: Last is not a valid face");
+        std::invalid_argument("JStartOffset: Last is not a valid face");
     }
 }
 
@@ -86,7 +86,7 @@ unsigned int LayoutCubeMap2::JEndOffset(LayoutCubeMapBased::Faces f) const
         return GetRes(Faces::Top)+GetRes(Faces::Back)+(m_maxOffsetLFRB-GetRes(Faces::Back))/2;
     case Faces::Black:
     case Faces::Last:
-        std::invalid_argument("IStartOffset: Last is not a valid face");
+        std::invalid_argument("JEndOffset: Last is not a valid face");
     }
 }
 
@@ -134,7 +134,7 @@ CoordF LayoutCubeMap2::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& 
     }
     else
     {
-        std::invalid_argument("FromNormalizedInfoTo2d: Last is not a valid face");
+        std::invalid_argument("FromNormalizedInfoTo2d: Last or Black are not a valid face");
     }
 }
 

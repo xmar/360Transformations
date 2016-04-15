@@ -2,66 +2,127 @@
 
 using namespace IMT;
 
+unsigned int LayoutCubeMap::IStartOffset(LayoutCubeMapBased::Faces f) const
+{
+    switch(f)
+    {
+        case Faces::Front:
+            return (m_maxOffsetCols[0]-GetRes(f))/2;
+        case Faces::Back:
+            return (m_maxOffsetCols[0]-GetRes(f))/2;
+        case Faces::Right:
+            return m_maxOffsetCols[0]+(m_maxOffsetCols[1]-GetRes(f))/2;
+        case Faces::Left:
+            return m_maxOffsetCols[0]+(m_maxOffsetCols[1]-GetRes(f))/2;
+        case Faces::Top:
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]+(m_maxOffsetCols[2]-GetRes(f))/2;
+        case Faces::Bottom:
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]+(m_maxOffsetCols[2]-GetRes(f))/2;
+        case Faces::Last:
+        case Faces::Black:
+            std::invalid_argument("IStartOffset: Last is not a valid face");
+    }
+}
+unsigned int LayoutCubeMap::IEndOffset(LayoutCubeMapBased::Faces f) const
+{
+    switch(f)
+    {
+        case Faces::Front:
+            return m_maxOffsetCols[0]-(m_maxOffsetCols[0]-GetRes(f))/2;
+        case Faces::Back:
+            return m_maxOffsetCols[0]-(m_maxOffsetCols[0]-GetRes(f))/2;
+        case Faces::Right:
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]-(m_maxOffsetCols[1]-GetRes(f))/2;
+        case Faces::Left:
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]-(m_maxOffsetCols[1]-GetRes(f))/2;
+        case Faces::Top:
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]+m_maxOffsetCols[2]-(m_maxOffsetCols[2]-GetRes(f))/2;
+        case Faces::Bottom:
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]+m_maxOffsetCols[2]-(m_maxOffsetCols[2]-GetRes(f))/2;
+        case Faces::Last:
+        case Faces::Black:
+            std::invalid_argument("IEndOffset: Last is not a valid face");
+    }
+}
+unsigned int LayoutCubeMap::JStartOffset(LayoutCubeMapBased::Faces f) const
+{
+    switch(f)
+    {
+        case Faces::Front:
+            return (m_maxOffsetRows[0]-GetRes(f))/2;
+        case Faces::Back:
+            return m_maxOffsetRows[0]+(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Right:
+            return (m_maxOffsetRows[0]-GetRes(f))/2;;
+        case Faces::Left:
+            return m_maxOffsetRows[0]+(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Top:
+            return (m_maxOffsetRows[0]-GetRes(f))/2;;
+        case Faces::Bottom:
+            return m_maxOffsetRows[0]+(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Last:
+        case Faces::Black:
+            std::invalid_argument("JStartOffset: Last is not a valid face");
+    }
+}
+unsigned int LayoutCubeMap::JEndOffset(LayoutCubeMapBased::Faces f) const
+{
+    switch(f)
+    {
+        case Faces::Front:
+            return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;
+        case Faces::Back:
+            return m_maxOffsetRows[0]+m_maxOffsetRows[1]-(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Right:
+            return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;;
+        case Faces::Left:
+            return m_maxOffsetRows[0]+m_maxOffsetRows[1]-(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Top:
+            return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;;
+        case Faces::Bottom:
+            return m_maxOffsetRows[0]+m_maxOffsetRows[1]-(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Last:
+        case Faces::Black:
+            std::invalid_argument("JEndOffset: Last is not a valid face");
+    }
+}
 
 LayoutCubeMapBased::Faces LayoutCubeMap::From2dToFace(unsigned int i, unsigned int j) const
 {
-    //From
-    if (i < m_cubeEdge && j < m_cubeEdge)
+    for(const auto& f: get_range<Faces>())
     {
-        return Faces::Front;
+        if (f != Faces::Last && f != Faces::Black && InFace(i,j,f))
+        {
+            return f;
+        }
     }
-    else if (i < m_cubeEdge && j < 2*m_cubeEdge)
-    {
-        return Faces::Back;
-    }
-    else if (i < 2*m_cubeEdge && j < m_cubeEdge)
-    {
-        return Faces::Right;
-    }
-    else if (i < 2*m_cubeEdge && j < 2*m_cubeEdge)
-    {
-        return Faces::Left;
-    }
-    else if (i < 3*m_cubeEdge && j < m_cubeEdge)
-    {
-        return Faces::Top;
-    }
-    else if (i < 3*m_cubeEdge && j < 2*m_cubeEdge)
-    {
-        return Faces::Bottom;
-    }
+    return Faces::Black;
 }
 
 Layout::NormalizedFaceInfo LayoutCubeMap::From2dToNormalizedFaceInfo(const CoordI& pixel) const
 {
     auto f = From2dToFace(pixel.x, pixel.y);
-    double i = double(pixel.x%m_cubeEdge)/m_cubeEdge;
-    double j = double(pixel.y%m_cubeEdge)/m_cubeEdge;
+    if (f == Faces::Black)
+    {
+        return Layout::NormalizedFaceInfo(CoordF(0,0), static_cast<int>(f));
+    }
+    double i = double(pixel.x - IStartOffset(f))/GetRes(f);
+    double j = double(pixel.y - JStartOffset(f))/GetRes(f);
     return Layout::NormalizedFaceInfo(CoordF(i,j), static_cast<int>(f));
 }
 
-#define BORDER(x) (MAX(1.0, MIN(m_cubeEdge-1,x)))
+#define BORDER(x) (MAX(1.0, MIN(GetRes(f)-1,x)))
 
 CoordF LayoutCubeMap::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
 {
-    LayoutCubeMapBased::Faces f = static_cast<LayoutCubeMapBased::Faces>(ni.m_faceId);
+    Faces f = static_cast<LayoutCubeMapBased::Faces>(ni.m_faceId);
     const CoordF& coord (ni.m_normalizedFaceCoordinate);
-    switch (f)
+    if (f != Faces::Last && f != Faces::Black)
     {
-        case LayoutCubeMapBased::Faces::Front:
-            return CoordF(BORDER(m_cubeEdge*coord.x), BORDER(m_cubeEdge*coord.y));
-        case LayoutCubeMapBased::Faces::Back:
-            return CoordF(BORDER(m_cubeEdge*coord.x), BORDER(m_cubeEdge*coord.y)+m_cubeEdge);
-        case LayoutCubeMapBased::Faces::Right:
-            return CoordF(BORDER(m_cubeEdge*coord.x)+m_cubeEdge, BORDER(m_cubeEdge*coord.y));
-        case LayoutCubeMapBased::Faces::Left:
-            return CoordF(BORDER(m_cubeEdge*coord.x)+m_cubeEdge, BORDER(m_cubeEdge*coord.y)+m_cubeEdge);
-        case LayoutCubeMapBased::Faces::Top:
-            return CoordF(BORDER(m_cubeEdge*coord.x)+2*m_cubeEdge, BORDER(m_cubeEdge*coord.y));
-        case LayoutCubeMapBased::Faces::Bottom:
-            return CoordF(BORDER(m_cubeEdge*coord.x)+2*m_cubeEdge, BORDER(m_cubeEdge*coord.y)+m_cubeEdge);
-        case LayoutCubeMapBased::Faces::Last:
-        case LayoutCubeMapBased::Faces::Black:
-            std::invalid_argument("FromNormalizedInfoTo2d: Last is not a valid face");
+        return CoordF(BORDER(GetRes(f)*coord.x)+IStartOffset(f), BORDER(GetRes(f)*coord.y)+JStartOffset(f));
+    }
+    else
+    {
+        throw std::invalid_argument("FromNormalizedInfoTo2d: Last is not a valid face");
     }
 }

@@ -19,10 +19,10 @@ class LayoutCubeMap2: public LayoutCubeMapBased
 	        FaceResolutions fr(std::move(pixelEdges));
 	        auto maxOffsetTFB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Top), fr.GetRes(Faces::Bottom)));
 	        auto maxOffsetLFRB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Left), MAX(fr.GetRes(Faces::Right), fr.GetRes(Faces::Back))));
-            return std::make_shared<LayoutCubeMap2>(
+            return std::shared_ptr<LayoutCubeMap2>( new LayoutCubeMap2(
                 fr.GetRes(Faces::Left)+maxOffsetTFB+fr.GetRes(Faces::Right)+fr.GetRes(Faces::Back),
                 fr.GetRes(Faces::Top)+maxOffsetLFRB+fr.GetRes(Faces::Bottom),
-                fr, maxOffsetTFB, maxOffsetLFRB);
+                fr, maxOffsetTFB, maxOffsetLFRB));
 	    }
 
         /** \brief Layout with the same resolution for each faces
@@ -34,8 +34,6 @@ class LayoutCubeMap2: public LayoutCubeMapBased
 		            LayoutCubeMapBased(4*pixelEdge, 3*pixelEdge,
                                  {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}})
                     , m_maxOffsetTFB(pixelEdge), m_maxOffsetLFRB(pixelEdge) {}
-        LayoutCubeMap2(unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
-                LayoutCubeMapBased(width, height, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
 
         virtual ~LayoutCubeMap2(void) = default;
 
@@ -48,6 +46,9 @@ class LayoutCubeMap2: public LayoutCubeMapBased
         private:
             unsigned int m_maxOffsetTFB;
             unsigned int m_maxOffsetLFRB;
+
+            LayoutCubeMap2(unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
+                LayoutCubeMapBased(width, height, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
 
 			unsigned int IStartOffset(LayoutCubeMapBased::Faces f) const;
             unsigned int IEndOffset(LayoutCubeMapBased::Faces f) const;
