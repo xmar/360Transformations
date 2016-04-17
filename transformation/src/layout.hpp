@@ -29,6 +29,14 @@ class Layout
         /*Return the coordinate of the 2d layout that correspond to the point on the sphere in shperical coordinate sphericalCoord*/
         CoordF FromSphereTo2d(const Coord3dSpherical& sphericalCoord) const;
 
+        /** \brief Function that can be overide to init the layout object (have to be called before using the layout object). By default do nothing.
+         */
+        virtual void Init(void) {}
+
+        /** \brief If we need a dynamic layout that evolve with the time, this function should be overide to apply the evolution. By default do nothing.
+         */
+        virtual void NextStep(void) {}
+
         /** \brief return the normalized face information corresponding to the given coordinate of a pixel on the 2d layout
          *
          * \param pixel Coordinate of the pixel on the 2d layout

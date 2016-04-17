@@ -11,31 +11,36 @@
 #include <fstream>
 #include <array>
 #include <memory>
+#include <math.h>
+#include <chrono>
 
 #include "boost/program_options.hpp"
 #include <boost/config.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
+#include <sstream>
+
 #include <opencv2/opencv.hpp>
 
 #include "picture.hpp"
-#include "layoutCubeMap.hpp"
-#include "layoutCubeMap2.hpp"
-#include "layoutEquirectangular.hpp"
-#include "layoutFlatFixed.hpp"
-#include "layoutPyramidal.hpp"
-#include "layoutRhombicdodeca.hpp"
+#include "layout.hpp"
+#include "configParser.hpp"
 
 using namespace IMT;
 
 int main( int argc, const char* argv[] )
 {
    namespace po = boost::program_options;
+   namespace pt = boost::property_tree;
    po::options_description desc("Options");
    desc.add_options()
       ("help,h", "Produce this help message")
       ("inputVideo,i", po::value<std::string>(), "path to the input video")
-      ("outputVideo,o", po::value<std::string>(), "path to the output video")
       ("nbFrames,n", po::value<int>(), "number Of Frame to process (if <= 0 process the whole video) [default 0]")
+      ("config,c", po::value<std::string>(),"Path to the configuration file")
       ;
 
    po::variables_map vm;
@@ -45,9 +50,9 @@ int main( int argc, const char* argv[] )
             vm);
 
       //--help
-      if ( vm.count("help") || !vm.count("inputVideo") || !vm.count("outputVideo") )
+      if ( vm.count("help") || !vm.count("inputVideo") || !vm.count("config"))
       {
-         std::cout << "Help: trans -i path -o path "<< std::endl
+         std::cout << "Help: trans -i path -o path -c config"<< std::endl
             <<  desc << std::endl;
          return 0;
       }
@@ -55,79 +60,120 @@ int main( int argc, const char* argv[] )
       po::notify(vm);
 
       auto pathToInputVideo = vm["inputVideo"].as<std::string>();
-      auto pathToOutputVideo = vm["outputVideo"].as<std::string>();
       int nbFrames = vm.count("nbFrames") && vm["nbFrames"].as<int>() > 0 ? vm["nbFrames"].as<int>() : 0;
+      std::string pathToIni = vm["config"].as<std::string>();
 
+      std::cout << "Path to the ini file: " <<pathToIni << std::endl;
 
-      //TEST
-      cv::VideoCapture cap(pathToInputVideo);
-      //cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), cap.get(CV_CAP_PROP_FPS), cv::Size(cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
-      //unsigned int cubeEdge = cap.get(CV_CAP_PROP_FRAME_WIDTH)/3;
-      LayoutEquirectangular leq (cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-      LayoutEquirectangular leq2(cap.get(CV_CAP_PROP_FRAME_WIDTH)/4, cap.get(CV_CAP_PROP_FRAME_HEIGHT)/4);
-      LayoutCubeMap lcm(cap.get(CV_CAP_PROP_FRAME_WIDTH));
-      LayoutCubeMap2 lcm2(cap.get(CV_CAP_PROP_FRAME_WIDTH));
-      LayoutPyramidal lp(2.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-      LayoutPyramidal lp2(3.1, 0, 0, 0, cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-      LayoutRhombicdodeca lr(cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2);
-      LayoutFlatFixed lff(PI()/2.f, -PI()/4.f, 0.f, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT), 3*PI()/4.f);
-      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), 24, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
+//      GlobalArgsStructure sga;
+//
+      //read the ini file the feed the GlobalArgsStructure
+      pt::ptree ptree;
+      pt::ptree ptree_json;
+      pt::ini_parser::read_ini(pathToIni, ptree);
+
+      std::vector<std::vector<std::string>> layoutFlowSections;
+      try {
+      std::stringstream ss(ptree.get<std::string>("Global.layoutFlow"));
+      pt::json_parser::read_json(ss, ptree_json);
+      BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
+      {
+          std::vector<std::string> lfs;
+          BOOST_FOREACH(boost::property_tree::ptree::value_type & u, v.second)
+          {
+              lfs.push_back(u.second.data());
+          }
+          if (lfs.size()>0)
+          {
+              layoutFlowSections.push_back(std::move(lfs));
+          }
+      }
+      }
+      catch (std::exception &e)
+      {
+          std::cout << "Error while parsing the Global.layoutFlow: " << e.what() << std::endl;
+          exit(1);
+      }
+
+      std::string pathToOutputVideo = ptree.get<std::string>("Global.videoOutputName");
+      bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
+
+        cv::VideoCapture cap(pathToInputVideo);
+
+        std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
+        for(auto& lfsv: layoutFlowSections)
+        {
+            bool isFirst = true;
+            layoutFlowVect.push_back(std::vector<std::shared_ptr<Layout>>());
+            for(auto& lfs: lfsv)
+            {
+                layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, isFirst, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
+                layoutFlowVect.back().back()->Init();
+                isFirst = false;
+            }
+        }
+
+        std::vector<cv::VideoWriter> cvVideoWriters;
+        if (!pathToOutputVideo.empty())
+        {
+            size_t lastindex = pathToOutputVideo.find_last_of(".");
+            std::string pathToOutputVideoExtension = pathToOutputVideo.substr(lastindex, pathToOutputVideo.size());
+            pathToOutputVideo = pathToOutputVideo.substr(0, lastindex);
+            double fps = ptree.get<double>("Global.fps");
+            unsigned int j = 0;
+            for(auto& lfsv: layoutFlowSections)
+            {
+                const auto& l = layoutFlowVect[j].back();
+                std::string path = pathToOutputVideo+std::to_string(j+1)+lfsv.back()+pathToOutputVideoExtension;
+                std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
+                cvVideoWriters.emplace_back(path, cv::VideoWriter::fourcc('D','A','V','C'), fps,
+                                            cv::Size(l->GetWidth(), l->GetHeight()));
+                ++j;
+            }
+        }
+
+//      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), sga.fps, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
       cv::Mat img;
       int count = 0;
+      double averageDuration = 0;
       while (cap.read(img))
       {
-          Picture pict(img);
-          std::cout << "Read image" << std::endl;
-          pict.ImgShowResize("Test", cv::Size(1200,600));
-          //cv::waitKey(0);
-          //cv::destroyAllWindows();
+          auto startTime = std::chrono::high_resolution_clock::now();
+          auto pict = std::make_shared<Picture>(img);
+          std::cout << "Read image " << count << std::endl;
 
-          auto cm = lcm.FromLayout(pict, leq);
-          cm->ImgShowResize("CubeMap", cv::Size(1200,800));
+        unsigned int j = 0;
+        for(auto& lf: layoutFlowVect)
+        {
+            auto pictOut = pict;
+            for (unsigned int i = 1; i < lf.size(); ++i)
+            {
+                pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
+                lf[i]->NextStep();
+            }
+            if (displayFinalPict)
+            {
+                pictOut->ImgShowWithLimit("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,900));
+            }
+            if (!cvVideoWriters.empty())
+            {
+                cvVideoWriters[j] << pictOut->GetMat();
+            }
+            ++j;
+        }
 
-          ////cv::destroyAllWindows();
-          //vwriter << cm->GetMat();
+        if (displayFinalPict)
+        {
+            cv::waitKey(0);
+            cv::destroyAllWindows();
+        }
 
-          auto eq = lcm.ToLayout(*cm, leq);
-          eq->ImgShowResize("Test2", cv::Size(1200,600));
-
-
-//          auto ff = lff.FromLayout(pict, leq);
-//          ff->ImgShowResize("Flat Fix", cv::Size(1200,600));
-//
-//          auto ff2 = lff.FromLayout(*cm, lcm);
-//          ff2->ImgShowResize("Flat Fix2", cv::Size(1200,600));
-//
-          auto p = lp.FromLayout(pict, leq);
-          p->ImgShowResize("Pyramidal", cv::Size(900,300));
-
-          auto eq2 =  lp.ToLayout(*p, leq);
-          eq2->ImgShowResize("PyramidalToEq", cv::Size(1200,600));
-
-          p = lp2.FromLayout(pict, leq);
-          p->ImgShowResize("Pyramidal2", cv::Size(900,300));
-
-          eq2 =  lp2.ToLayout(*p, leq);
-          eq2->ImgShowResize("Pyramidal2ToEq", cv::Size(1200,600));
-
-          auto rhombic = lr.FromLayout(pict, leq);
-          rhombic->ImgShowResize("Rhombicstuff", cv::Size(1200,400));
-
-          auto eq4 =  leq.FromLayout(*rhombic, lr);
-          eq4->ImgShowResize("RhombicToEq", cv::Size(1200,600));
-//
-//          auto ff3 = lff.FromLayout(*rhombic, lr);
-//          ff3->ImgShowResize("Flat Fix3", cv::Size(1200,600));
-//
-          auto cm2 = lcm2.FromLayout(pict, leq);
-          cm2->ImgShowResize("CubeMap2", cv::Size(1200,900));
-
-          auto eq5 = leq.FromLayout(*cm2, lcm2);
-          eq5->ImgShowResize("CubeMap2ToEq", cv::Size(1200,600));
-
-          cv::waitKey(0);
-          cv::destroyAllWindows();
+          auto endTime = std::chrono::high_resolution_clock::now();
+          auto duration = std::chrono::duration_cast<std::chrono::microseconds>( endTime - startTime ).count();
+          averageDuration = (averageDuration*count + duration)/(count+1);
+          std::cout << "Elapsed time for this picture: "<< float(duration)/1000000.f<< "s "
+            "estimated remaining time = " << (nbFrames-count-1)*averageDuration/1000000.f << "s "  << std::endl;
           if (++count == nbFrames)
           {
               break;
@@ -137,15 +183,20 @@ int main( int argc, const char* argv[] )
    catch(const po::error& e)
    {
       std::cerr << "ERROR: " << e.what() << std::endl << std::endl
-         << "Help: remuxer pathToInputVideo pathToOutputVideo [-hs] [--keepAll] [-r [--randomLossSize]] "<< std::endl
          << desc << std::endl;
       return 1;
+   }
+   catch(std::exception& e)
+   {
+      std::cerr << "Uncatched exception: " << e.what() << std::endl
+         << desc << std::endl;
+      return 1;
+
    }
    catch(...)
    {
       std::cerr << "Uncatched exception" << std::endl
-         << "Help: remuxer -i pathToInputVideo -o pathToOutputVideo [-hs] [--keepAll] [-r [--randomLossSize]] "<< std::endl
-         << desc << std::endl;
+        << desc << std::endl;
       return 1;
 
    }

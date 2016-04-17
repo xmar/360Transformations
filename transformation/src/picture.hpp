@@ -21,6 +21,13 @@ class Picture {
             cv::resize(m_pictMat, resizeImg, s);
             cv::imshow(txt, resizeImg);
         }
+        /** \brief Display the picture with it current dimention but will resize the picture not to exceed the size limit (keeping the picture propotions)
+         *
+         * \param txt std::string Name of the display window
+         * \param s cv::Size Size limit the picture will not exceed
+         *
+         */
+        void ImgShowWithLimit(std::string txt, cv::Size s) const;
         const cv::Mat& GetMat(void) const {return m_pictMat;}
         void SetValue(CoordI pt, Pixel val) { m_pictMat.at<Pixel>(pt) = val; }
     protected:

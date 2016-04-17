@@ -28,3 +28,38 @@ Pixel Picture::GetInterPixel(CoordF pt) const
 
     return Pixel(b, g, r);
 }
+
+void Picture::ImgShowWithLimit(std::string txt, cv::Size s) const
+{
+    unsigned int width = s.width;
+    unsigned int height = s.height;
+    const unsigned int pictWidth = m_pictMat.cols;
+    const unsigned int pictheight = m_pictMat.rows;
+    if (height < pictheight && width < pictWidth)
+    {
+        if (pictheight > pictWidth)
+        {
+            width = float(height) * pictWidth / pictheight;
+        }
+        else
+        {
+            height = float(width) * pictheight / pictWidth;
+        }
+    }
+    else if (width < pictWidth)
+    {
+        height = float(width) * pictheight / pictWidth;
+    }
+    else if (height < pictheight)
+    {
+        width = float(height) * pictWidth / pictheight;
+    }
+    else
+    {
+        height = pictheight;
+        width = pictWidth;
+        ImgShow(txt);
+        return;
+    }
+    ImgShowResize(txt, cv::Size(width,height));
+}

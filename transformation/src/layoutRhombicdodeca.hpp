@@ -8,7 +8,7 @@ class LayoutRhombicdodeca: public Layout
 {
     public:
         LayoutRhombicdodeca(unsigned int height): Layout(6*height, 2*height), m_faceHeight(height) {}
-        ~LayoutRhombicdodeca(void) = default;
+        virtual ~LayoutRhombicdodeca(void) = default;
 
         enum class Face{ Face1, Face2, Face3, Face4, Face5, Face6, Face7, Face8, Face9, Face10, Face11, Face12, Last, First=Face1 };
 

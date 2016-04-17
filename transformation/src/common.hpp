@@ -151,7 +151,6 @@ inline Coord3dSpherical IntersectionPlanSpherical (const Plan& p, const Coord3dC
 }
 
 
-
 inline constexpr bool AlmostEqual(double a, double b)
 {
    return inIntervalStrict(a, b-0.0005f, b+0.0005f);
