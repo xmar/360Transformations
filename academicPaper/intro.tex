@@ -24,17 +24,22 @@ extract the \ac{FoV} videos. This solution enables fast navigation but the bandw
 significant.
 
 We explore in this paper a solution where the server offers multiple versions of the same 360-degree 
-video. Each version contains the full spherical video with an emphasis on one angle of vision, \textit{i.e.},
+video. Each version contains the full spherical video with an emphasis on a given angle of vision, \textit{i.e.},
 the part of the video that is in front of the angle of vision is at the highest quality and the video quality degrades
 for the other parts. The client device chooses the video version according to the eye attention such that the 
-\ac{FoV} is the closest to the front view of the video version. When the end-user changes the 
+the front view of the video version is the closest to the \ac{FoV} videos. When the end-user changes the 
 \ac{FoV}, the client switches to another video version, but the movement is smooth because the device 
-can still compute \ac{FoV} videos from the full quality, even if it is at a lower quality until it gets the 
-new video version.
-
-\cite{wu_enabling_2015}.
+can always extract \ac{FoV} videos from any video version, even if it is at a lower quality until 
+it gets the video version that best suits the eye attention.
 
 \subsection{Limitations of Previous Work}
+
+The principle of differentiated video quality in the delivery of omnidirectional videos has been sketched 
+in a recent short paper by~\citet{ochi_live_2015}. Their proposal is based on the idea of video
+tiling, which has been proposed for panorama 
+video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}.
+In these papers, the video is cut into independent tiles (typically $8\times 8$) and the server offers several
+video qualities for each tile. The client selects the tile qualities according to the eye attention.
 
 \subsection{Our Contributions}
 
