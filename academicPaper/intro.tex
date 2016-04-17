@@ -1,9 +1,40 @@
 \section{Introduction}
 \label{sec:introduction}
 
-\subsection{Context}
-\cite{wu_enabling_2015}
-\subsection{Motivation}
+\subsection{Context and Motivations}
+
+The popularity of omnidirectional multimedia systems (also known as interactive 360-degree video) 
+has grown with the advent of both new capturing systems
+(including catadioptric optical systems and multi-camera with stitching systems) and new video
+consumption systems (including head-mounted display and interactive HTML5 video players).
+However, the delivery of 360-degree multimedia content, from the servers of the content providers
+to the end-users,
+is still a challenge. Head-mounted devices display two videos (one per
+eye), each of them with a high resolution (typically $1080\times 1200$ for state-of-the-art devices)
+and a high frame rate. Both videos, which correspond to the \ac{FoV} on both eyes, are extracted
+from a wider spherical video with a resolution that is three to four times larger.
+
+None of the current solutions for the delivery of 360-degree videos is entirely satisfactory. Sending only 
+the  \ac{FoV} videos is the implementation that is the least bandwidth-hungry. It requires however the server to 
+compute the \ac{FoV} from the spherical video for each end-user. Moreover, it does not enable fast
+navigation within the scene: When the client changes the 
+\ac{FoV}, the notification to the server and the delivery of the newly adjusted \ac{FoV} videos 
+introduce delays. Another delivery implementation is to send the full spherical video and to let the device
+extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth requirements are 
+significant.
+
+We explore in this paper a solution where the server offers multiple versions of the same 360-degree 
+video. Each version contains the full spherical video with an emphasis on one angle of vision, \textit{i.e.},
+the part of the video that is in front of the angle of vision is at the highest quality and the video quality degrades
+for the other parts. The client device chooses the video version according to the eye attention such that the 
+\ac{FoV} is the closest to the front view of the video version. When the end-user changes the 
+\ac{FoV}, the client switches to another video version, but the movement is smooth because the device 
+can still compute \ac{FoV} videos from the full quality, even if it is at a lower quality until it gets the 
+new video version.
+
+\cite{wu_enabling_2015}.
+
+\subsection{Limitations of Previous Work}
 
 \subsection{Our Contributions}
 
