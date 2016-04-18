@@ -39,6 +39,10 @@ Coord3dCart LayoutRhombicdodecaBased::FromNormalizedInfoTo3d(const Layout::Norma
     const double& normalizedI = ni.m_normalizedFaceCoordinate.x;
     const double& normalizedJ = ni.m_normalizedFaceCoordinate.y;
     auto f = static_cast<Faces>(ni.m_faceId);
+    if (f == Faces::Black)
+    {
+        return Coord3dCart(0,0,0);
+    }
     Coord3dCart canonicCoordinates = Coord3dCart(1,0,-1) + Coord3dCart(0, -std::sqrt(2)/2, 1) * normalizedI + Coord3dCart(0, std::sqrt(2)/2, 1) * normalizedJ;
     return Rotation(canonicCoordinates, FaceToRotMat(f));
 }

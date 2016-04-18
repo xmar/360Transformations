@@ -42,7 +42,7 @@ class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
 
             unsigned int totalWidth(0), totalHeight(0);
             for (auto& w: m_colsMaxOffset) {totalWidth += w;}
-            for (auto& h: m_rowsMaxOffset) {totalWidth += h;}
+            for (auto& h: m_rowsMaxOffset) {totalHeight += h;}
             SetWidth(totalWidth);
             SetHeight(totalHeight);
         }

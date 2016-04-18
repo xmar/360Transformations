@@ -144,7 +144,8 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             {
                 faceRes[i] = (infer ? inputWidth/8.0 : 1)*ptree.get<double>(layoutSection+".rhombEdgeLengthFace"+std::to_string(i+1));
             }
-            return std::make_shared<LayoutRhombicdodeca>(faceRes[0]);
+
+            return LayoutRhombicdodeca::GenerateLayout(faceRes);
         }
     }
     catch (std::exception &e)
