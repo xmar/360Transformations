@@ -9,6 +9,7 @@
 #include "layoutCubeMap.hpp"
 #include "layoutCubeMap2.hpp"
 #include "layoutEquirectangular.hpp"
+#include "layoutEquirectangularTiles.hpp"
 #include "layoutFlatFixed.hpp"
 #include "layoutPyramidal.hpp"
 #include "layoutPyramidal2.hpp"
@@ -146,6 +147,20 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
 
             return LayoutRhombicdodeca::GenerateLayout(faceRes);
+        }
+        if (layoutType == "equirectangularTiled")
+        {
+            LayoutEquirectangularTiles::TilesMap tileRes;
+            for (unsigned int i = 0; i < 8; ++i)
+            {
+                for (unsigned int j = 0; j < 8; ++j)
+                {
+                    auto scale = ptree.get<double>(layoutSection+".equirectangularTile_"+std::to_string(i)+"_"+std::to_string(j));
+                    tileRes[i][j] = std::make_tuple(unsigned(scale*inputWidth/8),unsigned(scale*inputHeight/8));
+                }
+            }
+
+            return std::make_shared<LayoutEquirectangularTiles>(tileRes);
         }
     }
     catch (std::exception &e)
