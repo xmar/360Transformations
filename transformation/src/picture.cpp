@@ -63,3 +63,21 @@ void Picture::ImgShowWithLimit(std::string txt, cv::Size s) const
     }
     ImgShowResize(txt, cv::Size(width,height));
 }
+
+double Picture::GetMSE(const Picture& pic) const
+{
+    if (pic.GetHeight()!= GetHeight() && pic.GetWidth() != GetWidth())
+    {
+        throw std::invalid_argument("MSE computation require pictures to have the same width and height");
+    }
+    cv::Mat tmp(cv::Mat::zeros(GetHeight(), GetWidth(), m_pictMat.type()));
+    cv::subtract(m_pictMat, pic.m_pictMat, tmp);
+    cv::multiply(tmp, tmp, tmp);
+    return cv::mean(tmp).val[0];
+}
+
+double Picture::GetPSNR(const Picture& pic) const
+{
+    auto mse = GetMSE(pic);
+    return mse != 0 ? 10.0*std::log10(255*255/mse) : 100.0;
+}

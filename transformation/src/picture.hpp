@@ -30,6 +30,23 @@ class Picture {
         void ImgShowWithLimit(std::string txt, cv::Size s) const;
         const cv::Mat& GetMat(void) const {return m_pictMat;}
         void SetValue(CoordI pt, Pixel val) { m_pictMat.at<Pixel>(pt) = val; }
+        /** \brief Return the Mean Square Error of the picture pic and this picture
+         *
+         * \param pic const Picture& The picture from witch we compare
+         * \return double The computed Mean Square Error
+         *
+         */
+        double GetMSE(const Picture& pic) const;
+        /** \brief Return the PSNR of the picture pic with this Picture as the reference
+         *
+         * \param pic const Picture& picture of with we want to compute the PSNR
+         * \return double The PSNR of the picture pic with this picture as reference
+         *
+         */
+        double GetPSNR(const Picture& pic) const;
+
+        const int& GetWidth(void) const {return m_pictMat.cols;}
+        const int& GetHeight(void) const {return m_pictMat.rows;}
     protected:
         cv::Mat m_pictMat;
     private:

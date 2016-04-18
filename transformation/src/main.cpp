@@ -22,6 +22,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <sstream>
+#include <fstream>
 
 #include <opencv2/opencv.hpp>
 
@@ -96,6 +97,7 @@ int main( int argc, const char* argv[] )
       }
 
       std::string pathToOutputVideo = ptree.get<std::string>("Global.videoOutputName");
+      std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
 
         cv::VideoCapture cap(pathToInputVideo);
@@ -131,7 +133,25 @@ int main( int argc, const char* argv[] )
                 ++j;
             }
         }
-
+        std::vector<std::shared_ptr<std::ofstream>> qualityWriterVect;
+        if (!pathToOutputQuality.empty())
+        {
+            size_t lastindex = pathToOutputQuality.find_last_of(".");
+            std::string pathToOutputQualityExtension = pathToOutputQuality.substr(lastindex, pathToOutputQuality.size());
+            pathToOutputQuality = pathToOutputQuality.substr(0, lastindex);
+            unsigned int j = 0;
+            for(auto& lfsv: layoutFlowSections)
+            {
+                if (j != 0)
+                {
+                    const auto& l = layoutFlowVect[j].back();
+                    std::string path = pathToOutputQuality+std::to_string(j+1)+lfsv.back()+pathToOutputQualityExtension;
+                    std::cout << "Quality path for flow "<< j+1 <<": " << path << std::endl;
+                    qualityWriterVect.push_back(std::make_shared<std::ofstream>(path));
+                }
+                ++j;
+            }
+        }
 //      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), sga.fps, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
       std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
       cv::Mat img;
@@ -144,6 +164,7 @@ int main( int argc, const char* argv[] )
           std::cout << "Read image " << count << std::endl;
 
         unsigned int j = 0;
+        decltype(pict) firstPict(nullptr);
         for(auto& lf: layoutFlowVect)
         {
             auto pictOut = pict;
@@ -152,9 +173,19 @@ int main( int argc, const char* argv[] )
                 pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
                 lf[i]->NextStep();
             }
+            if (firstPict == nullptr)
+            {
+                firstPict = pictOut;
+            }
             if (displayFinalPict)
             {
                 pictOut->ImgShowWithLimit("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,900));
+            }
+            if (!qualityWriterVect.empty() && j != 0)
+            {
+                auto psnr = firstPict->GetPSNR(*pictOut);
+                std::cout << "Flow " << j << ": PSNR = " << psnr << "dB" << std::endl;
+                *qualityWriterVect[j-1] << psnr << std::endl;
             }
             if (!cvVideoWriters.empty())
             {
