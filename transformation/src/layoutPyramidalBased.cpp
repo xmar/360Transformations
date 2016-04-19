@@ -113,3 +113,5 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
         return Coord3dCart(0,0,0);
     }
 }
+
+

@@ -27,7 +27,7 @@ class LayoutPyramidal: public LayoutPyramidalBased
          *
          */
         LayoutPyramidal(double baseEdge,double yaw, double pitch, double roll, unsigned int pixelBaseEdge):
-        LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*pixelBaseEdge, pixelBaseEdge) {}
+        LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*pixelBaseEdge, pixelBaseEdge,{{pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge}}) {}
         virtual ~LayoutPyramidal(void) = default;
 
 
