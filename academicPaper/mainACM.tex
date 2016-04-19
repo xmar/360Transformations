@@ -37,7 +37,7 @@
 \usepackage{listings}
 \usepackage[hidelinks]{hyperref}
 %\usetikzlibrary{plotmarks}
-\usetikzlibrary{shapes,positioning,calc}
+\usetikzlibrary{shapes,positioning,3d,calc}
 \usetikzlibrary{decorations,decorations.pathmorphing}
 \usetikzlibrary{external}
 \newcommand{\externaldirectory}{latex.out/}
@@ -166,7 +166,72 @@
 % =============
 \section{Navigable 360-degree Video Delivery}
 
-\subsection{Architecture}
+We provider in this Section the background for our study.
+First, we depict the overall architecture of the delivery system that we envisioned.
+Then, we recall the main geometrical mappings that exist for 360-degree videos.
+
+\subsection{Global Delivery Architecture}
+
+We introduce here the main principles of the delivery architecture and we let for future 
+work the complete description and the performance evaluation.
+
+\begin{figure}[h]
+\begin{tikzpicture}
+
+\tikzset{
+     element/.style={
+     	rounded corners,
+     	rectangle,
+  	 	thick,
+  	 	draw=black,
+  	 	minimum height=2.5cm,minimum width=2.5cm
+     }
+}
+
+\tikzset{
+	elementtitle/.style={
+		rectangle,
+		rounded corners,
+		fill=gray!60,
+		font=\footnotesize,
+		text=white,
+		anchor=north
+	}
+}
+
+\tikzset{
+	spherical/.pic={
+		\draw (-1,0) arc (180:360:1cm and 0.5cm);
+	    \draw[dashed] (-1,0) arc (180:0:1cm and 0.5cm);
+    	\draw (0,1) arc (90:270:0.5cm and 1cm);
+    	\draw[dashed] (0,1) arc (90:-90:0.5cm and 1cm);
+    	\draw (0,0) circle (1cm);
+    	\shade[ball color=blue!10!white,opacity=0.20] (0,0) circle (1cm);
+    }
+}
+		
+\def\ecart{20pt}
+
+
+
+% capturing system
+\node[element] (0,0) (capturing) {};
+\node[elementtitle, above=-10pt of capturing] {capturing};
+\draw (capturing) pic {spherical};
+
+% server
+\node[element,right=\ecart of capturing] (server) {};
+\node[elementtitle, above=-10pt of server] {\vphantom{pt}server};
+
+% client
+\node[element,right=\ecart of server] (client) {};
+\node[elementtitle, above=-10pt of client] {\vphantom{pt}client};
+
+
+\end{tikzpicture}
+\caption{Global architecture of the navigable 360-degree video delivery system}
+\end{figure}
+
 
 \subsection{Mapping of Spherical Videos}
 

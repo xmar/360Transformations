@@ -38,7 +38,7 @@ full video) until it switches to a new video version that better suits the new v
 
 \subsection{Limitations of Previous Work}
 
-The principle of differentiated video quality in the delivery of omnidirectional videos has been sketched 
+The principle of variable video quality in the delivery of omnidirectional videos has been sketched 
 in a recent short paper by~\citet{ochi_live_2015}. Their proposal is based on the idea of video
 tiling, which has been implemented for navigable panorama 
 video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}: The panorama video 
@@ -61,7 +61,7 @@ projections on \emph{cube map}~\cite{Ng2005} and
 geometrical layouts has focused on enabling efficient implementation of signal processing 
 functions~\cite{kazhdan_metric-aware_2010} and improving the video encoding~\cite{tosic_low_2009}. 
 However, to the best of our knowledge, the 
-question of differentiated quality on the different faces of the layouts has not been studied so far.
+question of variable quality on the different faces of the layouts has not been studied so far.
 
 Finally, a major content provider of 360-degree videos has recently released details about the 
 implementation of its delivery platform~\cite{facebook}. The depicted system is based on the same
@@ -75,17 +75,17 @@ information loss and distorted extraction of \ac{FoV} videos.
 \subsection{Our Contributions}
 
 In this paper, we present a system for navigable 360-degree video delivery. Our focus is
-about the mapping of spherical videos into geometrical layouts with differentiated qualities
+about the mapping of spherical videos into geometrical layouts with variable qualities
 with respect of angle of visions. Our contribution is twofold:
 \begin{itemize}
 \item We introduce a tool (released on open source in a public repository\footnote{url is hidden for blind
 preservation.}) that enables the mapping from a spherical video
-into any geometrical layout (and vice versa). The tool has two main features: it enables differentiated
+into any geometrical layout (and vice versa). The tool has two main features: it enables variable
 quality for different parts of the 2D video with respect to the geometrical layouts, and it extracts the 
 \ac{FoV} videos from any point in the sphere. With this tool, the scientific community will be able to 
 study the mapping of spherical videos for the delivery of 360-videos and the implementation of delivery 
 solutions.
-\item We provide a comprehensive comparison of the different quality-differentiated 
+\item We provide a comprehensive comparison of the different quality-variable 
 mappings regarding
 the bit-rate of the resulting videos, the quality of the extracted \ac{FoV} videos, and the capacity to
 implement smooth navigation. Thus, we address most of
