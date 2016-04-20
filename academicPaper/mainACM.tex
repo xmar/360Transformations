@@ -193,12 +193,18 @@ work the complete description and the performance evaluation.
 	elementtitle/.style={
 		rectangle,
 		rounded corners,
-		fill=gray!60,
+		fill=gray!80,
 		font=\footnotesize,
 		text=white,
 		anchor=north
 	}
 }
+
+\def\convCmPt{0.0352778}
+\def\convCmPtRec{0.019844}
+\def\convCmPtRecThird{0.0066147}
+\def\convCmPtFourth{0.0088194}
+
 
 \tikzset{
 	spherical/.pic={
@@ -210,15 +216,42 @@ work the complete description and the performance evaluation.
      	\shade[ball color=blue!10!white,opacity=0.20] (0,0) circle (#1 pt);
     }
 }
+
+\tikzset{
+	pics/equirectangular/.style n args={3}{
+		code={
+			\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
+			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			\draw[color=black,fill=black] (0.0088194*#2*#1, 0.0066147*#3*#1) circle (1pt);
+		}		
+	}
+}
+
+\tikzset{
+	fov/.pic ={
+		\draw[densely dotted, thick, red] (0,0.15) rectangle (0.4,-0.25);
+		\draw[fill=red] (0.2,-0.05) circle (2pt);
+	}
+}
+
+\tikzset{
+	vr/.pic = {
+		\draw[rounded corners, thick] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+		\draw[rounded corners] (-0.038*#1, -0.019844*#1) rectangle (0.038*#1, 0.024*#1);
+		\draw(-0.019*#1,0) pic {fov};
+		\draw(0.019*#1,0) pic {fov};	
+	}
+}
 		
 \def\ecartElement{20pt}
-\def\sizeSphere{15}
+\def\sizeSphere{13}
 \def\ecartObjet{2}
+\def\ecartYVersions{20pt}
 
 
 % capturing system
 \node[element] (0,0) (capturing) {};
-\node[elementtitle, above=-10pt of capturing] {capturing};
+\node[elementtitle, above=-5pt of capturing] {capturing};
 \draw ([xshift=-\sizeSphere - \ecartObjet pt]capturing.east) pic {spherical=\sizeSphere};
 \pgfdeclareimage[width=18 pt]{camera}{video-camera-icon-hi.png}
 \node at ([xshift=21 pt]capturing.west) (camera1)
@@ -229,15 +262,34 @@ work the complete description and the performance evaluation.
 
 % server
 \node[element,right=\ecartElement of capturing] (server) {};
-\node[elementtitle, above=-10pt of server] {\vphantom{pt}server};
+\node[elementtitle, above=-5pt of server] {\vphantom{pt}server};
 \draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
+\draw ([xshift=-\sizeSphere - \ecartObjet pt]server.east) pic {equirectangular={\sizeSphere}{2}{1}};
+\draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=\ecartYVersions]server.east) pic {equirectangular={\sizeSphere}{-2}{-1}};
+\draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=-\ecartYVersions]server.east) pic {equirectangular={\sizeSphere}{0}{0}};
+
+\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]server.east);
+\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=\ecartYVersions]server.east);
+\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=-\ecartYVersions]server.east);
 
 \draw[-latex] ([xshift=2pt]capturing.east) to ([xshift=-2pt]server.west);
 
 
 % client
 \node[element,right=\ecartElement of server] (client) {};
-\node[elementtitle, above=-10pt of client] {\vphantom{pt}client};
+\node[elementtitle, above=-5pt of client] {\vphantom{pt}client};
+\draw([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) pic {equirectangular={\sizeSphere}{0}{0}};
+\draw ([xshift=-\sizeSphere - \ecartObjet pt]client.east) pic {vr=\sizeSphere};
+
+
+
+\draw[-latex] ([xshift=2pt, yshift=-\ecartYVersions]server.east) to ([xshift=-2pt, yshift=-\ecartYVersions]client.west);
+
+\draw([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) pic {fov};
+
+
+
+
 
 
 
