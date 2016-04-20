@@ -62,7 +62,8 @@ class LayoutRhombicdodecaBased: public Layout
                 std::array<unsigned int, 12> m_faces;
         };
 
-        LayoutRhombicdodecaBased(FaceResolutions fr): Layout(), m_fr(std::move(fr)) {}
+        LayoutRhombicdodecaBased(double yaw, double pitch, double roll, FaceResolutions fr): Layout(), m_fr(std::move(fr)),
+        m_rotMat(GetRotMatrice(yaw, pitch, roll)) {}
         Plan FaceToPlan(Faces f) const
         {
             switch(f)
@@ -103,6 +104,7 @@ class LayoutRhombicdodecaBased: public Layout
         unsigned int GetRes(Faces f) const {return m_fr.GetRes(f);}
     private:
         FaceResolutions m_fr;
+        RotMat m_rotMat;
 };
 
 }

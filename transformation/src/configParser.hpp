@@ -146,13 +146,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         }
         if (layoutType == "rhombicDodeca")
         {
+            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
+            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
+            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
             std::array<unsigned int, 12> faceRes;
             for (unsigned int i = 0; i < 12; ++i)
             {
                 faceRes[i] = (infer ? inputWidth/8.0 : 1)*ptree.get<double>(layoutSection+".rhombEdgeLengthFace"+std::to_string(i+1));
             }
 
-            return LayoutRhombicdodeca::GenerateLayout(faceRes);
+            return LayoutRhombicdodeca::GenerateLayout(yaw, pitch, roll, faceRes);
         }
         if (layoutType == "equirectangularTiled")
         {

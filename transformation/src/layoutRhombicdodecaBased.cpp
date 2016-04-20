@@ -9,6 +9,7 @@ Layout::NormalizedFaceInfo LayoutRhombicdodecaBased::From3dToNormalizedFaceInfo(
     Coord3dCart inter;
     double minRho = std::numeric_limits<double>::max();
 
+    Coord3dSpherical sc = Rotation(sphericalCoord, m_rotMat.t());
 
     for (auto testF: get_range<LayoutRhombicdodecaBased::Faces>())
     {
@@ -44,7 +45,7 @@ Coord3dCart LayoutRhombicdodecaBased::FromNormalizedInfoTo3d(const Layout::Norma
         return Coord3dCart(0,0,0);
     }
     Coord3dCart canonicCoordinates = Coord3dCart(1,0,-1) + Coord3dCart(0, -std::sqrt(2)/2, 1) * normalizedI + Coord3dCart(0, std::sqrt(2)/2, 1) * normalizedJ;
-    return Rotation(canonicCoordinates, FaceToRotMat(f));
+    return Rotation(canonicCoordinates, m_rotMat*FaceToRotMat(f));
 }
 
 
