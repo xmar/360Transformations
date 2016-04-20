@@ -231,9 +231,14 @@ work the complete description and the performance evaluation.
 \node[element,right=\ecartElement of capturing] (server) {};
 \node[elementtitle, above=-10pt of server] {\vphantom{pt}server};
 \draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
+
+\draw[-latex] (capturing) to (server);
+
+
 % client
 \node[element,right=\ecartElement of server] (client) {};
 \node[elementtitle, above=-10pt of client] {\vphantom{pt}client};
+
 
 
 \end{tikzpicture}
