@@ -131,11 +131,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
             if (infer)
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, {{pyramidBaseEdgeLength*inputWidth/4, pyramidHeightLeft*inputWidth/4, pyramidHeightRight*inputWidth/4, pyramidHeightTop*inputWidth/4, pyramidHeightBottom*inputWidth/4}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
             }
         }
         if (layoutType == "rhombicDodeca")
