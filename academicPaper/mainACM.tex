@@ -232,7 +232,7 @@ work the complete description and the performance evaluation.
 \node[elementtitle, above=-10pt of server] {\vphantom{pt}server};
 \draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
 
-\draw[-latex] (capturing) to (server);
+\draw[-latex] ([xshift=2pt]capturing.east) to ([xshift=-2pt]server.west);
 
 
 % client
