@@ -3,90 +3,124 @@
 
 \subsection{Context and Motivations}
 
-The popularity of interactive 360-degree video systems (also known as immersive omnidirectional video) 
+The popularity of interactive 360-degree video systems 
 has grown with the advent of both capturing systems
-(including catadioptric optical systems and multi-camera with stitching systems) and video
-consumption systems (including head-mounted display and interactive HTML5 video players).
-However, the delivery of 360-degree video content, from the servers of the content providers
+(including multi-camera with stitching systems) and video
+consumption systems (including head-mounted display devices).
+However, the delivery of 360-degree video content, from the servers
 to the end-users,
 is still a challenge. Head-mounted devices display two videos (one per
-eye), each of them with a high resolution (typically $1080\times 1200$ for state-of-the-art devices)
-and a high frame rate. Both videos, which correspond to the \ac{FoV} on both eyes, are extracted
+eye), each of them with a high frame rate and a high resolution (typically 
+$1080\times 1200$ for state-of-the-art devices). Both videos, which 
+correspond to the \ac{FoV}, are extracted
 from a wider spherical video with a resolution that is three to four times larger.
 
-None of the current solutions for the delivery of 360-degree videos is entirely satisfactory. Sending only 
-the \ac{FoV} videos is the least bandwidth-hungry implementation. It requires however the server to 
-compute the \ac{FoV} from the spherical video for each end-user. Moreover, it does not enable fast
-navigation within the scene: When the client changes the 
-\ac{FoV}, the device cannot immediately display any video because it does not have information on the other
-parts of the full spherical video. The device has to notify the server and to wait for the reception of the 
+None of the current solutions for the delivery of 360-degree videos is entirely 
+satisfactory. Sending only 
+the \ac{FoV} videos is the least bandwidth-hungry implementation. However, it does 
+not enable fast
+navigation within the 360-degree video: When the client moves the head, the device cannot 
+immediately display any \ac{FoV} because it does not have information on the other
+parts of the full spherical video. The device has to notify the server and to wait 
+for the reception of the 
 newly adjusted \ac{FoV} videos. Another delivery implementation is to send the full spherical video 
 and to let the device
 extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth requirements are 
 significant.
 
 We explore in this paper a solution where the server offers multiple \emph{versions} of the same 
-360-degree  video. Each version is characterized by an \emph{angle of vision}. It contains the full spherical 
-video with an emphasis on the given angle of vision, \textit{i.e.},
-the part of the video that is in front of the angle of vision is at the highest quality and the video quality 
-degrades for the other parts. The client device chooses the video version according to the eye attention 
-such that the 
-the front view of the video version is close to the \ac{FoV} videos. Thus, the \ac{FoV} extraction is done
-from the high quality spherical video. When the end-user changes the 
-\ac{FoV}, the device can always extract a \ac{FoV} video (sometimes from a low quality part of the 
-full video) until it switches to a new video version that better suits the new visual attention.
+360-degree video. Each version is characterized by a \emph{\ac{QEC}}, which is a given 
+position in the spherical video. Around the \ac{QEC}, the quality of the video is maximum,
+ while it is lower for parts of the video that are far from the \ac{QEC}.
+The client device chooses the video version
+such that  
+the \ac{QEC} of this video is the closest to the center of the \ac{FoV}.
+The system is depicted in Figure~\ref{fig:deliverychain} where the server offers
+three video versions for different \acp{QEC}.
+This navigable 360-degree video delivery system presents three main advantages:
+$(i)$ the bit-rate of the delivered video is lower than the full high-quality original video.
+$(ii)$ when the end-user does not move, the \ac{FoV} extraction is done from the highest 
+quality spherical video.
+And $(iii)$ when the end-user moves the head, the video does not stop. The device can 
+always extract 
+a \ac{FoV} because it has the full spherical video. If the new \ac{FoV} is far from the 
+\ac{QEC} of the video version, the quality of the extracted video is lower but this
+degradation holds only until the 
+device selects another video version with a closer \ac{QEC}.
+
+\input{deliveryChain.tex}
+%is characterized by an \emph{angle of vision}. It contains the full spherical 
+%video with an emphasis on the given angle of vision, \textit{i.e.},
+%the part of the video that is in front of the angle of vision is at the highest quality and the video quality 
+%degrades for the other parts. 
 
 \subsection{Limitations of Previous Work}
 
-The principle of variable video quality in the delivery of omnidirectional videos has been sketched 
+The principle of delivering different qualities within a given omnidirectional video has 
+been sketched 
 in a recent short paper by~\citet{ochi_live_2015}. Their proposal is based on the idea of video
 tiling, which has been implemented for navigable panorama 
-video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}: The panorama video 
-is cut into independent \emph{tiles} (typically $8\times 8$) and the server offers several
-video qualities for each tile. The client selects the quality of each tile according to the eye attention. This
-solution has the same advantages of our proposal, since it reduces the overall bandwidth by emphasizing
-the video quality only for the parts that are actually watched, at the price of transient lower quality just after
-brutal navigation events. However, this solution does not take into account the characteristics of 360-degree
-videos. A spherical video can be mapped into an \emph{equirectangular} video without losing any information
-for the extraction of \ac{FoV}, but the pixels at the poles are over-sampled (the number of pixels
-used in the rectangle to depict a pixel into the sphere is higher at the pole than in the equator). 
-This characteristic is known to degrade the
-performance of traditional video encoders~\cite{wojciechowski_h.264_2006,yu_framework_2015}. It also 
-makes equirectangular tiling less relevant.
+video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}: 
+The spherical video is mapped into \emph{equirectangular} video, which
+is cut into independent \emph{tiles} (typically $8\times 8$). The server offers several
+video qualities for each tile. The client selects the quality of each tile according to 
+the \ac{FoV} of the end-user. This
+solution has the same advantages of our proposal, but it neglects
+the characteristics of 360-degree
+videos. In an equirectangular video, the pixels 
+at the poles are over-sampled, which not only degrades the
+performance of traditional video encoders~\cite{wojciechowski_h.264_2006,yu_framework_2015}, but also 
+makes equirectangular tiling less relevant. We consider instead geometrical tiling on
+other projections of spherical video.
 
-The mapping of spherical videos into 2D video is a projection that generates distortion on the resulting
-full 2D video, but some projections enable \ac{FoV} extraction without information loss. It is typically the case of 
-projections on \emph{cube map}~\cite{Ng2005} and 
-\emph{rhombic dodecahedron}~\cite{fu_rhombic_2009}. The previous work regarding mapping into these
+
+The mapping of spherical videos into 2D video is a projection that generates 
+distortion on the resulting
+full 2D video. Some projections enable \ac{FoV} extraction without information 
+loss, typically on \emph{cube maps}~\cite{Ng2005} and 
+\emph{rhombic dodecahedron}~\cite{fu_rhombic_2009}. The previous work regarding 
+mapping into these
 geometrical layouts has focused on enabling efficient implementation of signal processing 
-functions~\cite{kazhdan_metric-aware_2010} and improving the video encoding~\cite{tosic_low_2009}. 
+functions~\cite{kazhdan_metric-aware_2010} and improving the video 
+encoding~\cite{tosic_low_2009}. 
 However, to the best of our knowledge, the 
 question of variable quality on the different faces of the layouts has not been studied so far.
 
 Finally, a major content provider of 360-degree videos has recently released details about the 
-implementation of its delivery platform~\cite{facebook}. The depicted system is based on the same
-main idea as our proposal, where up to 30 versions of the same video are available according to angles
-of vision. This description corroborates that, from an industrial perspective, the extra-cost of
-generating and storing multiple versions of the same video is relevant with respect to the bandwidth
-savings. The authors use a mapping of the spherical videos into a pyramid where the base is the front
-view and the peak is behind. Yet, this mapping under-samples some pixels, which results in 
+implementation of its delivery platform~\cite{facebook}. The depicted system is based 
+on the same
+main idea as our proposal, where up to 30 versions of the same video are available from
+\acp{QEC}. This implementation corroborates that, from an industrial perspective, the 
+extra-cost of
+generating and storing multiple versions of the same video is relevant with respect 
+to the bandwidth
+savings. The authors use a mapping of the spherical videos into a \emph{pyramid} 
+where the 
+base is the front
+view and the peak is in the back. Yet, this projection under-samples pixels near the peak, 
+which 
+results in 
 information loss and distorted extraction of \ac{FoV} videos.
 
 \subsection{Our Contributions}
 
-In this paper, we present a system for navigable 360-degree video delivery. Our focus is
-about the mapping of spherical videos into geometrical layouts with variable qualities
-with respect of angle of visions. Our contribution is twofold:
+In this paper, we study the navigable 360-degree video delivery with a focus on the mapping 
+of spherical videos into various geometrical layouts. We propose
+several ways to arrange the video qualities, which leverage the structure of the
+different layouts. Our contribution is twofold:
 \begin{itemize}
-\item We introduce a tool (released on open source in a public repository\footnote{url is hidden for blind
+\item We introduce a tool (released on open source in a public 
+repository\footnote{url is hidden for blind
 preservation.}) that enables the mapping from a spherical video
-into any geometrical layout (and vice versa). The tool has two main features: it enables variable
-quality for different parts of the 2D video with respect to the geometrical layouts, and it extracts the 
-\ac{FoV} videos from any point in the sphere. With this tool, the scientific community will be able to 
-study the mapping of spherical videos for the delivery of 360-videos and the implementation of delivery 
-solutions.
-\item We provide a comprehensive comparison of the different quality-variable 
-mappings regarding
+into any geometrical layout (and vice versa). The tool has two main features: it allows
+any arrangement of video quality depending on the layout, and it 
+extracts the 
+\ac{FoV} videos from any point in the sphere. With this tool, the scientific community 
+will be able to 
+study the mapping of spherical videos for the delivery of 360-videos and the 
+implementation of new delivery systems.
+\item We provide a comprehensive comparison of the different geometric arrangements of
+video quality regarding
 the bit-rate of the resulting videos, the quality of the extracted \ac{FoV} videos, and the capacity to
 implement smooth navigation. Thus, we address most of
 the questions raised by~\citet{facebook}: which layout provides the best trade-off between bit-rate and
