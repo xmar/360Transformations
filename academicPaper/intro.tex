@@ -28,24 +28,23 @@ and to let the device
 extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth requirements are 
 significant.
 
-We explore in this paper a solution where the server offers multiple \emph{versions} of the same 
+We study in this paper a solution where the server offers multiple \emph{versions} of the same 
 360-degree video. Each version is characterized by a \emph{\ac{QEC}}, which is a given 
 position in the spherical video. Around the \ac{QEC}, the quality of the video is maximum,
- while it is lower for parts of the video that are far from the \ac{QEC}.
-The client device chooses the video version
+while it is lower for video areas that are far from the \ac{QEC}.
+The client download the video version
 such that  
-the \ac{QEC} of this video is the closest to the center of the \ac{FoV}.
-The system is depicted in Figure~\ref{fig:deliverychain} where the server offers
-three video versions for different \acp{QEC}.
-This navigable 360-degree video delivery system presents three main advantages:
+the \ac{QEC} of this video is close to the center of the \ac{FoV}.
+The system is depicted in Figure~\ref{fig:deliverychain}.
+This navigable 360-degree video delivery system presents three advantages:
 $(i)$ the bit-rate of the delivered video is lower than the full high-quality original video.
-$(ii)$ when the end-user does not move, the \ac{FoV} extraction is done from the highest 
+$(ii)$ When the end-user does not move, the \ac{FoV} is extracted from the highest 
 quality spherical video.
 And $(iii)$ when the end-user moves the head, the video does not stop. The device can 
-always extract 
+extract 
 a \ac{FoV} because it has the full spherical video. If the new \ac{FoV} is far from the 
 \ac{QEC} of the video version, the quality of the extracted video is lower but this
-degradation holds only until the 
+degradation is transient until the 
 device selects another video version with a closer \ac{QEC}.
 
 \input{deliveryChain.tex}
@@ -104,27 +103,28 @@ information loss and distorted extraction of \ac{FoV} videos.
 
 \subsection{Our Contributions}
 
-In this paper, we study the navigable 360-degree video delivery with a focus on the mapping 
-of spherical videos into various geometrical layouts. We propose
-several ways to arrange the video qualities, which leverage the structure of the
-different layouts. Our contribution is twofold:
+%
+%of spherical videos into various geometrical layouts. We propose
+%several ways to arrange the video qualities, which leverage the structure of the
+%different layouts.
+We study the navigable 360-degree video delivery system with a 
+focus on the arrangement of video qualities within the projections of 
+spherical videos into geometrical layouts. Our contribution is twofold:
 \begin{itemize}
 \item We introduce a tool (released on open source in a public 
 repository\footnote{url is hidden for blind
-preservation.}) that enables the mapping from a spherical video
-into any geometrical layout (and vice versa). The tool has two main features: it allows
+preservation.}), which enables the mapping from a spherical video
+into the most studied  geometrical layout (and vice versa). The tool has two main 
+features: it allows
 any arrangement of video quality depending on the layout, and it 
 extracts the 
-\ac{FoV} videos from any point in the sphere. With this tool, the scientific community 
-will be able to 
-study the mapping of spherical videos for the delivery of 360-videos and the 
-implementation of new delivery systems.
+\ac{FoV} videos from any point in the sphere. 
 \item We provide a comprehensive comparison of the different geometric arrangements of
-video quality regarding
-the bit-rate of the resulting videos, the quality of the extracted \ac{FoV} videos, and the capacity to
-implement smooth navigation. Thus, we address most of
-the questions raised by~\citet{facebook}: which layout provides the best trade-off between bit-rate and
-quality, how many video versions should be offered by the server, and what tile quality implementation 
+video quality on 360-degree video. We address the main questions raised 
+by~\citet{facebook}: which layout provides the best trade-off 
+between bit-rate and
+quality, how many video versions should be offered by the server, and what geometric 
+quality arrangement 
 enables the smoothest navigation.
 \end{itemize}
 
