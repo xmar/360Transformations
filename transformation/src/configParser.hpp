@@ -55,13 +55,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
+            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
+            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
+            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
             if (infer)
             {
-                return LayoutCubeMap::GenerateLayout({{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap::GenerateLayout({{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "cubeMap2")
@@ -72,13 +75,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
+            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
+            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
+            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
             if (infer)
             {
-                return LayoutCubeMap2::GenerateLayout({{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap2::GenerateLayout({{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "flatFixed")

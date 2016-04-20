@@ -29,7 +29,7 @@ struct SpacePoint {
     operator cv::Point3d&&() { return std::move(d);}
     SpacePoint<i>& operator=(const SpacePoint<i>& sp) { this->d = sp.d; return *this;}
     SpacePoint<i>& operator=(SpacePoint<i>&& sp) { std::swap(this->d, sp.d); return *this;}
-    template <int j> operator SpacePoint<j>(void);
+    template <int j> operator SpacePoint<j>(void) const;
     cv::Point3d d;
     double& x;
     double& y;
@@ -79,7 +79,7 @@ inline Coord3dCart SphericalToCart(const Coord3dSpherical& coordSphe)
 
 inline Coord3dCart ConvertCoord(const Coord3dSpherical& coordSphe) {return SphericalToCart(coordSphe);}
 inline Coord3dSpherical ConvertCoord(const Coord3dCart& coordCart) {return CartToSpherical(coordCart);}
-template <int i> template <int j> SpacePoint<i>::operator SpacePoint<j>(void){return ConvertCoord(*this);}
+template <int i> template <int j> SpacePoint<i>::operator SpacePoint<j>(void) const{return ConvertCoord(*this);}
 
 inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, const RotMat& rotationMat)
 {//hypothesis rotationMat is a 3x3 rotation matrix
@@ -89,19 +89,31 @@ inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, const RotMat& rotati
     return Coord3dCart(rotX,rotY,rotZ);
 }
 
-inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double pitch, double roll)
+inline RotMat GetRotMatrice(double yaw, double pitch, double roll)
 {
+    //Z*Y*X
     double cosY = std::cos(yaw);
     double sinY = std::sin(yaw);
     double cosP = std::cos(pitch);
     double sinP = std::sin(pitch);
     double cosR = std::cos(roll);
     double sinR = std::sin(roll);
-    double rotX = coordBefRot.x * cosP * cosY + coordBefRot.y*(cosY*sinP*sinR -sinY*cosR) + coordBefRot.z*(cosY*sinP*cosR + sinY * sinR);
-    double rotY = coordBefRot.x * sinY*cosP + coordBefRot.y * cosY * cosR + coordBefRot.z *( sinY*sinP*cosR - sinR * cosY);
-    double rotZ = coordBefRot.x * (-sinP) - coordBefRot.y * cosP * sinR + coordBefRot.z * cosP * cosR;
+    RotMat m(3,3);
+    m(0,0) = cosP * cosY;
+    m(0,1) = cosY*sinP*sinR -sinY*cosR;
+    m(0,2) = cosY*sinP*cosR + sinY * sinR;
+    m(1,0) = sinY*cosP;
+    m(1,1) = cosY * cosR ;
+    m(1,2) = sinY*sinP*cosR - sinR * cosY;
+    m(2,0) = -sinP;
+    m(2,1) = cosP * sinR;
+    m(2,2) = cosP * cosR;
+    return m;
+}
 
-    return Coord3dCart(rotX, rotY, rotZ);
+inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double pitch, double roll)
+{
+    return Rotation(coordBefRot, GetRotMatrice(yaw,pitch,roll));
 }
 
 inline Coord3dSpherical Rotation(const Coord3dSpherical& coordBefRot, double yaw, double pitch, double roll)
