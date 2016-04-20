@@ -178,6 +178,7 @@ work the complete description and the performance evaluation.
 \begin{figure}[h]
 \begin{tikzpicture}
 
+
 \tikzset{
      element/.style={
      	rounded corners,
@@ -211,7 +212,7 @@ work the complete description and the performance evaluation.
 }
 		
 \def\ecartElement{20pt}
-\def\sizeSphere{12}
+\def\sizeSphere{15}
 \def\ecartObjet{2}
 
 
@@ -219,6 +220,12 @@ work the complete description and the performance evaluation.
 \node[element] (0,0) (capturing) {};
 \node[elementtitle, above=-10pt of capturing] {capturing};
 \draw ([xshift=-\sizeSphere - \ecartObjet pt]capturing.east) pic {spherical=\sizeSphere};
+\pgfdeclareimage[width=18 pt]{camera}{video-camera-icon-hi.png}
+\node at ([xshift=21 pt]capturing.west) (camera1)
+    {\pgfbox[right,center]{\pgfuseimage{camera}}};
+    
+\draw[-latex] (camera1.east) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]capturing.east);
+
 
 % server
 \node[element,right=\ecartElement of capturing] (server) {};
