@@ -7,12 +7,12 @@ namespace IMT {
 class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
 {
     public:
-        static std::shared_ptr<LayoutRhombicdodeca> GenerateLayout(std::array<unsigned int,12> pixelEdges)
+        static std::shared_ptr<LayoutRhombicdodeca> GenerateLayout(double yaw, double pitch, double roll, std::array<unsigned int,12> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
-            return std::shared_ptr<LayoutRhombicdodeca>( new LayoutRhombicdodeca(std::move(fr)) );
+            return std::shared_ptr<LayoutRhombicdodeca>( new LayoutRhombicdodeca(yaw, pitch, roll, std::move(fr)) );
 	    }
-        LayoutRhombicdodeca(unsigned int height): LayoutRhombicdodecaBased({{height,height,height,height,
+        LayoutRhombicdodeca(unsigned int height): LayoutRhombicdodecaBased(0,0,0,{{height,height,height,height,
             height,height,height,height,height,height,height,height}}), m_colsMaxOffset(), m_rowsMaxOffset() {}
         virtual ~LayoutRhombicdodeca(void) = default;
 
@@ -20,7 +20,7 @@ class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 
     protected:
-        LayoutRhombicdodeca(FaceResolutions&& fr): LayoutRhombicdodecaBased(fr), m_colsMaxOffset(), m_rowsMaxOffset() {}
+        LayoutRhombicdodeca(double yaw, double pitch, double roll, FaceResolutions&& fr): LayoutRhombicdodecaBased(yaw, pitch, roll, fr), m_colsMaxOffset(), m_rowsMaxOffset() {}
 
         Faces LayoutToFace(unsigned int i, unsigned int j) const;
 

@@ -11,8 +11,9 @@ class LayoutCubeMapBased : public Layout
         struct FaceResolutions;//Forward declaration
     public:
         enum class Faces: int {Front, Back, Top, Bottom, Left, Right, Black, Last, First=Front};
-        LayoutCubeMapBased(unsigned int outWidth, unsigned int outHeight, FaceResolutions fr):
-            Layout(outWidth, outHeight), m_fr(std::move(fr)){};
+        LayoutCubeMapBased(unsigned int outWidth, unsigned int outHeight, double yaw, double pitch, double roll,
+                           FaceResolutions fr):
+            Layout(outWidth, outHeight), m_fr(std::move(fr)), m_rotMat(GetRotMatrice(yaw,pitch,roll)){};
         virtual ~LayoutCubeMapBased(void) = default;
 
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
@@ -89,6 +90,7 @@ class LayoutCubeMapBased : public Layout
 
     private:
         FaceResolutions m_fr;
+        RotMat m_rotMat;
 };
 
 }

@@ -9,7 +9,7 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
     double i = (ni.m_normalizedFaceCoordinate.x - 0.5)*2.f;
     double j = (0.5 - ni.m_normalizedFaceCoordinate.y)*2.f;
     Coord3dCart point(1, i, -j);
-    return Rotation(point, FaceToRotMat(f));
+    return Rotation(point, m_rotMat*FaceToRotMat(f));
 }
 
 
@@ -19,8 +19,7 @@ Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const 
     auto f = Faces::Last;
     Coord3dCart inter;
     double minRho = std::numeric_limits<double>::max();
-    Coord3dSpherical p(1, sphericalCoord.y, sphericalCoord.z);
-
+    Coord3dSpherical p = Rotation(sphericalCoord, m_rotMat.t());
 
     for (auto testF: get_range<LayoutCubeMapBased::Faces>())
     {

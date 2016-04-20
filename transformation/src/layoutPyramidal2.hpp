@@ -49,7 +49,7 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
 	    }
 
         LayoutPyramidal2(double baseEdge, double yaw, double pitch, double roll, unsigned int pixelBaseEdge):
-            LayoutPyramidalBased(baseEdge, yaw, pitch, roll, baseEdge+2*pixelBaseEdge, baseEdge+2*pixelBaseEdge,{{baseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {};
+            LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*pixelBaseEdge, 3*pixelBaseEdge,{{pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {};
         virtual ~LayoutPyramidal2(void) = default;
 
         Faces From2dToFace(unsigned int i, unsigned int j) const;
