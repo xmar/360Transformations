@@ -210,21 +210,22 @@ work the complete description and the performance evaluation.
     }
 }
 		
-\def\ecart{20pt}
-
+\def\ecartElement{20pt}
+\def\sizeSphere{12}
+\def\ecartObjet{2}
 
 
 % capturing system
 \node[element] (0,0) (capturing) {};
 \node[elementtitle, above=-10pt of capturing] {capturing};
-\draw ([xshift=-14pt]capturing.east) pic {spherical=12};
+\draw ([xshift=-\sizeSphere - \ecartObjet pt]capturing.east) pic {spherical=\sizeSphere};
 
 % server
-\node[element,right=\ecart of capturing] (server) {};
+\node[element,right=\ecartElement of capturing] (server) {};
 \node[elementtitle, above=-10pt of server] {\vphantom{pt}server};
-
+\draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
 % client
-\node[element,right=\ecart of server] (client) {};
+\node[element,right=\ecartElement of server] (client) {};
 \node[elementtitle, above=-10pt of client] {\vphantom{pt}client};
 
 
