@@ -128,7 +128,7 @@ int main( int argc, const char* argv[] )
                 const auto& l = layoutFlowVect[j].back();
                 std::string path = pathToOutputVideo+std::to_string(j+1)+lfsv.back()+pathToOutputVideoExtension;
                 std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
-                cvVideoWriters.emplace_back(path, cv::VideoWriter::fourcc('D','A','V','C'), fps,
+                cvVideoWriters.emplace_back(path, cv::VideoWriter::fourcc('H','E','V','C'), fps,
                                             cv::Size(l->GetWidth(), l->GetHeight()));
                 ++j;
             }
@@ -183,9 +183,9 @@ int main( int argc, const char* argv[] )
             }
             if (!qualityWriterVect.empty() && j != 0)
             {
-                auto psnr = firstPict->GetPSNR(*pictOut);
-                std::cout << "Flow " << j << ": PSNR = " << psnr << "dB" << std::endl;
-                *qualityWriterVect[j-1] << psnr << std::endl;
+                auto msssim = firstPict->GetMSSSIM(*pictOut);
+                std::cout << "Flow " << j << ": MS-SSIM = " << msssim << ", PSNR = " << firstPict->GetPSNR(*pictOut) << ", SSIM: " << firstPict->GetSSIM(*pictOut) << std::endl;
+                *qualityWriterVect[j-1] << msssim << std::endl;
             }
             if (!cvVideoWriters.empty())
             {

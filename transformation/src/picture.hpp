@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <opencv2/opencv.hpp>
 #include "common.hpp"
 
@@ -18,7 +19,7 @@ class Picture {
         }
         void ImgShowResize(std::string txt, cv::Size s) const {
             cv::Mat resizeImg;
-            cv::resize(m_pictMat, resizeImg, s);
+            cv::resize(m_pictMat, resizeImg, s, 0, 0, cv::INTER_LINEAR);
             cv::imshow(txt, resizeImg);
         }
         /** \brief Display the picture with it current dimention but will resize the picture not to exceed the size limit (keeping the picture propotions)
@@ -45,10 +46,21 @@ class Picture {
          */
         double GetPSNR(const Picture& pic) const;
 
+        double GetSSIM(const Picture& pic) const;
+        double GetMSSSIM(const Picture& pic) const;
+
         const int& GetWidth(void) const {return m_pictMat.cols;}
         const int& GetHeight(void) const {return m_pictMat.rows;}
     protected:
         cv::Mat m_pictMat;
     private:
+        static constexpr int m_nlevs = 5;
+        static double m_mssimWeight[m_nlevs];
+        static constexpr float m_ssim_c1 = 6.5025f;
+        static constexpr float m_ssim_c2 = 58.5225f;
+
+        void ApplyGaussianBlur(const cv::Mat& src, cv::Mat& dst, int ksize, double sigma) const;
+        std::tuple<double,double> ComputeSSIM(const cv::Mat& img1, const cv::Mat& img2) const;
+
 };
 }
