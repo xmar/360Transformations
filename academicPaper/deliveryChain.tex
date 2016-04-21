@@ -92,10 +92,11 @@
 \node at ([xshift=21 pt]capturing.west) (camera1)
     {\pgfbox[right,center]{\pgfuseimage{camera}}};
     
+% the arrow in the capture
 \draw[-latex] (camera1.east) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]capturing.east);
 
 
-% server
+% ===== server
 \node[element,right=\ecartElement of capturing] (server) {};
 \node[elementtitle, above=-5pt of server] {\vphantom{pt}server};
 \draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
@@ -103,31 +104,41 @@
 \draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=\ecartYVersions]server.east) pic {equirectangular={\sizeSphere}{-2}{-1}};
 \draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=-\ecartYVersions]server.east) pic {equirectangular={\sizeSphere}{0}{0}};
 
+% the three arrows in the server
 \draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]server.east);
 \draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=\ecartYVersions]server.east);
 \draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=-\ecartYVersions]server.east);
 
+% between capture and server
 \draw[-latex] ([xshift=2pt]capturing.east) to ([xshift=-2pt]server.west);
 
 
-% client
+% ===== client
 \node[element,right=\ecartElement of server] (client) {};
 \node[elementtitle, above=-5pt of client] {\vphantom{pt}client};
+% the equirecntagular
 \draw([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) pic {equirectangular={\sizeSphere}{0}{0}};
-\draw ([xshift=-\sizeSphere - \ecartObjet pt]client.east) pic {vr=\sizeSphere};
-
-
-
-\draw[-latex] ([xshift=2pt, yshift=-\ecartYVersions]server.east) to ([xshift=-2pt, yshift=-\ecartYVersions]client.west);
-
+% the old vr
+%\draw ([xshift=-\sizeSphere - \ecartObjet pt]client.east) pic {vr=\sizeSphere};
+% the fov
 \draw([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) pic {fov};
 
+% vr headset
+\pgfdeclareimage[width=24 pt]{vrheadset}{vr_icon.png}
+\node at ([xshift=-28 pt]client.east) (headset)
+    {\pgfbox[left,center]{\pgfuseimage{vrheadset}}};
+    
+% old vr    
+%
+
+% the arrow in the client
 \draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt,
 						yshift=-\ecartYVersions]client.west) to 
 						([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
 
 
-
+% between server and client
+\draw[-latex] ([xshift=2pt, yshift=-\ecartYVersions]server.east) to ([xshift=-2pt, yshift=-\ecartYVersions]client.west);
 
 
 \end{tikzpicture}

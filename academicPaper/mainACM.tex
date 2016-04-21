@@ -167,32 +167,54 @@
 \section{Background}
 
 In this Section, we provide the background for our study.
-First, we depict the overall architecture of the delivery system that we envisioned.
+First, we depict the overall architecture of the delivery system.
 Then, we recall the main 2D geometric layouts for spherical videos.
 
 \subsection{Navigable 360-degree Video Delivery}
 
 The principles of a navigable video delivery system are similar as in adaptive bit-rate
-video systems such as \ac{DASH}. The server offers multiple versions of the same video and the client
+video systems such as \ac{DASH}. The server offers multiple versions of the same video 
+and the client
 selects the most appropriate version according to some criteria. These versions 
-are cut into second-long segments such that the client can regularly switch from one version to another.
+are cut into second-long segments such that the client can regularly switch from one 
+version to another.
 
-In the case of wide video with different spatial quality, the main idea is to spatially cut the video into \emph{tiles}.
+In the case of wide video with different spatial qualities, the main idea is to spatially cut 
+the video into \emph{tiles}.
 Then, two implementations are possible for the delivery system. Either the server 
-offers each tile at different qualities. The client selects each tile version independently and it has to reconstruct
-the full video from these tiles before the \ac{FoV} extraction. This solution allows a fine setting of qualities but 
-most of the computation is done at the client side. Typically, \citet{gaddam_tiling_2015} measured that it takes
-15\,ms to select all the tile versions, which prevents the delivery of high frame-rate video. The second option, 
-which is the one we consider in this paper and is also the implementation described by~\citet{facebook}, is that
-the server prepares $x$ versions related to $x$ different \acp{QEC}. Each version is an arrangement of tile
-qualities such that the tiles that are close to the \ac{QEC} are selected with high-quality and the other tiles
-are selected among lower quality versions. The main advantages is that the \emph{manifest }file that describes 
-all the versions are smaller and the selection of the video version is easier.
+offers each tile at different qualities. The client selects each tile version independently 
+and it has to reconstruct
+the full video from these tiles before the \ac{FoV} extraction. This solution allows a 
+fine setting of qualities but 
+most of the computation is done at the client side. The second option, 
+which is the one we consider in this paper and is also the industrial implementation described 
+by~\citet{facebook}, is that
+the server prepares $x$ versions related to $x$ different \acp{QEC}. Each version 
+is an arrangement of tile
+qualities such that the tiles that are close to the \ac{QEC} are at high-quality 
+and the other tiles
+are at a lower quality. The main advantages include an easy management of the server 
+(\textit{e.g.} small \emph{manifest} file), a simple selection process for the client (by
+a distance computation), and no need of re-constructing the video before the \ac{FoV} extraction.
 
-In this paper, we consider three levels of qualities for the tiles: the full quality video around the \ac{QEC}, 
-a medium quality for the tiles that are not far from the \ac{QEC} and a low quality
+At the client side, the end-user moves its head to decide the \ac{FoV}. The head movements
+are called \emph{yaw}, \emph{pitch}, and \emph{roll}. The center of the \ac{FoV} is a 
+point on the sphere, the size of the \ac{FoV} depends on the device (typically
+around 100$^\circ$ in state-of-the-art devices), and the orientation of the extracted video 
+is related to the roll.
+
+The complete analysis and evaluation of the navigable 360-degree video delivery system
+is left for future work. Due to lack of space, we focus here on the geometric layout
+of the video versions and the tile quality arrangement.
+
 
 \subsection{Mapping of Spherical Videos}
+
+The projection of a sphere into a plane (known as mapping) has been extensively studied
+for centuries. In this paper, we consider the four projections that are the most natural
+candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:projections}.
+
+
 
 \subsubsection{Equirectangular}
 
