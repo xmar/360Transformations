@@ -69,21 +69,21 @@ the characteristics of 360-degree
 videos. In an equirectangular video, the pixels 
 at the poles are over-sampled, which not only degrades the
 performance of traditional video encoders~\cite{wojciechowski_h.264_2006,yu_framework_2015}, but also 
-makes equirectangular tiling less relevant. We consider instead geometrical tiling on
+makes equirectangular tiling less relevant. We consider instead geometric tiling on
 other projections of spherical video.
 
 
-The mapping of spherical videos into 2D video is a projection that generates 
+The mapping of spherical videos into a geometric layout is a projection that generates 
 distortion on the resulting
-full 2D video. Some projections enable \ac{FoV} extraction without information 
+full 2D video. Some layouts enable \ac{FoV} extraction without information 
 loss, typically on \emph{cube maps}~\cite{Ng2005} and 
 \emph{rhombic dodecahedron}~\cite{fu_rhombic_2009}. The previous work regarding 
-mapping into these
-geometrical layouts has focused on enabling efficient implementation of signal processing 
+these
+geometric layouts has focused on enabling efficient implementation of signal processing 
 functions~\cite{kazhdan_metric-aware_2010} and improving the video 
 encoding~\cite{tosic_low_2009}. 
 However, to the best of our knowledge, the 
-question of variable quality on the different faces of the layouts has not been studied so far.
+question of arranging various video qualities on the layout has not been studied so far.
 
 Finally, a major content provider of 360-degree videos has recently released details about the 
 implementation of its delivery platform~\cite{facebook}. The depicted system is based 
@@ -109,12 +109,12 @@ information loss and distorted extraction of \ac{FoV} videos.
 %different layouts.
 We study the navigable 360-degree video delivery system with a 
 focus on the arrangement of video qualities within the projections of 
-spherical videos into geometrical layouts. Our contribution is twofold:
+spherical videos into geometric layouts. Our contribution is twofold:
 \begin{itemize}
 \item We introduce a tool (released on open source in a public 
 repository\footnote{url is hidden for blind
 preservation.}), which enables the mapping from a spherical video
-into the most studied  geometrical layout (and vice versa). The tool has two main 
+into the most studied  geometric layout (and vice versa). The tool has two main 
 features: it allows
 any arrangement of video quality depending on the layout, and it 
 extracts the 
