@@ -15,6 +15,7 @@ extern "C"
 #include <string>
 #include <exception>
 #include <memory>
+#include <opencv2/opencv.hpp>
 
 namespace IMT
 {
