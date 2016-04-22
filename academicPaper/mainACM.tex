@@ -290,18 +290,39 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 }
 
 \tikzset{
-	pics/losangeA/.style n args={2}{
+	pics/losange/.style n args={3}{
 		code={
-			\draw[fill=#2] (0,0) 
-				-- (#1,0.5*#1)
-				-- (2*#1,0)
-				-- (#1,-0.5*#1)
+			\draw[fill=#2, rotate around={#3:(0,0)}] 
+				(0,0) 
+				-- (#1, 0.75*#1)
+				-- (2*#1, 0)
+				-- (#1, -0.75*#1)
 				--	cycle;
 		}
 	}
 }
 
-
+\tikzset{
+	dodecahedron/.pic={		
+		\def\xshi{0}
+		\pic at(\xshi,0) {losange={#1}{white}{0}};
+		\pic at(\xshi,0) {losange={#1}{white}{287}};
+		\pic at(\xshi+2*#1,0) {losange={#1}{gray!30}{254}};
+		\pic at(\xshi+1.46*#1,-1.93*#1) {losange={#1}{gray!30}{0}};
+		
+		\def\xshi{2.89*#1}
+		\pic at(\xshi,0) {losange={#1}{gray!70}{0}};
+		\pic at(\xshi,0) {losange={#1}{gray!70}{287}};
+		\pic at(\xshi+2*#1,0) {losange={#1}{gray!30}{254}};
+		\pic at(\xshi+1.46*#1,-1.93*#1) {losange={#1}{white}{0}};	
+		
+		\def\xshi{-2.89*#1}%5.78
+		\pic at(\xshi,0) {losange={#1}{gray!30}{0}};
+		\pic at(\xshi,0) {losange={#1}{gray!30}{287}};
+		\pic at(\xshi+2*#1,0) {losange={#1}{gray!30}{254}};
+		\pic at(\xshi+1.46*#1,-1.93*#1) {losange={#1}{white}{0}};
+	}
+}
 
 \def\sizeSphere{20}%pt
 \def\ecartY{-2}%cm
@@ -320,11 +341,13 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 \pic [local bounding box=pyra] at (1,\ecartY) {pyramid=\sizeSphere};
 
 % rhombic
-\pgfdeclareimage[width=36 pt]{dodecahedron}{RhombicDodecahedron.png}
-\node at (3,\ecartY) (dodec)
-    {\pgfbox[center,center]{\pgfuseimage{dodecahedron}}};
+%\pgfdeclareimage[width=36 pt]{dodecahedron}{RhombicDodecahedron.png}
+%\node at (3,\ecartY) (dodec)
+%    {\pgfbox[center,center]{\pgfuseimage{dodecahedron}}};
     
-\pic [local bounding box=dodeca] at (3,0.5*\ecartY) {losangeA={1}{gray!30}};
+\def\unitused{0.2}
+
+\pic [local bounding box=dodeca] at (3,0.88*\ecartY) {dodecahedron=\unitused};
 
 % links
 \draw[-latex] (spher.180) -| (equi);
