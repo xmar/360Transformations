@@ -56,8 +56,8 @@ class Picture {
     private:
         static constexpr int m_nlevs = 5;
         static double m_mssimWeight[m_nlevs];
-        static constexpr float m_ssim_c1 = 6.5025f;
-        static constexpr float m_ssim_c2 = 58.5225f;
+        static constexpr double m_ssim_c1 = 6.5025;
+        static constexpr double m_ssim_c2 = 58.5225;
 
         void ApplyGaussianBlur(const cv::Mat& src, cv::Mat& dst, int ksize, double sigma) const;
         std::tuple<double,double> ComputeSSIM(const cv::Mat& img1, const cv::Mat& img2) const;
