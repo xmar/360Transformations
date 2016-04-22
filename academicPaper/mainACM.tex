@@ -263,6 +263,31 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 	}
 }
 
+\tikzset{
+	pyramid/.pic={
+		\draw[fill=gray!70] (-0.011759*#1,-0.006615*#1) rectangle (0.011759*#1,0.006615*#1);
+		% triangle north
+		\draw[fill=gray!30] (-0.011759*#1,0.006615*#1)
+			 -- (0.011759*#1,0.006615*#1)
+			 -- (0,0.019844*#1)
+			 -- cycle;
+		% triangle south
+		\draw[fill=gray!30] (-0.011759*#1,-0.006615*#1)
+			 -- (0.011759*#1,-0.006615*#1)
+			 -- (0,-0.019844*#1)
+			 -- cycle;
+		% triangle west
+		\draw[fill=gray!30] (-0.011759*#1,-0.006615*#1)
+			 -- (-0.011759*#1,0.006615*#1)
+			 -- (-0.0352778*#1,0)
+			 -- cycle;
+		% triangle east
+		\draw[fill=gray!30] (0.011759*#1,-0.006615*#1)
+			 -- (0.011759*#1,0.006615*#1)
+			 -- (0.0352778*#1,0)
+			 -- cycle;
+	}
+}
 
 
 
@@ -280,7 +305,7 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 \pic [local bounding box=cubemap] at (-1,\ecartY) {cubemap=\sizeSphere};
 
 % pyramid
-\pic [local bounding box=pyra] at (1,\ecartY) {equirectangular={\sizeSphere}{0}{0}};
+\pic [local bounding box=pyra] at (1,\ecartY) {pyramid=\sizeSphere};
 
 % rhombic
 \pic [local bounding box=dodeca] at (3,\ecartY) {equirectangular={\sizeSphere}{0}{0}};
