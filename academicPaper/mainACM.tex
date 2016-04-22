@@ -232,9 +232,9 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 	pics/equirectangular/.style n args={3}{
 		code={
 			%mid-quality
-			\draw[fill=gray!30] (#2*0.00881945*#1-3*0.00881945*#1,#3*0.004961*#1-3*0.004961*#1) 
+			\draw[fill=gray!30] (#2*0.00881945*#1-2*0.00881945*#1,#3*0.004961*#1-2*0.004961*#1) 
 			rectangle 
-			(#2*0.00881945*#1+4*0.00881945*#1,#3*0.004961*#1+4*0.004961*#1);
+			(#2*0.00881945*#1+3*0.00881945*#1,#3*0.004961*#1+3*0.004961*#1);
 
 			%full-quality
 			\draw[fill=gray!70] (#2*0.00881945*#1-0.00881945*#1,#3*0.004961*#1-0.004961*#1) 
@@ -289,6 +289,18 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 	}
 }
 
+\tikzset{
+	pics/losangeA/.style n args={2}{
+		code={
+			\draw[fill=#2] (0,0) 
+				-- (#1,0.5*#1)
+				-- (2*#1,0)
+				-- (#1,-0.5*#1)
+				--	cycle;
+		}
+	}
+}
+
 
 
 \def\sizeSphere{20}%pt
@@ -308,7 +320,11 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 \pic [local bounding box=pyra] at (1,\ecartY) {pyramid=\sizeSphere};
 
 % rhombic
-\pic [local bounding box=dodeca] at (3,\ecartY) {equirectangular={\sizeSphere}{0}{0}};
+\pgfdeclareimage[width=36 pt]{dodecahedron}{RhombicDodecahedron.png}
+\node at (3,\ecartY) (dodec)
+    {\pgfbox[center,center]{\pgfuseimage{dodecahedron}}};
+    
+\pic [local bounding box=dodeca] at (3,0.5*\ecartY) {losangeA={1}{gray!30}};
 
 % links
 \draw[-latex] (spher.180) -| (equi);
