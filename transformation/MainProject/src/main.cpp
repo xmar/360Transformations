@@ -41,7 +41,6 @@ int main( int argc, const char* argv[] )
    desc.add_options()
       ("help,h", "Produce this help message")
       ("inputVideo,i", po::value<std::string>(), "path to the input video")
-      ("nbFrames,n", po::value<int>(), "number Of Frame to process (if <= 0 process the whole video) [default 0]")
       ("config,c", po::value<std::string>(),"Path to the configuration file")
       ;
 
@@ -62,7 +61,6 @@ int main( int argc, const char* argv[] )
       po::notify(vm);
 
       auto pathToInputVideo = vm["inputVideo"].as<std::string>();
-      int nbFrames = vm.count("nbFrames") && vm["nbFrames"].as<int>() > 0 ? vm["nbFrames"].as<int>() : 0;
       std::string pathToIni = vm["config"].as<std::string>();
 
       std::cout << "Path to the ini file: " <<pathToIni << std::endl;
@@ -100,6 +98,7 @@ int main( int argc, const char* argv[] )
       std::string pathToOutputVideo = ptree.get<std::string>("Global.videoOutputName");
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
+      auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
 
         cv::VideoCapture cap(pathToInputVideo);
 
@@ -186,7 +185,7 @@ int main( int argc, const char* argv[] )
             if (!qualityWriterVect.empty() && j != 0)
             {
                 auto msssim = firstPict->GetMSSSIM(*pictOut);
-                std::cout << "Flow " << j << ": MS-SSIM = " << msssim << ", PSNR = " << firstPict->GetPSNR(*pictOut) << ", SSIM: " << firstPict->GetSSIM(*pictOut) << std::endl;
+                std::cout << "Flow " << j << ": MS-SSIM = " << msssim << std::endl;
                 *qualityWriterVect[j-1] << msssim << std::endl;
             }
             if (!cvVideoWriters.empty())

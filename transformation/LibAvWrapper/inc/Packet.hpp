@@ -4,7 +4,6 @@ extern "C"
 {
     #include <libavformat/avformat.h>
 }
-#include <opencv2/opencv.hpp>
 
 namespace IMT
 {

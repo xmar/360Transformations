@@ -97,12 +97,31 @@ void Picture::ApplyGaussianBlur(const cv::Mat& src, cv::Mat& dst, int ksize, dou
 }
 
 
-std::tuple<double, double> Picture::ComputeSSIM(const cv::Mat& img1, const cv::Mat& img2) const
+std::tuple<double, double> Picture::ComputeSSIM(const cv::Mat& img1_ori, const cv::Mat& img2_ori) const
 {
 
-    if (img1.rows!= img2.rows && img1.cols !=  img2.cols)
+    if (img1_ori.rows!= img2_ori.rows && img1_ori.cols !=  img2_ori.cols)
+//    if (img1.rows!= img2.rows && img1.cols !=  img2.cols)
     {
         throw std::invalid_argument("SSIM computation require pictures to have the same width and height");
+    }
+
+    cv::Mat img1, img2;
+    if (img1_ori.type() != CV_32F)
+    {
+         img1_ori.convertTo(img1, CV_32F);
+    }
+    else
+    {
+        img1 = img1_ori;
+    }
+    if (img2_ori.type() != CV_32F)
+    {
+         img2_ori.convertTo(img2, CV_32F);
+    }
+    else
+    {
+        img2 = img2_ori;
     }
 
     int ht = img1.rows;
@@ -110,12 +129,12 @@ std::tuple<double, double> Picture::ComputeSSIM(const cv::Mat& img1, const cv::M
     int w = wt - 10;
     int h = ht - 10;
 
-    cv::Mat mu1(h,w,m_pictMat.type()), mu2(h,w,m_pictMat.type());
-    cv::Mat mu1_sq(h,w,m_pictMat.type()), mu2_sq(h,w,m_pictMat.type()), mu1_mu2(h,w,m_pictMat.type());
-    cv::Mat img1_sq(ht,wt,m_pictMat.type()), img2_sq(ht,wt,m_pictMat.type()), img1_img2(ht,wt,m_pictMat.type());
-    cv::Mat sigma1_sq(h,w,m_pictMat.type()), sigma2_sq(h,w,m_pictMat.type()), sigma12(h,w,m_pictMat.type());
-    cv::Mat tmp1(h,w,m_pictMat.type()), tmp2(h,w,m_pictMat.type()), tmp3(h,w,m_pictMat.type());
-    cv::Mat ssim_map(h,w,m_pictMat.type()), cs_map(h,w,m_pictMat.type());
+    cv::Mat mu1(h,w,CV_32F), mu2(h,w,CV_32F);
+    cv::Mat mu1_sq(h,w,CV_32F), mu2_sq(h,w,CV_32F), mu1_mu2(h,w,CV_32F);
+    cv::Mat img1_sq(ht,wt,CV_32F), img2_sq(ht,wt,CV_32F), img1_img2(ht,wt,CV_32F);
+    cv::Mat sigma1_sq(h,w,CV_32F), sigma2_sq(h,w,CV_32F), sigma12(h,w,CV_32F);
+    cv::Mat tmp1(h,w,CV_32F), tmp2(h,w,CV_32F), tmp3(h,w,CV_32F);
+    cv::Mat ssim_map(h,w,CV_32F), cs_map(h,w,CV_32F);
 
     // mu1 = filter2(window, img1, 'valid');
     ApplyGaussianBlur(img1, mu1, 11, 1.5);
@@ -186,8 +205,26 @@ double Picture::GetMSSSIM(const Picture& pic) const
     cv::Mat im1[m_nlevs];
     cv::Mat im2[m_nlevs];
 
-    cv::resize(m_pictMat, im2[0], cv::Size(w, h), 0, 0, cv::INTER_LINEAR);
-    cv::resize(pic.m_pictMat, im1[0], cv::Size(w, h), 0, 0, cv::INTER_LINEAR);
+    cv::Mat tmp1, tmp2;
+
+    cv::resize(m_pictMat, tmp1, cv::Size(w, h), 0, 0, cv::INTER_LINEAR);
+    cv::resize(pic.m_pictMat, tmp2, cv::Size(w, h), 0, 0, cv::INTER_LINEAR);
+    if (m_pictMat.type() != CV_32F)
+    {
+         tmp1.convertTo(im1[0], CV_32F);
+    }
+    else
+    {
+        im1[0] = tmp1;
+    }
+    if (pic.m_pictMat.type() != CV_32F)
+    {
+         tmp2.convertTo(im2[0], CV_32F);
+    }
+    else
+    {
+        im2[0] = tmp2;
+    }
 
     for (int l=0; l<m_nlevs; l++) {
         // [mssim_array(l) ssim_map_array{l} mcs_array(l) cs_map_array{l}] = ssim_index_new(im1, im2, K, window);
@@ -198,8 +235,8 @@ double Picture::GetMSSSIM(const Picture& pic) const
         if (l < m_nlevs-1) {
             w /= 2;
             h /= 2;
-            im1[l+1] = cv::Mat(h,w,m_pictMat.type());
-            im2[l+1] = cv::Mat(h,w,m_pictMat.type());
+            im1[l+1] = cv::Mat(h,w,CV_32F);
+            im2[l+1] = cv::Mat(h,w,CV_32F);
 
             // filtered_im1 = filter2(downsample_filter, im1, 'valid');
             // im1 = filtered_im1(1:2:M-1, 1:2:N-1);
