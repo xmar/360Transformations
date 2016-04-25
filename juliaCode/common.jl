@@ -21,6 +21,17 @@ function RotMat(v, theta)
     R
 end
 
+function ConvertToCart(A)
+"Convert the spherical to cartezian coordinates"
+    println(A[1], " ", A[2], " ", A[3])
+    M = zeros(3)
+    M[1] = sin(A[3])*cos(A[2])
+    M[2] = sin(A[3])*sin(A[2])
+    M[3] = cos(A[3])
+
+    return M
+end
+
 
 function FindTransMat(A,B,C,D,E,F)
 "Find the rotation matrice R with R*A=D; R*B=E; R*C=F"
