@@ -99,6 +99,7 @@ int main( int argc, const char* argv[] )
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
+      auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate");
 
         cv::VideoCapture cap(pathToInputVideo);
 
@@ -130,7 +131,7 @@ int main( int argc, const char* argv[] )
                 std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
                 cvVideoWriters.push_back(std::make_shared<IMT::LibAv::VideoWriter>(path));//, IMT::LibAv::VideoWriter::fourcc('H','E','V','C'), fps,
                                             //cv::Size(l->GetWidth(), l->GetHeight()));
-                cvVideoWriters.back()->Init("libx265", l->GetWidth(), l->GetHeight(), fps, 32, 4*std::pow(10,6));
+                cvVideoWriters.back()->Init("libx265", l->GetWidth(), l->GetHeight(), fps, 32, videoOutputBitRate*std::pow(10,3));
                 ++j;
             }
         }

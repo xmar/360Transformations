@@ -11,9 +11,9 @@ class LayoutCubeMap: public LayoutCubeMapBased
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
 	        auto offsetArraysTuple = Init(fr);
-            return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap(
+            return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap( yaw, pitch, roll,
                 std::get<0>(offsetArraysTuple)[0] + std::get<0>(offsetArraysTuple)[1] + std::get<0>(offsetArraysTuple)[2],
-                std::get<1>(offsetArraysTuple)[0] + std::get<1>(offsetArraysTuple)[1], yaw, pitch, roll,
+                std::get<1>(offsetArraysTuple)[0] + std::get<1>(offsetArraysTuple)[1],
                 fr, offsetArraysTuple));
 	    }
         LayoutCubeMap(unsigned int pixelEdge):

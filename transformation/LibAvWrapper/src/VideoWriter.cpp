@@ -91,7 +91,7 @@ void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, u
     m_codec_ctx->sample_aspect_ratio.num = 1;
     m_codec_ctx->sample_aspect_ratio.den = 1;
     m_codec_ctx->width = width;
-    m_codec_ctx->height = height;
+    m_codec_ctx->height = height + height%2;
     m_codec_ctx->time_base.num = 1;
     m_codec_ctx->time_base.den = fps;
     m_codec_ctx->gop_size = gop_size;
