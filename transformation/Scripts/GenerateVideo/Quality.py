@@ -140,7 +140,7 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
             name2 = l.GetName()
             resultQualityName = '{}/{}_{}.txt'.format(outputDirQEC, name1, name2)
             if i != 1:
-                lName_quality.append(('{}'.format(name2), GetAverageQuality(resultQualityName)))
+                lName_quality.append((name1, GetAverageQuality(resultQualityName)))
             i += 1
 
         if isGood:
