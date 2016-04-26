@@ -6,14 +6,12 @@ import sys
 import LayoutGenerators
 
 
-def GenerateConfigString(layouts_a, fps, bitrate, nbFrames, output):
-
+def GenerateConfigString(layouts_a, fps, bitrate, nbFrames, inputVideo, output):
     c = '[Global]\n'
     c += 'fps= {}\n'.format(fps)
-    c += 'layoutFlow= [['
-    first = True
+    c += 'layoutFlow= [[ "{}"'.format(inputVideo)
     for (l,a) in layouts_a:
-        c += '{}"{}"'.format('' if first else ', ', l.GetName() )
+        c += ', "{}"'.format( l.GetName() )
         first = False
     c += ']]\n'
     c += 'displayFinalPict=false\n'
@@ -37,9 +35,9 @@ def GenerateVideo(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId
         lastA = a
     try:
         with open(config, 'w') as cf:
-            cf.write(GenerateConfigString(layouts_a, fps, bitrate, nbFrames, tmpVideo))
+            cf.write(GenerateConfigString(layouts_a, fps, bitrate, nbFrames, inputVideo, tmpVideo))
 
-        sub.check_call([trans, '-c', config, '-i', inputVideo])
+        sub.check_call([trans, '-c', config])
 
         shutil.move('/tmp/tmp1{}.mkv'.format(lastName), '{}.mkv'.format(outputId))
 

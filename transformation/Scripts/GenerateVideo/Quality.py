@@ -6,19 +6,21 @@ import pickle
 
 import LayoutGenerators
 
-def GenerateConf(ls, outputVideo, outputQuality, nbFrames, fps, bitrate):
+def GenerateConf(ls, inputVideos, outputVideo, outputQuality, nbFrames, fps, bitrate):
     c = '[Global]\n'
     c += 'fps= {}\n'.format(fps)
     c += 'layoutFlow= ['
     first = True
+    counter = 0
     for layouts_a in ls:
         if not first:
             c += ','
-        c += '['
-        first = True
-        for (l,a) in layouts_a:
-            c += '{}"{}"'.format('' if first else ', ', l.GetName() )
+        else:
             first = False
+        c += '["{}"'.format(inputVideos[counter])
+        counter += 1
+        for (l,a) in layouts_a:
+            c += ', "{}"'.format( l.GetName() )
         c += ']'
     c += ']\n'
     c += 'displayFinalPict=false\n'
@@ -81,7 +83,9 @@ def GetAverageQuality(fileName):
             n += 1
     return q/n if n != 0 else 0
 
-def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideo, outputDirQEC, isGood):
+def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideos, outputDirQEC, isGood):
+    if len(layoutsToTest) != len(inputVideos):
+        raise ValueError("layoutsToTest and inputVideos should have the same lenth")
     layouts = []
     for ls in layoutsToTest:
         newLs = list(ls)
@@ -96,11 +100,18 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
 
     if not qs.IsNameInside(flatFixedLayout.GetName()):
 
+        newIv = []
         try:
+            counter = 1
+            for iv in inputVideos:
+                nivp = '/tmp/inputVideo{}.mkv'.format(counter)
+                counter += 1
+                shutil.copy(iv, nivp)
+                newIv.append(nivp)
             with open(config, 'w') as cf:
-                cf.write(GenerateConf(layouts, '/tmp/test.mkv', '/tmp/test.txt', n, fps, 0))
+                cf.write(GenerateConf(layouts, newIv, '/tmp/test.mkv', '/tmp/test.txt', n, fps, 0))
     
-            sub.check_call([trans, '-c', config, '-i', inputVideo])
+            sub.check_call([trans, '-c', config])
     
             i = 1
             for ls in layouts:
@@ -117,6 +128,9 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                     shutil.move(outputQualityName, resultQualityName)
                 i += 1
         finally:
+            for iv in newIv:
+                if os.path.isfile(iv):
+                    os.remove(iv)
             i = 1
             for ls in layouts:
                 (l,a) = ls[-2]
@@ -149,6 +163,3 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
             qs.AddBad(flatFixedLayout.GetName(), lName_quality)
 
         qs.Dump(outputQualityStorageName)
-
-
-

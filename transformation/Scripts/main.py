@@ -67,19 +67,22 @@ if __name__ ==  '__main__':
             if not os.path.isdir(outputDirQEC):
                 os.makedirs(outputDirQEC)
             eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
-            layoutsToTest = [[(eqL, None)], [(eqL, None), (LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)]]
+            inputVideos = [inputVideo, '{}/equirectangularTiled{}_{}.mkv'.format(outputDir,i,j)]
+            layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)]]
             for layoutId in ['CubMap', 'CubMapCompact', 'Pyramidal', 'RhombicDodeca']:
                 storageName = '{}/{}{}_{}_storage.dat'.format(outputDir,layoutId,i,j)
+                layoutVideoName = '{}/{}{}_{}.mkv'.format(outputDir,layoutId,i,j)
                 ls = LayoutGenerators.LayoutStorage.Load(storageName)
-                layoutsToTest.append( [(eqL, None), (ls.layout, ls.a)] )
+                inputVideos.append(layoutVideoName)
+                layoutsToTest.append( [(ls.layout, ls.a)] )
 
             #Test Good Layout
             flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.',''), 1920, 1080, 110, goodCenter)
-            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideo, outputDirQEC, True)
+            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, True)
 
             #Test Bad layout
             flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.',''), 1920, 1080, 110, goodCenter)
-            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideo, outputDirQEC, False)
+            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, False)
 
             k -= 1
         
