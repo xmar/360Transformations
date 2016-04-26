@@ -63,7 +63,7 @@ class LayoutRhombicdodecaBased: public Layout
         };
 
         LayoutRhombicdodecaBased(double yaw, double pitch, double roll, FaceResolutions fr): Layout(), m_fr(std::move(fr)),
-        m_rotMat(GetRotMatrice(yaw, pitch, roll)) {}
+        m_rotMat(GetRotMatrice(yaw, pitch, roll)), m_faceRotations() {InitFaceRotations();}
         Plan FaceToPlan(Faces f) const
         {
             switch(f)
@@ -99,12 +99,15 @@ class LayoutRhombicdodecaBased: public Layout
             }
         }
 
-        RotMat FaceToRotMat(Faces f) const; //Rot matrix to transform Face1 into f
+        const RotMat& FaceToRotMat(Faces f) const; //Rot matrix to transform Face1 into f
 
         unsigned int GetRes(Faces f) const {return m_fr.GetRes(f);}
     private:
         FaceResolutions m_fr;
         RotMat m_rotMat;
+        std::array<RotMat,12> m_faceRotations;
+
+        void InitFaceRotations(void);
 };
 
 }

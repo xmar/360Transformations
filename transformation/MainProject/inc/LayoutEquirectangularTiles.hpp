@@ -71,19 +71,45 @@ class LayoutEquirectangularTiles : public Layout
             }
             SetWidth(sumWidth);
             SetHeight(sumHeight);
+            for (unsigned i = 0; i < 8; ++i)
+            {
+                for (unsigned j = 0; j < 8; ++j)
+                {
+                    unsigned int offI(0), offJ(0);
+                    for (unsigned k = 0; k < i; ++k)
+                    {
+                        offI += m_colsMaxSize[k];
+                    }
+                    for (unsigned k = 0; k < j; ++k)
+                    {
+                        offJ += m_rowsMaxSize[k];
+                    }
+                    if (i != 0)
+                    {
+                        offI += (m_colsMaxSize[i]-m_tr.GetResWidth(std::make_tuple(i,j)))/2;
+                    }
+                    if (j != 0)
+                    {
+                        offJ += (m_rowsMaxSize[j]-m_tr.GetResHeight(std::make_tuple(i,j)))/2;
+                    }
+                    m_offsets[i][j] = CoordI(offI, offJ);
+                }
+            }
         }
 
         TileId From2dToTileId(unsigned int i, unsigned int j) const;
-        CoordI TileIdTo2dOffset(const TileId& ti) const;
+        const CoordI& TileIdTo2dOffset(const TileId& ti) const {return TileIdTo2dOffset(std::get<0>(ti),std::get<1>(ti));}
+        const CoordI& TileIdTo2dOffset(const unsigned int& i, const unsigned int& j) const;
         CoordI TileIdTo2dEndOffset(const TileId& ti) const;
         TileResolutions m_tr;
         std::array<unsigned int, 8> m_rowsMaxSize;
         std::array<unsigned int, 8> m_colsMaxSize;
+        std::array<std::array<CoordI,8>,8> m_offsets;
 
     public:
 
         LayoutEquirectangularTiles(TilesMap tr): m_tr(std::move(tr)),
-        m_rowsMaxSize(), m_colsMaxSize() {};
+        m_rowsMaxSize(), m_colsMaxSize(), m_offsets() {};
 
 };
 }
