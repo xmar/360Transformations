@@ -3,16 +3,16 @@
 
 \subsection{Context and Motivations}
 
-The popularity of interactive 360-degree video systems 
+The popularity of navigable 360-degree video systems 
 has grown with the advent of both capturing systems
-(including multi-camera with stitching systems) and video
-consumption systems (including head-mounted display devices).
+(including multi-camera with stitching systems) and interactive entertaining
+systems (including head-mounted display devices).
 However, the delivery of 360-degree video content, from the servers
 to the end-users,
 is still a challenge. Head-mounted devices display two videos (one per
 eye), each of them with a high frame rate and a high resolution (typically 
-$1080\times 1200$ for state-of-the-art devices). Both videos, which 
-correspond to the \ac{FoV}, are extracted
+$1080\times 1200$ for state-of-the-art devices). The combination of both videos
+form the \ac{FoV}, which is extracted
 from a wider spherical video with a resolution that is three to four times larger.
 
 None of the current solutions for the delivery of 360-degree videos is entirely 
@@ -32,12 +32,12 @@ We study in this paper a solution where the server offers multiple \emph{version
 360-degree video. Each version is characterized by a \emph{\ac{QEC}}, which is a given 
 position in the spherical video. Around the \ac{QEC}, the quality of the video is maximum,
 while it is lower for video areas that are far from the \ac{QEC}.
-The client download the video version
+The client downloads the video version
 such that  
 the \ac{QEC} of this video is close to the center of the \ac{FoV}.
 The system is depicted in Figure~\ref{fig:deliverychain}.
-This navigable 360-degree video delivery system presents three advantages:
-$(i)$ the bit-rate of the delivered video is lower than the full high-quality original video.
+This navigable 360-degree video delivery system has three advantages:
+$(i)$ the bit-rate of the delivered video is lower than the original full-quality video.
 $(ii)$ When the end-user does not move, the \ac{FoV} is extracted from the highest 
 quality spherical video.
 And $(iii)$ when the end-user moves the head, the video does not stop. The device can 
@@ -55,16 +55,15 @@ device selects another video version with a closer \ac{QEC}.
 
 \subsection{Limitations of Previous Work}
 
-The principle of delivering different qualities within a given omnidirectional video has 
-been sketched 
+The principle of delivering different qualities within a given navigable omnidirectional video is sketched 
 in a recent short paper by~\citet{ochi_live_2015}. Their proposal is based on the idea of video
 tiling, which has been implemented for navigable panorama 
 video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}: 
-The spherical video is mapped into \emph{equirectangular} video, which
+The spherical video is mapped into an \emph{equirectangular} video, which
 is cut into independent \emph{tiles} (typically $8\times 8$). The server offers several
 video qualities for each tile. The client selects the quality of each tile according to 
 the \ac{FoV} of the end-user. This
-solution has the same advantages of our proposal, but it neglects
+solution has the same advantages as our proposal, but it neglects
 the characteristics of 360-degree
 videos. In an equirectangular video, the pixels 
 at the poles are over-sampled, which not only degrades the
@@ -73,13 +72,13 @@ makes equirectangular tiling less relevant. We consider instead geometric tiling
 other projections of spherical video.
 
 
-The mapping of spherical videos into a geometric layout is a projection that generates 
+The projection of spherical videos into a geometric layout generates 
 distortion on the resulting
 full 2D video. Some layouts enable \ac{FoV} extraction without information 
 loss, typically on \emph{cube maps}~\cite{Ng2005} and 
 \emph{rhombic dodecahedron}~\cite{fu_rhombic_2009}. The previous work regarding 
 these
-geometric layouts has focused on enabling efficient implementation of signal processing 
+geometric layouts focuses on enabling efficient implementation of signal processing 
 functions~\cite{kazhdan_metric-aware_2010} and improving the video 
 encoding~\cite{tosic_low_2009}. 
 However, to the best of our knowledge, the 
@@ -87,13 +86,11 @@ question of arranging various video qualities on the layout has not been studied
 
 Finally, a major content provider of 360-degree videos has recently released details about the 
 implementation of its delivery platform~\cite{facebook}. The depicted system is based 
-on the same
-main idea as our proposal, where up to 30 versions of the same video are available from
+on the same idea as our proposal, where up to 30 versions of the same video are available depending on
 \acp{QEC}. This implementation corroborates that, from an industrial perspective, the 
 extra-cost of
-generating and storing multiple versions of the same video is relevant with respect 
-to the bandwidth
-savings. The authors use a mapping of the spherical videos into a \emph{pyramid} 
+generating and storing multiple versions of the same video is worth the bandwidth
+savings and the system usability. The authors projects the spherical videos into a \emph{pyramid} 
 where the 
 base is the front
 view and the peak is in the back. Yet, this projection under-samples pixels near the peak, 
@@ -113,12 +110,12 @@ spherical videos into geometric layouts. Our contribution is twofold:
 \begin{itemize}
 \item We introduce a tool (released on open source in a public 
 repository\footnote{url is hidden for blind
-preservation.}), which enables the mapping from a spherical video
+preservation.}), which enables the projection from a spherical video
 into the most studied  geometric layout (and vice versa). The tool has two main 
 features: it allows
 any arrangement of video quality depending on the layout, and it 
 extracts the 
-\ac{FoV} videos from any point in the sphere. 
+\ac{FoV} video from any point in the sphere. 
 \item We provide a comprehensive comparison of the different geometric arrangements of
 video quality on 360-degree video. We address the main questions raised 
 by~\citet{facebook}: which layout provides the best trade-off 

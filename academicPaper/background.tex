@@ -1,9 +1,9 @@
 % =============
 \section{Background}
 
-In this Section, we provide the background for our study.
+We now provide the background for our study.
 First, we depict the overall architecture of the delivery system.
-Then, we recall the main 2D geometric layouts for spherical videos.
+Then, we recall the main geometric layouts for spherical videos.
 
 \subsection{Navigable 360-degree Video Delivery}
 
@@ -47,7 +47,7 @@ of the video versions and the tile quality arrangement.
 
 The projection of a sphere into a plane (known as mapping) has been extensively studied
 for centuries. In this paper, we consider the four projections that are the most natural
-candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:mapping}.
+candidates for 360-degree video delivery. These layouts are depicted in Figure~\ref{fig:mapping}.
 
 \begin{figure}[ht]
 \centering
@@ -92,11 +92,13 @@ candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:
 \caption{Projections into four geometric layouts}\label{fig:mapping}
 \end{figure}
 
-The advantages and shortcomings of every projection have been studied in the literature. Shortly put, from
+The advantages and shortcomings of every projection have been studied in the literature. From
 the images that are
-projected on a equirectangular, a cube map, and a rhombic dodecahedron, it is possible to generate a \ac{FoV}
+projected on an equirectangular, a cube map, and a rhombic dodecahedron, it is possible 
+to generate a \ac{FoV}
 for any position and angle in the sphere. Indeed, no information is loss, because no pixel is under-sampled in 
-this projection (no pair of pixels in the sphere is projected on these geometrical layouts in only one pixel). However,
+this projection (no pair of pixels in the sphere is projected on these geometrical 
+layouts in only one pixel). However,
 some pixels from the spherical image are over-sampled in the projected image. It is typically the case for
 the equirectangular layout, for which the projection generates a significant over-sampling at the poles. On the 
 contrary, the pyramid is not a geometric layout for lossless projections. Some pixels (those who are in the back
