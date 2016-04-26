@@ -72,6 +72,9 @@
 \DeclarePairedDelimiter{\integerInterval}{\llbracket}{\rrbracket}
 \DeclareMathOperator*{\minimize}{minimize}
 
+% parag
+\newcommand{\parag}[1]{\vspace{5pt}\noindent\textbf{#1}.\hspace{5pt}}
+
 %Some symbols definitions
 \newcommand{\packetset}{\mathcal P}
 \newcommand{\frameset}{\mathcal F}
@@ -115,13 +118,6 @@
 \booltrue{doubleBlinded}  %comment this line to remove all user comments
 
 \makeatletter
-%\def\@name{ \ifdoubleBlinded \phantom{ \fi \emph{Xavier Corbillon$^{\star}$ \quad Florian Boyrivent$^{\star}$
-%\quad Gr\'{e}goire Asselin\,De\,Williencourt$^{\star}$} \ifdoubleBlinded } \fi \\ \ifdoubleBlinded \phantom{ \emph{Gwendal
-%Simon$^{\star}$ \quad G\'{e}raldine Texier$^{\star}$ \quad Jacob
-%Chakareski$^{\dagger}$}\ifdoubleBlinded } \fi}
-%
-%\address{\ifdoubleBlinded \phantom{ \fi $^{\star}$ T\'{e}l\'{e}com Bretagne / IRISA, France \ifdoubleBlinded } \#$144$ \phantom{ \fi\quad
-%$^{\dagger}$ University of Alabama, USA \ifdoubleBlinded } \fi}
 
 \ifdoubleBlinded
 \numberofauthors{1}
@@ -149,10 +145,6 @@
 
 \makeatother
 
-%\pgfdeclareimage[width=3cm]{gamer}{plots/game-controller-icon-614x460.png}
-%\pgfdeclareimage[width=1.6cm]{tv}{plots/1411044172_PixelKit_tv_icon.png}
-%\pgfdeclareimage[width=0.8cm]{rack}{plots/1411044156_PixelKit_network_icon.png}
-
 \input{tikzset.tex}
 
 
@@ -169,141 +161,86 @@
 
 \input{background.tex}
 
-\section{Quality-Differentiated Mapping Evaluation}
+\section{Geometric Layout Evaluation}
 
-\begin{figure}[t]
-\begin{tikzpicture}
+Our objective is to identify the layout that offers the best performance regarding the quality of 
+the extracted\ac{FoV} video and the bit-rate of the delivered 360-degree video. We first introduce 
+the tool that we release to generate and exploit quality-differentiated
+360-degree videos on geometric layouts. Then, we describe the testbed that we set up to evaluate the
+performance of the four main geometric layouts. Finally, we show the first results that we obtained.
 
-\def\ecartx{1}
-\def\ecartybig{0.5}
-\def\ecartysmall{0.3}
-\def\heimax{8*\ecartysmall+3*\ecartybig}
-\def\sizeIcon{12}
-\def\unitdodeca{0.11}
+\subsection{Our Tool to Project 360-degree Video Into Quality-Differentiated Layouts}
 
-\pic [local bounding box = equiFirst] at (\ecartx,0.5*\heimax) 
-		{equirectangular={\sizeIcon}{-1}{0}};
-\pic [local bounding box = equiSecond, 
-		below= \ecartysmall of equiFirst] {equirectangular={\sizeIcon}{0}{-1}};
-%\pic [local bounding box = equiThird, 
-%		below=\ecartysmall of equiSecond] {equirectangular={\sizeIcon}{0}{0}};
+We do not enter into details. The code is available at \textit{hidden url}. The main features of this tool include:
+\begin{itemize}
+\item Projection from a spherical video into any of the four geometric layouts and vice versa. Our tool is in 
+particular able to re-project the 360-degree videos that are encoded and stored in the equirectangular layout,
+which corresponds to a large fraction of current catalogs of 360-degree videos. 
+\item Adjusting video qualities for each geometric face of any layout by setting \noteGS{to be written}
+\item \ac{FoV} extraction for any spherical coordinate and any angle, in particular for quality-differentiated videos.
+\end{itemize}
 
-\pic [local bounding box = cubeFirst, below=\ecartybig of equiSecond] {cubemap=\sizeIcon};
-\pic [local bounding box = cubeSecond, 
-		below=\ecartysmall of cubeFirst] {cubemap=\sizeIcon};
-%\pic [local bounding box = cubeThird, 
-%			below=\ecartysmall of cubeSecond] {cubemap=\sizeIcon};
+The software can thus be used by the scientific community to study geometric layouts, quality arrangement over the tiles, and \ac{FoV} extraction strategies.
 
-\pic [local bounding box = pyraFirst, below=\ecartybig of cubeSecond] {pyramid=\sizeIcon};
-\pic [local bounding box = pyraSecond, 
-		below=\ecartysmall of pyraFirst] {pyramid=\sizeIcon};
-%\pic [local bounding box = pyraThird, 
-%			below=\ecartysmall of pyraSecond] {pyramid=\sizeIcon};
+\subsection{Testbed Description}
 
-\pic [local bounding box = dodecaFirst, below=\ecartybig of pyraSecond, 
-		xshift=-3pt] {dodecahedron=\unitdodeca};
-\pic [local bounding box = dodecaSecond, below=\ecartysmall of dodecaFirst, xshift=-6pt,
-		yshift=2pt] {dodecahedron=\unitdodeca};
-%\pic [local bounding box = dodecaThird, 
-%			below=\ecartysmall of dodecaSecond] {dodecahedron=\unitdodeca};
+The testbed that we
+set up is depicted in Figure~\ref{fig:testbed}. From the original spherical video, we considered the 
+projection 
+into the four considered geometric layouts (equirectangular, cube map, pyramid, dodecahedron). For 
+each layout, we built
+$x$ different versions of the video, which corresponds to $x$ different \acp{QEC}. Then we simulated
+a client watching in a specific direction. We selected, for each layout, the version such that the \ac{QEC}
+is the closest to the given direction. We extracted the \ac{FoV} from this version. Finally, we compared
+the quality of the four different \ac{FoV} with respect to the reference video that has been generated
+without quality loss from the spherical video.
 
-% ==== sphere
-\pic [local bounding box=spher, yshift=10pt,
-		right=-\ecartx cm of pyraFirst] at (0,0) {spherical=10};
-		
-% == links
-\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]equiSecond.west);
-\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]cubeSecond.west);
-\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]pyraSecond.west);
-\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]dodecaSecond.west);
+\input{testbed.tex}
 
-% ==== selected versions
-\pic [local bounding box = chosenEqui, 
-		right= \ecartx of equiFirst] {equirectangular={\sizeIcon}{0}{-1}};
-\pic [local bounding box = chosenCube, right=\ecartx of cubeFirst] {cubemap=\sizeIcon};
-\pic [local bounding box = chosenPyra, 
-		right=\ecartx of pyraSecond] {pyramid=\sizeIcon};
-\pic [local bounding box = chosenDodeca, right=\ecartx of dodecaFirst, 
-		xshift=-5pt, yshift=3.5pt] {dodecahedron=\unitdodeca};
-		
-% == links
-\draw[-latex] ([xshift=1.5pt]equiFirst.east) to ([xshift=-1pt]chosenEqui.west);
-\draw[-latex] ([xshift=1.5pt]cubeFirst.east) to ([xshift=-1pt]chosenCube.west);
-\draw[-latex] ([xshift=1.5pt]pyraSecond.east) to ([xshift=-1pt]chosenPyra.west);
-\draw[-latex] ([xshift=0.5pt]dodecaFirst.east) to ([xshift=-1pt]chosenDodeca.west);
+To generate the different videos, we made some choices, which are mostly in conformance to the
+literature and to real implementation of 360-degree video delivery systems. Our future work 
+includes to study in more details the impact of some of these choices on
+the overall performance of the system; it is not our objective here.
 
-% == legend
-\tikzset{
-	legendNode/.style={
-		font=\scriptsize,
-		text width=1cm,
-		align=center,
-		anchor=south
-	}
-}
-\node[legendNode] at (chosenEqui |- equiFirst.north) {selected version};
-\node[legendNode] at (equiFirst.north) {offered versions};
+We generated $x=16$ different video versions for each layout. This number of versions is smaller than
+the number of videos (with pyramid layouts) given by~\citet{facebook}. It is however closer to the
+number of video representations that are recommended in rate-adaptive streaming 
+systems~\cite{Aparicio-PardoP15}. We describe now specific quality arrangements per layout:
+%\begin{description}
+%\item[equirectangular] 
 
-% ==== fov
+\parag{Equirectangular}We cut the equirectangular layout into $8\time 8$ tiles as proposed in
+the literature related to panorama video~\cite{gaddam_tiling_2015}. Tiles are thus rectangular.
+We considered three different qualities: the \emph{full quality}, which corresponds to the quality of the
+input spherical video, a \emph{medium quality}, which is set as half as good as the full quality, and a 
+\emph{low quality}, which is one quarter of the full quality. The quality arrangement is done such that
+the $3\time 3$ tiles that are around the \ac{QEC} are full quality, the $7\time 7$ tiles around 
+the \ac{QEC} (excluding the closest $3\time 3$) are with the medium quality, and the remaining tiles
+are with the low quality.
 
-\tikzset{
-	pics/equirec/.style n args={3}{
-		code={
-			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
-			\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
-			\draw[draw,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
-		}		
-	}
-}
+\parag{Cube Map}To generate the $x=16$ \acp{QEC}, we rotate the cube in the sphere so that the
+center of the square front face is the \ac{QEC}. The front face is at full quality, while the left, right, 
+top, and bottom faces are mid quality and the back face is low quality.
 
-\pic [local bounding box=fovEqui, right=\ecartx of chosenEqui] {equirec={\sizeIcon}{-2}{-1}};
-\pic [local bounding box=fovCube, right=\ecartx of chosenCube] {equirec={\sizeIcon}{1}{0}};
-\pic [local bounding box=fovPyra, right=\ecartx of chosenPyra] {equirec={\sizeIcon}{0}{-1}};
-\pic [local bounding box=fovDodeca] at (fovPyra |- chosenDodeca) {equirec={\sizeIcon}{0}{0}};
+\parag{Pyramid}This layout differs from other layouts. First, it does not preserve
+the pixel information of the spherical videos. Second, the distortion depends on the size of the square
+base face and to the distance from the peak. As for the cube map, we rotate the pyramid to adjust
+the center of the base face to the \ac{QEC}. The base is at full quality while the other faces are
+at a medium quality. \noteGS{To be written}
 
-\node[legendNode] at (fovEqui |- equiFirst.north) {\ac{FoV} extraction};
+\parag{Rhombic Dodecahedron}We rotated the dodecahedron such that the \ac{QEC} is between
+the two same faces (say face\,1 and face\,2). Both faces are at full quality. Then, the eight 
+faces that are around
+these faces are at medium quality, and the two remaining faces are at low quality.
 
-% == links
-
-\draw[-latex] ([xshift=1.5pt]chosenEqui.east) to ([xshift=-1pt]fovEqui.west);
-\draw[-latex] ([xshift=1.5pt]chosenCube.east) to ([xshift=-1pt]fovCube.west);
-\draw[-latex] ([xshift=1.5pt]chosenPyra.east) to ([xshift=-1pt]fovPyra.west);
-\draw[-latex] ([xshift=0.5pt]chosenDodeca.east) to ([xshift=-1pt]fovDodeca.west);
-
-% ==== reference video
-\tikzset{
-	refVideo/.pic={
-		\draw[fill=gray!70] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
-	}
-}
-
-\pic[local bounding box=fovRef,yshift=-15pt] 
-		at (fovDodeca |- dodecaSecond.south) {refVideo=\sizeIcon};
-\node[legendNode, text width=2cm] at (fovRef.north) {reference video};
-		
-\draw[-latex] (spher.south) |- (fovRef.west);
-
-% ==== comparison MS-SSIM
-
-\node[rounded corners,rectangle,thick,fill=gray!10,
-		text width=1.5cm,align=center,anchor=west] (msssim)
-		at ([xshift=\ecartx cm]fovEqui |- spher) {MS-SSIM comparison};
-		
-% == links
-
-\draw[-latex] (fovEqui.east) -| (msssim.45);
-\draw[-latex] (fovCube.east) -| (msssim.135);
-\draw[-latex] (fovPyra.east) -| (msssim.225);
-\draw[-latex] (fovDodeca.east) -| (msssim.270);
-\draw[-latex] (fovRef.east) -| (msssim.315);
-
-\end{tikzpicture}
-
-
-\end{figure}
-
-
-\subsection{Evaluation Platform}
+We observed that, for the quality setting that we decided for the equirectangular (medium quality and 
+low quality at half, respectively a quarter, quality of the full quality), the bit-rate of the
+generated equirectangular layouts are greater than for those of the other layouts. To get the
+same bit-rate for each video version, we apply the following process. We set that, for a given 
+360-degree video, the projection on the equirectangular provides the \emph{bit-rate budget}. For the
+other layout, the low quality is kept at a quarter of the full quality, but we explore the range of
+possible medium qualities until the bit-rate of the generated video version is equal to the 
+bit-rate budget.
 
 \subsection{Results}
 

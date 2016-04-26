@@ -1,0 +1,132 @@
+\begin{figure}[t]
+\begin{tikzpicture}
+
+\def\ecartx{1}
+\def\ecartybig{0.5}
+\def\ecartysmall{0.3}
+\def\heimax{8*\ecartysmall+3*\ecartybig}
+\def\sizeIcon{12}
+\def\unitdodeca{0.11}
+
+\pic [local bounding box = equiFirst] at (\ecartx,0.5*\heimax) 
+		{equirectangular={\sizeIcon}{-1}{0}};
+\pic [local bounding box = equiSecond, 
+		below= \ecartysmall of equiFirst] {equirectangular={\sizeIcon}{0}{-1}};
+%\pic [local bounding box = equiThird, 
+%		below=\ecartysmall of equiSecond] {equirectangular={\sizeIcon}{0}{0}};
+
+\pic [local bounding box = cubeFirst, below=\ecartybig of equiSecond] {cubemap=\sizeIcon};
+\pic [local bounding box = cubeSecond, 
+		below=\ecartysmall of cubeFirst] {cubemap=\sizeIcon};
+%\pic [local bounding box = cubeThird, 
+%			below=\ecartysmall of cubeSecond] {cubemap=\sizeIcon};
+
+\pic [local bounding box = pyraFirst, below=\ecartybig of cubeSecond] {pyramid=\sizeIcon};
+\pic [local bounding box = pyraSecond, 
+		below=\ecartysmall of pyraFirst] {pyramid=\sizeIcon};
+%\pic [local bounding box = pyraThird, 
+%			below=\ecartysmall of pyraSecond] {pyramid=\sizeIcon};
+
+\pic [local bounding box = dodecaFirst, below=\ecartybig of pyraSecond, 
+		xshift=-3pt] {dodecahedron=\unitdodeca};
+\pic [local bounding box = dodecaSecond, below=\ecartysmall of dodecaFirst, xshift=-6pt,
+		yshift=2pt] {dodecahedron=\unitdodeca};
+%\pic [local bounding box = dodecaThird, 
+%			below=\ecartysmall of dodecaSecond] {dodecahedron=\unitdodeca};
+
+% ==== sphere
+\pic [local bounding box=spher, yshift=10pt,
+		right=-\ecartx cm of pyraFirst] at (0,0) {spherical=10};
+		
+% == links
+\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]equiSecond.west);
+\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]cubeSecond.west);
+\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]pyraSecond.west);
+\draw[-latex] (spher) to ([xshift=-3pt, yshift=5pt]dodecaSecond.west);
+
+% ==== selected versions
+\pic [local bounding box = chosenEqui, 
+		right= \ecartx of equiFirst] {equirectangular={\sizeIcon}{-1}{0}};
+\pic [local bounding box = chosenCube, right=\ecartx of cubeFirst] {cubemap=\sizeIcon};
+\pic [local bounding box = chosenPyra, 
+		right=\ecartx of pyraSecond] {pyramid=\sizeIcon};
+\pic [local bounding box = chosenDodeca, right=\ecartx of dodecaFirst, 
+		xshift=-5pt, yshift=3.5pt] {dodecahedron=\unitdodeca};
+		
+% == links
+\draw[-latex] ([xshift=1.5pt]equiFirst.east) to ([xshift=-1pt]chosenEqui.west);
+\draw[-latex] ([xshift=1.5pt]cubeFirst.east) to ([xshift=-1pt]chosenCube.west);
+\draw[-latex] ([xshift=1.5pt]pyraSecond.east) to ([xshift=-1pt]chosenPyra.west);
+\draw[-latex] ([xshift=0.5pt]dodecaFirst.east) to ([xshift=-1pt]chosenDodeca.west);
+
+% == legend
+\tikzset{
+	legendNode/.style={
+		font=\scriptsize,
+		text width=1cm,
+		align=center,
+		anchor=south
+	}
+}
+\node[legendNode] at (chosenEqui |- equiFirst.north) {selected version};
+\node[legendNode] at (equiFirst.north) {offered versions};
+
+% ==== fov
+
+\tikzset{
+	pics/equirec/.style n args={4}{
+		code={
+			\draw[draw=none,fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-#4*0.0088194*#1, 0.0066147*#3*#1 - #4*0.0066147*#1) rectangle (0.0088194*#2*#1 + #4*0.0088194*#1, 0.0066147*#3*#1 + #4*0.0066147*#1);
+			\draw[draw, very thick, densely dotted,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+		}		
+	}
+}
+
+\pic [local bounding box=fovEqui, right=\ecartx of chosenEqui] {equirec={\sizeIcon}{-2}{-1}{2}};
+\pic [local bounding box=fovCube, right=\ecartx of chosenCube] {equirec={\sizeIcon}{1}{0}{3}};
+\pic [local bounding box=fovPyra, right=\ecartx of chosenPyra] {equirec={\sizeIcon}{0}{-1}{2}};
+\pic [local bounding box=fovDodeca] at (fovPyra |- chosenDodeca) {equirec={\sizeIcon}{0}{0}{3}};
+
+\node[legendNode] at (fovEqui |- equiFirst.north) {\ac{FoV} extraction};
+
+% == links
+
+\draw[-latex] ([xshift=1.5pt]chosenEqui.east) to ([xshift=-1pt]fovEqui.west);
+\draw[-latex] ([xshift=1.5pt]chosenCube.east) to ([xshift=-1pt]fovCube.west);
+\draw[-latex] ([xshift=1.5pt]chosenPyra.east) to ([xshift=-1pt]fovPyra.west);
+\draw[-latex] ([xshift=0.5pt]chosenDodeca.east) to ([xshift=-1pt]fovDodeca.west);
+
+% ==== reference video
+\tikzset{
+	refVideo/.pic={
+		\draw[draw=black, very thick, densely dotted, fill=gray!70] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+	}
+}
+
+\pic[local bounding box=fovRef,yshift=-15pt] 
+		at (fovDodeca |- dodecaSecond.south) {refVideo=\sizeIcon};
+\node[legendNode, text width=2cm] at (fovRef.north) {reference video};
+		
+\draw[-latex] (spher.south) |- (fovRef.west);
+
+% ==== comparison MS-SSIM
+
+\node[rounded corners,rectangle,thick,fill=gray!10,
+		text width=1.5cm,align=center,anchor=west] (msssim)
+		at ([xshift=\ecartx cm]fovEqui |- spher) {MS-SSIM comparison};
+		
+% == links
+
+\draw[-latex] (fovEqui.east) -| (msssim.45);
+\draw[-latex] (fovCube.east) -| (msssim.135);
+\draw[-latex] (fovPyra.east) -| (msssim.225);
+\draw[-latex] (fovDodeca.east) -| (msssim.270);
+\draw[-latex] (fovRef.east) -| (msssim.315);
+
+\end{tikzpicture}
+
+\caption{Our testbed: the spherical video is projected into four geometric layouts with variable qualities and
+one layout at full-quality for reference. The best version is selected, and the \ac{FoV} is extracted. The quality
+of the extracted \acp{FoV} are compared with respect to the reference video.}\label{fig:testbed}
+\end{figure}
