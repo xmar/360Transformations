@@ -7,4 +7,5 @@ class EquirectangularLayout(Layout):
 
     def GenerateLayout(self, a=None):
         c = '[{}]\ntype=equirectangular\n'.format(self.GetName())
+        c += 'relativeResolution=true\nwidth=1\nheight=1\n'
         return c

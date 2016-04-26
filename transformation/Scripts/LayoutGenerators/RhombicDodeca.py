@@ -13,7 +13,7 @@ class RhombicDodecaLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
-        for i in [1,5]: #TODO check the right face ID
+        for i in [1,5]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,4,6,7]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, mediumRatio)

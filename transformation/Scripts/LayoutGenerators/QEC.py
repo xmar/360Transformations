@@ -13,7 +13,7 @@ class QEC:
                 self.yaw is None or \
                 self.roll is None:
             self.yaw = self.x*45-157.5
-            self.pitch = 78.75-22.5*self.y
+            self.pitch = -78.75+22.5*self.y
             self.roll = 0
         return (self.yaw, self.pitch, self.roll)
 
