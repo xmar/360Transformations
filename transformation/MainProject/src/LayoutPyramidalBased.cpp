@@ -15,7 +15,7 @@ Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(cons
 
 
     //Transform to the canonic representation
-    Coord3dSpherical p = Rotation(sphericalCoord, -m_yaw, -m_pitch, -m_roll);
+    Coord3dSpherical p = Rotation(sphericalCoord, m_rotationMat.t());
 
     for (auto testF: get_range<LayoutPyramidalBased::Faces>())
     {
@@ -77,35 +77,35 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
     case Faces::Base:
         {
             Coord3dCart inter(1, (normalizedI-0.5)*m_baseEdge, (0.5 - normalizedJ)*m_baseEdge);
-            return Rotation(inter, m_yaw, m_pitch, m_roll);
+            return Rotation(inter, m_rotationMat);
         }
     case Faces::Left:
         {
             double z = -normalizedI*(normalizedJ-0.5) * m_baseEdge;
             double x = (m_pyramidHeight+1.0)*normalizedI-m_pyramidHeight;
             double y = -UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
+            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
         }
     case Faces::Top:
         {
             double y = (normalizedI-0.5)*normalizedJ * m_baseEdge;
             double x =  (m_pyramidHeight+1.0)*normalizedJ-m_pyramidHeight;
             double z = UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
+            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
         }
     case Faces::Right:
         {
             double z = -((normalizedJ-0.5)*(1-normalizedI)) * m_baseEdge;
             double x = -(m_pyramidHeight+1.0)*normalizedI+1;
             double y = UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
+            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
         }
     case Faces::Bottom:
         {
             double y = ((normalizedI-0.5)*(1-normalizedJ)) * m_baseEdge;
             double x = -(m_pyramidHeight+1.0)*normalizedJ+1;
             double z = -UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_yaw, m_pitch, m_roll);
+            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
         }
     case Faces::Last:
         throw std::invalid_argument("FromNormalizedInfoTo3d: Last is not a valid face");

@@ -74,36 +74,17 @@ LayoutEquirectangularTiles::TileId LayoutEquirectangularTiles::From2dToTileId(un
     return std::make_tuple(unsigned(-1), unsigned(-1));
 }
 
-CoordI LayoutEquirectangularTiles::TileIdTo2dOffset(const TileId& ti) const
+const CoordI& LayoutEquirectangularTiles::TileIdTo2dOffset(const unsigned int& i, const unsigned int& j) const
 {
-    auto i = std::get<0>(ti);
-    auto j = std::get<1>(ti);
     if (i >= 8 || j >= 8)
     {
         throw std::invalid_argument("GetRes: invalide tile id -> ("+std::to_string(i)+","+std::to_string(j)+")");
     }
-    unsigned int offI(0), offJ(0);
-    for (unsigned k = 0; k < i; ++k)
-    {
-        offI += m_colsMaxSize[k];
-    }
-    for (unsigned k = 0; k < j; ++k)
-    {
-        offJ += m_rowsMaxSize[k];
-    }
-    if (i != 0)
-    {
-        offI += (m_colsMaxSize[i]-m_tr.GetResWidth(ti))/2;
-    }
-    if (j != 0)
-    {
-        offJ += (m_rowsMaxSize[j]-m_tr.GetResHeight(ti))/2;
-    }
-    return CoordI(offI, offJ);
+    return m_offsets[i][j];
 }
 
 CoordI LayoutEquirectangularTiles::TileIdTo2dEndOffset(const TileId& ti) const
 {
-    auto coordStart = TileIdTo2dOffset(ti);
+    const auto& coordStart = TileIdTo2dOffset(ti);
     return CoordI(coordStart.x+m_tr.GetResWidth(ti), coordStart.y+m_tr.GetResHeight(ti));
 }

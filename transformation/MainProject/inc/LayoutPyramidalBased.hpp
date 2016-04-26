@@ -18,7 +18,8 @@ class LayoutPyramidalBased : public Layout
              m_interTop((1-std::pow(m_alpha,2))/(1+std::pow(m_alpha,2)),0,2*m_alpha/(1+std::pow(m_alpha,2))),
              m_pyramidHeight(norm(m_top-Coord3dCart(1,0,0))),
              m_topHeight(norm(m_top-Coord3dCart(1,0,m_alpha))),
-             m_intersectionHeight(norm(m_interTop-Coord3dCart(1,0,m_alpha))), m_fr(std::move(fr))
+             m_intersectionHeight(norm(m_interTop-Coord3dCart(1,0,m_alpha))), m_fr(std::move(fr)),
+             m_rotationMat(GetRotMatrice(yaw,pitch,roll))
              {}
 
 
@@ -51,7 +52,6 @@ class LayoutPyramidalBased : public Layout
             }
         }
 
-        RotMat FaceToRotMat(Faces f) const;
         unsigned int GetRes(const Faces& f) const {return m_fr.GetRes(f);}
     protected:
         struct FaceResolutions
@@ -105,5 +105,7 @@ class LayoutPyramidalBased : public Layout
 
       double UsePlanEquation(double x) const; //compute the value of z knowing the value of x (for the top plan in the canonic pyramid)
       FaceResolutions m_fr;
+      RotMat m_rotationMat;
+
 };
 }

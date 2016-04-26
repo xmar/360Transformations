@@ -42,45 +42,57 @@ Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const 
     return ni;
 }
 
-RotMat LayoutCubeMapBased::FaceToRotMat(Faces f) const
+void LayoutCubeMapBased::InitFaceRotations(void)
 {
-    RotMat m(3,3);
-    m = cv::Mat::zeros(3,3, m.type());
-    switch (f)
+    for (auto f: get_range<LayoutCubeMapBased::Faces>())
     {
-        case Faces::Front:
-            m(0,0) = 1;
-            m(1,1) = 1;
-            m(2,2) = -1;
-            break;
-        case Faces::Back:
-            m(0,0) = -1;
-            m(1,1) = -1;
-            m(2,2) = -1;
-            break;
-        case Faces::Left:
-            m(0,1) = 1;
-            m(1,0) = -1;
-            m(2,2) = -1;
-            break;
-        case Faces::Right:
-            m(0,1) = -1;
-            m(1,0) = 1;
-            m(2,2) = -1;
-            break;
-        case Faces::Top:
-            m(0,2) = 1;
-            m(1,1) = 1;
-            m(2,0) = 1;
-            break;
-        case Faces::Bottom:
-            m(0,2) = -1;
-            m(1,1) = 1;
-            m(2,0) = -1;
-            break;
-        case Faces::Last:
-        case Faces::Black:
-            throw std::invalid_argument("FaceToRotMat: Last is not a valid face");
+        RotMat m(3,3);
+        m = cv::Mat::zeros(3,3, m.type());
+        switch (f)
+        {
+            case Faces::Front:
+                m(0,0) = 1;
+                m(1,1) = 1;
+                m(2,2) = -1;
+                break;
+            case Faces::Back:
+                m(0,0) = -1;
+                m(1,1) = -1;
+                m(2,2) = -1;
+                break;
+            case Faces::Left:
+                m(0,1) = 1;
+                m(1,0) = -1;
+                m(2,2) = -1;
+                break;
+            case Faces::Right:
+                m(0,1) = -1;
+                m(1,0) = 1;
+                m(2,2) = -1;
+                break;
+            case Faces::Top:
+                m(0,2) = 1;
+                m(1,1) = 1;
+                m(2,0) = 1;
+                break;
+            case Faces::Bottom:
+                m(0,2) = -1;
+                m(1,1) = 1;
+                m(2,0) = -1;
+                break;
+            case Faces::Last:
+            case Faces::Black:
+                continue;
+        }
+        m_faceRotations[static_cast<unsigned>(f)] = m;
     }
-    return m;
+}
+
+const RotMat& LayoutCubeMapBased::FaceToRotMat(Faces f) const
+{
+    if (f == Faces::Last || f == Faces::Black)
+    {
+        throw std::invalid_argument("FaceToRotMat: Last is not a valid face");
+    }
+    return m_faceRotations[static_cast<unsigned>(f)];
 }

@@ -27,19 +27,15 @@ Layout::NormalizedFaceInfo LayoutFlatFixed::From3dToNormalizedFaceInfo(const Coo
     //Coordination of the intersection =
     Coord3dCart inter (x ,y , z);
     //Go back to the plan x=1
-    auto rotInter = Rotation(inter, -m_yaw, -m_pitch, m_roll);
+    auto rotInter = Rotation(inter, m_rotationMat.t());
 
-    double maxHDist = 2.f*std::tan(m_horizontalAngleOfVision/2);
-    double maxVDist = 2.f*std::tan(m_verticalAngleOfVision/2);
-    double normalizedI = rotInter.y/maxHDist + 0.5f; //between 0;1
-    double normalizedJ = rotInter.z/maxVDist + 0.5f;
+    double normalizedI = rotInter.y/m_maxHDist + 0.5f; //between 0;1
+    double normalizedJ = rotInter.z/m_maxVDist + 0.5f;
     return Layout::NormalizedFaceInfo(CoordF(normalizedI, normalizedJ), 0);
 }
 Coord3dCart LayoutFlatFixed::FromNormalizedInfoTo3d(const Layout::NormalizedFaceInfo& ni) const
 {
-    const double maxHDist = 2.f*std::tan(m_horizontalAngleOfVision/2);
-    const double maxVDist = 2.f*std::tan(m_verticalAngleOfVision/2);
     const CoordF& coord(ni.m_normalizedFaceCoordinate);
-    Coord3dCart coordBefRot(1.f, (coord.x-0.5)*maxHDist, (coord.y-0.5)*maxVDist);//coordinate in the plan x=1
-    return Rotation(coordBefRot, m_yaw, m_pitch, m_roll);
+    Coord3dCart coordBefRot(1.f, (coord.x-0.5)*m_maxHDist, (coord.y-0.5)*m_maxVDist);//coordinate in the plan x=1
+    return Rotation(coordBefRot, m_rotationMat);
 }
