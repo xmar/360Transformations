@@ -130,8 +130,6 @@ int main( int argc, const char* argv[] )
                 layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, isFirst, refResolution.x, refResolution.y));
                 layoutFlowVect.back().back()->Init();
                 refResolution = layoutFlowVect.back().back()->GetReferenceResolution();
-                std::cout << "Ref resolution: "<< refResolution.x << ", " << refResolution.y << std::endl;
-                std::cout << "Width, height: "<< layoutFlowVect.back().back()->GetWidth() << ", " << layoutFlowVect.back().back()->GetHeight() << std::endl;
                 isFirst = false;
                 ++k;
             }
