@@ -67,21 +67,30 @@ if __name__ ==  '__main__':
             if not os.path.isdir(outputDirQEC):
                 os.makedirs(outputDirQEC)
             eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
-            inputVideos = [inputVideo, '{}/equirectangularTiled{}_{}.mkv'.format(outputDir,i,j)]
-            layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)]]
+            #inputVideos = [inputVideo, '{}/equirectangularTiled{}_{}.mkv'.format(outputDir,i,j)]
+            inputVideos = [inputVideo, inputVideo]
+            #layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)]]
+            layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)]]
+            #DEBUG####
+            for layoutId in ['RhombicDodeca']:
+                storageName = '{}/{}{}_{}_storage.dat'.format(outputDir,layoutId,i,j)
+                GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(ls.layout, ls.a), (LayoutGenerators.EquirectangularLayout('EquirectangularOut'), None)], 24, n,  inputVideo, 'TestRhombicToEq.mkv')
+                GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(LayoutGenerators.RhombicDodecaLayout('Rhombic',(0,0,0)), ls.a), (LayoutGenerators.EquirectangularLayout('EquirectangularOut'), None)], 24, n,  inputVideo, 'TestRhombicToEq2.mkv')
             for layoutId in ['CubMap', 'CubMapCompact', 'Pyramidal', 'RhombicDodeca']:
                 storageName = '{}/{}{}_{}_storage.dat'.format(outputDir,layoutId,i,j)
                 layoutVideoName = '{}/{}{}_{}.mkv'.format(outputDir,layoutId,i,j)
                 ls = LayoutGenerators.LayoutStorage.Load(storageName)
-                inputVideos.append(layoutVideoName)
-                layoutsToTest.append( [(ls.layout, ls.a)] )
+                #inputVideos.append(layoutVideoName)
+                inputVideos.append(inputVideo)
+                #layoutsToTest.append( [(ls.layout, ls.a)] )
+                layoutsToTest.append( [(eqL, None),(ls.layout, ls.a)] )
 
             #Test Good Layout
             flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.',''), 1920, 1080, 110, goodCenter)
             GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, True)
 
             #Test Bad layout
-            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.',''), 1920, 1080, 110, goodCenter)
+            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.',''), 1920, 1080, 110, badCenter)
             GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, False)
 
             k -= 1
