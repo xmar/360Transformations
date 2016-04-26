@@ -1,0 +1,104 @@
+% =============
+\section{Background}
+
+In this Section, we provide the background for our study.
+First, we depict the overall architecture of the delivery system.
+Then, we recall the main 2D geometric layouts for spherical videos.
+
+\subsection{Navigable 360-degree Video Delivery}
+
+The principles of a navigable video delivery system are similar as in adaptive bit-rate
+video systems such as \ac{DASH}. The server offers multiple versions of the same video 
+and the client
+selects the most appropriate version according to some criteria. These versions 
+are cut into second-long segments such that the client can regularly switch from one 
+version to another.
+
+In the case of wide video with different spatial qualities, the main idea is to spatially cut 
+the video into \emph{tiles}.
+Then, two implementations are possible for the delivery system. Either the server 
+offers each tile at different qualities. The client selects each tile version independently 
+and it has to reconstruct
+the full video from these tiles before the \ac{FoV} extraction. This solution allows a 
+fine setting of qualities but 
+most of the computation is done at the client side. The second option, 
+which is the one we consider in this paper and is also the industrial implementation described 
+by~\citet{facebook}, is that
+the server prepares $x$ versions related to $x$ different \acp{QEC}. Each version 
+is an arrangement of tile
+qualities such that the tiles that are close to the \ac{QEC} are at high-quality 
+and the other tiles
+are at a lower quality. The main advantages include an easy management of the server 
+(\textit{e.g.} small \emph{manifest} file), a simple selection process for the client (by
+a distance computation), and no need of re-constructing the video before the \ac{FoV} extraction.
+
+At the client side, the end-user moves its head to decide the \ac{FoV}. The head movements
+are called \emph{yaw}, \emph{pitch}, and \emph{roll}. The center of the \ac{FoV} is a 
+point on the sphere, the size of the \ac{FoV} depends on the device (typically
+around 100$^\circ$ in state-of-the-art devices), and the orientation of the extracted video 
+is related to the roll.
+
+The complete analysis and evaluation of the navigable 360-degree video delivery system
+is left for future work. Due to lack of space, we focus here on the geometric layout
+of the video versions and the tile quality arrangement.
+
+
+\subsection{Geometric Layouts for Spherical Videos}
+
+The projection of a sphere into a plane (known as mapping) has been extensively studied
+for centuries. In this paper, we consider the four projections that are the most natural
+candidates for 360-degree video delivery. These are depicted in Figure~\ref{fig:mapping}.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\def\sizeSphere{20}%pt
+\def\ecartY{-1.2}%cm
+\def\ecartX{6}
+
+% da sphere
+\pic [local bounding box=spher]  at (0,0) {spherical=15};
+
+% recantagular
+\pic [local bounding box=equi] at (-3,\ecartY) {equirectangular={\sizeSphere}{-1}{0}};
+
+% cupe map
+\pic [local bounding box=cubemap] at (-1,\ecartY) {cubemap=\sizeSphere};
+
+% pyramid
+\pic [local bounding box=pyra] at (1,\ecartY) {pyramid=\sizeSphere};
+
+% rhombic
+%\pgfdeclareimage[width=36 pt]{dodecahedron}{RhombicDodecahedron.png}
+%\node at (3,\ecartY) (dodec)
+%    {\pgfbox[center,center]{\pgfuseimage{dodecahedron}}};
+    
+\def\unitused{0.22}
+
+\pic [local bounding box=dodeca] at (3,0.88*\ecartY) {dodecahedron=\unitused};
+
+% links
+\draw[-latex] (spher.180) -| (equi);
+\draw[-latex] (spher.200) -| (cubemap);
+\draw[-latex] (spher.340) -| (pyra);
+\draw[-latex] (spher) -| (dodeca);
+
+\node[font=\scriptsize,anchor=north] at (equi.south) {equirectangular};
+\node[font=\scriptsize,anchor=north] at (cubemap.south) {cube map};
+\node[font=\scriptsize,anchor=north] at (pyra.south) {pyramid};
+\node[font=\scriptsize,anchor=north] at (dodeca.south) {\vphantom{y}dodecahedron};
+
+\end{tikzpicture}
+\caption{Projections into four geometric layouts}\label{fig:mapping}
+\end{figure}
+
+The advantages and shortcomings of every projection have been studied in the literature. Shortly put, from
+the images that are
+projected on a equirectangular, a cube map, and a rhombic dodecahedron, it is possible to generate a \ac{FoV}
+for any position and angle in the sphere. Indeed, no information is loss, because no pixel is under-sampled in 
+this projection (no pair of pixels in the sphere is projected on these geometrical layouts in only one pixel). However,
+some pixels from the spherical image are over-sampled in the projected image. It is typically the case for
+the equirectangular layout, for which the projection generates a significant over-sampling at the poles. On the 
+contrary, the pyramid is not a geometric layout for lossless projections. Some pixels (those who are in the back
+of the view face) are under-sampled, so two pixels can be projected into one pixel by interpolating their color
+values. A \ac{FoV} that is extracted for positions near the back can suffer from distortion.
