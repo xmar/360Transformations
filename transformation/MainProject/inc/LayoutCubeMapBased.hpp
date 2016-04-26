@@ -17,41 +17,7 @@ class LayoutCubeMapBased : public Layout
             m_faceRotations(){InitFaceRotations();};
         virtual ~LayoutCubeMapBased(void) = default;
 
-        virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
 
-        virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const = 0;
-
-        virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const final;
-
-        virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const final;
-
-        Plan FromFaceToPlan(Faces f) const
-        {
-            switch(f)
-            {
-                case Faces::Front:
-                    return Plan(-1,0,0,1);
-                case Faces::Back:
-                    return Plan(1,0,0,1);
-                case Faces::Top:
-                    return Plan(0,0,-1,1);
-                case Faces::Bottom:
-                    return Plan(0,0,1,1);
-                case Faces::Right:
-                    return Plan(0,-1,0,1);
-                case Faces::Left:
-                    return Plan(0,1,0,1);
-                case Faces::Black:
-                    return Plan(0,0,0,0);
-                case Faces::Last:
-                    throw std::invalid_argument("FaceToPlan: Last is not a valid face");
-
-            }
-        }
-
-        const RotMat& FaceToRotMat(Faces f) const;
-
-        unsigned int GetRes(const Faces& f) const {return m_fr.GetRes(f);}
     protected:
         struct FaceResolutions
         {
@@ -88,6 +54,42 @@ class LayoutCubeMapBased : public Layout
             private:
                 std::array<unsigned int, 6> m_faces;
         };
+
+        virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
+
+        virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const = 0;
+
+        virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const final;
+
+        virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const final;
+
+        Plan FromFaceToPlan(Faces f) const
+        {
+            switch(f)
+            {
+                case Faces::Front:
+                    return Plan(-1,0,0,1);
+                case Faces::Back:
+                    return Plan(1,0,0,1);
+                case Faces::Top:
+                    return Plan(0,0,-1,1);
+                case Faces::Bottom:
+                    return Plan(0,0,1,1);
+                case Faces::Right:
+                    return Plan(0,-1,0,1);
+                case Faces::Left:
+                    return Plan(0,1,0,1);
+                case Faces::Black:
+                    return Plan(0,0,0,0);
+                case Faces::Last:
+                    throw std::invalid_argument("FaceToPlan: Last is not a valid face");
+
+            }
+        }
+
+        const RotMat& FaceToRotMat(Faces f) const;
+
+        unsigned int GetRes(const Faces& f) const {return m_fr.GetRes(f);}
 
     private:
         FaceResolutions m_fr;

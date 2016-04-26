@@ -37,28 +37,39 @@ class LayoutCubeMap2: public LayoutCubeMapBased
 
         virtual ~LayoutCubeMap2(void) = default;
 
+        virtual CoordI GetReferenceResolution(void) override
+        {
+            return CoordI(4*m_maxOffsetLFRB, 2*m_maxOffsetLFRB);
+        }
 
-		Faces From2dToFace(unsigned int i, unsigned int j) const;
+        static CoordI GetReferenceResolution(unsigned width, unsigned heigth, const std::array<double,6>& scales)
+        {
+            const double w = width/(scales[0]+scales[2]+scales[3]+scales[1]);
+             return CoordI(4*w, 2*w);
+        }
+
+    protected:
+        Faces From2dToFace(unsigned int i, unsigned int j) const;
 
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 
-        private:
-            unsigned int m_maxOffsetTFB;
-            unsigned int m_maxOffsetLFRB;
+    private:
+        unsigned int m_maxOffsetTFB;
+        unsigned int m_maxOffsetLFRB;
 
-            LayoutCubeMap2(double yaw, double pitch, double roll, unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
-                LayoutCubeMapBased(width, height, yaw, pitch, roll, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
+        LayoutCubeMap2(double yaw, double pitch, double roll, unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
+            LayoutCubeMapBased(width, height, yaw, pitch, roll, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
 
-			unsigned int IStartOffset(LayoutCubeMapBased::Faces f) const;
-            unsigned int IEndOffset(LayoutCubeMapBased::Faces f) const;
-            unsigned int JStartOffset(LayoutCubeMapBased::Faces f) const;
-            unsigned int JEndOffset(LayoutCubeMapBased::Faces f) const;
+        unsigned int IStartOffset(LayoutCubeMapBased::Faces f) const;
+        unsigned int IEndOffset(LayoutCubeMapBased::Faces f) const;
+        unsigned int JStartOffset(LayoutCubeMapBased::Faces f) const;
+        unsigned int JEndOffset(LayoutCubeMapBased::Faces f) const;
 
-            inline bool InFace(unsigned i, unsigned j, LayoutCubeMapBased::Faces f) const
-            {
-                return inInterval(i, IStartOffset(f), IEndOffset(f)) && inInterval(j, JStartOffset(f), JEndOffset(f));
-            }
+        inline bool InFace(unsigned i, unsigned j, LayoutCubeMapBased::Faces f) const
+        {
+            return inInterval(i, IStartOffset(f), IEndOffset(f)) && inInterval(j, JStartOffset(f), JEndOffset(f));
+        }
 };
 
 }

@@ -11,8 +11,43 @@ class LayoutEquirectangularTiles : public Layout
     public:
         typedef std::tuple<unsigned int, unsigned int> TileId;
         typedef std::array<std::array<std::tuple<unsigned int, unsigned int>, 8>,8> TilesMap;
+        typedef std::array<std::array<double, 8>,8> ScaleTilesMap;
         virtual ~LayoutEquirectangularTiles() = default;
 
+        virtual CoordI GetReferenceResolution(void) override
+        {
+            unsigned maxI(0), maxJ(0);
+            for (unsigned i = 0; i < 8; ++i)
+            {
+                for (unsigned j = 0; j < 8; ++j)
+                {
+                    maxI = MAX(maxI, m_tr.GetResWidth(std::make_tuple(i,j)));
+                    maxJ = MAX(maxJ, m_tr.GetResHeight(std::make_tuple(i,j)));
+                }
+            }
+            return CoordI(8*maxI, 8*maxJ);
+        }
+
+        static CoordI GetReferenceResolution(unsigned width, unsigned heigth, const ScaleTilesMap& scaleTm)
+        {
+            double sumRationCols = 0;
+            double sumRationRows = 0;
+            for (unsigned int i = 0; i < 8; ++i)
+            {
+                double maxCols(0), maxRows(0);
+                for (unsigned int j = 0; j < 8; ++j)
+                {
+                    maxCols = std::max(maxCols, scaleTm[i][j]);
+                    maxRows = std::max(maxCols, scaleTm[j][i]);
+                }
+                sumRationCols += maxCols;
+                sumRationRows += maxRows;
+            }
+            return CoordI(8*width/sumRationCols, 8*heigth/sumRationRows);
+        }
+
+
+    protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override;

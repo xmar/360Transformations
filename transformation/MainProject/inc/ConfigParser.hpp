@@ -58,6 +58,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            if (isInput)
+            {
+                if (!infer)
+                {
+                    throw std::invalid_argument("Input with static resolution not supported yet");
+                }
+                auto refRes = LayoutCubeMap::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+                inputWidth = refRes.x;
+                inputHeight = refRes.y;
+            }
             if (infer)
             {
                 return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
@@ -78,6 +88,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            if (isInput)
+            {
+                if (!infer)
+                {
+                    throw std::invalid_argument("Input with static resolution not supported yet");
+                }
+                auto refRes = LayoutCubeMap2::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+                inputWidth = refRes.x;
+                inputHeight = refRes.y;
+            }
             if (infer)
             {
                 return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
@@ -95,6 +115,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double width = ptree.get<double>(layoutSection+".width");
             double height = ptree.get<double>(layoutSection+".height");
             double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
+            if (isInput)
+            {
+                throw std::invalid_argument("FlatFixed  layout cannot be the input of the transformation flow");
+            }
             if (infer)
             {
                 return std::make_shared<LayoutFlatFixed>(yaw, pitch, roll, width*inputWidth, height*inputHeight, horizontalAngleVision);
@@ -115,13 +139,23 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightBottom");
+            if (isInput)
+            {
+                if (!infer)
+                {
+                    throw std::invalid_argument("Input with static resolution not supported yet");
+                }
+                auto refRes = LayoutPyramidal::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+                inputWidth = refRes.x;
+                inputHeight = refRes.y;
+            }
             if (infer)
             {
-                return std::make_shared<LayoutPyramidal2>(pyramidBaseEdge, yaw, pitch, roll, pyramidBaseEdgeLength*inputWidth/4);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, pyramidBaseEdgeLength*inputWidth/4);
             }
             else
             {
-                return std::make_shared<LayoutPyramidal2>(pyramidBaseEdge, yaw, pitch, roll, pyramidBaseEdgeLength);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, pyramidBaseEdgeLength);
             }
         }
         if (layoutType == "pyramid2")
@@ -135,6 +169,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
+            if (isInput)
+            {
+                if (!infer)
+                {
+                    throw std::invalid_argument("Input with static resolution not supported yet");
+                }
+                auto refRes = LayoutPyramidal2::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+                inputWidth = refRes.x;
+                inputHeight = refRes.y;
+            }
             if (infer)
             {
                 return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
@@ -149,23 +193,60 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            std::array<double, 12> faceResScale;
             std::array<unsigned int, 12> faceRes;
             for (unsigned int i = 0; i < 12; ++i)
             {
-                faceRes[i] = (infer ? inputWidth/8.0 : 1)*ptree.get<double>(layoutSection+".rhombEdgeLengthFace"+std::to_string(i+1));
+                faceResScale[i] = ptree.get<double>(layoutSection+".rhombEdgeLengthFace"+std::to_string(i+1));
+            }
+            if (isInput)
+            {
+                if (!infer)
+                {
+                    throw std::invalid_argument("Input with static resolution not supported yet");
+                }
+                auto refRes = LayoutRhombicdodeca::GetReferenceResolution(inputWidth, inputHeight, faceResScale);
+                inputWidth = refRes.x;
+                inputHeight = refRes.y;
+            }
+
+            for (unsigned int i = 0; i < 12; ++i)
+            {
+                faceRes[i] = (infer ? inputWidth/8.0 : 1)*faceResScale[i];
             }
 
             return LayoutRhombicdodeca::GenerateLayout(yaw, pitch, roll, faceRes);
         }
         if (layoutType == "equirectangularTiled")
         {
-            LayoutEquirectangularTiles::TilesMap tileRes;
+            LayoutEquirectangularTiles::ScaleTilesMap scaleRes;
+
             for (unsigned int i = 0; i < 8; ++i)
             {
                 for (unsigned int j = 0; j < 8; ++j)
                 {
                     auto scale = ptree.get<double>(layoutSection+".equirectangularTile_"+std::to_string(i)+"_"+std::to_string(j));
-                    tileRes[i][j] = std::make_tuple(unsigned(scale*inputWidth/8),unsigned(scale*inputHeight/8));
+                    scaleRes[i][j] = scale;
+                }
+            }
+
+            if (isInput)
+            {
+                if (!infer)
+                {
+                    throw std::invalid_argument("Input with static resolution not supported yet");
+                }
+                auto refRes = LayoutEquirectangularTiles::GetReferenceResolution(inputWidth, inputHeight, scaleRes);
+                inputWidth = refRes.x;
+                inputHeight = refRes.y;
+            }
+
+            LayoutEquirectangularTiles::TilesMap tileRes;
+            for (unsigned int i = 0; i < 8; ++i)
+            {
+                for (unsigned int j = 0; j < 8; ++j)
+                {
+                    tileRes[i][j] = std::make_tuple(unsigned(scaleRes[i][j]*inputWidth/8),unsigned(scaleRes[i][j]*inputHeight/8));
                 }
             }
 

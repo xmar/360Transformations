@@ -30,7 +30,18 @@ class LayoutPyramidal: public LayoutPyramidalBased
         LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*pixelBaseEdge, pixelBaseEdge,{{pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge}}) {}
         virtual ~LayoutPyramidal(void) = default;
 
+        virtual CoordI GetReferenceResolution(void) override
+        {
+            return CoordI(GetRes(Faces::Base)*4, GetRes(Faces::Base)*2);
+        }
 
+        static CoordI GetReferenceResolution(unsigned width, unsigned heigth, const std::array<double,5>& scales)
+        {
+            const double w = width/(scales[0]+scales[1]+scales[2]);
+            return CoordI(4*w, 2*w);
+        }
+
+    protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 

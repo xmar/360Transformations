@@ -1,6 +1,7 @@
 #pragma once
 #include "LayoutRhombicdodecaBased.hpp"
 #include <stdexcept>
+#include <algorithm>
 
 namespace IMT {
 
@@ -16,10 +17,22 @@ class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
             height,height,height,height,height,height,height,height}}), m_colsMaxOffset(), m_rowsMaxOffset() {}
         virtual ~LayoutRhombicdodeca(void) = default;
 
+        virtual CoordI GetReferenceResolution(void) override
+        {
+            auto maxWidthRes = *std::max_element(m_colsMaxOffset.begin(), m_colsMaxOffset.end());
+            return CoordI(maxWidthRes*8, maxWidthRes*4);
+        }
+
+        static CoordI GetReferenceResolution(unsigned width, unsigned heigth, const std::array<double,12>& scales)
+        {
+            const double w = width/(scales[0]+scales[3]+scales[4]+scales[7]+scales[9]+scales[11]);
+             return CoordI(4*w, 2*w);
+        }
+    protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 
-    protected:
+
         LayoutRhombicdodeca(double yaw, double pitch, double roll, FaceResolutions&& fr): LayoutRhombicdodecaBased(yaw, pitch, roll, fr), m_colsMaxOffset(), m_rowsMaxOffset() {}
 
         Faces LayoutToFace(unsigned int i, unsigned int j) const;

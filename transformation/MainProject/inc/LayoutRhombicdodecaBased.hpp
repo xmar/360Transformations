@@ -11,12 +11,13 @@ class LayoutRhombicdodecaBased: public Layout
 
         enum class Faces{ Face1, Face2, Face3, Face4, Face5, Face6, Face7, Face8, Face9, Face10, Face11, Face12, Black, Last, First=Face1 };
 
+    protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const = 0;
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const final;
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const final;
 
-    protected:
+
         struct FaceResolutions
         {
             public:

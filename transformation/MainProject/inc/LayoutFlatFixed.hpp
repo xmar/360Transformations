@@ -12,6 +12,11 @@ class LayoutFlatFixed: public Layout
             m_maxVDist(2.f*std::tan(m_verticalAngleOfVision/2)) {}
         virtual ~LayoutFlatFixed(void) = default;
 
+        virtual CoordI GetReferenceResolution(void) override
+        {
+            return CoordI(GetWidth(), GetHeight());
+        }
+    protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override;

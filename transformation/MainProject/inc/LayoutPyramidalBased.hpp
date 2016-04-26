@@ -24,6 +24,7 @@ class LayoutPyramidalBased : public Layout
 
 
 
+    protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const = 0;
         //Return coordinate value between [0;1] for each face
@@ -53,7 +54,7 @@ class LayoutPyramidalBased : public Layout
         }
 
         unsigned int GetRes(const Faces& f) const {return m_fr.GetRes(f);}
-    protected:
+
         struct FaceResolutions
         {
             public:

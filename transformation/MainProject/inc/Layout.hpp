@@ -38,7 +38,31 @@ class Layout
          */
         virtual void NextStep(void) {}
 
-        /** \brief return the normalized face information corresponding to the given coordinate of a pixel on the 2d layout
+
+        unsigned int GetWidth(void) const {return m_outWidth;}
+        unsigned int GetHeight(void) const {return m_outHeight;}
+
+        /** \brief Return the reference width and height of this layout. The reference width and height is what is used to compute relative size from on picture to an other
+         */
+        virtual CoordI GetReferenceResolution(void) = 0;
+
+        //transform the layoutPic that is a picture in the current layout into a picture with the layout destLayout with the dimention (width, height)
+        std::shared_ptr<Picture> ToLayout(const Picture& layoutPic, const Layout& destLayout) const;
+        std::shared_ptr<Picture> FromLayout(const Picture& picFromOtherLayout, const Layout& originalLayout) const
+        {return originalLayout.ToLayout(picFromOtherLayout, *this);}
+
+    protected:
+        unsigned int m_outWidth;
+        unsigned int m_outHeight;
+        bool m_isInit;
+
+        /** \brief Protected function called by Init to initialized the layout object. Can be override. By default do nothing.
+         */
+        virtual void InitImpl(void) {}
+        void SetWidth(unsigned int w) {m_outWidth = w;}
+        void SetHeight(unsigned int h) {m_outHeight = h;}
+
+                /** \brief return the normalized face information corresponding to the given coordinate of a pixel on the 2d layout
          *
          * \param pixel Coordinate of the pixel on the 2d layout
          * \return A NormalizedFaceInfo contening the normalized information about this pixel
@@ -67,32 +91,6 @@ class Layout
          *
          */
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const = 0;
-        /** \brief Protect the border of the normalized
-         *
-         * \param ni const NormalizedFaceInfo&
-         * \return virtual NormalizedFaceInfo
-         *
-         */
-
-        unsigned int GetWidth(void) const {return m_outWidth;}
-        unsigned int GetHeight(void) const {return m_outHeight;}
-
-
-        //transform the layoutPic that is a picture in the current layout into a picture with the layout destLayout with the dimention (width, height)
-        std::shared_ptr<Picture> ToLayout(const Picture& layoutPic, const Layout& destLayout) const;
-        std::shared_ptr<Picture> FromLayout(const Picture& picFromOtherLayout, const Layout& originalLayout) const
-        {return originalLayout.ToLayout(picFromOtherLayout, *this);}
-
-    protected:
-        unsigned int m_outWidth;
-        unsigned int m_outHeight;
-        bool m_isInit;
-
-        /** \brief Protected function called by Init to initialized the layout object. Can be override. By default do nothing.
-         */
-        virtual void InitImpl(void) {}
-        void SetWidth(unsigned int w) {m_outWidth = w;}
-        void SetHeight(unsigned int h) {m_outHeight = h;}
     private:
 };
 

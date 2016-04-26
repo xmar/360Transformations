@@ -2,6 +2,7 @@
 
 #include "LayoutCubeMapBased.hpp"
 
+
 namespace IMT {
 
 class LayoutCubeMap: public LayoutCubeMapBased
@@ -24,11 +25,23 @@ class LayoutCubeMap: public LayoutCubeMapBased
         virtual ~LayoutCubeMap(void) = default;
 
 
+        virtual CoordI GetReferenceResolution(void) override
+        {
+            unsigned int maxCol = std::max(m_maxOffsetCols[0], std::max(m_maxOffsetCols[1], m_maxOffsetCols[2]));
+            return CoordI(4*maxCol, 2*maxCol);
+        }
+
+        static CoordI GetReferenceResolution(unsigned width, unsigned heigth, const std::array<double,6>& scales)
+        {
+            const double w = width/(scales[0]+scales[2]+scales[4]);
+             return CoordI(4*w, 2*w);
+        }
+
+    protected:
         Faces From2dToFace(unsigned int i, unsigned int j) const;
 
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
-
     private:
         typedef std::array<unsigned int, 3> ColsOffsetArray;
         typedef std::array<unsigned int, 2> RowsOffsetArray;

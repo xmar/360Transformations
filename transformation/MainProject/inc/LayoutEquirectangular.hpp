@@ -9,6 +9,12 @@ class LayoutEquirectangular: public Layout
         LayoutEquirectangular(unsigned int width, unsigned int height): Layout(width, height) {}
         virtual ~LayoutEquirectangular(void) = default;
 
+        virtual CoordI GetReferenceResolution(void) override
+        {
+            return CoordI(GetWidth(), GetHeight());
+        }
+
+    protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override
         {
             return NormalizedFaceInfo(CoordF(double(pixel.x)/GetWidth(), double(pixel.y)/GetHeight()), 0);

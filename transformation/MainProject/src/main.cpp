@@ -40,7 +40,7 @@ int main( int argc, const char* argv[] )
    po::options_description desc("Options");
    desc.add_options()
       ("help,h", "Produce this help message")
-      ("inputVideo,i", po::value<std::string>(), "path to the input video")
+      //("inputVideo,i", po::value<std::string>(), "path to the input video")
       ("config,c", po::value<std::string>(),"Path to the configuration file")
       ;
 
@@ -51,16 +51,16 @@ int main( int argc, const char* argv[] )
             vm);
 
       //--help
-      if ( vm.count("help") || !vm.count("inputVideo") || !vm.count("config"))
+      if ( vm.count("help") || !vm.count("config"))
       {
-         std::cout << "Help: trans -i path -o path -c config"<< std::endl
+         std::cout << "Help: trans -c config"<< std::endl
             <<  desc << std::endl;
          return 0;
       }
 
       po::notify(vm);
 
-      auto pathToInputVideo = vm["inputVideo"].as<std::string>();
+      std::vector<std::string> pathToInputVideos;// = vm["inputVideo"].as<std::string>();
       std::string pathToIni = vm["config"].as<std::string>();
 
       std::cout << "Path to the ini file: " <<pathToIni << std::endl;
@@ -78,14 +78,23 @@ int main( int argc, const char* argv[] )
       pt::json_parser::read_json(ss, ptree_json);
       BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
       {
-          std::vector<std::string> lfs;
+          std::vector<std::string> lfsv;
+          bool first = true;
           BOOST_FOREACH(boost::property_tree::ptree::value_type & u, v.second)
           {
-              lfs.push_back(u.second.data());
+              if (first)
+              {
+                  first = false;
+                  pathToInputVideos.push_back(u.second.data());
+              }
+              else
+              {
+                  lfsv.push_back(u.second.data());
+              }
           }
-          if (lfs.size()>0)
+          if (lfsv.size()>0)
           {
-              layoutFlowSections.push_back(std::move(lfs));
+              layoutFlowSections.push_back(std::move(lfsv));
           }
       }
       }
@@ -101,19 +110,32 @@ int main( int argc, const char* argv[] )
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
       auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate");
 
-        cv::VideoCapture cap(pathToInputVideo);
+      std::vector<cv::VideoCapture> capVect;
+      for (auto& inputPath:pathToInputVideos)
+      {
+          capVect.push_back(cv::VideoCapture(inputPath));
+      }
 
         std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
+
+        unsigned j = 0;
         for(auto& lfsv: layoutFlowSections)
         {
             bool isFirst = true;
             layoutFlowVect.push_back(std::vector<std::shared_ptr<Layout>>());
+            CoordI refResolution ( capVect[j].get(CV_CAP_PROP_FRAME_WIDTH), capVect[j].get(CV_CAP_PROP_FRAME_HEIGHT) );
+            unsigned k = 0;
             for(auto& lfs: lfsv)
             {
-                layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, isFirst, cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT)));
+                layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, isFirst, refResolution.x, refResolution.y));
                 layoutFlowVect.back().back()->Init();
+                refResolution = layoutFlowVect.back().back()->GetReferenceResolution();
+                std::cout << "Ref resolution: "<< refResolution.x << ", " << refResolution.y << std::endl;
+                std::cout << "Width, height: "<< layoutFlowVect.back().back()->GetWidth() << ", " << layoutFlowVect.back().back()->GetHeight() << std::endl;
                 isFirst = false;
+                ++k;
             }
+            ++j;
         }
 
         std::vector<std::shared_ptr<IMT::LibAv::VideoWriter>> cvVideoWriters;
@@ -155,20 +177,22 @@ int main( int argc, const char* argv[] )
             }
         }
 //      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), sga.fps, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
-      std::cout << "Nb frames: " << cap.get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
+      std::cout << "Nb frames: " << capVect[0].get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
       cv::Mat img;
       int count = 0;
       double averageDuration = 0;
-      while (cap.read(img))
+      while (count < nbFrames)
       {
           auto startTime = std::chrono::high_resolution_clock::now();
-          auto pict = std::make_shared<Picture>(img);
+
           std::cout << "Read image " << count << std::endl;
 
         unsigned int j = 0;
-        decltype(pict) firstPict(nullptr);
+        std::shared_ptr<Picture> firstPict(nullptr);
         for(auto& lf: layoutFlowVect)
         {
+            capVect[j].read(img);
+            auto pict = std::make_shared<Picture>(img);
             auto pictOut = pict;
             for (unsigned int i = 1; i < lf.size(); ++i)
             {
