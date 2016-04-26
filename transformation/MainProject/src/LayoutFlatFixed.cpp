@@ -6,13 +6,13 @@ Layout::NormalizedFaceInfo LayoutFlatFixed::From2dToNormalizedFaceInfo(const Coo
 {
 
     double normalizedI = (double(pixel.x)/m_outWidth); //between 0 and 1
-    double normalizedJ = (double(pixel.y)/m_outHeight); //between 0 and 1
+    double normalizedJ = 1-(double(pixel.y)/m_outHeight); //between 0 and 1
     return Layout::NormalizedFaceInfo(CoordF(normalizedI, normalizedJ), 0);
 }
 CoordF LayoutFlatFixed::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
 {
     const CoordF& coord(ni.m_normalizedFaceCoordinate);
-    return CoordF(coord.x*m_outWidth, coord.y*m_outHeight);
+    return CoordF(coord.x*m_outWidth, (1-coord.y)*m_outHeight);
 }
 Layout::NormalizedFaceInfo LayoutFlatFixed::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
