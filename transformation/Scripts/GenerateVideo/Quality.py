@@ -53,7 +53,7 @@ class QualityStorage:
                 else:
                     self.goodQuality[lId] = [(q,qec,centerYP)]
 
-    def AddBad(self, name, LayoutId_quality):
+    def AddBad(self, name, LayoutId_quality, qec, centerYP):
         if name not in self.names:
             self.names.append(name)
             for (lId,q) in LayoutId_quality:
@@ -158,8 +158,8 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
             i += 1
 
         if isGood:
-            qs.AddGood(flatFixedLayout.GetName(), lName_quality)
+            qs.AddGood(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterYP)
         else:
-            qs.AddBad(flatFixedLayout.GetName(), lName_quality)
+            qs.AddBad(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterYP)
 
         qs.Dump(outputQualityStorageName)

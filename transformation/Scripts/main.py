@@ -18,9 +18,10 @@ if __name__ ==  '__main__':
     parser.add_argument('--trans',  type=str, help='path to the trans software', default='../build/trans')
     parser.add_argument('--config', type=str, help='path to the generated config file', default='./ConfigTest.ini')
     parser.add_argument('--doNotReuseVideosForQuality', help='if set, will not reuse the video previously generated as input to compute the Quality', dest='reuseVideosForQuality', action='store_false')
-    parser.add_argument('-n', type=int, help='number of frame to process', default=50)
-    parser.add_argument('-i', type=int, help='number max of iteration for the dichotomous search', default=10)
+    parser.add_argument('-n', type=int, help='number of frame to process [50]', default=50)
+    parser.add_argument('-i', type=int, help='number max of iteration for the dichotomous search [10]', default=10)
     parser.add_argument('-r', type=str, help='Output flat fixed view resolution [1920x1080]', default='1920x1080')
+    parser.add_argument('-nbT', type=int, help='Number of "random" test to do [100]', default=100)
     args = parser.parse_args()
 
     trans = args.trans
@@ -32,6 +33,7 @@ if __name__ ==  '__main__':
     reuseVideo = args.reuseVideosForQuality
     outputResolution = args.r.split('x')
     outputResolution = (int(outputResolution[0]), int(outputResolution[1]))
+    k = args.nbT
 
     try:
         for qec in LayoutGenerators.QEC.TestQecGenerator():
@@ -58,7 +60,6 @@ if __name__ ==  '__main__':
                 outLayoutId = '{}/{}'.format(outputDir,lName)
                 SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, outEquiNameVideo, layout, maxIteration)
         #Now all the video representations have been generated: we start to compute the flat fixed view
-        k = 2
         while k != 0:
             (cy, cp) = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get the good flat fixed center
             (cyBad, cpBad) = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get a badly located flat fixed center
@@ -110,7 +111,7 @@ if __name__ ==  '__main__':
             if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
                 qs = GenerateVideo.QualityStorage.Load(qualityStorage)
                 print('Results QEC ({},{}):'.format(i,j))
-                print('Nb test = {}'.format(len(qs.names)))
+                print('Nb test = {}'.format(len(qs.names)/2))
                 print('Good:')
                 for k in qs.goodQuality:
                     print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.goodQuality[k]])/len(qs.goodQuality[k])))
