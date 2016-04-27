@@ -20,6 +20,7 @@ if __name__ ==  '__main__':
     parser.add_argument('--doNotReuseVideosForQuality', help='if set, will not reuse the video previously generated as input to compute the Quality', dest='reuseVideosForQuality', action='store_false')
     parser.add_argument('-n', type=int, help='number of frame to process', default=50)
     parser.add_argument('-i', type=int, help='number max of iteration for the dichotomous search', default=10)
+    parser.add_argument('-r', type=str, help='Output flat fixed view resolution [1920x1080]', default='1920x1080')
     args = parser.parse_args()
 
     trans = args.trans
@@ -29,6 +30,8 @@ if __name__ ==  '__main__':
     outputDir = args.outputDir
     maxIteration = args.i
     reuseVideo = args.reuseVideosForQuality
+    outputResolution = args.r.split('x')
+    outputResolution = (int(outputResolution[0]), int(outputResolution[1]))
 
     try:
         for qec in LayoutGenerators.QEC.TestQecGenerator():
@@ -90,11 +93,11 @@ if __name__ ==  '__main__':
                     layoutsToTest.append( [(eqL, None),(ls.layout, ls.a)] )
 
             #Test Good Layout
-            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.',''), 1920, 1080, 110, goodCenter)
+            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.',''), outputResolution[0], outputResolution[1], 110, goodCenter)
             GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cy, cp), True)
 
             #Test Bad layout
-            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.',''), 1920, 1080, 110, badCenter)
+            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.',''), outputResolution[0], outputResolution[1], 110, badCenter)
             GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cyBad, cpBad), False)
 
             k -= 1
