@@ -32,7 +32,8 @@ class QEC:
 
     def ComputeDistance(self, yaw,pitch):
         (y,p,r) = self.GetEulerAngles()
-        return math.sqrt(math.pow(min(abs(y-yaw), abs(y-360-yaw), abs(y+360-yaw)),2)+math.pow(p-pitch,2))
+        #return math.sqrt(math.pow(min(abs(y-yaw), abs(y-360-yaw), abs(y+360-yaw)),2)+math.pow(p-pitch,2))
+        return 2*math.asin(math.sqrt(math.sin((p-pitch)/2)**2 + math.cos(p)*math.cos(pitch)*math.sin((y-yaw)/2)**2))
 
     @staticmethod
     def TestQecGenerator():
