@@ -25,7 +25,7 @@ class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
 
         static CoordI GetReferenceResolution(unsigned width, unsigned heigth, const std::array<double,12>& scales)
         {
-            const double w = width/(scales[0]+scales[3]+scales[4]+scales[7]+scales[9]+scales[11]);
+            const double w = width/(std::max(scales[0],scales[1])+std::max(scales[2],scales[3])+std::max(scales[4],scales[5])+std::max(scales[6],scales[7])+std::max(scales[8],scales[9])+std::max(scales[10],scales[11]));
              return CoordI(8*w, 4*w);
         }
     protected:
