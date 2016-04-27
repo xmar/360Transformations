@@ -15,8 +15,8 @@ Layout::NormalizedFaceInfo LayoutRhombicdodecaBased::From3dToNormalizedFaceInfo(
     {
         try {
             auto plan = FaceToPlan(testF);
-            auto interSphe = IntersectionPlanSpherical(plan, sphericalCoord); //raise exception if no intersection
-            if (minRho > interSphe.x && AlmostEqual(interSphe.y, sphericalCoord.y)) //check direction
+            auto interSphe = IntersectionPlanSpherical(plan, sc); //raise exception if no intersection
+            if (minRho > interSphe.x && AlmostEqual(interSphe.y, sc.y)) //check direction
             {
                 minRho = interSphe.x;
                 inter = SphericalToCart(interSphe);

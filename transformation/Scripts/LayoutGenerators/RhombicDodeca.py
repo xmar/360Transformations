@@ -15,8 +15,8 @@ class RhombicDodecaLayout(Layout):
         c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
         for i in [1,5]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
-        for i in [2,3,4,6,7]:
+        for i in [2,3,4,6,7,8,10,11]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, mediumRatio)
-        for i in [8,9,10,11,12]:
+        for i in [9,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.BAD_QUALITY)
         return c

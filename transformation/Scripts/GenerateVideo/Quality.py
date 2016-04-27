@@ -44,23 +44,23 @@ class QualityStorage:
         self.badQuality = {}
         self.names = []
 
-    def AddGood(self, name, LayoutId_quality):
+    def AddGood(self, name, LayoutId_quality, qec, centerYP):
         if name not in self.names:
             self.names.append(name)
             for (lId,q) in LayoutId_quality:
                 if lId in self.goodQuality:
-                    self.goodQuality[lId].append(q)
+                    self.goodQuality[lId].append((q,qec,centerYP))
                 else:
-                    self.goodQuality[lId] = [q]
+                    self.goodQuality[lId] = [(q,qec,centerYP)]
 
-    def AddBad(self, name, LayoutId_quality):
+    def AddBad(self, name, LayoutId_quality, qec, centerYP):
         if name not in self.names:
             self.names.append(name)
             for (lId,q) in LayoutId_quality:
                 if lId in self.badQuality:
-                    self.badQuality[lId].append(q)
+                    self.badQuality[lId].append((q,qec,centerYP))
                 else:
-                    self.badQuality[lId] = [q]
+                    self.badQuality[lId] = [(q,qec,centerYP)]
 
     def IsNameInside(self, name):
         return name in self.names
@@ -83,7 +83,7 @@ def GetAverageQuality(fileName):
             n += 1
     return q/n if n != 0 else 0
 
-def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideos, outputDirQEC, isGood):
+def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideos, outputDirQEC, qec, flatFixedCenterYP, isGood):
     if len(layoutsToTest) != len(inputVideos):
         raise ValueError("layoutsToTest and inputVideos should have the same lenth")
     layouts = []
@@ -104,7 +104,7 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
         try:
             counter = 1
             for iv in inputVideos:
-                nivp = '/tmp/inputVideo{}.mkv'.format(counter)
+                nivp = '/tmp/inputVideo{}_{}.mkv'.format(counter, os.path.splitext(os.path.basename(iv))[0])
                 counter += 1
                 shutil.copy(iv, nivp)
                 newIv.append(nivp)
@@ -158,8 +158,8 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
             i += 1
 
         if isGood:
-            qs.AddGood(flatFixedLayout.GetName(), lName_quality)
+            qs.AddGood(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterYP)
         else:
-            qs.AddBad(flatFixedLayout.GetName(), lName_quality)
+            qs.AddBad(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterYP)
 
         qs.Dump(outputQualityStorageName)

@@ -38,7 +38,7 @@ class LayoutEquirectangularTiles : public Layout
                 for (unsigned int j = 0; j < 8; ++j)
                 {
                     maxCols = std::max(maxCols, scaleTm[i][j]);
-                    maxRows = std::max(maxCols, scaleTm[j][i]);
+                    maxRows = std::max(maxRows, scaleTm[j][i]);
                 }
                 sumRationCols += maxCols;
                 sumRationRows += maxRows;
