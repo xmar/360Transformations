@@ -26,7 +26,7 @@ class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
         static CoordI GetReferenceResolution(unsigned width, unsigned heigth, const std::array<double,12>& scales)
         {
             const double w = width/(scales[0]+scales[3]+scales[4]+scales[7]+scales[9]+scales[11]);
-             return CoordI(4*w, 2*w);
+             return CoordI(8*w, 4*w);
         }
     protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
