@@ -91,11 +91,11 @@ if __name__ ==  '__main__':
 
             #Test Good Layout
             flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.',''), 1920, 1080, 110, goodCenter)
-            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, True)
+            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cy, cp), True)
 
             #Test Bad layout
             flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.',''), 1920, 1080, 110, badCenter)
-            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, False)
+            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cyBad, cpBad), False)
 
             k -= 1
         
@@ -110,10 +110,10 @@ if __name__ ==  '__main__':
                 print('Nb test = {}'.format(len(qs.names)))
                 print('Good:')
                 for k in qs.goodQuality:
-                    print('Average MS-SSIM for {} = {}'.format(k, sum(qs.goodQuality[k])/len(qs.goodQuality[k])))
+                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.goodQuality[k]])/len(qs.goodQuality[k])))
                 print ('Bad:')
                 for k in qs.badQuality:
-                    print('Average MS-SSIM for {} = {}'.format(k, sum(qs.badQuality[k])/len(qs.badQuality[k])))
+                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.badQuality[k]])/len(qs.badQuality[k])))
 
     finally:
         print('Program done')
