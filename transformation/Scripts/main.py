@@ -17,7 +17,7 @@ if __name__ ==  '__main__':
     parser.add_argument('outputDir', type=str, help='path to the output dir')
     parser.add_argument('--trans',  type=str, help='path to the trans software', default='../build/trans')
     parser.add_argument('--config', type=str, help='path to the generated config file', default='./ConfigTest.ini')
-    parser.add_argument('--reuseVideosForQuality', help='if set, will reuse the video previously generated as input to compute the Quality', dest='reuseVideosForQuality', action='store_true')
+    parser.add_argument('--doNotReuseVideosForQuality', help='if set, will not reuse the video previously generated as input to compute the Quality', dest='reuseVideosForQuality', action='store_false')
     parser.add_argument('-n', type=int, help='number of frame to process', default=50)
     parser.add_argument('-i', type=int, help='number max of iteration for the dichotomous search', default=10)
     args = parser.parse_args()
@@ -75,7 +75,10 @@ if __name__ ==  '__main__':
             else:
                 inputVideos = [inputVideo, inputVideo]
                 layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), closestQec), None)]]
-            for layoutId in ['CubMap', 'CubMapCompact', 'Pyramidal', 'RhombicDodeca']:
+            for layoutId in ['CubMap', \
+                    #'CubMapCompact', \
+                    'Pyramidal', \
+                    'RhombicDodeca']:
                 storageName = '{}/{}{}_{}_storage.dat'.format(outputDir,layoutId,i,j)
                 layoutVideoName = '{}/{}{}_{}.mkv'.format(outputDir,layoutId,i,j)
                 ls = LayoutGenerators.LayoutStorage.Load(storageName)

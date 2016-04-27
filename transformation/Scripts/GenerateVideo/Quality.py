@@ -104,7 +104,7 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
         try:
             counter = 1
             for iv in inputVideos:
-                nivp = '/tmp/inputVideo{}.mkv'.format(counter)
+                nivp = '/tmp/inputVideo{}_{}.mkv'.format(counter, os.path.splitext(os.path.basename(iv))[0])
                 counter += 1
                 shutil.copy(iv, nivp)
                 newIv.append(nivp)
