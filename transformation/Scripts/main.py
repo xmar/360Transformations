@@ -17,6 +17,7 @@ if __name__ ==  '__main__':
     parser.add_argument('outputDir', type=str, help='path to the output dir')
     parser.add_argument('--trans',  type=str, help='path to the trans software', default='../build/trans')
     parser.add_argument('--config', type=str, help='path to the generated config file', default='./ConfigTest.ini')
+    parser.add_argument('--reuseVideosForQuality', help='if set, will reuse the video previously generated as input to compute the Quality', dest='reuseVideosForQuality', action='store_true')
     parser.add_argument('-n', type=int, help='number of frame to process', default=50)
     parser.add_argument('-i', type=int, help='number max of iteration for the dichotomous search', default=10)
     args = parser.parse_args()
@@ -27,6 +28,7 @@ if __name__ ==  '__main__':
     inputVideo = args.inputVideo
     outputDir = args.outputDir
     maxIteration = args.i
+    reuseVideo = args.reuseVideosForQuality
 
     try:
         for qec in LayoutGenerators.QEC.TestQecGenerator():
@@ -67,23 +69,22 @@ if __name__ ==  '__main__':
             if not os.path.isdir(outputDirQEC):
                 os.makedirs(outputDirQEC)
             eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
-            #inputVideos = [inputVideo, '{}/equirectangularTiled{}_{}.mkv'.format(outputDir,i,j)]
-            inputVideos = [inputVideo, inputVideo]
-            #layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)]]
-            layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)]]
-            #DEBUG####
-            for layoutId in ['RhombicDodeca']:
-                storageName = '{}/{}{}_{}_storage.dat'.format(outputDir,layoutId,i,j)
-                GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(ls.layout, ls.a), (LayoutGenerators.EquirectangularLayout('EquirectangularOut'), None)], 24, n,  inputVideo, 'TestRhombicToEq.mkv')
-                GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(LayoutGenerators.RhombicDodecaLayout('Rhombic',(0,0,0)), ls.a), (LayoutGenerators.EquirectangularLayout('EquirectangularOut'), None)], 24, n,  inputVideo, 'TestRhombicToEq2.mkv')
+            if reuseVideo:
+                inputVideos = [inputVideo, '{}/equirectangularTiled{}_{}.mkv'.format(outputDir,i,j)]
+                layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), closestQec), None)]]
+            else:
+                inputVideos = [inputVideo, inputVideo]
+                layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), closestQec), None)]]
             for layoutId in ['CubMap', 'CubMapCompact', 'Pyramidal', 'RhombicDodeca']:
                 storageName = '{}/{}{}_{}_storage.dat'.format(outputDir,layoutId,i,j)
                 layoutVideoName = '{}/{}{}_{}.mkv'.format(outputDir,layoutId,i,j)
                 ls = LayoutGenerators.LayoutStorage.Load(storageName)
-                #inputVideos.append(layoutVideoName)
-                inputVideos.append(inputVideo)
-                #layoutsToTest.append( [(ls.layout, ls.a)] )
-                layoutsToTest.append( [(eqL, None),(ls.layout, ls.a)] )
+                if reuseVideo:
+                    inputVideos.append(layoutVideoName)
+                    layoutsToTest.append( [(ls.layout, ls.a)] )
+                else:
+                    inputVideos.append(inputVideo)
+                    layoutsToTest.append( [(eqL, None),(ls.layout, ls.a)] )
 
             #Test Good Layout
             flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.',''), 1920, 1080, 110, goodCenter)
