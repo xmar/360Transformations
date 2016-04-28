@@ -35,6 +35,7 @@ if __name__ ==  '__main__':
     outputResolution = args.r.split('x')
     outputResolution = (int(outputResolution[0]), int(outputResolution[1]))
     k = args.nbT
+    averageGoalSize = (0,0)
 
     try:
         for qec in LayoutGenerators.QEC.TestQecGenerator():
@@ -52,6 +53,9 @@ if __name__ ==  '__main__':
             if not skip:
                 ls = GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), qec), None)], 24, n,  inputVideo, outEquiId)
                 ls.Dump(outEquiNameStorage)
+            
+            goalSize = os.stat(outEquiNameVideo).st_size
+            averageGoalSize = (averageGoalSize[0] + goalSize, averageGoalSize[1]+1)
   
             for (lName, lGenerator) in [('CubMap{}_{}'.format(i,j), LayoutGenerators.CubeMapLayout),\
                     ('CubMapCompact{}_{}'.format(i,j), LayoutGenerators.CubeMapLayoutCompact),\
@@ -59,7 +63,22 @@ if __name__ ==  '__main__':
                     ('RhombicDodeca{}_{}'.format(i,j), LayoutGenerators.RhombicDodecaLayout)]:
                 layout = lGenerator(lName, qec.GetEulerAngles())
                 outLayoutId = '{}/{}'.format(outputDir,lName)
-                SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, outEquiNameVideo, layout, maxIteration)
+                SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, goalSize, layout, maxIteration)
+        #Compute the average equirectangularTiled video
+        averageGoalSize = averageGoalSize[0]/averageGoalSize[1]
+        averageNameStorage = '{}/AverageEquiTiled_storage.dat'.format(outputDir)
+        averageNameVideo = '{}/AverageEquiTiled.mkv'.format(outputDir)
+        skip = False
+        if os.path.isfile(averageNameStorage) and os.path.isfile(averageNameVideo):
+            lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
+            if n == lsAverage.nbFrames:
+                skip = True
+        if not skip:
+            outLayoutId = '{}/AverageEquiTiled'.format(outputDir)
+            layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None) 
+            SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, averageGoalSize, layoutAverage, maxIteration)
+            lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
+
         #Now all the video representations have been generated: we start to compute the flat fixed view
         while k != 0:
             (cy, cp) = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get the good flat fixed center
@@ -75,11 +94,13 @@ if __name__ ==  '__main__':
                 os.makedirs(outputDirQEC)
             eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
             if reuseVideo:
-                inputVideos = [inputVideo, '{}/equirectangularTiled{}_{}.mkv'.format(outputDir,i,j)]
-                layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), closestQec), None)]]
+                inputVideos = [inputVideo, '{}/equirectangularTiled{}_{}.mkv'.format(outputDir,i,j), averageNameVideo]
+                layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), closestQec), None)], \
+                        [(lsAverage.layout, lsAverage.a)]]
             else:
-                inputVideos = [inputVideo, inputVideo]
-                layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), closestQec), None)]]
+                inputVideos = [inputVideo, inputVideo, inputVideo]
+                layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}_{}'.format(i,j), closestQec), None)], \
+                        [(eqL, None),(lsAverage.layout, lsAverage.a)]]
             for layoutId in ['CubMap', \
                     #'CubMapCompact', \
                     'Pyramidal', \
@@ -122,5 +143,7 @@ if __name__ ==  '__main__':
         FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
         FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
 
+    except Exception as inst:
+        print (inst)
     finally:
         print('Program done')
