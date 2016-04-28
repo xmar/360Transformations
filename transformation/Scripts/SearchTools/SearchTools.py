@@ -7,14 +7,13 @@ import shutil
 import LayoutGenerators
 import GenerateVideo
 
-def DichotomousSearch(trans, config, n, inputVideo, outputName, goalVideo, layout, maxIteration):
+def DichotomousSearch(trans, config, n, inputVideo, outputName, goalSize, layout, maxIteration):
     best = 0
     bestSize = None
 
     count = maxIteration
     a_min = 0
     a_max = 1
-    goalSize = os.stat(goalVideo).st_size
     print('The goal size is ',goalSize, 'Bytes')
 
     try:

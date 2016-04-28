@@ -25,7 +25,14 @@ class QEC:
         dibis = abs(ibis-self.x)
         diters = abs(iters-self.x)
         minD = min(di,dibis,diters)
-        return max(minD, abs(j-self.y))
+        dist = max(minD, abs(j-self.y))
+        if self.y == 1 or self.y == 2:
+            if j <= 5 or (j == 6 and i == self.x):
+                return min(2,dist)
+        elif self.y ==  5 or self.y == 6:
+            if j >= 2 or (j == 1 and i == self.x):
+                return min(2,dist)
+        return dist
 
     def GetTileCoordinate(self):
         return (self.x,self.y)

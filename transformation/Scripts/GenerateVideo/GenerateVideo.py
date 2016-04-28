@@ -40,10 +40,13 @@ def GenerateVideo(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId
         sub.check_call([trans, '-c', config])
 
         shutil.move('/tmp/tmp1{}.mkv'.format(lastName), '{}.mkv'.format(outputId))
+        shutil.copy(config, '{}_log.txt'.format(outputId))
 
     except KeyboardInterrupt:
         print('Received <ctrl-c>')
         sys.exit(1)
+    except Exception as inst:
+        print (inst)
     finally:
         if os.path.isfile('/tmp/tmp1{}.mkv'.format(lastName)):
             os.remove('/tmp/tmp1{}.mkv'.format(lastName))
