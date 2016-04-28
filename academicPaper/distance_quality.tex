@@ -48,7 +48,8 @@ column sep=15pt,
         \addplot+ table [x=distance, y=qualityCubMap]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityPyramidal]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityRhombicDodeca]{results/distanceQuality.csv};
-        \legend{EqTiled,CubeMap,Pyramid,RhombicDodeca}
+        \addplot+ table [x=distance, y=qualityAverageEquiTi]{results/distanceQuality.csv};
+        \legend{EqTiled,CubeMap,Pyramid,RhombicDodeca,AverageEqui}
 
     \end{axis}
 \end{tikzpicture}
