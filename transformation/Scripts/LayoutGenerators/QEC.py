@@ -18,6 +18,12 @@ class QEC:
         return (self.yaw, self.pitch, self.roll)
 
     def DistanceInTileNb(self, i, j):
+        if self.y == 1 or self.y == 2:
+            if j <= 7 or (j == 6 and i == self.x):
+                return 2
+        elif self.y ==  5 or self.y == 6:
+            if j >= 2 or (j == 1 and i == self.x):
+                return 2
         #Normalize i value
         ibis = i - 8
         iters = i + 8
