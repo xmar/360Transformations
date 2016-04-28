@@ -9,6 +9,7 @@ import shutil
 import SearchTools
 import GenerateVideo
 import LayoutGenerators
+import FormatResults
 
 if __name__ ==  '__main__':
     parser = argparse.ArgumentParser(description="Will test mulitple resolution and return the resolution that give a the file size closer to the goad file size");
@@ -104,20 +105,22 @@ if __name__ ==  '__main__':
             k -= 1
         
         #print Results:
-        for qec in LayoutGenerators.QEC.TestQecGenerator():
-            (i,j) = qec.GetTileCoordinate()
-            outputDirQEC = '{}/QEC{}_{}'.format(outputDir, i, j)
-            qualityStorage = '{}/quality_storage.dat'.format(outputDirQEC)
-            if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
-                qs = GenerateVideo.QualityStorage.Load(qualityStorage)
-                print('Results QEC ({},{}):'.format(i,j))
-                print('Nb test = {}'.format(len(qs.names)/2))
-                print('Good:')
-                for k in qs.goodQuality:
-                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.goodQuality[k]])/len(qs.goodQuality[k])))
-                print ('Bad:')
-                for k in qs.badQuality:
-                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.badQuality[k]])/len(qs.badQuality[k])))
+#        for qec in LayoutGenerators.QEC.TestQecGenerator():
+#            (i,j) = qec.GetTileCoordinate()
+#            outputDirQEC = '{}/QEC{}_{}'.format(outputDir, i, j)
+#            qualityStorage = '{}/quality_storage.dat'.format(outputDirQEC)
+#            if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
+#                qs = GenerateVideo.QualityStorage.Load(qualityStorage)
+#                print('Results QEC ({},{}):'.format(i,j))
+#                print('Nb test = {}'.format(len(qs.names)/2))
+#                print('Good:')
+#                for k in qs.goodQuality:
+#                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.goodQuality[k]])/len(qs.goodQuality[k])))
+#                print ('Bad:')
+#                for k in qs.badQuality:
+#                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.badQuality[k]])/len(qs.badQuality[k])))
+        FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
+        FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
 
     finally:
         print('Program done')
