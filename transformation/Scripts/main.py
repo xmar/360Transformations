@@ -75,7 +75,7 @@ if __name__ ==  '__main__':
                 skip = True
         if not skip:
             outLayoutId = '{}/AverageEquiTiled'.format(outputDir)
-            layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None) 
+            layoutAverage = LayoutGenerators.EquirectangularLayout('AverageEquiTiled') 
             SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, averageGoalSize, layoutAverage, maxIteration)
             lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
 
