@@ -20,7 +20,7 @@
 \usepackage[numbers,sort]{natbib}
 \renewcommand\citet[1]{\citeauthor{#1}~\cite{#1}} % redefine the \citet command to add a ~ space between authors and []
 \usepackage{color}
-\usepackage[dvipsnames]{xcolor}
+\usepackage[dvipsnames,table]{xcolor}
 \usepackage{stfloats}
 %\usepackage{pst-gantt}
 % \usepackage{algorithm}
@@ -176,6 +176,24 @@
     \caption{A caption}
     \label{fig:dist_quality}
 \end{figure}
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}[t]
+\scriptsize
+\centering
+\begin{tabular}{r@{\hspace{2pt}}|c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c}
+% \rowcolor{gray!50}
+ \multicolumn{2}{c|}{~} & \multicolumn{2}{c|}{high quality} & \multicolumn{2}{c|}{mid quality} & \multicolumn{2}{c}{low quality} \\
+%\rowcolor{gray!50}
+ & \# tiles & \# tiles & res. & \# tiles & res. & \# tiles & res. \\ \hline \hline
+ \textbf{equi.} & 64 & 9 & 1 & 40 & 0.5 & 15 & 0.25 \\
+ \textbf{cube} & 6 & 1 & 1 & 4 & [0.4,0.7] & 1 & 0.25\\
+ \textbf{pyramid} & 5 & 1 & 1 & 4 & --- & 0 & ---\\
+ \textbf{dodeca.} & 12 & 2 & 1 & 8 & [0.4--0.7] & 2 & 0.25 
+\end{tabular}
+\caption{tile quality arrangement}\label{tab:quality}
+\end{table}
+
 
 \section{Discussion and Conclusion}
 
