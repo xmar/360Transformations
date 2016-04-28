@@ -18,12 +18,6 @@ class QEC:
         return (self.yaw, self.pitch, self.roll)
 
     def DistanceInTileNb(self, i, j):
-        if self.y == 1 or self.y == 2:
-            if j <= 7 or (j == 6 and i == self.x):
-                return 2
-        elif self.y ==  5 or self.y == 6:
-            if j >= 2 or (j == 1 and i == self.x):
-                return 2
         #Normalize i value
         ibis = i - 8
         iters = i + 8
@@ -31,7 +25,14 @@ class QEC:
         dibis = abs(ibis-self.x)
         diters = abs(iters-self.x)
         minD = min(di,dibis,diters)
-        return max(minD, abs(j-self.y))
+        dist = max(minD, abs(j-self.y))
+        if self.y == 1 or self.y == 2:
+            if j <= 5 or (j == 6 and i == self.x):
+                return min(2,dist)
+        elif self.y ==  5 or self.y == 6:
+            if j >= 2 or (j == 1 and i == self.x):
+                return min(2,dist)
+        return dist
 
     def GetTileCoordinate(self):
         return (self.x,self.y)
