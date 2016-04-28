@@ -126,9 +126,10 @@
 %
 
 % the arrow in the client
-\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt,
-						yshift=-\ecartYVersions]client.west) to 
-						([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
+\draw[-latex] 
+%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to 
+	(thisfov.60) to
+		([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
 
 
 % between server and client
@@ -137,7 +138,7 @@
 
 \end{tikzpicture}
 \caption{Navigable 360-degree video delivery system: The server
-offers video versions for three \acp{QEC}, the dark grey being the high quality and the light
+offers video versions for three \acp{QEC}, the dark gray being the high quality and the light
 gray the low quality. The \ac{FoV} is the dotted red rectangle, and the \ac{FoV} center is the 
 cross}
 \label{fig:deliverychain}
