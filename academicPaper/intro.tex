@@ -2,6 +2,7 @@
 \label{sec:introduction}
 
 \subsection{Context and Motivations}
+\label{sec:context}
 
 The popularity of navigable 360-degree video systems
 has grown with the advent of both capturing systems
@@ -91,13 +92,13 @@ on the same idea as our proposal, where up to 30 versions of the same video are 
 \acp{QEC}. This implementation corroborates that, from an industrial perspective, the
 extra-cost of
 generating and storing multiple versions of the same video is worth the bandwidth
-savings and the system usability. The authors projects the spherical videos into a \emph{pyramid}
+savings and the system usability. The authors project the spherical videos into a \emph{pyramid}
 where the
 base is the front
 view and the peak is in the back. Yet, this projection under-samples pixels near the peak,
 which
 results in
-information loss and distorted extraction of \ac{FoV} videos.
+information loss and distorted extraction of \ac{FoV} videos. \AD{Additionally, they projected the spherical videos into a \emph{cubemap}. However, unlike in our approach, they left the same full resolution of all faces, which limited the video size reduction.}{}
 
 \subsection{Our Contributions}
 
