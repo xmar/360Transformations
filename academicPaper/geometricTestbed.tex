@@ -1,7 +1,7 @@
 \section{Geometric Layout Evaluation}
 
-Our objective is to identify the layout that offers the best performance regarding the quality of 
-the extracted \ac{FoV} video and the bit-rate of the delivered 360-degree video. We first introduce 
+Our objective is to identify the layout that offers the best performance regarding the quality of
+the extracted \ac{FoV} video and the bit-rate of the delivered 360-degree video. We first introduce
 the tool that we release to generate and exploit quality-differentiated
 360-degree videos on geometric layouts. Then, we describe the testbed that we set up to evaluate the
 performance of the four main geometric layouts. Finally, we present our first results.
@@ -10,10 +10,10 @@ performance of the four main geometric layouts. Finally, we present our first re
 
 The code and all the details are available at \textit{hidden url}. The main features of this tool include:
 \begin{itemize}
-\item Projection from a spherical video into any of the four geometric layouts and vice versa. Our tool is in 
+\item Projection from a spherical video into any of the four geometric layouts and vice versa. Our tool is in
 particular able to re-project the 360-degree videos that are encoded and stored in the equirectangular layout,
-which corresponds to a large fraction of current catalogs of 360-degree videos. 
-\item Adjusting video qualities for each geometric face of any layout by setting \noteGS{to be written}
+which corresponds to a large fraction of current catalogs of 360-degree videos.
+\item Adjusting video qualities for each geometric face of any layout by setting \AD{a resolution of the face in the number of pixels. In the cubemap and rhombic dodecahadron the edge length of each face is specified, while in the pyramid layout a height of the pyramid is adjusted to yield the desired resolution. The equirectangular layout enables resolution of each tile to be defined.}{}
 \item \ac{FoV} extraction for any spherical coordinate and any angle, in particular for quality-differentiated videos.
 \end{itemize}
 
@@ -22,41 +22,41 @@ The software can thus be used by the scientific community to study geometric lay
 \subsection{Testbed Description}
 
 The testbed that we
-set up is depicted in Figure~\ref{fig:testbed}. From the original spherical video, we considered the 
-projection 
-into the four geometric layouts (equirectangular, cube map, pyramid, dodecahedron). For 
+set up is depicted in Figure~\ref{fig:testbed}. From the original spherical video, we considered the
+projection
+into the four geometric layouts (equirectangular, cube map, pyramid, dodecahedron). For
 each layout, we built
 $x$ video versions characterized by different \acp{QEC}. Then we simulated
 a client watching in a specific direction. We selected, for each layout, the version such that the \ac{QEC}
-is the closest to the given direction. We extracted the \ac{FoV} from this version. Finally, we compared
-the quality of the four different \ac{FoV}videos against the reference video generated
+is closest to the given direction. We extracted the \ac{FoV} from this version. Finally, we compared
+the quality of four different \ac{FoV} videos against the reference video generated
 without quality loss from the spherical video.
 
 \input{testbed.tex}
 
 To generate the different videos, we made some choices, which are mostly in conformance to the
-literature and to real implementation of 360-degree video delivery systems. Our future work 
+literature and to real implementation of 360-degree video delivery systems. Our future work
 includes to study in more details the impact of some of these choices on
 the overall performance of the system; it is not our objective here.
 
 We generated $x=16$ different video versions for each layout. This number of versions is smaller than
 the number of videos (with pyramid layouts) given by~\citet{facebook}. It is however closer to the
-number of video representations that are recommended in rate-adaptive streaming 
+number of video representations that are recommended in rate-adaptive streaming
 systems~\cite{Aparicio-PardoP15}. We describe now specific quality arrangements per layout:
 %\begin{description}
-%\item[equirectangular] 
+%\item[equirectangular]
 
 \parag{Equirectangular}We cut the equirectangular layout into $8\times 8$ tiles as proposed in
 the literature related to panorama video~\cite{gaddam_tiling_2015}. Tiles are thus rectangular.
 We considered three different qualities: the \emph{full quality}, which corresponds to the quality of the
-input spherical video, a \emph{medium quality}, which is set as half as good as the full quality, and a 
+input spherical video, a \emph{medium quality}, which is set as half as good as the full quality, and a
 \emph{low quality}, which is one quarter of the full quality. The quality arrangement is done such that
-the $3\times 3$ tiles that are around the \ac{QEC} are full quality, the $7\times 7$ tiles around 
+the $3\times 3$ tiles that are around the \ac{QEC} are full quality, the $7\times 7$ tiles around
 the \ac{QEC} (excluding the closest $3\times 3$) are with the medium quality, and the remaining tiles
 are with the low quality.
 
 \parag{Cube Map}To generate the $x=16$ \acp{QEC}, we rotate the cube in the sphere so that the
-center of the square front face matches the \ac{QEC}. The front face is at full quality, while the left, right, 
+center of the square front face matches the \ac{QEC}. The front face is at full quality, while the left, right,
 top, and bottom faces are mid quality and the back face is low quality.
 
 \parag{Pyramid}This layout differs from other layouts. First, it does not preserve
@@ -66,24 +66,24 @@ the center of the base face to the \ac{QEC}. The base is at full quality while t
 at a medium quality. \noteGS{To be written}
 
 \parag{Rhombic Dodecahedron}We rotated the dodecahedron such that the \ac{QEC} is between
-the two same faces (say face\,1 and face\,2). Both faces are at full quality. Then, the eight 
+the two same faces (say face\,1 and face\,2). Both faces are at full quality. Then, the eight
 faces that are around
 these faces are at medium quality, and the two remaining faces are at low quality.
 
-We observed that, for the quality setting that we decided for the equirectangular (medium quality and 
+We observed that, for the quality setting that we decided for the equirectangular (medium quality and
 low quality at half and a quarter quality of the full quality respectively), the bit-rate of the
 generated equirectangular layouts are larger than for the other layouts. To get the
-same bit-rate for each video version, we apply the following process. We set that, for a given 
+same bit-rate for each video version, we apply the following process. We set that, for a given
 360-degree video, the projection on the equirectangular provides the \emph{bit-rate budget}. For the
-other layout, the low quality is kept at a quarter of the full quality, but we select the video quality of the medium quality such that the bit-rate of the generated video version is equal to the 
+other layout, the low quality is kept at a quarter of the full quality, but we select the video quality of the medium quality such that the bit-rate of the generated video version is equal to the
 bit-rate budget.
 
-Other settings are as follows. 
+Other settings are as follows.
 The 360-degree video that we chose is \noteGS{To be given}. The encoding of the video in each
 geometric layout is done by HEVC \noteGS{To be given}. The direction of the client heads is as follows.
 First we chose a \ac{FoV} center by a uniform random choice. Then we selected a second \ac{FoV} center
 by a random choice that increases the chances to select a position near the equator. We consider
 both points as the origin and the destination \ac{FoV} centers. The selection of the selected version
-is based on the distance between the origin \ac{FoV} center and the \ac{QEC}. To compare the 
+is based on the distance between the origin \ac{FoV} center and the \ac{QEC}. To compare the
 quality of the \ac{FoV} video against the reference video, we use the \emph{MS-SSIM} quality
 evaluation tool.
