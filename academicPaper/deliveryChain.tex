@@ -126,9 +126,10 @@
 %
 
 % the arrow in the client
-\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt,
-						yshift=-\ecartYVersions]client.west) to
-						([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
+\draw[-latex] 
+%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to 
+	(thisfov.60) to
+		([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
 
 
 % between server and client
