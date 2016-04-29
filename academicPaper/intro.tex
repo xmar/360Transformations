@@ -7,12 +7,12 @@ The popularity of navigable 360-degree video systems
 has grown with the advent of both capturing systems
 (including multi-camera with stitching systems) and interactive entertaining
 systems (including head-mounted display devices).
-However, the delivery of 360-degree video content, from the servers
+However, the delivery of 360-degree video content, from servers
 to the end-users,
-is still a challenge. 
+is still a challenge.
 
-\AD{Head-mounted devices (HMDs) display these videos in high resolution and frame rate, hence restricting the visible part to a viewer depending on the viewing angle, which is determined by the viewer's head direction. The viewing angle, measured horizontally or vertically from the head center, determines how wide or long the visible picture will be, which is specific for a given HMD. The observable part of the 360 degree video at a given time is referred to as a \textbf{Field of View (FoV) video}, which is characterized by the viewing angle (horizontal or vertical) and the observable picture's resolution. A \textbf{FoV center} is defined as the center point of the FoV video.}{}
-%two videos (one per eye), each of them with a high frame rate and a high resolution (typically $1080\times 1200$ for state-of-the-art devices). 
+\AD{Head-mounted devices (HMDs) display these videos in high resolution and frame rate, hence restricting the visible part to a viewer depending on the viewing angle, which is determined by the viewer's head direction. A viewing angle, measured horizontally or vertically from the head center and specific to a given HMD, determines how wide or long picture will be seen by a viewer. The observable part of a 360-degree video at a given time, referred to as a \textbf{Field of View (FoV) video}, is thus defined by a horizontal, vertical viewing angle, and a picture resolution. A \textbf{FoV center} represents the center point of a FoV video.}{}
+%two videos (one per eye), each of them with a high frame rate and a high resolution (typically $1080\times 1200$ for state-of-the-art devices).
 %The combination of both videos
 %form the \ac{FoV}, which is extracted
 %from a wider spherical video with a resolution that is three to four times larger.
@@ -23,7 +23,7 @@ not enable fast
 navigation within the 360-degree video: When the client moves the head, \AD{the FoV center changes, requiring a new FoV video to be immediately displayed. However, since a device has no knowledge about other parts of the spherical video, it has to notify the server about the changes and wait for reception of newly adjusted FoV video.}{}
 %the device cannot immediately display any \ac{FoV} because it does not have information on the other
 %parts of the full spherical video. The device has to notify the server and to wait
-%for the reception of the newly adjusted \ac{FoV} videos. 
+%for the reception of the newly adjusted \ac{FoV} videos.
 Another delivery implementation is to send the full spherical video
 and to let the device
 extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth requirements are
@@ -35,15 +35,15 @@ position in the spherical video. Around the \ac{QEC}, the quality of the video i
 while it is lower for video areas that are far from the \ac{QEC}.
 The client downloads the video version
 such that
-the \ac{QEC} of this video is close to the center of the \ac{FoV}.
+the \ac{QEC} is close to the \AD{FoV center}.
 The system is depicted in Figure~\ref{fig:deliverychain}.
 This navigable 360-degree video delivery system has three advantages:
 $(i)$ the bit-rate of the delivered video is lower than the original full-quality video.
-$(ii)$ When the end-user does not move, the \ac{FoV} is extracted from the highest
+$(ii)$ When the end-user does not move, the \ac{FoV} \AD{video}{} is extracted from the highest
 quality spherical video.
 And $(iii)$ when the end-user moves the head, the video does not stop. The device can
 extract
-a \ac{FoV} because it has the full spherical video. If the new \ac{FoV} is far from the
+a \AD{new}{} \ac{FoV} \AD{video}{} because it has the full spherical video. If the new \ac{FoV} \AD{center}{} is far from the
 \ac{QEC} of the video version, the quality of the extracted video is lower but this
 degradation is transient until the
 device selects another video version with a closer \ac{QEC}.
