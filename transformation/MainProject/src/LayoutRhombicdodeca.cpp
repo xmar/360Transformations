@@ -150,7 +150,8 @@ Layout::NormalizedFaceInfo LayoutRhombicdodeca::From2dToNormalizedFaceInfo(const
     CoordF normalizedCoord(double(pixel.x-IStartOffset(f)) / GetRes(f), double(pixel.y-JStartOffset(f)) / GetRes(f));
     return Layout::NormalizedFaceInfo(normalizedCoord, static_cast<int>(f));
 }
-#define BORDER(x) (MAX(0,MIN(GetRes(f)-1,x)))
+#define BORDER(x) (x)
+//(MAX(0,MIN(GetRes(f)-1,x)))
 CoordF LayoutRhombicdodeca::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
 {
     auto f = static_cast<Faces>(ni.m_faceId);

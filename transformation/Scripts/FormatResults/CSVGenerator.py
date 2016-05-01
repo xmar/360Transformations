@@ -6,8 +6,8 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
     distanceToQualityRAW = {}
     maxDist = 0
     for qec in qecList:
-        (i,j) = qec.GetTileCoordinate()
-        outputDirQEC = '{}/QEC{}_{}'.format(outputDir, i, j)
+        qecId = qec.GetStrId()
+        outputDirQEC = '{}/QEC{}'.format(outputDir, qecId)
         qualityStorage = '{}/quality_storage.dat'.format(outputDirQEC)
         if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
             qualityStorage = GenerateVideo.QualityStorage.Load(qualityStorage)
@@ -66,8 +66,8 @@ def WriteQualityCdfCSV(outputPath, outputDir, qecList):
     badQuality = {}
     maxDist = 0
     for qec in qecList:
-        (i,j) = qec.GetTileCoordinate()
-        outputDirQEC = '{}/QEC{}_{}'.format(outputDir, i, j)
+        qecId = qec.GetStrId()
+        outputDirQEC = '{}/QEC{}'.format(outputDir, qecId)
         qualityStorage = '{}/quality_storage.dat'.format(outputDirQEC)
         if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
             qualityStorage = GenerateVideo.QualityStorage.Load(qualityStorage)

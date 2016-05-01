@@ -1,20 +1,20 @@
 import math
 
 class QEC:
-    def __init__(self, xTiledCoordinated, yTiledCoordinated):
+    def __init__(self, xTiledCoordinated, yTiledCoordinated, yaw, pitch, roll):
         self.x = xTiledCoordinated
         self.y = yTiledCoordinated
-        self.pitch = None
-        self.yaw = None
-        self.roll = None
+        self.pitch = pitch
+        self.yaw = yaw
+        self.roll = roll
 
     def GetEulerAngles(self):
-        if self.pitch is None or \
-                self.yaw is None or \
-                self.roll is None:
-            self.yaw = self.x*45-157.5
-            self.pitch = -78.75+22.5*self.y
-            self.roll = 0
+#        if self.pitch is None or \
+#                self.yaw is None or \
+#                self.roll is None:
+#            self.yaw = self.x*45-157.5
+#            self.pitch = -78.75+22.5*self.y
+#            self.roll = 0
         return (self.yaw, self.pitch, self.roll)
 
     def DistanceInTileNb(self, i, j):
@@ -36,6 +36,10 @@ class QEC:
 
     def GetTileCoordinate(self):
         return (self.x,self.y)
+
+    def GetStrId(self):
+        return "{0:.2f}_{1:.2f}".format(abs(self.yaw),abs(self.pitch)).replace('.','_')
+
 
     def ComputeDistance(self, yaw,pitch):
         (y,p,r) = self.GetEulerAngles()
@@ -60,15 +64,21 @@ class QEC:
     def TestQecGenerator():
         for i in [1,3,5,7]:
             for j in [1,3,4,6]:
-                yield QEC(i,j)
+                yaw = i*45-157.5
+                pitch = -78.75+22.5*j
+                roll = 0
+                yield QEC(4,3, yaw, pitch, roll)
 
     @classmethod
     def GetClosestQecFromTestQec(cls, yaw,pitch):
         qec = None
-        distance = None
+        distance = 5
         for q in cls.TestQecGenerator():
             d = q.ComputeDistance(yaw,pitch)
-            if distance is None or d < distance:
+            print('d =',d," yaw = ",yaw, ' ', q.yaw,"; pitch = ", pitch, ' ', q.pitch)
+            #if distance is None or d < distance:
+            if d < distance:
                 distance = d
                 qec = q
+        print ('min = ', qec.yaw, " ", qec.pitch, ' ', distance)
         return qec

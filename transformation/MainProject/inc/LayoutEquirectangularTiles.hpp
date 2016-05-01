@@ -140,11 +140,14 @@ class LayoutEquirectangularTiles : public Layout
         std::array<unsigned int, 8> m_rowsMaxSize;
         std::array<unsigned int, 8> m_colsMaxSize;
         std::array<std::array<CoordI,8>,8> m_offsets;
+        RotMat m_rotationMatrice;
 
     public:
 
-        LayoutEquirectangularTiles(TilesMap tr): m_tr(std::move(tr)),
-        m_rowsMaxSize(), m_colsMaxSize(), m_offsets() {};
+        LayoutEquirectangularTiles(TilesMap tr, double yaw, double pitch, double roll): m_tr(std::move(tr)),
+        m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
+        m_rotationMatrice(GetRotMatrice(yaw, pitch, roll)) {};
+
 
 };
 }

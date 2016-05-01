@@ -28,9 +28,12 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         bool infer = isInput ? true : ptree.get<bool>(layoutSection+".relativeResolution");
         if (layoutType == "equirectangular")
         {
+            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
+            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
+            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
             if (isInput)
             {
-                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight));
+                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, yaw, pitch, roll));
             }
             else
             {
@@ -38,11 +41,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 double relativeHeight = ptree.get<double>(layoutSection+".height");
                 if (infer)
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, yaw, pitch, roll));
                 }
                 else
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, yaw, pitch, roll));
                 }
             }
 
@@ -221,6 +224,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         {
             LayoutEquirectangularTiles::ScaleTilesMap scaleRes;
 
+            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
+            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
+            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+
             for (unsigned int i = 0; i < 8; ++i)
             {
                 for (unsigned int j = 0; j < 8; ++j)
@@ -250,7 +257,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 }
             }
 
-            return std::make_shared<LayoutEquirectangularTiles>(tileRes);
+            return std::make_shared<LayoutEquirectangularTiles>(tileRes, yaw, pitch, roll);
         }
     }
     catch (std::exception &e)
