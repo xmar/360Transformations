@@ -38,7 +38,7 @@ class QEC:
         return (self.x,self.y)
 
     def GetStrId(self):
-        return "{0:.2f}_{1:.2f}".format(abs(self.yaw),abs(self.pitch)).replace('.','_')
+        return "{0:.2f}_{1:.2f}".format(self.yaw,self.pitch).replace('.','_').replace('-','m')
 
 
     def ComputeDistance(self, yaw,pitch):
@@ -75,10 +75,8 @@ class QEC:
         distance = 5
         for q in cls.TestQecGenerator():
             d = q.ComputeDistance(yaw,pitch)
-            print('d =',d," yaw = ",yaw, ' ', q.yaw,"; pitch = ", pitch, ' ', q.pitch)
             #if distance is None or d < distance:
             if d < distance:
                 distance = d
                 qec = q
-        print ('min = ', qec.yaw, " ", qec.pitch, ' ', distance)
         return qec

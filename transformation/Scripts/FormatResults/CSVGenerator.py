@@ -12,7 +12,7 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
         if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
             qualityStorage = GenerateVideo.QualityStorage.Load(qualityStorage)
             for lId in qualityStorage.goodQuality:
-                name = lId[:-3]
+                name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in distanceToQualityRAW:
                     distanceToQualityRAW[name] = {}
                 for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
@@ -20,7 +20,7 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                     maxDist = max(maxDist, distance)
                     distanceToQualityRAW[name][distance] = q
             for lId in qualityStorage.badQuality:
-                name = lId[:-3]
+                name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in distanceToQualityRAW:
                     distanceToQualityRAW[name] = {}
                 for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
@@ -28,7 +28,7 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                     maxDist = max(maxDist, distance)
                     distanceToQualityRAW[name][distance] = q
 
-    nbPoint = 20
+    nbPoint = 30
     with open(outputPath, 'w') as o:
         o.write('distance')
         for name in sorted(distanceToQualityRAW.keys()):
@@ -72,13 +72,13 @@ def WriteQualityCdfCSV(outputPath, outputDir, qecList):
         if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
             qualityStorage = GenerateVideo.QualityStorage.Load(qualityStorage)
             for lId in qualityStorage.goodQuality:
-                name = lId[:-3]
+                name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in goodQuality:
                     goodQuality[name] = []
                 for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
                     goodQuality[name].append(q)
             for lId in qualityStorage.badQuality:
-                name = lId[:-3]
+                name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in badQuality:
                     badQuality[name] = []
                 for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:

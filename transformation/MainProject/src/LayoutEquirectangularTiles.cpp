@@ -35,7 +35,7 @@ Layout::NormalizedFaceInfo LayoutEquirectangularTiles::From3dToNormalizedFaceInf
 {
     //auto i = 8*std::fmod(PI()+sphericalCoord.y, 2.0*PI()/8)/ (2.0*PI());
     //auto j = 8*std::fmod(sphericalCoord.z, PI()/8) / PI();
-    Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationMatrice);
+    Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationMatrice.t());
     double i = 0.5+rotCoord.y/ (2.0*PI());
     double j = rotCoord.z / PI();
     auto ni =  unsigned(i*8);
