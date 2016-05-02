@@ -52,123 +52,93 @@ void LayoutRhombicdodecaBased::InitFaceRotations(void)
 {
     for (auto f: get_range<LayoutRhombicdodecaBased::Faces>())
     {
-        RotMat m(3,3);
-        m = cv::Mat::zeros(3,3, m.type());
+        RotMat m;
         switch(f)
         {
             case Faces::Face1:
-                m(0,0) = 1;
-                m(1,1) = 1;
-                m(2,2) = 1;
+                m_faceRotations[static_cast<unsigned>(f)] = RotMat::eye();
                 break;
             case Faces::Face2:
-                m(0,0) = 1.0/2;
-                m(0,1) = std::sqrt(2)/2;
-                m(0,2) = -1.0/2;
-                m(1,0) = std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = std::sqrt(2)/2;
-                m(2,0) = 1.0/2;
-                m(2,1) = -std::sqrt(2)/2;
-                m(2,2) = -1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( 1.0/2, std::sqrt(2)/2, -1.0/2,
+                            std::sqrt(2)/2, 0, std::sqrt(2)/2,
+                            1.0/2, -std::sqrt(2)/2, -1.0/2
+                            );
                 break;
             case Faces::Face3:
-                m(0,0) = 1.0/2;
-                m(0,1) = -std::sqrt(2)/2;
-                m(0,2) = -1.0/2;
-                m(1,0) = std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = std::sqrt(2)/2;
-                m(2,0) = -1.0/2;
-                m(2,1) = -std::sqrt(2)/2;
-                m(2,2) = 1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( 1.0/2, -std::sqrt(2)/2, -1.0/2,
+                            std::sqrt(2)/2, 0, std::sqrt(2)/2,
+                            -1.0/2, -std::sqrt(2)/2, 1.0/2
+                            );
                 break;
             case Faces::Face4:
-                m(0,0) = 1.0/2;
-                m(0,1) = std::sqrt(2)/2;
-                m(0,2) = 1.0/2;
-                m(1,0) = -std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = std::sqrt(2)/2;
-                m(2,0) = 1.0/2;
-                m(2,1) = -std::sqrt(2)/2;
-                m(2,2) = 1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( 1.0/2, std::sqrt(2)/2, 1.0/2,
+                            -std::sqrt(2)/2, 0, std::sqrt(2)/2,
+                            1.0/2, -std::sqrt(2)/2, 1.0/2
+                            );
                 break;
             case Faces::Face5:
-                m(0,0) = 1.0/2;
-                m(0,1) = -std::sqrt(2)/2;
-                m(0,2) = 1.0/2;
-                m(1,0) = -std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = std::sqrt(2)/2;
-                m(2,0) = -1.0/2;
-                m(2,1) = -std::sqrt(2)/2;
-                m(2,2) = -1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( 1.0/2, -std::sqrt(2)/2, 1.0/2,
+                            -std::sqrt(2)/2, 0, std::sqrt(2)/2,
+                            -1.0/2, -std::sqrt(2)/2, -1.0/2
+                            );
                 break;
             case Faces::Face6:
-                m(0,2) = 1;
-                m(1,1) = 1;
-                m(2,0) = -1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( 0, 0, -1,
+                            0, 1, 0,
+                            -1, 0, 0
+                            );
                 break;
             case Faces::Face7:
-                m(0,0) = -1.0/2;
-                m(0,1) = std::sqrt(2)/2;
-                m(0,2) = 1.0/2;
-                m(1,0) = -std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = -std::sqrt(2)/2;
-                m(2,0) = -1.0/2;
-                m(2,1) = -std::sqrt(2)/2;
-                m(2,2) = 1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( -1.0/2, std::sqrt(2)/2, 1.0/2,
+                            -std::sqrt(2)/2, 0, -std::sqrt(2)/2,
+                            -1.0/2, -std::sqrt(2)/2, 1.0/2
+                            );
                 break;
             case Faces::Face8:
-                m(0,0) = -1.0/2;
-                m(0,1) = -std::sqrt(2)/2;
-                m(0,2) = 1.0/2;
-                m(1,0) = std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = std::sqrt(2)/2;
-                m(2,0) = -1.0/2;
-                m(2,1) = std::sqrt(2)/2;
-                m(2,2) = 1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( -1.0/2, -std::sqrt(2)/2, 1.0/2,
+                            std::sqrt(2)/2, 0, std::sqrt(2)/2,
+                            -1.0/2, std::sqrt(2)/2, 1.0/2
+                            );
                 break;
             case Faces::Face9:
-                m(0,0) = -1.0/2;
-                m(0,1) = -std::sqrt(2)/2;
-                m(0,2) = -1.0/2;
-                m(1,0) = std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = -std::sqrt(2)/2;
-                m(2,0) = 1.0/2;
-                m(2,1) = -std::sqrt(2)/2;
-                m(2,2) = 1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( -1.0/2, -std::sqrt(2)/2, -1.0/2,
+                            std::sqrt(2)/2, 0, -std::sqrt(2)/2,
+                            1.0/2, -std::sqrt(2)/2, 1.0/2
+                            );
                 break;
             case Faces::Face10:
-                m(0,0) = -1.0/2;
-                m(0,1) = std::sqrt(2)/2;
-                m(0,2) = -1.0/2;
-                m(1,0) = -std::sqrt(2)/2;
-                m(1,1) = 0;
-                m(1,2) = std::sqrt(2)/2;
-                m(2,0) = 1.0/2;
-                m(2,1) = std::sqrt(2)/2;
-                m(2,2) = 1.0/2;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( -1.0/2, std::sqrt(2)/2, -1.0/2,
+                            -std::sqrt(2)/2, 0, std::sqrt(2)/2,
+                            1.0/2, std::sqrt(2)/2, 1.0/2
+                            );
                 break;
             case Faces::Face11:
-                m(0,2) = -1;
-                m(1,1) = 1;
-                m(2,0) = 1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( 0, 0, -1,
+                            0, 1, 0,
+                            1, 0, 0
+                            );
                 break;
             case Faces::Face12:
-                m(0,0) = -1;
-                m(1,1) = -1;
-                m(2,2) = 1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat ( -1, 0, 0,
+                            0, -1, 0,
+                            0, 0, 1
+                            );
                 break;
             case Faces::Black:
             case Faces::Last:
                 continue;
         }
-        m_faceRotations[static_cast<unsigned>(f)] = m;
     }
 }
 

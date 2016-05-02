@@ -22,12 +22,17 @@ Pixel Picture::GetInterPixel(CoordF pt) const
     float a = pt.x - (float)x;
     float c = pt.y - (float)y;
 
-    uchar b = (uchar)cvRound((img.at<Pixel>(y0, x0)[0] * (1.f - a) + img.at<Pixel>(y0, x1)[0] * a) * (1.f - c)
-                           + (img.at<Pixel>(y1, x0)[0] * (1.f - a) + img.at<Pixel>(y1, x1)[0] * a) * c);
-    uchar g = (uchar)cvRound((img.at<Pixel>(y0, x0)[1] * (1.f - a) + img.at<Pixel>(y0, x1)[1] * a) * (1.f - c)
-                           + (img.at<Pixel>(y1, x0)[1] * (1.f - a) + img.at<Pixel>(y1, x1)[1] * a) * c);
-    uchar r = (uchar)cvRound((img.at<Pixel>(y0, x0)[2] * (1.f - a) + img.at<Pixel>(y0, x1)[2] * a) * (1.f - c)
-                           + (img.at<Pixel>(y1, x0)[2] * (1.f - a) + img.at<Pixel>(y1, x1)[2] * a) * c);
+    const auto& p00 = img.at<Pixel>(y0, x0);
+    const auto& p01 = img.at<Pixel>(y0, x1);
+    const auto& p10 = img.at<Pixel>(y1, x0);
+    const auto& p11 = img.at<Pixel>(y1, x1);
+
+    uchar b = (uchar)cvRound((p00[0] * (1.f - a) + p01[0] * a) * (1.f - c)
+                           + (p10[0] * (1.f - a) + p11[0] * a) * c);
+    uchar g = (uchar)cvRound((p00[1] * (1.f - a) + p01[1] * a) * (1.f - c)
+                           + (p10[1] * (1.f - a) + p11[1] * a) * c);
+    uchar r = (uchar)cvRound((p00[2] * (1.f - a) + p01[2] * a) * (1.f - c)
+                           + (p10[2] * (1.f - a) + p11[2] * a) * c);
 
     return Pixel(b, g, r);
 }

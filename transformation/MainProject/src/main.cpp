@@ -192,11 +192,14 @@ int main( int argc, const char* argv[] )
             capVect[j].read(img);
             auto pict = std::make_shared<Picture>(img);
             auto pictOut = pict;
+            std::cout << "Flow " << j << ": " << layoutFlowSections[j][0];
             for (unsigned int i = 1; i < lf.size(); ++i)
             {
+                std::cout << " -> " << layoutFlowSections[j][i];
                 pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
                 lf[i]->NextStep();
             }
+            std::cout << std::endl;
             if (firstPict == nullptr)
             {
                 firstPict = pictOut;

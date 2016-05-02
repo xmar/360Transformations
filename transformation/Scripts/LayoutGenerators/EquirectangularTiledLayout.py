@@ -10,7 +10,7 @@ class EquirectangularTiledLayout(Layout):
         c = '[{}]\ntype=equirectangularTiled\n'.format(self.GetName())
         c += 'relativeResolution=true\n'
         (y, p, r) = self.qec.GetEulerAngles() if self.qec is not None else (0, 0, 0)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(y, p, r)
+        c+='yaw={}\npitch={}\nroll={}\n'.format(y-45, p+22.5, r)
         if self.qec is not None:
             if a is None:
                 a = Constants.MEDIUM_QUALITY

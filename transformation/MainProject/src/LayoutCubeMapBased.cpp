@@ -46,45 +46,54 @@ void LayoutCubeMapBased::InitFaceRotations(void)
 {
     for (auto f: get_range<LayoutCubeMapBased::Faces>())
     {
-        RotMat m(3,3);
-        m = cv::Mat::zeros(3,3, m.type());
         switch (f)
         {
             case Faces::Front:
-                m(0,0) = 1;
-                m(1,1) = 1;
-                m(2,2) = -1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat(1, 0, 0,
+                           0, 1, 0,
+                           0, 0, -1
+                           );
                 break;
             case Faces::Back:
-                m(0,0) = -1;
-                m(1,1) = -1;
-                m(2,2) = -1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat(-1, 0, 0,
+                           0, -1, 0,
+                           0, 0, -1
+                           );
                 break;
             case Faces::Left:
-                m(0,1) = 1;
-                m(1,0) = -1;
-                m(2,2) = -1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat(0, 1, 0,
+                           -1, 0, 0,
+                           0, 0, -1
+                           );
                 break;
             case Faces::Right:
-                m(0,1) = -1;
-                m(1,0) = 1;
-                m(2,2) = -1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat(0, -1, 0,
+                           1, 0, 0,
+                           0, 0, -1
+                           );
                 break;
             case Faces::Top:
-                m(0,2) = 1;
-                m(1,1) = 1;
-                m(2,0) = 1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat(0, 0, 1,
+                           0, 1, 0,
+                           1, 0, 0
+                           );
                 break;
             case Faces::Bottom:
-                m(0,2) = -1;
-                m(1,1) = 1;
-                m(2,0) = -1;
+                m_faceRotations[static_cast<unsigned>(f)] =
+                    RotMat(0, 0, -1,
+                           0, 1, 0,
+                           -1, 0, 0
+                           );
                 break;
             case Faces::Last:
             case Faces::Black:
                 continue;
         }
-        m_faceRotations[static_cast<unsigned>(f)] = m;
     }
 }
 
