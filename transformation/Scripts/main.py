@@ -103,7 +103,7 @@ if __name__ ==  '__main__':
   
             for (lName, lGenerator) in [('CubMap{}'.format(qecId), LayoutGenerators.CubeMapLayout),\
                     ('CubMapCompact{}'.format(qecId), LayoutGenerators.CubeMapLayoutCompact),\
-                    ('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,3))),\
+                    ('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5))),\
                     ('RhombicDodeca{}'.format(qecId), LayoutGenerators.RhombicDodecaLayout)]:
                 layout = lGenerator(lName, qec.GetEulerAngles())
                 outLayoutId = '{}/{}'.format(outputDir,lName)
