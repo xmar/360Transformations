@@ -11,6 +11,51 @@ import GenerateVideo
 import LayoutGenerators
 import FormatResults
 
+def RunFlatFixedViewTest(good, bad):
+    (cy, cp) = good
+    (cyBad, cpBad) = bad
+    goodCenter = (cy, cp, 0)
+    badCenter = (cyBad, cpBad, 0)
+    closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(cy, cp)
+    (i,j) = closestQec.GetTileCoordinate()
+    qecId = closestQec.GetStrId()
+    (y,p,r) = closestQec.GetEulerAngles()
+    #First we check if the output folder for this QEC exist:
+    outputDirQEC = '{}/QEC{}'.format(outputDir, qecId)
+    if not os.path.isdir(outputDirQEC):
+        os.makedirs(outputDirQEC)
+    eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
+    if reuseVideo:
+        inputVideos = [inputVideo, '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId), averageNameVideo]
+        layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None)], \
+                [(lsAverage.layout, lsAverage.a)]]
+    else:
+        inputVideos = [inputVideo, inputVideo, inputVideo]
+        layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None)], \
+                [(eqL, None),(lsAverage.layout, lsAverage.a)]]
+    for layoutId in ['CubMap', \
+            #'CubMapCompact', \
+            'Pyramidal', \
+            'RhombicDodeca']:
+        storageName = '{}/{}{}_storage.dat'.format(outputDir,layoutId,qecId)
+        layoutVideoName = '{}/{}{}.mkv'.format(outputDir,layoutId,qecId)
+        ls = LayoutGenerators.LayoutStorage.Load(storageName)
+        if reuseVideo:
+            inputVideos.append(layoutVideoName)
+            layoutsToTest.append( [(ls.layout, ls.a)] )
+        else:
+            inputVideos.append(inputVideo)
+            layoutsToTest.append( [(eqL, None),(ls.layout, ls.a)] )
+    
+    #Test Good Layout
+    flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.','_'), outputResolution[0], outputResolution[1], 110, goodCenter)
+    GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cy, cp), True)
+    
+    #Test Bad layout
+    flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.','_'), outputResolution[0], outputResolution[1], 110, badCenter)
+    GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cyBad, cpBad), False)
+
+
 if __name__ ==  '__main__':
     parser = argparse.ArgumentParser(description="Will test mulitple resolution and return the resolution that give a the file size closer to the goad file size");
     parser.add_argument('inputVideo', type=str, help='path to input video' )
@@ -78,68 +123,21 @@ if __name__ ==  '__main__':
             SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, averageGoalSize, layoutAverage, maxIteration)
             lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
 
+        #Comupute results for perfect Good and Perfect Bad
+        for qec in LayoutGenerators.QEC.TestQecGenerator():
+            (y,p,r) = qec.GetEulerAngles()
+            good = (y,p)
+            bad = ( y + 180, -p )
+            RunFlatFixedViewTest(good, bad)
         #Now all the video representations have been generated: we start to compute the flat fixed view
         while k != 0:
-            (cy, cp) = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get the good flat fixed center
-            (cyBad, cpBad) = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get a badly located flat fixed center
-            goodCenter = (cy, cp, 0)
-            badCenter = (cyBad, cpBad, 0)
-            closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(cy, cp)
-#            (i,j) = closestQec.GetTileCoordinate()
-            qecId = closestQec.GetStrId()
-            (y,p,r) = closestQec.GetEulerAngles()
-            #First we check if the output folder for this QEC exist:
-            outputDirQEC = '{}/QEC{}'.format(outputDir, qecId)
-            if not os.path.isdir(outputDirQEC):
-                os.makedirs(outputDirQEC)
-            eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
-            if reuseVideo:
-                inputVideos = [inputVideo, '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId), averageNameVideo]
-                layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None)], \
-                        [(lsAverage.layout, lsAverage.a)]]
-            else:
-                inputVideos = [inputVideo, inputVideo, inputVideo]
-                layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None)], \
-                        [(eqL, None),(lsAverage.layout, lsAverage.a)]]
-            for layoutId in ['CubMap', \
-                    #'CubMapCompact', \
-                    'Pyramidal', \
-                    'RhombicDodeca']:
-                storageName = '{}/{}{}_storage.dat'.format(outputDir,layoutId,qecId)
-                layoutVideoName = '{}/{}{}.mkv'.format(outputDir,layoutId,qecId)
-                ls = LayoutGenerators.LayoutStorage.Load(storageName)
-                if reuseVideo:
-                    inputVideos.append(layoutVideoName)
-                    layoutsToTest.append( [(ls.layout, ls.a)] )
-                else:
-                    inputVideos.append(inputVideo)
-                    layoutsToTest.append( [(eqL, None),(ls.layout, ls.a)] )
-
-            #Test Good Layout
-            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.','_'), outputResolution[0], outputResolution[1], 110, goodCenter)
-            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cy, cp), True)
-
-            #Test Bad layout
-            flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cyBad),abs(cpBad)).replace('.','_'), outputResolution[0], outputResolution[1], 110, badCenter)
-            GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cyBad, cpBad), False)
-
+            good = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get the good flat fixed center
+            bad = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get a badly located flat fixed center
+#TODO
+            RunFlatFixedViewTest(good, bad)
             k -= 1
         
         #print Results:
-#        for qec in LayoutGenerators.QEC.TestQecGenerator():
-#            (i,j) = qec.GetTileCoordinate()
-#            outputDirQEC = '{}/QEC{}_{}'.format(outputDir, i, j)
-#            qualityStorage = '{}/quality_storage.dat'.format(outputDirQEC)
-#            if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
-#                qs = GenerateVideo.QualityStorage.Load(qualityStorage)
-#                print('Results QEC ({},{}):'.format(i,j))
-#                print('Nb test = {}'.format(len(qs.names)/2))
-#                print('Good:')
-#                for k in qs.goodQuality:
-#                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.goodQuality[k]])/len(qs.goodQuality[k])))
-#                print ('Bad:')
-#                for k in qs.badQuality:
-#                    print('Average MS-SSIM for {} = {}'.format(k, sum([p[0] for p in qs.badQuality[k]])/len(qs.badQuality[k])))
         FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
         FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
 
