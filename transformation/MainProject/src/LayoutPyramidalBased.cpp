@@ -12,7 +12,7 @@ Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(cons
     Coord3dSpherical p = Rotation(sphericalCoord, m_rotationMat.t());
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
-    auto rtr = Intersection<Coord3dCart>(lambda, p);
+    auto rtr = IntersectionCart(lambda, p);
     Coord3dCart inter = std::get<0>(rtr);
     Faces f = std::get<1>(rtr);
 

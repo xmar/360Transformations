@@ -5,6 +5,8 @@ using namespace IMT;
 
 double Picture::m_mssimWeight[m_nlevs] = {0.0448, 0.2856, 0.3001, 0.2363, 0.1333};
 
+#define INTERPOLATION_BILINEAR 1
+
 Pixel Picture::GetInterPixel(CoordF pt) const
 {
     const cv::Mat& img = m_pictMat;
@@ -14,6 +16,7 @@ Pixel Picture::GetInterPixel(CoordF pt) const
     int x = (int)pt.x;
     int y = (int)pt.y;
 
+#if INTERPOLATION_BILINEAR == 1
     int x0 = cv::borderInterpolate(x,   img.cols, cv::BORDER_REFLECT_101);
     int x1 = cv::borderInterpolate(x+1, img.cols, cv::BORDER_REFLECT_101);
     int y0 = cv::borderInterpolate(y,   img.rows, cv::BORDER_REFLECT_101);
@@ -33,8 +36,21 @@ Pixel Picture::GetInterPixel(CoordF pt) const
                            + (p10[1] * (1.f - a) + p11[1] * a) * c);
     uchar r = (uchar)cvRound((p00[2] * (1.f - a) + p01[2] * a) * (1.f - c)
                            + (p10[2] * (1.f - a) + p11[2] * a) * c);
-
     return Pixel(b, g, r);
+
+#else
+
+    if (x >= img.cols)
+    {
+        x = img.cols-1;
+    }
+    if (y >= img.rows)
+    {
+        y = img.rows-1;
+    }
+    return img.at<Pixel>(y,x);
+
+#endif
 }
 
 void Picture::ImgShowWithLimit(std::string txt, cv::Size s) const

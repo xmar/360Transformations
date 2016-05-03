@@ -7,6 +7,7 @@ class EquirectangularLayout(Layout):
 
     def GenerateLayout(self, a=None):
         c = '[{}]\ntype=equirectangular\n'.format(self.GetName())
+        c += self.GetRefResolutionLine()
         c+='yaw={}\npitch={}\nroll={}\n'.format(0, 0, 0)
         if a is None:
             a = 1

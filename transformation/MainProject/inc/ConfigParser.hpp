@@ -23,6 +23,7 @@ namespace pt = boost::property_tree;
 std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& ptree, bool isInput, unsigned int inputWidth, unsigned int inputHeight)
 {
     std::string layoutType;
+
     try {
         layoutType = ptree.get<std::string>(layoutSection+".type");
         bool infer = isInput ? true : ptree.get<bool>(layoutSection+".relativeResolution");
@@ -50,6 +51,21 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
 
         }
+        CoordI refRes(0,0);
+        if (isInput)
+        {
+            try
+            {
+                int width = ptree.get<double>(layoutSection+".refWidth");
+                int height = ptree.get<double>(layoutSection+".refHeight");
+                refRes = CoordI(width, height);
+            }
+            catch(...)
+            {
+                std::cout << "Could not find " << layoutSection+".refWidth" << " or " << layoutSection+".refHeight" <<
+                    "for layoutSection=" << layoutSection << std::endl;
+            }
+        }
         if (layoutType == "cubeMap")
         {
             double edgeFront = ptree.get<double>(layoutSection+".cubeEdgeLengthFront");
@@ -67,7 +83,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 {
                     throw std::invalid_argument("Input with static resolution not supported yet");
                 }
-                auto refRes = LayoutCubeMap::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+                if (refRes == CoordI(0,0))
+                {
+                    refRes = LayoutCubeMap::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+                }
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
             }
@@ -97,7 +116,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 {
                     throw std::invalid_argument("Input with static resolution not supported yet");
                 }
-                auto refRes = LayoutCubeMap2::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+                if (refRes == CoordI(0,0))
+                {
+                    refRes = LayoutCubeMap2::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+                }
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
             }
@@ -148,7 +170,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 {
                     throw std::invalid_argument("Input with static resolution not supported yet");
                 }
-                auto refRes = LayoutPyramidal::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+                if (refRes == CoordI(0,0))
+                {
+                    refRes = LayoutPyramidal::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+                }
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
             }
@@ -178,7 +203,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 {
                     throw std::invalid_argument("Input with static resolution not supported yet");
                 }
-                auto refRes = LayoutPyramidal2::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+                if (refRes == CoordI(0,0))
+                {
+                    refRes = LayoutPyramidal2::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+                }
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
             }
@@ -208,7 +236,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 {
                     throw std::invalid_argument("Input with static resolution not supported yet");
                 }
-                auto refRes = LayoutRhombicdodeca::GetReferenceResolution(inputWidth, inputHeight, faceResScale);
+                if (refRes == CoordI(0,0))
+                {
+                    refRes = LayoutRhombicdodeca::GetReferenceResolution(inputWidth, inputHeight, faceResScale);
+                }
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
             }
@@ -243,7 +274,10 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 {
                     throw std::invalid_argument("Input with static resolution not supported yet");
                 }
-                auto refRes = LayoutEquirectangularTiles::GetReferenceResolution(inputWidth, inputHeight, scaleRes);
+                if (refRes == CoordI(0,0))
+                {
+                    refRes = LayoutEquirectangularTiles::GetReferenceResolution(inputWidth, inputHeight, scaleRes);
+                }
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
             }

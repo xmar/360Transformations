@@ -264,11 +264,8 @@ template<class enum_type> constexpr boost::iterator_range<enum_iterator<enum_typ
 template <class FaceType>
 using FaceToPlanFct = std::function<Plan(FaceType)>;
 
-//template <class RtrCoordType, class FaceType>
-//std::tuple<RtrCoordType, FaceType> Intersection(FaceToPlanFct<FaceType> FaceToPlan, const Coord3dSpherical& secondPoint);
-
-template <class, class FaceType>
-std::tuple<Coord3dSpherical, FaceType> Intersection(Plan (*FaceToPlan)(FaceType), const Coord3dSpherical& secondPoint)
+template <class FaceType>
+std::tuple<Coord3dSpherical, FaceType> IntersectionSphe(FaceToPlanFct<FaceType> FaceToPlan, const Coord3dSpherical& secondPoint)
 {
     double theta(secondPoint.y), phi(secondPoint.z);
     double cosT(std::cos(theta)), sinT(std::sin(theta)), cosP(std::cos(phi)), sinP(std::sin(phi));
@@ -295,8 +292,8 @@ std::tuple<Coord3dSpherical, FaceType> Intersection(Plan (*FaceToPlan)(FaceType)
     return std::make_tuple( Coord3dSpherical(minR, theta, phi),  interFace);
 }
 
-template <class, class FaceType>
-std::tuple<Coord3dCart, FaceType> Intersection(FaceToPlanFct<FaceType> FaceToPlan, const Coord3dSpherical& secondPoint)
+template <class FaceType>
+std::tuple<Coord3dCart, FaceType> IntersectionCart(FaceToPlanFct<FaceType> FaceToPlan, const Coord3dSpherical& secondPoint)
 {
     double theta(secondPoint.y), phi(secondPoint.z);
     double cosT(std::cos(theta)), sinT(std::sin(theta)), cosP(std::cos(phi)), sinP(std::sin(phi));

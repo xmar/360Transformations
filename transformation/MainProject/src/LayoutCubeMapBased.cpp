@@ -19,7 +19,7 @@ Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const 
     Coord3dSpherical p = Rotation(sphericalCoord, m_rotMat.t());
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FromFaceToPlan(f);};
-    auto rtr = Intersection<Coord3dCart>(lambda, p);
+    auto rtr = IntersectionCart(lambda, p);
     Coord3dCart inter = std::get<0>(rtr);
     Faces f = std::get<1>(rtr);
 

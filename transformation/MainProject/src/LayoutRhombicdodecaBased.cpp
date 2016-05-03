@@ -8,7 +8,7 @@ Layout::NormalizedFaceInfo LayoutRhombicdodecaBased::From3dToNormalizedFaceInfo(
     Coord3dSpherical sc = Rotation(sphericalCoord, m_rotMat.t()); //Go back to the normalized rhombic
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
-    auto rtr = Intersection<Coord3dCart>(lambda, sc);
+    auto rtr = IntersectionCart(lambda, sc);
     Coord3dCart inter = std::get<0>(rtr);
     Faces f = std::get<1>(rtr);
 

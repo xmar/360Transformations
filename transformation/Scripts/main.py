@@ -5,6 +5,7 @@ import os
 import numpy as np
 import subprocess as sub
 import shutil
+import re
 
 import SearchTools
 import GenerateVideo
@@ -26,7 +27,7 @@ def RunFlatFixedViewTest(good, bad):
         os.makedirs(outputDirQEC)
     eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
     if reuseVideo:
-        inputVideos = [inputVideo, '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId), averageNameVideo]
+        inputVideos = ['{}/equirectangular.mkv'.format(outputDir), '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId), averageNameVideo]
         layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None)], \
                 [(lsAverage.layout, lsAverage.a)]]
     else:
@@ -83,28 +84,51 @@ if __name__ ==  '__main__':
     averageGoalSize = (0,0)
 
     try:
+        #First we re-encode the original Equirectangular video for fair comparaison later
+        outEquiNameStorage = '{}/equirectangular_storage.dat'.format(outputDir)
+        outEquiNameVideo = '{}/equirectangular.mkv'.format(outputDir)
+        outEquiId = '{}/equirectangular'.format(outputDir)
+        skip = False
+        if os.path.isfile(outEquiNameStorage) and os.path.isfile(outEquiNameVideo):
+            ls = LayoutGenerators.LayoutStorage.Load(outEquiNameStorage)
+            if n == ls.nbFrames:
+                skip = True
+        if not skip:
+            ls = GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None)], 24, n,  inputVideo, outEquiId)
+            ls.Dump(outEquiNameStorage)
+
+        #We get the resolution of the video
+        ffmpegProcess = sub.Popen(['ffmpeg', '-i', outEquiNameVideo], stderr=sub.PIPE)
+        regex = re.compile('.*\s(\d+)x(\d+)\s.*')
+        for line in iter(ffmpegProcess.stderr.readline, b''):
+            m = regex.match(line.decode('utf-8'))
+            if m is not None:
+                refWidth = int(m.group(1))
+                refHeight = int(m.group(2))
+ 
+        #for each QEC we compute the EquirectangularTiled layout associated + the other layout with a fixed bitrate
         for qec in LayoutGenerators.QEC.TestQecGenerator():
             qecId = qec.GetStrId()
             print('Start computation for QEC({})'.format(qecId))
-            outEquiNameStorage = '{}/equirectangularTiled{}_storage.dat'.format(outputDir,qecId)
-            outEquiNameVideo = '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId)
-            outEquiId = '{}/equirectangularTiled{}'.format(outputDir,qecId)
+            outEquiTiledNameStorage = '{}/equirectangularTiled{}_storage.dat'.format(outputDir,qecId)
+            outEquiTiledNameVideo = '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId)
+            outEquiTiledId = '{}/equirectangularTiled{}'.format(outputDir,qecId)
             skip = False
-            if os.path.isfile(outEquiNameStorage) and os.path.isfile(outEquiNameVideo):
-                ls = LayoutGenerators.LayoutStorage.Load(outEquiNameStorage)
+            if os.path.isfile(outEquiTiledNameStorage) and os.path.isfile(outEquiTiledNameVideo):
+                ls = LayoutGenerators.LayoutStorage.Load(outEquiTiledNameStorage)
                 if n == ls.nbFrames:
                     skip = True
             if not skip:
-                ls = GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), qec), None)], 24, n,  inputVideo, outEquiId)
-                ls.Dump(outEquiNameStorage)
+                ls = GenerateVideo.GenerateVideo(config, trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), qec, refWidth, refHeight), None)], 24, n,  inputVideo, outEquiTiledId)
+                ls.Dump(outEquiTiledNameStorage)
             
-            goalSize = os.stat(outEquiNameVideo).st_size
+            goalSize = os.stat(outEquiTiledNameVideo).st_size
             averageGoalSize = (averageGoalSize[0] + goalSize, averageGoalSize[1]+1)
   
-            for (lName, lGenerator) in [('CubMap{}'.format(qecId), LayoutGenerators.CubeMapLayout),\
-                    ('CubMapCompact{}'.format(qecId), LayoutGenerators.CubeMapLayoutCompact),\
-                    ('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5))),\
-                    ('RhombicDodeca{}'.format(qecId), LayoutGenerators.RhombicDodecaLayout)]:
+            for (lName, lGenerator) in [('CubMap{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLayout(n, ypr, refWidth, refHeight))),\
+                    ('CubMapCompact{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLayoutCompact(n, ypr, refWidth, refHeight))),\
+                    ('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5, refWidth, refHeight))),\
+                    ('RhombicDodeca{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaLayout(n, ypr, refWidth, refHeight)))]:
                 layout = lGenerator(lName, qec.GetEulerAngles())
                 outLayoutId = '{}/{}'.format(outputDir,lName)
                 SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, goalSize, layout, maxIteration)
@@ -119,7 +143,7 @@ if __name__ ==  '__main__':
                 skip = True
         if not skip:
             outLayoutId = '{}/AverageEquiTiled'.format(outputDir)
-            layoutAverage = LayoutGenerators.EquirectangularLayout('AverageEquiTiled') 
+            layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None, refWidth, refHeight) 
             SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, averageGoalSize, layoutAverage, maxIteration)
             lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
 
@@ -133,7 +157,7 @@ if __name__ ==  '__main__':
         while k != 0:
             good = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get the good flat fixed center
             bad = LayoutGenerators.FlatFixedLayout.GetRandomCenter() #Get a badly located flat fixed center
-#TODO
+
             RunFlatFixedViewTest(good, bad)
             k -= 1
         
@@ -141,7 +165,7 @@ if __name__ ==  '__main__':
         FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
         FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
 
-    except Exception as inst:
-        print (inst)
+    #except Exception as inst:
+    #    print (inst)
     finally:
         print('Program done')

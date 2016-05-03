@@ -43,6 +43,9 @@ class LayoutEquirectangularTiles : public Layout
                 sumRationCols += maxCols;
                 sumRationRows += maxRows;
             }
+            std::cout << 8*width/sumRationCols << "; " << 8*heigth/sumRationRows << std::endl;
+            std::cout << width << "; " << heigth << std::endl;
+            std::cout << sumRationCols << "; " << sumRationRows << std::endl;
             return CoordI(8*width/sumRationCols, 8*heigth/sumRationRows);
         }
 

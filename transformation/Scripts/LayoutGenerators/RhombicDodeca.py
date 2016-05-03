@@ -2,14 +2,15 @@ from . import Constants
 from .Layout import Layout
 
 class RhombicDodecaLayout(Layout):
-    def __init__(self, layoutName, ypr):
-        super().__init__(layoutName)
+    def __init__(self, layoutName, ypr, refWidth = None, refHeight = None):
+        super().__init__(layoutName, refWidth, refHeight)
         self.yaw = ypr[0] +19.4712 #+ 35.2643 #- 19.4712
         self.pitch = ypr[1] - 26.5650
         self.roll = ypr[2]
 
     def GenerateLayout(self, mediumRatio):
         c = '[{}]\ntype=rhombicDodeca\n'.format(self.GetName())
+        c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
 
         c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
