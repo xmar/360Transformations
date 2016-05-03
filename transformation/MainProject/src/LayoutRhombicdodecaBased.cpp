@@ -5,28 +5,12 @@ using namespace IMT;
 
 Layout::NormalizedFaceInfo LayoutRhombicdodecaBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    auto f = Faces::Last;
-    Coord3dCart inter;
-    double minRho = std::numeric_limits<double>::max();
-
     Coord3dSpherical sc = Rotation(sphericalCoord, m_rotMat.t()); //Go back to the normalized rhombic
 
-    for (auto testF: get_range<LayoutRhombicdodecaBased::Faces>())
-    {
-        try {
-            auto plan = FaceToPlan(testF);
-            auto interSphe = IntersectionPlanSpherical(plan, sc); //raise exception if no intersection
-            if (minRho > interSphe.x && AlmostEqual(interSphe.y, sc.y)) //check direction
-            {
-                minRho = interSphe.x;
-                inter = SphericalToCart(interSphe);
-                f = testF;
-            }
-        } catch ( std::logic_error& le )
-        { //no intersection with this face
-            continue;
-        }
-    }
+    FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
+    auto rtr = Intersection<Coord3dCart>(lambda, sc);
+    Coord3dCart inter = std::get<0>(rtr);
+    Faces f = std::get<1>(rtr);
 
     Coord3dCart canonicCoordinates = Rotation(inter, FaceToRotMat(f).t()); //do the inverse rotation to go back to Face1
 

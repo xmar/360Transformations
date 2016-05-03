@@ -3,6 +3,7 @@
 #include <cmath>
 #include <boost/range/iterator_range.hpp>
 #include <stdexcept>
+#include <functional>
 
 
 namespace IMT {
@@ -152,6 +153,35 @@ inline Plan Rotation(const Plan& p, double theta, double phi, double roll)
     return Plan(r.x, r.y, r.z, p[3]);
 }
 
+
+inline Coord3dSpherical IntersectionPlanOptimized(const Plan& p, double theta, double phi)
+{//Return the spherical coordinate of the intersaction of the line v(1,theta, phi) in spherical coordinate as the direction vector and the plan a.x+b.y+c.z+d = 0 (only if in the right direction
+    //if no solution return (0,0,0)
+    const double& a = p[0];
+    const double& b = p[1];
+    const double& c = p[2];
+    const double& d = p[3];
+    double cosT(std::cos(theta)), sinT(std::sin(theta)), cosP(std::cos(phi)), sinP(std::sin(phi));
+    double u = a*cosT*sinP + b*sinT*sinP + c*cosP;
+    if (u > 0)
+    {
+        return Coord3dSpherical(-d/u, theta, phi);
+    }
+    else if (u < 0)
+    {
+        return Coord3dSpherical(0, 0, 0);
+    }
+    else
+    {
+        throw std::logic_error("No intersection");
+    }
+}
+
+inline Coord3dSpherical IntersectionPlanOptimized (const Plan& p, const Coord3dSpherical& secondPoint)
+{ //intersection between the plan p and the line from O to secondPoint;
+    return IntersectionPlanOptimized(p, secondPoint.y, secondPoint.z);
+}
+
 inline Coord3dCart IntersectionPlan(const Plan& p, double theta, double phi)
 {//Return the cartesian coordinate of the intersaction of the line v(1,theta, phi) in spherical coordinate as the dirtion vector and the plan a.x+b.y+c.z+d = 0
     //if no solution return (0,0,0)
@@ -174,20 +204,12 @@ inline Coord3dCart IntersectionPlan(const Plan& p, double theta, double phi)
     }
 }
 
-inline Coord3dSpherical IntersectionPlanSpherical(const Plan& p, double theta, double phi)
-{
-    return CartToSpherical(IntersectionPlan(p, theta, phi));
+
+inline Coord3dCart IntersectionPlan (const Plan& p, const Coord3dSpherical& secondPoint)
+{ //intersection between the plan p and the line from O to secondPoint;
+    return IntersectionPlan(p, secondPoint.y, secondPoint.z);
 }
 
-inline Coord3dSpherical IntersectionPlanSpherical (const Plan& p, const Coord3dSpherical& secondPoint)
-{ //intersection between the plan p and the line from O to secondPoint;
-    return IntersectionPlanSpherical(p, secondPoint.y, secondPoint.z);
-}
-
-inline Coord3dSpherical IntersectionPlanSpherical (const Plan& p, const Coord3dCart& secondPoint)
-{ //intersection between the plan p and the line from O to secondPoint;
-    return IntersectionPlanSpherical(p, CartToSpherical(secondPoint));
-}
 
 
 inline constexpr bool AlmostEqual(double a, double b)
@@ -239,6 +261,66 @@ template<class enum_type> constexpr boost::iterator_range<enum_iterator<enum_typ
 {return boost::make_iterator_range(enum_iterator<enum_type>(enum_type::First), enum_iterator<enum_type>(enum_type::Last));}
 
 
+template <class FaceType>
+using FaceToPlanFct = std::function<Plan(FaceType)>;
 
+//template <class RtrCoordType, class FaceType>
+//std::tuple<RtrCoordType, FaceType> Intersection(FaceToPlanFct<FaceType> FaceToPlan, const Coord3dSpherical& secondPoint);
+
+template <class, class FaceType>
+std::tuple<Coord3dSpherical, FaceType> Intersection(Plan (*FaceToPlan)(FaceType), const Coord3dSpherical& secondPoint)
+{
+    double theta(secondPoint.y), phi(secondPoint.z);
+    double cosT(std::cos(theta)), sinT(std::sin(theta)), cosP(std::cos(phi)), sinP(std::sin(phi));
+    FaceType interFace;
+    double minR = std::numeric_limits<double>::max();
+    for (auto testF: get_range<FaceType>())
+    {
+        Plan p = FaceToPlan(testF);
+        const double& a = p[0];
+        const double& b = p[1];
+        const double& c = p[2];
+        const double& d = p[3];
+        double u = a*cosT*sinP + b*sinT*sinP + c*cosP;
+        if (u != 0)
+        {
+            double r = -d / u;
+            if (r > 0 && minR > r)
+            {
+                minR = r;
+                interFace = testF;
+            }
+        }
+    }
+    return std::make_tuple( Coord3dSpherical(minR, theta, phi),  interFace);
+}
+
+template <class, class FaceType>
+std::tuple<Coord3dCart, FaceType> Intersection(FaceToPlanFct<FaceType> FaceToPlan, const Coord3dSpherical& secondPoint)
+{
+    double theta(secondPoint.y), phi(secondPoint.z);
+    double cosT(std::cos(theta)), sinT(std::sin(theta)), cosP(std::cos(phi)), sinP(std::sin(phi));
+    FaceType interFace;
+    double minR = std::numeric_limits<double>::max();
+    for (auto testF: get_range<FaceType>())
+    {
+        Plan p = FaceToPlan(testF);
+        const double& a = p[0];
+        const double& b = p[1];
+        const double& c = p[2];
+        const double& d = p[3];
+        double u = a*cosT*sinP + b*sinT*sinP + c*cosP;
+        if (u != 0)
+        {
+            double r = -d / u;
+            if (r > 0 && minR > r)
+            {
+                minR = r;
+                interFace = testF;
+            }
+        }
+    }
+    return std::make_tuple( Coord3dCart(minR*cosT*sinP, minR*sinT*sinP, minR*cosP),  interFace);
+}
 
 }

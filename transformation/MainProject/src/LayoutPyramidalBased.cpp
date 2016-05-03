@@ -9,30 +9,13 @@ double LayoutPyramidalBased::UsePlanEquation(double x) const //Use the plan equa
 
 Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    auto f = Faces::Last;
-    Coord3dCart inter;
-    double minRho = std::numeric_limits<double>::max();
-
-
-    //Transform to the canonic representation
     Coord3dSpherical p = Rotation(sphericalCoord, m_rotationMat.t());
 
-    for (auto testF: get_range<LayoutPyramidalBased::Faces>())
-    {
-        try {
-            auto plan = FaceToPlan(testF);
-            auto interSphe = IntersectionPlanSpherical(plan, p); //raise exception if no intersection
-            if (minRho > interSphe.x && AlmostEqual(interSphe.y, p.y)) //check direction
-            {
-                minRho = interSphe.x;
-                inter = SphericalToCart(interSphe);
-                f = testF;
-            }
-        } catch ( std::logic_error& le )
-        { //no intersection with this face
-            //continue;
-        }
-    }
+    FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
+    auto rtr = Intersection<Coord3dCart>(lambda, p);
+    Coord3dCart inter = std::get<0>(rtr);
+    Faces f = std::get<1>(rtr);
+
     double normalizedI(0);
     double normalizedJ(0);
     switch (f)

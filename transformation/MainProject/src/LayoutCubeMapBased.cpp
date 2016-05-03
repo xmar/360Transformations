@@ -16,27 +16,13 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
 Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
     //First we find the face with which we intersect
-    auto f = Faces::Last;
-    Coord3dCart inter;
-    double minRho = std::numeric_limits<double>::max();
     Coord3dSpherical p = Rotation(sphericalCoord, m_rotMat.t());
 
-    for (auto testF: get_range<LayoutCubeMapBased::Faces>())
-    {
-        try {
-            auto plan = FromFaceToPlan(testF);
-            auto interSphe = IntersectionPlanSpherical(plan, p); //raise exception if no intersection
-            if (minRho > interSphe.x && AlmostEqual(interSphe.y, p.y)) //check direction
-            {
-                minRho = interSphe.x;
-                inter = SphericalToCart(interSphe);
-                f = testF;
-            }
-        } catch ( std::logic_error& le )
-        { //no intersection with this face
-            continue;
-        }
-    }
+    FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FromFaceToPlan(f);};
+    auto rtr = Intersection<Coord3dCart>(lambda, p);
+    Coord3dCart inter = std::get<0>(rtr);
+    Faces f = std::get<1>(rtr);
+
     Coord3dCart canonicPoint ( Rotation(inter, FaceToRotMat(f).t()) );
     Layout::NormalizedFaceInfo ni (CoordF((canonicPoint.y+1.0)/2.0, (canonicPoint.z+1.0)/2.0), static_cast<int>(f));
     return ni;
