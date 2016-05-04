@@ -3,13 +3,13 @@ Sections = $(filter-out $MainSource, $(wildcard *.tex))
 Bib = $(wildcard *.bib)
 Plots = $(wildcard plots/*.tex)
 PlotsPdf = $(patsubst %.tex,%.pdf,$(Plots))
-Data = $(wildcard plots/datas/ILP_VOD/*.csv) $(wildcard plots/datas/heuristic_vod_likeilp/*.csv)
+Data = $(wildcard results/*.csv)
 python_version_full = $(wordlist 2,4,$(subst ., ,$(shell python3 --version 2>&1)))
 Python3 = python3.$(word 2,${python_version_full})
 
 all: mainACM.pdf
 
-mainACM.pdf: $(MainSource) $(Sections) $(Plots) $(Bib)
+mainACM.pdf: $(MainSource) $(Sections) $(Plots) $(Bib) $(Data)
 	$(Python3) latexrun $<
 	#./latexrun --latex-args="-shell-escape" $<
 
