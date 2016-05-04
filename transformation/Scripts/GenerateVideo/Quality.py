@@ -76,12 +76,15 @@ class QualityStorage:
 
 def GetAverageQuality(fileName):
     q = 0
+    p = 0
     n = 0
     with open(fileName, 'r') as i:
         for line in i:
-            q += float(line)
+            (msssin, psnr) = line.split(' ')
+            q += float(msssin)
+            p += float(psnr)
             n += 1
-    return q/n if n != 0 else 0
+    return (q/n, p/n) if n != 0 else 0
 
 def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideos, outputDirQEC, qec, flatFixedCenterYP, isGood):
     if len(layoutsToTest) != len(inputVideos):

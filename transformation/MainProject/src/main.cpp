@@ -211,8 +211,9 @@ int main( int argc, const char* argv[] )
             if (!qualityWriterVect.empty() && j != 0)
             {
                 auto msssim = firstPict->GetMSSSIM(*pictOut);
-                std::cout << "Flow " << j << ": MS-SSIM = " << msssim << std::endl;
-                *qualityWriterVect[j-1] << msssim << std::endl;
+                auto psnr = firstPict->GetPSNR(*pictOut);
+                std::cout << "Flow " << j << ": MS-SSIM = " << msssim << " PSNR = " << psnr << std::endl;
+                *qualityWriterVect[j-1] << msssim << " " << psnr << std::endl;
             }
             if (!cvVideoWriters.empty())
             {

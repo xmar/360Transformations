@@ -42,7 +42,40 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                 if index not in distanceToQualityProcessed[name]:
                     distanceToQualityProcessed[name][index] = (0,0)
                 (v,c) = distanceToQualityProcessed[name][index]
-                distanceToQualityProcessed[name][index] = (v+q, c+1)
+                distanceToQualityProcessed[name][index] = (v+q[0], c+1)
+        for i in range(0, nbPoint):
+            hasValue = False
+            for name in distanceToQualityProcessed:
+                hasValue = hasValue or (i in distanceToQualityProcessed[name])
+                if hasValue:
+                    break
+            if not hasValue:
+                continue
+            o.write('{}'.format((i+0.5)*maxDist/nbPoint))
+            for name in sorted(distanceToQualityProcessed.keys()):
+                if i in distanceToQualityProcessed[name]:
+                    (v,c) = distanceToQualityProcessed[name][i]
+                else:
+                    (v,c) = (-1,1)
+                o.write(' {}'.format(v/c))
+            o.write('\n')
+
+    with open(outputPath[:-4]+'_psnr.csv', 'w') as o:
+        o.write('distance')
+        for name in sorted(distanceToQualityRAW.keys()):
+            if name != 'AverageEquiTiled' :
+                o.write(' quality{}'.format(name))
+        o.write('\n')
+        distanceToQualityProcessed = {}
+        for name in sorted(distanceToQualityRAW.keys()):
+            if name != 'AverageEquiTiled':
+                distanceToQualityProcessed[name] = {}
+                for (d,q) in distanceToQualityRAW[name].items():
+                    index = int(nbPoint*d/maxDist)
+                    if index not in distanceToQualityProcessed[name]:
+                        distanceToQualityProcessed[name][index] = (0,0)
+                    (v,c) = distanceToQualityProcessed[name][index]
+                    distanceToQualityProcessed[name][index] = (v+q[1]-distanceToQualityRAW['AverageEquiTiled'][d][1], c+1)
         for i in range(0, nbPoint):
             hasValue = False
             for name in distanceToQualityProcessed:
@@ -61,6 +94,7 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
             o.write('\n')
 
 
+
 def WriteQualityCdfCSV(outputPath, outputDir, qecList):
     goodQuality = {}
     badQuality = {}
@@ -76,13 +110,13 @@ def WriteQualityCdfCSV(outputPath, outputDir, qecList):
                 if name not in goodQuality:
                     goodQuality[name] = []
                 for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
-                    goodQuality[name].append(q)
+                    goodQuality[name].append(q[0])
             for lId in qualityStorage.badQuality:
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in badQuality:
                     badQuality[name] = []
                 for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
-                    badQuality[name].append(q)
+                    badQuality[name].append(q[0])
 
     for name in goodQuality:
         goodQuality[name] = np.array(sorted(goodQuality[name]))
