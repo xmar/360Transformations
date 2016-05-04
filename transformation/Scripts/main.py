@@ -28,11 +28,11 @@ def RunFlatFixedViewTest(good, bad):
     eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
     if reuseVideo:
         inputVideos = ['{}/equirectangular.mkv'.format(outputDir), '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId), averageNameVideo]
-        layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None)], \
+        layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None, refWidth, refHeight)], \
                 [(lsAverage.layout, lsAverage.a)]]
     else:
         inputVideos = [inputVideo, inputVideo, inputVideo]
-        layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None)], \
+        layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None, refWidth, refHeight)], \
                 [(eqL, None),(lsAverage.layout, lsAverage.a)]]
     for layoutId in ['CubMap', \
             #'CubMapCompact', \
