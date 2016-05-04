@@ -1,0 +1,4 @@
+*.mp4
+*.mkv
+build
+__pycache__
