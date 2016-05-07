@@ -51,3 +51,17 @@ def GenerateVideo(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId
         if os.path.isfile('/tmp/tmp1{}.mkv'.format(lastName)):
             os.remove('/tmp/tmp1{}.mkv'.format(lastName))
         return LayoutGenerators.LayoutStorage(lastLayout, lastA, nbFrames)
+
+def GenerateVideoAndStore(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId, bitrate=0):
+    outStorage = '{}_storage.dat'.format(outputId)
+    outNameVideo = '{}.mkv'.format(outputId)
+    skip = False
+    if os.path.isfile(outStorage) and os.path.isfile(outNameVideo):
+        ls = LayoutGenerators.LayoutStorage.Load(outStorage)
+        if nbFrames == ls.nbFrames:
+            skip = True
+    if not skip:
+        ls = GenerateVideo(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId, bitrate)
+        ls.Dump(outStorage)
+
+
