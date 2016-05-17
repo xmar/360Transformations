@@ -1,0 +1,7 @@
+tracks
+*.txt
+*.csv
+*.pdf
+latex.out
+__pycache__
+
