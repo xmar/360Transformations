@@ -17,6 +17,7 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                     distanceToQualityRAW[name] = {}
                 for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
                     distance = qec.ComputeDistance(y,p)
+                    print ('d={}; qec={}; ({},{})'.format(distance,qec.GetStrId(),y,p))
                     maxDist = max(maxDist, distance)
                     distanceToQualityRAW[name][distance] = q
             for lId in qualityStorage.badQuality:
@@ -25,6 +26,7 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                     distanceToQualityRAW[name] = {}
                 for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
                     distance = qec.ComputeDistance(y,p)
+                    print ('d={}; qec={}; ({},{})'.format(distance,qec.GetStrId(),y,p))
                     maxDist = max(maxDist, distance)
                     distanceToQualityRAW[name][distance] = q
 

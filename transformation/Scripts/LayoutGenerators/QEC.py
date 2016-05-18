@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class QEC:
     def __init__(self, xTiledCoordinated, yTiledCoordinated, yaw, pitch, roll):
@@ -7,6 +8,12 @@ class QEC:
         self.pitch = pitch
         self.yaw = yaw
         self.roll = roll
+
+    def __eq__(self, qec):
+        return (self.yaw == qec.yaw) and (self.pitch == qec.pitch) and (self.roll == qec.roll)
+
+    def __ne__(self, qec):
+        return not self.__eq__(qec)
 
     def GetEulerAngles(self):
 #        if self.pitch is None or \
@@ -80,3 +87,21 @@ class QEC:
                 distance = d
                 qec = q
         return qec
+
+    @staticmethod
+    def ToRotMat(yaw, pitch, roll):
+        '''yaw, pitch and roll in radian'''
+        cosP = math.cos(pitch)
+        sinP = math.sin(pitch)
+        cosY = math.cos(yaw)
+        sinY = math.sin(yaw)
+        cosR = math.cos(roll)
+        sinR = math.sin(roll)
+        return np.matrix('{},{},{};{},{},{};{},{},{}'.format(
+                cosP * cosY,     cosY*sinP*sinR -sinY*cosR,  cosY*sinP*cosR + sinY * sinR,
+                sinY*cosP,       cosY * cosR,                sinY*sinP*cosR - sinR * cosY,
+                -sinP,           cosP * sinR,                cosP * cosR))
+
+    def GetRotMat(self):
+        return self.ToRotMat(math.radians(self.yaw), math.radians(self.pitch), math.radians(self.roll))
+
