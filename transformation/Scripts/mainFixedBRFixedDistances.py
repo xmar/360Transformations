@@ -142,13 +142,17 @@ if __name__ ==  '__main__':
         step = 0.25
         for dist in np.arange(0, math.pi+step, step):
             dist = min(dist, math.pi)
+            LayoutGenerators.FlatFixedLayout.SetRandomSeed(dist)
             print('*',dist)
             k = args.nbT
             while k != 0:
                 for qec in LayoutGenerators.QEC.TestQecGenerator():
                     print('Start computation for QEC({}) for test id {} and distance {}'.format(qec.GetStrId(), args.nbT-k, dist))
                     point = LayoutGenerators.FlatFixedLayout.GetRandomCenterAtDistance(qec, dist) #Get the good flat fixed center
-                    print('qec = {}, point = {}'.format(qec.GetStrId(), point))
+                    (y,p) = point
+                    if abs(dist - qec.ComputeDistance(y,p)) > 10**-5:
+                        print('ERROR distance of the random point too far compare to expected distance: expect', dist, 'but got', qec.ComputeDistance(y,p))
+                        quit()
 
                     RunFlatFixedViewTest(point, qec)
                 k -= 1
