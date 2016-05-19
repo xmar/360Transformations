@@ -19,6 +19,8 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                     distance = qec.ComputeDistance(y,p)
                     print ('d={}; qec={}; ({},{})'.format(distance,qec.GetStrId(),y,p))
                     maxDist = max(maxDist, distance)
+                    if distance in distanceToQualityRAW[name]:
+                        print ('ERROR distance already exist')
                     distanceToQualityRAW[name][distance] = q
             for lId in qualityStorage.badQuality:
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
@@ -28,9 +30,11 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                     distance = qec.ComputeDistance(y,p)
                     print ('d={}; qec={}; ({},{})'.format(distance,qec.GetStrId(),y,p))
                     maxDist = max(maxDist, distance)
+                    if distance in distanceToQualityRAW[name]:
+                        print ('ERROR distance already exist')
                     distanceToQualityRAW[name][distance] = q
 
-    nbPoint = 30
+    nbPoint = 13
     with open(outputPath, 'w') as o:
         o.write('distance')
         for name in sorted(distanceToQualityRAW.keys()):
@@ -95,6 +99,78 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList):
                 o.write(' {}'.format(v/c))
             o.write('\n')
 
+def WriteQualityInTermsOfDistanceCSVFixedDistance(outputPath, outputDir, qecList, distanceList):
+    distanceToQualityRAW = {}
+    for qec in qecList:
+        qecId = qec.GetStrId()
+        outputDirQEC = '{}/QEC{}'.format(outputDir, qecId)
+        qualityStorage = '{}/quality_storage.dat'.format(outputDirQEC)
+        if os.path.isdir(outputDirQEC) and os.path.isfile(qualityStorage):
+            qualityStorage = GenerateVideo.QualityStorage.Load(qualityStorage)
+            for lId in qualityStorage.goodQuality:
+                name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
+                if name not in distanceToQualityRAW:
+                    distanceToQualityRAW[name] = {}
+                for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
+                    distance = qec.ComputeDistance(y,p)
+                    matchInListDist = None
+                    for d in distanceList:
+                        if abs(distance-d) < 10**-5:
+                            matchInListDist = d
+                            break
+                    if matchInListDist is not None:
+                        if matchInListDist not in distanceToQualityRAW[name]:
+                            distanceToQualityRAW[name][matchInListDist] = []
+                        distanceToQualityRAW[name][matchInListDist].append(q)
+            for lId in qualityStorage.badQuality:
+                name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
+                if name not in distanceToQualityRAW:
+                    distanceToQualityRAW[name] = {}
+                for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
+                    distance = qec.ComputeDistance(y,p)
+                    matchInListDist = None
+                    for d in distanceList:
+                        if abs(distance-d) < 10**-5:
+                            matchInListDist = d
+                            break
+                    if matchInListDist is not None:
+                        if matchInListDist not in distanceToQualityRAW[name]:
+                            distanceToQualityRAW[name][matchInListDist] = []
+                        distanceToQualityRAW[name][matchInListDist].append(q)
+
+    with open(outputPath, 'w') as o:
+        o.write('distance')
+        for name in sorted(distanceToQualityRAW.keys()):
+            o.write(' quality{}'.format(name))
+        o.write('\n')
+
+        for dist in distanceList:
+            o.write(dist)
+            for name in sorted(distanceToQualityRAW.keys()):
+                msssimList = [ q[0] for q in distanceToQualityRAW[name][dist] ]
+                avgMsssim = sum(msssimList)/len(msssimList)
+                o.write(' {}'.format(avgMsssim))
+            o.write('\n')
+
+
+
+    with open(outputPath[:-4]+'_psnr.csv', 'w') as o:
+        o.write('distance')
+        for name in sorted(distanceToQualityRAW.keys()):
+            if name != 'AverageEquiTiled' :
+                o.write(' quality{}'.format(name))
+        o.write('\n')
+
+        for dist in distanceList:
+            o.write(dist)
+            psnrList = [ q[1] for q in distanceToQualityRAW['AverageEquiTiled'][dist] ]
+            avgPsnrForAvgVid = sum(psnrList)/len(psnrList)
+            for name in sorted(distanceToQualityRAW.keys()):
+                if name != 'AverageEquiTiled':
+                    psnrList = [ q[1] for q in distanceToQualityRAW[name][dist] ]
+                    avgPsnr = sum(psnrList)/len(psnrList)
+                    o.write(' {}'.format(avgPsnr-avgPsnrForAvgVid))
+            o.write('\n')
 
 
 def WriteQualityCdfCSV(outputPath, outputDir, qecList):

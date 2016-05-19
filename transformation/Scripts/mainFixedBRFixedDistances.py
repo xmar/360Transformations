@@ -77,7 +77,7 @@ if __name__ ==  '__main__':
     outputResolution = (int(outputResolution[0]), int(outputResolution[1]))
     k = args.nbT
     averageGoalSize = (0,0)
-    bitrateGoal = 10000
+    bitrateGoal = 15000
 
     try:
         #First we re-encode the original Equirectangular video for fair comparaison later
@@ -139,9 +139,9 @@ if __name__ ==  '__main__':
             RunFlatFixedViewTest(good, qec)
             RunFlatFixedViewTest(bad, qec)
         #Now all the video representations have been generated: we start to compute the flat fixed view
-        step = 0.25
-        for dist in np.arange(0, math.pi+step, step):
-            dist = min(dist, math.pi)
+        step = 0.5
+        distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+step, step) ]
+        for dist in distList:
             LayoutGenerators.FlatFixedLayout.SetRandomSeed(dist)
             print('*',dist)
             k = args.nbT
@@ -158,7 +158,7 @@ if __name__ ==  '__main__':
                 k -= 1
 
         #print Results:
-        FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
+        FormatResults.WriteQualityInTermsOfDistanceCSVFixedDistance('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(), distList)
         FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
 
     #except Exception as inst:
