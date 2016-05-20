@@ -33,16 +33,24 @@ class FlatFixedLayout(Layout):
         return (random.uniform(-180,180), random.uniform(-90,90))
 
     @classmethod
+    def SetRandomSeed(cls, seed):
+        random.seed(seed)
+
+    @classmethod
     def GetRandomCenterAtDistance(cls, qec, dist):
         '''Return a random point (theta, phi) at the distance dist from the given qec'''
-        if not cls.wasRandomInit:
-            cls.wasRandomInit = True
-            random.seed(1)
         theta = math.radians(random.uniform(-90,90))
         c = np.matrix('{};{};{}'.format(math.sin(dist)*math.cos(theta), math.sin(dist)*math.sin(theta), math.cos(dist)))
-        realPoint = np.reshape(qec.GetRotMat()*QEC.ToRotMat(0,math.radians(-90),0)*c, 3)
+        qecRotation = qec.GetRotMat()
+        qecRotation[np.abs(qecRotation) < np.finfo(np.float).eps] = 0
+        toXRotation = QEC.ToRotMat(0,math.radians(90),0)
+        toXRotation[np.abs(toXRotation) < np.finfo(np.float).eps] = 0
+        afterFirstRotation = toXRotation*c
+        afterFirstRotation[np.abs(afterFirstRotation) < np.finfo(np.float).eps] = 0
+        realPoint = np.reshape(qecRotation*afterFirstRotation, 3)
         (rx, ry, rz) = (realPoint.item(0), realPoint.item(1), realPoint.item(2))
-        theta = math.acos( rz / math.sqrt(np.inner(realPoint,realPoint)))
-        phi = math.atan2(ry,rx)
+        theta = math.degrees(math.atan2(ry,rx))
+        phi = math.degrees(math.acos( rz / math.sqrt(np.inner(realPoint,realPoint)))) - 90
+        print ((theta, phi))
         return (theta, phi)
 

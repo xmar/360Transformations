@@ -79,7 +79,7 @@ if __name__ ==  '__main__':
     k = args.nbT
     averageGoalSize = (0,0)
     nbQec = args.nbQEC
-    bitrateGoal = 10000
+    bitrateGoal = 15000
 
     try:
         #First we re-encode the original Equirectangular video for fair comparaison later
@@ -141,22 +141,26 @@ if __name__ ==  '__main__':
             RunFlatFixedViewTest(good, qec)
             RunFlatFixedViewTest(bad, qec)
         #Now all the video representations have been generated: we start to compute the flat fixed view
-        step = 0.25
-        for dist in np.arange(0, math.pi+step, step):
-            dist = min(dist, math.pi)
+        step = 0.5
+        distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+step, step) ]
+        for dist in distList:
+            LayoutGenerators.FlatFixedLayout.SetRandomSeed(dist)
             print('*',dist)
             k = args.nbT
             while k != 0:
                 for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):
                     print('Start computation for QEC({}) for test id {} and distance {}'.format(qec.GetStrId(), args.nbT-k, dist))
                     point = LayoutGenerators.FlatFixedLayout.GetRandomCenterAtDistance(qec, dist) #Get the good flat fixed center
-                    print('qec = {}, point = {}'.format(qec.GetStrId(), point))
+                    (y,p) = point
+                    if abs(dist - qec.ComputeDistance(y,p)) > 10**-5:
+                        print('ERROR distance of the random point too far compare to expected distance: expect', dist, 'but got', qec.ComputeDistance(y,p))
+                        quit()
 
                     RunFlatFixedViewTest(point, qec)
                 k -= 1
 
         #print Results:
-        FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec))
+        FormatResults.WriteQualityInTermsOfDistanceCSVFixedDistance('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec), distList)
         FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec))
 
     #except Exception as inst:
