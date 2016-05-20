@@ -64,6 +64,7 @@ if __name__ ==  '__main__':
     parser.add_argument('-i', type=int, help='number max of iteration for the dichotomous search [10]', default=10)
     parser.add_argument('-r', type=str, help='Output flat fixed view resolution [1920x1080]', default='1920x1080')
     parser.add_argument('-nbT', type=int, help='Number of "random" test to do [100]', default=100)
+    parser.add_argument('-nbQEC', type=int, help='Number of QEC [16]', default=16)
     args = parser.parse_args()
 
     trans = args.trans
@@ -77,6 +78,7 @@ if __name__ ==  '__main__':
     outputResolution = (int(outputResolution[0]), int(outputResolution[1]))
     k = args.nbT
     averageGoalSize = (0,0)
+    nbQec = args.nbQEC
     bitrateGoal = 10000
 
     try:
@@ -96,7 +98,7 @@ if __name__ ==  '__main__':
                 refHeight = int(m.group(2))
 
         #for each QEC we compute the EquirectangularTiled layout associated + the other layout with a fixed bitrate
-        for qec in LayoutGenerators.QEC.TestQecGenerator():
+        for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):
             qecId = qec.GetStrId()
             print('Start computation for QEC({})'.format(qecId))
             outEquiTiledNameStorage = '{}/equirectangularTiled{}_storage.dat'.format(outputDir,qecId)
@@ -131,7 +133,7 @@ if __name__ ==  '__main__':
             lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
 
         #Comupute results for perfect Good and Perfect Bad
-        for qec in LayoutGenerators.QEC.TestQecGenerator():
+        for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):
             print('Start Good/Bad computation for QEC({})'.format(qec.GetStrId()))
             (y,p,r) = qec.GetEulerAngles()
             good = (y,p)
@@ -145,7 +147,7 @@ if __name__ ==  '__main__':
             print('*',dist)
             k = args.nbT
             while k != 0:
-                for qec in LayoutGenerators.QEC.TestQecGenerator():
+                for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):
                     print('Start computation for QEC({}) for test id {} and distance {}'.format(qec.GetStrId(), args.nbT-k, dist))
                     point = LayoutGenerators.FlatFixedLayout.GetRandomCenterAtDistance(qec, dist) #Get the good flat fixed center
                     print('qec = {}, point = {}'.format(qec.GetStrId(), point))
@@ -154,8 +156,8 @@ if __name__ ==  '__main__':
                 k -= 1
 
         #print Results:
-        FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
-        FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator())
+        FormatResults.WriteQualityInTermsOfDistanceCSV('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec))
+        FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec))
 
     #except Exception as inst:
     #    print (inst)
