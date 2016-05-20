@@ -1,3 +1,4 @@
+import os
 import math
 import numpy as np
 
@@ -68,13 +69,28 @@ class QEC:
         return 2*math.asin(math.sqrt(math.pow(math.sin(abs(p1-p2)/2),2) + math.cos(abs(p1))*math.cos(abs(p2))*math.pow(math.sin(abs(y1-y2)/2),2)))
 
     @staticmethod
-    def TestQecGenerator():
-        for i in [1,3,5,7]:
-            for j in [1,3,4,6]:
-                yaw = i*45-157.5
-                pitch = -78.75+22.5*j
-                roll = 0
-                yield QEC(4,3, yaw, pitch, roll)
+    def TestQecGenerator(nbQec = 16):
+        if os.path.exists('LayoutGenerators/QecCenters/{}.txt'.format(nbQec)):
+            with open('LayoutGenerators/QecCenters/{}.txt'.format(nbQec), 'r') as i:
+                first = True
+                for line in i:
+                    (Id, x, y, z) = map(float,line.replace(':','').split('\t'))
+                    p = np.matrix('{};{};{}'.format(x,y,z))
+                    print(p)
+                    if first:
+                        first = False
+                        theta = math.atan2(y,x)
+                        phi = math.acos( z ) - math.pi/2
+                        rotMat = np.transpose(QEC.ToRotMat(theta, phi, 0))
+                    newP = rotMat*p
+                    newP[np.abs(newP) < np.finfo(np.float).eps] = 0
+                    (rx, ry, rz) = (newP.item(0), newP.item(1), newP.item(2))
+                    theta = math.degrees(math.atan2(ry,rx))
+                    phi = math.degrees(math.acos( rz ))
+                    yield QEC(4,3, theta, phi, 0)
+        else:
+            raise NotImplementedError
+
 
     @classmethod
     def GetClosestQecFromTestQec(cls, yaw,pitch):
