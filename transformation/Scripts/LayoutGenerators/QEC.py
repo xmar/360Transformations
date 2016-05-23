@@ -91,7 +91,6 @@ class QEC:
         else:
             raise NotImplementedError
 
-
     @classmethod
     def GetClosestQecFromTestQec(cls, yaw,pitch):
         qec = None
