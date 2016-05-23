@@ -65,6 +65,7 @@ if __name__ ==  '__main__':
     parser.add_argument('-r', type=str, help='Output flat fixed view resolution [1920x1080]', default='1920x1080')
     parser.add_argument('-nbT', type=int, help='Number of "random" test to do [100]', default=100)
     parser.add_argument('-nbQEC', type=int, help='Number of QEC [16]', default=16)
+    parser.add_argument('-step', type=float, help='Step for the distance', default =0.5)
     args = parser.parse_args()
 
     trans = args.trans
@@ -80,6 +81,7 @@ if __name__ ==  '__main__':
     averageGoalSize = (0,0)
     nbQec = args.nbQEC
     bitrateGoal = 15000
+    distStep = args.step
 
     try:
         #First we re-encode the original Equirectangular video for fair comparaison later
@@ -141,8 +143,7 @@ if __name__ ==  '__main__':
             RunFlatFixedViewTest(good, qec, nbQec)
             RunFlatFixedViewTest(bad, qec, nbQec)
         #Now all the video representations have been generated: we start to compute the flat fixed view
-        step = 0.5
-        distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+step, step) ]
+        distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+distStep, distStep) ]
         for dist in distList:
             LayoutGenerators.FlatFixedLayout.SetRandomSeed(dist)
             print('*',dist)
