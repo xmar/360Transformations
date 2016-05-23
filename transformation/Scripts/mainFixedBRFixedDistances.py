@@ -13,10 +13,10 @@ import GenerateVideo
 import LayoutGenerators
 import FormatResults
 
-def RunFlatFixedViewTest(point, currentQec):
+def RunFlatFixedViewTest(point, currentQec, nbQec):
     (cy, cp) = point
     center = (cy, cp, 0)
-    closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(cy, cp)
+    closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(cy, cp, nbQec)
     (i,j) = closestQec.GetTileCoordinate()
     qecId = closestQec.GetStrId()
     (y,p,r) = closestQec.GetEulerAngles()
@@ -138,8 +138,8 @@ if __name__ ==  '__main__':
             (y,p,r) = qec.GetEulerAngles()
             good = (y,p)
             bad = ( y + 180, -p )
-            RunFlatFixedViewTest(good, qec)
-            RunFlatFixedViewTest(bad, qec)
+            RunFlatFixedViewTest(good, qec, nbQec)
+            RunFlatFixedViewTest(bad, qec, nbQec)
         #Now all the video representations have been generated: we start to compute the flat fixed view
         step = 0.5
         distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+step, step) ]
@@ -156,7 +156,7 @@ if __name__ ==  '__main__':
                         print('ERROR distance of the random point too far compare to expected distance: expect', dist, 'but got', qec.ComputeDistance(y,p))
                         quit()
 
-                    RunFlatFixedViewTest(point, qec)
+                    RunFlatFixedViewTest(point, qec, nbQec)
                 k -= 1
 
         #print Results:

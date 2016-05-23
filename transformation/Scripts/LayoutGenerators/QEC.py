@@ -92,10 +92,10 @@ class QEC:
             raise NotImplementedError
 
     @classmethod
-    def GetClosestQecFromTestQec(cls, yaw,pitch):
+    def GetClosestQecFromTestQec(cls, yaw, pitch, nbQec = 16):
         qec = None
         distance = 5
-        for q in cls.TestQecGenerator():
+        for q in cls.TestQecGenerator(nbQec):
             d = q.ComputeDistance(yaw,pitch)
             #if distance is None or d < distance:
             if d < distance:
