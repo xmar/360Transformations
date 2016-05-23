@@ -146,7 +146,6 @@ if __name__ ==  '__main__':
         distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+distStep, distStep) ]
         for dist in distList:
             LayoutGenerators.FlatFixedLayout.SetRandomSeed(dist)
-            print('*',dist)
             k = args.nbT
             while k != 0:
                 for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):

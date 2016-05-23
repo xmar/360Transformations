@@ -129,26 +129,18 @@ def WriteQualityInTermsOfDistanceCSVFixedDistance(outputPath, outputDir, qecList
                 for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
                     distance = qec.ComputeDistance(y,p)
                     matchInListDist = None
-                    print ('Distance ',distance, ': ', end='')
                     for d in distanceList:
                         if abs(distance-d) < 10**-5:
                             matchInListDist = d
                             break
                     if matchInListDist is not None:
-                        print('Match')
                         if matchInListDist not in distanceToQualityRAW[name]:
                             distanceToQualityRAW[name][matchInListDist] = []
                         distanceToQualityRAW[name][matchInListDist].append(q)
-                    else:
-                        print('No match')
 
     with open(outputPath, 'w') as o:
         o.write('distance')
         for name in sorted(distanceToQualityRAW.keys()):
-            print('DEBUG*-* ', name, ': ', end='')
-            for d in distanceToQualityRAW[name]:
-                print(d, end=' ')
-            print()
             o.write(' quality{}'.format(name))
         o.write('\n')
 
@@ -168,10 +160,6 @@ def WriteQualityInTermsOfDistanceCSVFixedDistance(outputPath, outputDir, qecList
     with open(outputPath[:-4]+'_psnr.csv', 'w') as o:
         o.write('distance')
         for name in sorted(distanceToQualityRAW.keys()):
-            print('DEBUG+-* ', name, ': ', end='')
-            for d in distanceToQualityRAW[name]:
-                print(d, end=' ')
-            print()
             if name != 'AverageEquiTiled' :
                 o.write(' quality{}'.format(name))
         o.write('\n')

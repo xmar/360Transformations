@@ -76,7 +76,6 @@ class QEC:
                 for line in i:
                     (Id, x, y, z) = map(float,line.replace(':','').split('\t'))
                     p = np.matrix('{};{};{}'.format(x,y,z))
-                    print(p)
                     if first:
                         first = False
                         theta = math.atan2(y,x)
