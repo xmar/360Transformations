@@ -159,9 +159,12 @@ if __name__ ==  '__main__':
                     RunFlatFixedViewTest(point, qec, nbQec)
                 k -= 1
 
+        comment = 'Nb QEC = {}, Distance step = {}, NbTest = {}, use HEVC = {}, FlatFixedResolution = {}, inputVideo={}'.format(nbQec, distStep, args.nbT, reuseVideo, args.r,inputVideo.replace('_','-'))
         #print Results:
-        FormatResults.WriteQualityInTermsOfDistanceCSVFixedDistance('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec), distList)
-        FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec))
+        FormatResults.WriteQualityInTermsOfDistanceCSVFixedDistance('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec), distList, comment)
+        FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec), comment)
+
+        FormatResults.GeneratePDF(outputDir, '{}/plots'.format(outputDir), comment)
 
     #except Exception as inst:
     #    print (inst)
