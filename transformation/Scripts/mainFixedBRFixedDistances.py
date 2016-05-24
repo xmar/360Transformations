@@ -28,11 +28,11 @@ def RunFlatFixedViewTest(point, currentQec, nbQec):
     eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
     if reuseVideo:
         inputVideos = ['{}/equirectangular.mkv'.format(outputDir), '{}/equirectangularTiled{}.mkv'.format(outputDir,qecId), averageNameVideo]
-        layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec, refWidth, refHeight), None)], \
+        layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, refWidth, refHeight), None)], \
                 [(lsAverage.layout, lsAverage.a)]]
     else:
         inputVideos = [inputVideo, inputVideo, inputVideo]
-        layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), closestQec), None, refWidth, refHeight)], \
+        layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, refWidth, refHeight), None)], \
                 [(eqL, None),(lsAverage.layout, lsAverage.a)]]
     for layoutId in ['CubeMap', \
             #'CubeMapCompact', \
@@ -80,7 +80,7 @@ if __name__ ==  '__main__':
     k = args.nbT
     averageGoalSize = (0,0)
     nbQec = args.nbQEC
-    bitrateGoal = 15000
+    bitrateGoal = 5000
     distStep = args.step
 
     try:
@@ -134,14 +134,14 @@ if __name__ ==  '__main__':
             SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, averageGoalSize, layoutAverage, maxIteration)
             lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
 
-        #Comupute results for perfect Good and Perfect Bad
-        for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):
-            print('Start Good/Bad computation for QEC({})'.format(qec.GetStrId()))
-            (y,p,r) = qec.GetEulerAngles()
-            good = (y,p)
-            bad = ( y + 180, -p )
-            RunFlatFixedViewTest(good, qec, nbQec)
-            RunFlatFixedViewTest(bad, qec, nbQec)
+        ##Comupute results for perfect Good and Perfect Bad
+        #for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):
+        #    print('Start Good/Bad computation for QEC({})'.format(qec.GetStrId()))
+        #    (y,p,r) = qec.GetEulerAngles()
+        #    good = (y,p)
+        #    bad = ( y + 180, -p )
+        #    RunFlatFixedViewTest(good, qec, nbQec)
+        #    RunFlatFixedViewTest(bad, qec, nbQec)
         #Now all the video representations have been generated: we start to compute the flat fixed view
         distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+distStep, distStep) ]
         for dist in distList:

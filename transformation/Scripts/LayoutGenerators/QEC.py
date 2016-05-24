@@ -54,7 +54,8 @@ class QEC:
         pitch = math.radians(pitch)
         v1 = np.reshape(self.ToVect(),3)
         v2 = np.reshape(self.ToRotMat(yaw,pitch,0)*np.matrix('1;0;0'), 3)
-        return math.acos(np.inner(v1,v2))
+        #print ('v1=',v1,'\nv2=', v2, '\ninner =', np.inner(v1,v2)) 
+        return math.acos(min(1,max(-1,np.inner(v1,v2))))
 
     @staticmethod
     def ComputeDistance2( point1, point2 ):
