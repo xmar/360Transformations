@@ -1,2 +1,4 @@
 from .CSVGenerator import WriteQualityInTermsOfDistanceCSV
+from .CSVGenerator import WriteQualityInTermsOfDistanceCSVFixedDistance
 from .CSVGenerator import WriteQualityCdfCSV
+from .PDFGenerator import GeneratePDF

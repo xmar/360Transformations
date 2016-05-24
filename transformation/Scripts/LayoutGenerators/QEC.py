@@ -76,7 +76,6 @@ class QEC:
                 for line in i:
                     (Id, x, y, z) = map(float,line.replace(':','').split('\t'))
                     p = np.matrix('{};{};{}'.format(x,y,z))
-                    print(p)
                     if first:
                         first = False
                         theta = math.atan2(y,x)
@@ -91,12 +90,11 @@ class QEC:
         else:
             raise NotImplementedError
 
-
     @classmethod
-    def GetClosestQecFromTestQec(cls, yaw,pitch):
+    def GetClosestQecFromTestQec(cls, yaw, pitch, nbQec = 16):
         qec = None
         distance = 5
-        for q in cls.TestQecGenerator():
+        for q in cls.TestQecGenerator(nbQec):
             d = q.ComputeDistance(yaw,pitch)
             #if distance is None or d < distance:
             if d < distance:

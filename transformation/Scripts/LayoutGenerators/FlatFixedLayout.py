@@ -51,6 +51,5 @@ class FlatFixedLayout(Layout):
         (rx, ry, rz) = (realPoint.item(0), realPoint.item(1), realPoint.item(2))
         theta = math.degrees(math.atan2(ry,rx))
         phi = math.degrees(math.acos( rz / math.sqrt(np.inner(realPoint,realPoint)))) - 90
-        print ((theta, phi))
         return (theta, phi)
 

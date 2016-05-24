@@ -13,10 +13,10 @@ import GenerateVideo
 import LayoutGenerators
 import FormatResults
 
-def RunFlatFixedViewTest(point, currentQec):
+def RunFlatFixedViewTest(point, currentQec, nbQec):
     (cy, cp) = point
     center = (cy, cp, 0)
-    closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(cy, cp)
+    closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(cy, cp, nbQec)
     (i,j) = closestQec.GetTileCoordinate()
     qecId = closestQec.GetStrId()
     (y,p,r) = closestQec.GetEulerAngles()
@@ -65,6 +65,7 @@ if __name__ ==  '__main__':
     parser.add_argument('-r', type=str, help='Output flat fixed view resolution [1920x1080]', default='1920x1080')
     parser.add_argument('-nbT', type=int, help='Number of "random" test to do [100]', default=100)
     parser.add_argument('-nbQEC', type=int, help='Number of QEC [16]', default=16)
+    parser.add_argument('-step', type=float, help='Step for the distance', default =0.5)
     args = parser.parse_args()
 
     trans = args.trans
@@ -80,6 +81,7 @@ if __name__ ==  '__main__':
     averageGoalSize = (0,0)
     nbQec = args.nbQEC
     bitrateGoal = 15000
+    distStep = args.step
 
     try:
         #First we re-encode the original Equirectangular video for fair comparaison later
@@ -138,14 +140,12 @@ if __name__ ==  '__main__':
             (y,p,r) = qec.GetEulerAngles()
             good = (y,p)
             bad = ( y + 180, -p )
-            RunFlatFixedViewTest(good, qec)
-            RunFlatFixedViewTest(bad, qec)
+            RunFlatFixedViewTest(good, qec, nbQec)
+            RunFlatFixedViewTest(bad, qec, nbQec)
         #Now all the video representations have been generated: we start to compute the flat fixed view
-        step = 0.5
-        distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+step, step) ]
+        distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+distStep, distStep) ]
         for dist in distList:
             LayoutGenerators.FlatFixedLayout.SetRandomSeed(dist)
-            print('*',dist)
             k = args.nbT
             while k != 0:
                 for qec in LayoutGenerators.QEC.TestQecGenerator(nbQec):
@@ -156,12 +156,15 @@ if __name__ ==  '__main__':
                         print('ERROR distance of the random point too far compare to expected distance: expect', dist, 'but got', qec.ComputeDistance(y,p))
                         quit()
 
-                    RunFlatFixedViewTest(point, qec)
+                    RunFlatFixedViewTest(point, qec, nbQec)
                 k -= 1
 
+        comment = 'Nb QEC = {}, Distance step = {}, NbTest = {}, use HEVC = {}, FlatFixedResolution = {}, inputVideo={}'.format(nbQec, distStep, args.nbT, reuseVideo, args.r,inputVideo.replace('_','-'))
         #print Results:
-        FormatResults.WriteQualityInTermsOfDistanceCSVFixedDistance('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec), distList)
-        FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec))
+        FormatResults.WriteQualityInTermsOfDistanceCSVFixedDistance('{}/distanceQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec), distList, comment)
+        FormatResults.WriteQualityCdfCSV('{}/cdfQuality.csv'.format(outputDir), outputDir, LayoutGenerators.QEC.TestQecGenerator(nbQec), comment)
+
+        FormatResults.GeneratePDF(outputDir, '{}/plots'.format(outputDir), comment)
 
     #except Exception as inst:
     #    print (inst)
