@@ -17,9 +17,9 @@ def RunFlatFixedViewTest(point, currentQec, nbQec):
     (cy, cp) = point
     center = (cy, cp, 0)
     closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(cy, cp, nbQec)
-    (i,j) = closestQec.GetTileCoordinate()
-    qecId = closestQec.GetStrId()
-    (y,p,r) = closestQec.GetEulerAngles()
+    (i,j) = currentQec.GetTileCoordinate()
+    qecId = currentQec.GetStrId()
+    (y,p,r) = currentQec.GetEulerAngles()
     goodPoint = (currentQec == closestQec)
     #First we check if the output folder for this QEC exist:
     outputDirQEC = '{}/QEC{}'.format(outputDir, qecId)
@@ -50,7 +50,7 @@ def RunFlatFixedViewTest(point, currentQec, nbQec):
 
     #Test Layout
     flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.','_'), outputResolution[0], outputResolution[1], 110, center)
-    GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, closestQec, (cy, cp), goodPoint)
+    GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, currentQec, (cy, cp), goodPoint)
 
 if __name__ ==  '__main__':
     parser = argparse.ArgumentParser(description="Will test mulitple resolution and return the resolution that give a the file size closer to the goad file size");

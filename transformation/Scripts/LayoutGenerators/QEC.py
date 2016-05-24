@@ -50,13 +50,11 @@ class QEC:
 
 
     def ComputeDistance(self, yaw,pitch):
-        (y,p,r) = self.GetEulerAngles()
         yaw = math.radians(yaw)
         pitch = math.radians(pitch)
-        y = math.radians(y)
-        p = math.radians(p)
-        #return math.sqrt(math.pow(min(abs(y-yaw), abs(y-360-yaw), abs(y+360-yaw)),2)+math.pow(p-pitch,2))
-        return 2*math.asin(math.sqrt(math.pow(math.sin(abs(p-pitch)/2),2) + math.cos(abs(p))*math.cos(abs(pitch))*math.pow(math.sin(abs(y-yaw)/2),2)))
+        v1 = np.reshape(self.ToVect(),3)
+        v2 = np.reshape(self.ToRotMat(yaw,pitch,0)*np.matrix('1;0;0'), 3)
+        return math.acos(np.inner(v1,v2))
 
     @staticmethod
     def ComputeDistance2( point1, point2 ):
@@ -66,7 +64,10 @@ class QEC:
         y2 = math.radians(y2)
         p1 = math.radians(p1)
         p2 = math.radians(p2)
-        return 2*math.asin(math.sqrt(math.pow(math.sin(abs(p1-p2)/2),2) + math.cos(abs(p1))*math.cos(abs(p2))*math.pow(math.sin(abs(y1-y2)/2),2)))
+        v1 = np.reshape(self.ToRotMat(y1,p1,0)*np.matrix('1;0;0'),3)
+        v2 = np.reshape(self.ToRotMat(y2,p2,0)*np.matrix('1;0;0'), 3)
+        return math.acos(np.inner(v1,v2))
+
 
     @staticmethod
     def TestQecGenerator(nbQec = 16):
@@ -118,4 +119,7 @@ class QEC:
 
     def GetRotMat(self):
         return self.ToRotMat(math.radians(self.yaw), math.radians(self.pitch), math.radians(self.roll))
+
+    def ToVect(self):
+        return self.GetRotMat()*np.matrix('1;0;0')
 
