@@ -14,9 +14,10 @@ def main():
     parser.add_argument('authkey', type=str, help='Authentification key')
     args = parser.parse_args()
 
-    Worker = lambda job_q, result_q: MultiProcess.FixedBitrateAndFixedDistances( args.trans, args.config, args.outputDir, args.hostname, job_q, result_q)
+    SpecializedWorker = lambda args_tuple: MultiProcess.FixedBitrateAndFixedDistances( args.trans, args.config, args_tuple)
+    GenericWorker = lambda share_job_q, share_result_q: MultiProcess.GenericWorker( SpecializedWorker, args.outputDir, args.hostname, share_job_q, share_result_q)
 
-    MultiProcess.RunClient(Worker, args.hostname, args.serverPort, args.authkey)
+    MultiProcess.RunClient(GenericWorker, args.hostname, args.serverPort, args.authkey)
 
 if __name__ == '__main__':
     main()
