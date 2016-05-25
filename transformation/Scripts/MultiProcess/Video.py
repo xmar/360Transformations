@@ -23,12 +23,23 @@ class Video(object):
                 p = v.read(1024)
 
     def Receive(self, socket):
+        receivedSize = 0
+        count = 100
         with open(self.realPath, 'wb') as v:
             p = socket.recv(1024)
             while p:
                 v.write(p)
+                receivedSize += len(p)
+                if count > 0:
+                    count -= 1
+                else:
+                    count = 100
+                    persentage = -1
+                    if self.size != 0:
+                        persentage = 100*receivedSize/self.size
+                    print('\033[1K\r{} -> {:.2f}%'.format(self.fileName, persentage), end='')
                 p = socket.recv(1024)
-            print ('Video {} received'.format(self.fileName))
+            print ('\nVideo {} received'.format(self.fileName))
 
 
     def __eq__(self, v):

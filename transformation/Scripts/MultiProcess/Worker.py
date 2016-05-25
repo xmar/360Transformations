@@ -84,7 +84,7 @@ def FixedBitrateAndFixedDistances(trans, config, outDir, hostname, shared_job_q,
             if not os.path.exists(outputVideoDir):
                 os.mkdir(outputVideoDir)
             video.UpdateVideoDir(outputVideoDir)
-            if not os.path.exists(video.realPath):
+            if not os.path.exists(video.realPath) or Video.Video(video.realPath) != video:
                 Video.VideoReceiver(video, hostname)
             inputVideo = video.realPath
             maxIteration = job.nbDicothomicInteration
