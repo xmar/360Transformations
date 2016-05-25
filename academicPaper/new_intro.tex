@@ -13,23 +13,27 @@ to the end-users,
 is still a challenge.
 
 Let us provide some numbers to illustrate the challenge.
-An \ac{HMD} enables immersion in a scene, which is captured in every direction.
+A 360-degree video is either a real scene captured in every direction
+to form one global video, or in the case of gaming, a virtual scene from which the
+game engine pre-computes views in all directions around the main player.
 In the same manner that a human
 views the real world from a given perspective, an \ac{HMD} displays only a portion
 of the 360-degree video. The displayed scene is called the \textit{\ac{FoV}}. It is commonly
 defined by 
 a device-specific viewing angle (typically 120 degrees), which delimits horizontally or 
-vertically the scene from the head direction center. To get a good immersion, the pixel 
+vertically the scene from the head direction center, called \ac{FoV} center. To get a good 
+immersion, the pixel 
 resolution of
 the displayed \ac{FoV} should be high, typically 4k ($3840\,\times\,2160$). It means that
 the resolution of the full 360-degree video should be at least 12k ($11520\,\times\,6480$). 
 Furthermore, to prevent the so-called \emph{simulator sickness}~\cite{moss2011characteristics}, the \ac{HMD} 
-vendors recommend to
-match the video frame rate to the \ac{HMD} refresh rate.\footnote{\url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}} Given that the refresh rate of 
-state-of-the-art \acp{HMD} is \SI{90}{Hz}, the video frame rate should thus be up to 100\,\acp{fps}.
-The encoding of videos that combine large resolution (up to 12k) and high
-frame rate (up to 100\,\acp{fps}) requires bit-rates that are higher to the maximum bandwidth
-of state-of-the-art access networks. To compare, the bit-rate of 8k videos 
+vendors recommend to make the system react to head movement as fast as the \ac{HMD}
+refresh rate.\footnote{\url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}} Given that the refresh rate of 
+state-of-the-art \acp{HMD} is \SI{90}{Hz}, the video frame rate should thus be high,
+typically around 100\,\acp{fps}.
+Overall, high-quality 360-degree videos combine both large resolution (up to 12k) and high
+frame rate (up to 100\,\acp{fps}), which makes them impossible to stream on any
+state-of-the-art access network technology. To compare, the bit-rate of 8k videos 
 at 60\,\acp{fps} encoded in \ac{HEVC} is around \SI{100}{Mbps}~\cite{7398367}.
 
 
