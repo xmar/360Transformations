@@ -60,6 +60,7 @@ def RunServer(jobList, outputDir, PortAuthkey):
 
     try:
         while len(results) != len(jobList):
+            print('Estimated remaining job: {}'.format(shared_job_q.qsize()))
             result = shared_result_q.get()
             results.append(result)
             ProcessTheResult(outputDir, result)
