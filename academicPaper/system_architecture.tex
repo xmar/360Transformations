@@ -1,9 +1,11 @@
 \section{System architecture}
 
-This section describes the proposed adaptive video delivery system. The video delivery system consists of a client and a server, using MPEG DASH standard \cite{} for adaptive video streaming. It streams an entire 360-degree video to the client, displaying only a portion of the video (where the user looks at) on the user's HMD.
+This section describes the proposed adaptive video delivery system. The video delivery system, depicted in Figure \ref{fig:videoDeliveryArchitecture}, consists of a client and a server, using DASH standard \cite{Stockhammer11} for adaptive video streaming. It streams an entire 360-degree video to the client, displaying only a portion of the video (where the user looks at) on the user's HMD.
+
+\input{videoDeliveryArchitecture.tex}
 
 A server maintains several video versions. It takes as an input a 360-degree video in equirectangular format and transforms each frame into desired geometrical layout. From there it creates a number of different video versions, each with a different QEC and encoded in 5 different bitrates.
- %based on the number of QECs, encoding each version in 5 different bitrates. 
+ %based on the number of QECs, encoding each version in 5 different bitrates.
  The server splits all such encoded video versions in short duration segments that are delivered to the client in the bitrate that is just below the Internet speed connection.
 
 A client detects the user's head movements, computes the FoV center, updates and diplays a new FoV video to the user on his/her HMD. It periodically sends a request to the server for the video segment, specifying a new FoV center. The server replies with the video version whose QEC is closest to the new FoV center.
