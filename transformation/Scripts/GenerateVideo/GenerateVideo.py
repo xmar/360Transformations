@@ -33,18 +33,24 @@ def GenerateVideo(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId
         lastName = l.GetName()
         lastLayout = l
         lastA = a
+    proc = None
     try:
         with open(config, 'w') as cf:
             cf.write(GenerateConfigString(layouts_a, fps, bitrate, nbFrames, inputVideo, tmpVideo))
 
-        sub.check_call([trans, '-c', config])
+        proc = sub.Popen([trans, '-c', config])
+        if proc.wait() != 0:
+            print('Error while processing')
+            return None
 
         shutil.move('/tmp/tmp1{}.mkv'.format(lastName), '{}.mkv'.format(outputId))
         shutil.copy(config, '{}_log.txt'.format(outputId))
 
     except KeyboardInterrupt:
         print('Received <ctrl-c>')
+        proc.terminate()
         sys.exit(1)
+        raise
     except Exception as inst:
         print (inst)
     finally:
@@ -62,6 +68,9 @@ def GenerateVideoAndStore(config, trans, layouts_a, fps, nbFrames,  inputVideo, 
             skip = True
     if not skip:
         ls = GenerateVideo(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId, bitrate)
-        ls.Dump(outStorage)
+        if ls != None:
+            ls.Dump(outStorage)
+        else:
+            raise Exception('Error while processing')
 
 

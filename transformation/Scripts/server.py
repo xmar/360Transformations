@@ -24,6 +24,8 @@ def main():
     args = parser.parse_args()
 
     jobList = []
+    videoDic = {}
+    listenPort = args.serverPort+1
     for nbQEC in [int(nbQEC) for nbQEC in args.nbQEC.split(',')]:
         for step in [float(step) for step in args.step.split(',')]:
             for nbT in [int(nbT) for nbT in args.nbT.split(',')]:
@@ -31,14 +33,20 @@ def main():
                     for r in args.r.split(','):
                         for bitrateGoal in [int(bitrateGoal) for bitrateGoal in args.bitrateGoal.split(',')]:
                             for reuse in [reuse == 'True' for reuse in args.reuseVideosForQuality.split(',')]:
-                                job = MultiProcess.Job(nbQEC, step, nbT, n, args.i, reuse, r, args.inputVideo, bitrateGoal)
-                                outDir = '{}/{}'.format(args.outputDir, job.ToDirName())
-                                if os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
-                                        os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
-                                        os.path.exists('{}/cdfQuality.csv'.format(outDir)):
-                                    FormatResults.GeneratePDF(outDir, '{}/plots'.format(outDir), job.ToComment())
-                                else:
-                                    jobList.append( job )
+                                for inputVideo in args.inputVideo.split(','):
+                                    video = MultiProcess.Video(inputVideo)
+                                    if not video.fileName in videoDic:
+                                        video.SetTcpPort(listenPort)
+                                        listenPort += 1
+                                        videoDic[video.fileName] = video
+                                    job = MultiProcess.Job(nbQEC, step, nbT, n, args.i, reuse, r, videoDic[video.fileName], bitrateGoal)
+                                    outDir = '{}/{}'.format(args.outputDir, job.ToDirName())
+                                    if os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
+                                            os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
+                                            os.path.exists('{}/cdfQuality.csv'.format(outDir)):
+                                        FormatResults.GeneratePDF(outDir, '{}/plots'.format(outDir), job.ToComment())
+                                    else:
+                                        jobList.append( job )
 
     MultiProcess.RunServer(jobList, args.outputDir, (args.serverPort, args.authkey))
 

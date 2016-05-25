@@ -2,6 +2,7 @@ import multiprocessing as mp
 from multiprocessing.managers import SyncManager
 import queue
 from .Worker import WorkerManager
+from .Video import VideoReceiver
 
 
 def MakeClientManager(host, port, authkey):
@@ -12,6 +13,7 @@ def MakeClientManager(host, port, authkey):
 
     ServerQueueManager.register('get_job_q')
     ServerQueueManager.register('get_result_q')
+    ServerQueueManager.register('get_server_exit_event')
 
     manager = ServerQueueManager(address=(host, port), authkey=authkey.encode('utf-8'))
     manager.connect()
@@ -26,6 +28,7 @@ def RunClient(mp_job_worker, host, port, authkey):
 
     job_q = manager.get_job_q()
     result_q = manager.get_result_q()
+    server_exit_event = manager.get_server_exit_event()
 
     #Do the job (only one process)
-    WorkerManager(mp_job_worker, job_q, result_q)
+    WorkerManager(mp_job_worker, job_q, result_q, server_exit_event)

@@ -12,8 +12,8 @@ class Job(object):
         self.bitrateGoal = int(bitrateGoal)
 
     def ToDirName(self):
-        return 'NbQec{}Res{}Bitrate{}distStep{}ReuseVideo{}'.format(self.nbQec,
+        return '{}NbQec{}Res{}Bitrate{}distStep{}ReuseVideo{}'.format(self.inputVideo.fileName.split('.')[0],self.nbQec,
                 self.res, self.bitrateGoal, self.distStep, self.reuseVideo)
 
     def ToComment(self):
-        return 'Nb QEC = {}, Distance step = {}, NbTest = {}, use HEVC = {}, FlatFixedResolution = {}, inputVideo={}'.format(self.nbQec, self.distStep, self.nbTest, self.reuseVideo, self.res, self.inputVideo.replace('_','-'))
+        return 'Nb QEC = {}, Distance step = {}, NbTest = {}, use HEVC = {}, FlatFixedResolution = {}, inputVideo={}'.format(self.nbQec, self.distStep, self.nbTest, self.reuseVideo, self.res, self.inputVideo.fileName.replace('_','-'))

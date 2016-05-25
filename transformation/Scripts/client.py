@@ -14,7 +14,7 @@ def main():
     parser.add_argument('authkey', type=str, help='Authentification key')
     args = parser.parse_args()
 
-    Worker = lambda job_q, result_q: MultiProcess.FixedBitrateAndFixedDistances( args.trans, args.config, args.outputDir, job_q, result_q)
+    Worker = lambda job_q, result_q: MultiProcess.FixedBitrateAndFixedDistances( args.trans, args.config, args.outputDir, args.hostname, job_q, result_q)
 
     MultiProcess.RunClient(Worker, args.hostname, args.serverPort, args.authkey)
 

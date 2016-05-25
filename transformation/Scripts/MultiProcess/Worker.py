@@ -12,17 +12,28 @@ import GenerateVideo
 import LayoutGenerators
 import FormatResults
 from .Results import Results
+import MultiProcess.Video as Video
 
-def WorkerManager(SpecializedWorker, shared_job_q, shared_result_q):
+def WorkerManager(SpecializedWorker, shared_job_q, shared_result_q, exit_event):
     """Run a unique process that will run the SpecializedWorker"""
     proc = mp.Process(target=SpecializedWorker,
             args=(shared_job_q, shared_result_q))
 
     proc.start()
 
-    proc.join()
+    while True:
+        proc.join(5)
+        try:
+            if not proc.is_alive():
+                break
+            elif exit_event.is_set():
+                proc.terminate()
+                proc.join(5)
+        except Exception:
+            proc.terminate()
+            proc.join(5)
 
-def FixedBitrateAndFixedDistances(trans, config, outDir, shared_job_q, shared_result_q):
+def FixedBitrateAndFixedDistances(trans, config, outDir, hostname, shared_job_q, shared_result_q):
     def RunFlatFixedViewTest(point, currentQec, nbQec):
         (cy, cp) = point
         center = (cy, cp, 0)
@@ -62,13 +73,20 @@ def FixedBitrateAndFixedDistances(trans, config, outDir, shared_job_q, shared_re
         flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}_{}'.format(abs(cy),abs(cp)).replace('.','_'), outputResolution[0], outputResolution[1], 110, center)
         GenerateVideo.ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, 24, n, inputVideos, outputDirQEC, currentQec, (cy, cp), goodPoint)
 
+    outputVideoDir = '{}/InputVideos'.format(outDir)
     while True:
         try:
             workDone = False
             job = None
             job = shared_job_q.get_nowait()
             n = job.nbFrames
-            inputVideo = job.inputVideo
+            video = job.inputVideo
+            if not os.path.exists(outputVideoDir):
+                os.mkdir(outputVideoDir)
+            video.UpdateVideoDir(outputVideoDir)
+            if not os.path.exists(video.realPath):
+                Video.VideoReceiver(video, hostname)
+            inputVideo = video.realPath
             maxIteration = job.nbDicothomicInteration
             reuseVideo = job.reuseVideo
             outputResolution = job.res.split('x')
@@ -172,6 +190,8 @@ def FixedBitrateAndFixedDistances(trans, config, outDir, shared_job_q, shared_re
         
             #except Exception as inst:
             #    print (inst)
+            except KeyboardInterrupt:
+                raise
             finally:
                 print('Job done')
                 if job is not None:
@@ -179,6 +199,8 @@ def FixedBitrateAndFixedDistances(trans, config, outDir, shared_job_q, shared_re
                     if not workDone:
                         #if we fail to perform the job then we put it back into the job queue
                         shared_job_q.put(job)
+        except KeyboardInterrupt:
+            raise
         except queue.Empty:
             return
 
