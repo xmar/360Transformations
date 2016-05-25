@@ -64,11 +64,11 @@ def ListenWorker(video, exit_event):
                 procs.append(p)
                 p.start()
             except KeyboardInterrupt:
-                raise
+                return
             finally:
                 c.close()
     except KeyboardInterrupt:
-        raise
+        return
     finally:
         for p in procs:
             if p.is_alive():
@@ -82,8 +82,11 @@ def VideoSenderManager(videoList, exit_event):
         procs.append(p)
         p.start()
 
-    for p in procs:
-        p.join()
+    try:
+        for p in procs:
+            p.join()
+    except KeyboardInterrupt:
+        return
 
 def VideoReceiver(video, hostname):
     s = socket.socket()

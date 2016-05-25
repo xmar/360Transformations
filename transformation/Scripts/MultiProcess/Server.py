@@ -63,13 +63,13 @@ def RunServer(jobList, outputDir, PortAuthkey):
             result = shared_result_q.get()
             results.append(result)
             ProcessTheResult(outputDir, result)
+        server_exit_event.set()
     except KeyboardInterrupt:
         print('Shuting down the server')
-        time.sleep(10)
+        #server_exit_event.set()
+        time.sleep(5)
         print('Done')
-        raise
     finally:
-        server_exit_event.set()
         videoSender.join(10)
 
     print ('All works done! Ready to stop the server.')
