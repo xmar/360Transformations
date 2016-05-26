@@ -203,7 +203,7 @@ class FixedBitrateAndFixedDistances(GenericWorker):
                     [(self.lsAverage.layout, self.lsAverage.a)]]
         else:
             inputVideos = [self.inputVideo, self.inputVideo, self.inputVideo]
-            layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), self.currentQec, self.refWidth, self.refHeight), None)], \
+            layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)], \
                     [(eqL, None),(self.lsAverage.layout, self.lsAverage.a)]]
         for layoutId in ['CubeMap', \
                 #'CubeMapCompact', \

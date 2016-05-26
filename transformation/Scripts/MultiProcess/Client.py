@@ -32,3 +32,4 @@ def RunClient(mp_job_worker, host, port, authkey):
 
     #Do the job (only one process)
     WorkerManager(mp_job_worker, job_q, result_q, server_exit_event)
+    del manager
