@@ -16,4 +16,4 @@ class Job(object):
                 self.res, self.bitrateGoal, self.distStep, self.reuseVideo)
 
     def ToComment(self):
-        return 'Nb QEC = {}, Distance step = {}, NbTest = {}, use HEVC = {}, FlatFixedResolution = {}, inputVideo={}'.format(self.nbQec, self.distStep, self.nbTest, self.reuseVideo, self.res, self.inputVideo.fileName.replace('_','-'))
+        return 'Nb QEC = {}, Distance step = {}, NbTest = {}, use HEVC = {}, FlatFixedResolution = {}, BitrateGoal = {} inputVideo={}'.format(self.nbQec, self.distStep, self.nbTest, self.reuseVideo, self.res, self.bitrateGoal, self.inputVideo.fileName.replace('_','-'))

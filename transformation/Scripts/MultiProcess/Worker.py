@@ -6,6 +6,7 @@ import shutil
 import re
 import math
 import queue
+from timeit import default_timer as timer
 
 import SearchTools
 import GenerateVideo
@@ -62,11 +63,14 @@ def GenericWorker(SpecializedWorker, outDir, hostname, shared_job_q, shared_resu
 
             comment = job.ToComment()
             print('Start job {}'.format(comment))
-
+            startTime = timer() 
             (workDone, result) = SpecializedWorker((job, n, inputVideo, maxIteration, reuseVideo, outputResolution, k, nbQec, bitrateGoal, distStep, outputDir))
+            endTime = timer()
+            print('Elapsed time = {}s'.format(endTime-startTime))
 
             if workDone:
                 try:
+                    result.SetElapsedTime(endTime-startTime)
                     shared_result_q.put(result)
                 except ConnectionResetError:
                     print('Connection with the server lost...')

@@ -14,3 +14,7 @@ class Results(object):
             for line in i:
                 self.distanceQualityPSNR += line
         self.job = job
+        self.time = -1
+
+    def SetElapsedTime(self, time):
+        self.time = time
