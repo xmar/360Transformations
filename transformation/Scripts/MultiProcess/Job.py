@@ -14,10 +14,10 @@ class Job(object):
 
     def ToDirName(self):
         if self.printBitrateGoal:
-            return '{}NbQec{}NbFrames{}Res{}Bitrate{}distStep{}ReuseVideo{}'.format(self.inputVideo.fileName.split('.')[0], self.nbFrames, self.nbQec,
+            return '{}NbQec{}NbFrames{}Res{}Bitrate{}distStep{}ReuseVideo{}'.format(self.inputVideo.fileName.split('.')[0], self.nbQec, self.nbFrames,
                     self.res, self.bitrateGoal, self.distStep, self.reuseVideo)
         else:
-            return '{}NbQec{}NbFrames{}Res{}distStep{}ReuseVideo{}'.format(self.inputVideo.fileName.split('.')[0], self.nbFrames, self.nbQec,
+            return '{}NbQec{}NbFrames{}Res{}distStep{}ReuseVideo{}'.format(self.inputVideo.fileName.split('.')[0], self.nbQec, self.nbFrames, 
                     self.res, self.distStep, self.reuseVideo)
 
 
