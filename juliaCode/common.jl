@@ -32,6 +32,17 @@ function ConvertToCart(A)
     return M
 end
 
+function ConvertToSpherical(A)
+"Convert the cartezian to spherical coordinates"
+   println(A[1], " ", A[2], " ", A[3])
+   M = zeros(3)
+   M[1] = 1
+   M[2] = atan(A[2]/A[1])
+   M[3] = acos(A[3]/M[1])
+
+   return M
+end
+
 
 function FindTransMat(A,B,C,D,E,F)
 "Find the rotation matrice R with R*A=D; R*B=E; R*C=F"

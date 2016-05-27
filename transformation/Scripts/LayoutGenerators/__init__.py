@@ -13,5 +13,8 @@ from .PyramidLayout import PyramidLowerQualityLayout
 from .PyramidLayout import PyramidHigherQualityLayout
 from .QEC import QEC
 from .RhombicDodeca import RhombicDodecaLayout
+from .RhombicDodeca import RhombicDodecaHigherQualityLayout
+from .RhombicDodeca import RhombicDodecaMediumQualityLayout
+from .RhombicDodeca import RhombicDodecaEqualQualityLayout
 from .FlatFixedLayout import FlatFixedLayout
 from .LayoutStorage import LayoutStorage
