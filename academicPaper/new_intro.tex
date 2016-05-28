@@ -36,46 +36,82 @@ frame rate (up to 100\,\acp{fps}), which makes them impossible to stream on any
 state-of-the-art access network technology. To compare, the bit-rate of 8k videos 
 at 60\,\acp{fps} encoded in \ac{HEVC} is around \SI{100}{Mbps}~\cite{7398367}.
 
-
-
-None of the current solutions for the delivery of 360-degree videos is entirely
-satisfactory. Sending only \AD{FoV}{} videos is the least bandwidth-hungry implementation. However, it does
+As we will see in Section~\ref{sec:relatedwork}, none of the current solutions 
+for the delivery of 360-degree videos is entirely
+satisfactory. Sending only FoV videos is the least bandwidth-hungry 
+implementation. However, it does
 not enable fast
-navigation within the 360-degree video: When the client moves the head, \AD{the FoV center changes, requiring a new FoV video to be immediately displayed. However, since a device has no knowledge about other parts of the spherical video, it has to notify the server about the viewer head's movement and wait for reception of newly adjusted FoV video.}{}
-%the device cannot immediately display any \ac{FoV} because it does not have information on the other
-%parts of the full spherical video. The device has to notify the server and to wait
-%for the reception of the newly adjusted \ac{FoV} videos.
+navigation within the 360-degree video: When the client moves the head, the FoV 
+center changes, requiring a new FoV video to be immediately displayed. However, since 
+the device has no knowledge about other parts of the spherical video, it has to notify 
+the server about the viewer head's movement and wait for reception of the newly 
+adjusted FoV video.
 Another delivery implementation is to send the full spherical video
 and to let the device
-extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth requirements are
+extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth 
+requirements are
 significant.
 
-We study in this paper a solution where the server offers multiple \emph{versions} of the same
-360-degree video. Each version is characterized by a \emph{\ac{QEC}}, which is a given
+We propose in this paper a solution where, following the same principles as in
+rate-adaptive streaming technologies, the server offers multiple \emph{versions} of the same
+360-degree video. But instead of offering versions that only differ by
+their bit-rate and their resolution, the server offers here versions that differ by 
+having a better quality in a given region of the video.
+Our proposal is a \emph{region-adaptive streaming system} and is depicted in 
+Figure~\ref{fig:deliverychain}.
+Each version is characterized by a \emph{\ac{QEC}}, which is a given
 position in the spherical video. Around the \ac{QEC}, the quality of the video is maximum,
-while it is lower for video areas that are far from the \ac{QEC}.
-The client downloads the video version
-such that
-the \ac{QEC} is close to the \AD{FoV center}.
-The system is depicted in Figure~\ref{fig:deliverychain}.
-This navigable 360-degree video delivery system has three advantages:
+while it is lower for video areas that are far from the \ac{QEC}. Similarly as 
+in \ac{DASH}, the video is cut into segments and the client periodically selects
+the video version with respect to an adaptation logic algorithm. Here, the client downloads 
+the video version
+such that, not only the bit-rate fits with their bandwidth, but also
+the \ac{QEC} is the closest to their \AD{FoV center}.
+
+\input{deliveryChain.tex}
+
+This region-adaptive 360-degree streaming system has three advantages:
 $(i)$ the bit-rate of the delivered video is lower than the original full-quality video.
-$(ii)$ When the end-user does not move, the \ac{FoV} \AD{video}{} is extracted from the highest
+$(ii)$ When the end-user does not move, the \ac{FoV} video is extracted from the highest
 quality spherical video.
 And $(iii)$ when the end-user moves the head, the video does not stop. The device can
-extract
-a \AD{new}{} \ac{FoV} \AD{video}{} because it has the full spherical video. If the new \ac{FoV} \AD{center}{} is far from the
+always extract
+a new \ac{FoV} video because it has the full spherical video. If the 
+new \ac{FoV} center is far from the
 \ac{QEC} of the video version, the quality of the extracted video is lower but this
 degradation is transient until the
 device selects another video version with a closer \ac{QEC}.
 
-\input{deliveryChain.tex}
+In this paper, we introduce region-adaptive streaming systems for navigable 360-degree
+videos and we discuss the key design points of such system. We address
+the choice of the projection from a spherical video into a geometric two-dimensional layout
+with a focus on the impact of this projection into the quality of the video encoding. We evaluate
+several video quality arrangement into the geometric layouts and we show that the 
+cube map layout offers the best performance regarding the quality of the extracted 
+\ac{FoV}.
+Furthermore, based on a dataset of
+real users navigating in 360-degree videos, we study the length of the video segments
+for region-adaptive streaming system. We show that head movements are significant
+in short period, so the video segments have to be short enough to enable 
+frequent region switches.
+
+Finally, we introduce a tool (released on open source in a public
+repository\footnote{url is hidden for blind
+preservation.}), which create video versions for region-adaptive 360-degree videos.
+The tool is highly configurable: from a given 360-degree video, it allows
+any arrangement of video quality depending on any geometric layout, and it
+extracts the
+\ac{FoV} video from any point in the sphere. This tool thus provides the
+main software modules for the implementation of region-adaptive streaming
+for navigable 360-degree videos.
+
 %is characterized by an \emph{angle of vision}. It contains the full spherical
 %video with an emphasis on the given angle of vision, \textit{i.e.},
 %the part of the video that is in front of the angle of vision is at the highest quality and the video quality
 %degrades for the other parts.
 
-\subsection{Limitations of Previous Work}
+\section{Related Work}
+\label{sec:relatedwork}
 
 The principle of delivering different qualities within a given navigable omnidirectional video is sketched
 in a recent short paper by~\citet{ochi_live_2015}. Their proposal is based on the idea of video
@@ -120,37 +156,30 @@ which
 results in
 information loss and distorted extraction of \ac{FoV} videos. \AD{Additionally, they projected the spherical videos into a \emph{cubemap}. However, unlike in our approach, they left the same full resolution of all faces, which limited the video size reduction.}{}
 
-\subsection{Our Contributions}
-
+%\subsection{Our Contributions}
 %
-%of spherical videos into various geometrical layouts. We propose
-%several ways to arrange the video qualities, which leverage the structure of the
-%different layouts.
-We study the navigable 360-degree video delivery system with a
-focus on the arrangement of video qualities within the projections of
-spherical videos into geometric layouts. Our contribution is twofold:
-\begin{itemize}
-\item We introduce a tool (released on open source in a public
-repository\footnote{url is hidden for blind
-preservation.}), which enables the projection from a spherical video
-into the most studied  geometric layout (and vice versa). The tool has two main
-features: it allows
-any arrangement of video quality depending on the layout, and it
-extracts the
-\ac{FoV} video from any point in the sphere.
-\item We provide a comprehensive comparison of the different geometric arrangements of
-video quality on 360-degree video. We address the main questions raised
-by~\citet{facebook}: which layout provides the best trade-off
-between bit-rate and
-quality, how many video versions should be offered by the server, and what geometric
-quality arrangement
-enables the smoothest navigation.
-\end{itemize}
-
-In this short paper, we restrict our study to essentials, and we provide only our main findings based on a
-sample of the results. \textit{Here are our findings...}
-
-
+%%
+%%of spherical videos into various geometrical layouts. We propose
+%%several ways to arrange the video qualities, which leverage the structure of the
+%%different layouts.
+%We study the navigable 360-degree video delivery system with a
+%focus on the arrangement of video qualities within the projections of
+%spherical videos into geometric layouts. Our contribution is twofold:
+%\begin{itemize}
+%\item 
+%\item We provide a comprehensive comparison of the different geometric arrangements of
+%video quality on 360-degree video. We address the main questions raised
+%by~\citet{facebook}: which layout provides the best trade-off
+%between bit-rate and
+%quality, how many video versions should be offered by the server, and what geometric
+%quality arrangement
+%enables the smoothest navigation.
+%\end{itemize}
+%
+%In this short paper, we restrict our study to essentials, and we provide only our main findings based on a
+%sample of the results. \textit{Here are our findings...}
+%
+%
 
 
 %%% Local Variables:
