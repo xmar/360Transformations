@@ -58,11 +58,18 @@ def RunServer(jobList, outputDir, PortAuthkey):
     videoSender = mp.Process( target= Video.VideoSenderManager, args=(videoList, server_exit_event) )
     videoSender.start()
 
+    elapsedTime = (0,0)
     try:
         while len(results) != len(jobList):
-            print('Estimated remaining job: {}'.format(shared_job_q.qsize()))
+            print('Estimated remaining job: {}; Number of results still missing: {}'.format(shared_job_q.qsize(), len(jobList)-len(results)))
             result = shared_result_q.get()
             results.append(result)
+            elapsedTime = (elapsedTime[0]+result.time, elapsedTime[1]+1)
+            m1, s1 = divmod(result.time, 60)
+            remainingTime = (len(jobList)-len(results))*elapsedTime[0]/elapsedTime[1]
+            m, s = divmod(remainingTime, 60)
+            h, m = divmod(m, 60)
+            print('Elapsed time = {}m{:.3f}s, estimated remaining time = {}h{}m{:0.3f}s'.format(int(m1), s1, int(h), int(m), s))
             ProcessTheResult(outputDir, result)
         server_exit_event.set()
     except KeyboardInterrupt:
@@ -76,4 +83,5 @@ def RunServer(jobList, outputDir, PortAuthkey):
     print ('All works done! Ready to stop the server.')
 
     time.sleep(5)
-    manager.shutdown()
+    #manager.shutdown()
+    del manager
