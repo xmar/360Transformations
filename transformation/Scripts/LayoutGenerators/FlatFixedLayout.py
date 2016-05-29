@@ -39,12 +39,10 @@ class FlatFixedLayout(Layout):
     @classmethod
     def GetRandomCenterAtDistance(cls, qec, dist):
         '''Return a random point (theta, phi) at the distance dist from the given qec'''
-        theta = math.radians(random.uniform(-90,90))
+        theta = math.radians(random.uniform(-180,180))
         c = np.matrix('{};{};{}'.format(math.sin(dist)*math.cos(theta), math.sin(dist)*math.sin(theta), math.cos(dist)))
         qecRotation = qec.GetRotMat()
-        qecRotation[np.abs(qecRotation) < np.finfo(np.float).eps] = 0
         toXRotation = QEC.ToRotMat(0,math.radians(90),0)
-        toXRotation[np.abs(toXRotation) < np.finfo(np.float).eps] = 0
         afterFirstRotation = toXRotation*c
         afterFirstRotation[np.abs(afterFirstRotation) < np.finfo(np.float).eps] = 0
         realPoint = np.reshape(qecRotation*afterFirstRotation, 3)

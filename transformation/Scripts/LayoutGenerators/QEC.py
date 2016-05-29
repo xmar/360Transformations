@@ -113,10 +113,12 @@ class QEC:
         sinY = math.sin(yaw)
         cosR = math.cos(roll)
         sinR = math.sin(roll)
-        return np.matrix('{},{},{};{},{},{};{},{},{}'.format(
+        mat = np.matrix('{},{},{};{},{},{};{},{},{}'.format(
                 cosP * cosY,     cosY*sinP*sinR -sinY*cosR,  cosY*sinP*cosR + sinY * sinR,
                 sinY*cosP,       cosY * cosR,                sinY*sinP*cosR - sinR * cosY,
                 -sinP,           cosP * sinR,                cosP * cosR))
+        mat[np.abs(mat) < np.finfo(np.float).eps] = 0
+        return mat
 
     def GetRotMat(self):
         return self.ToRotMat(math.radians(self.yaw), math.radians(self.pitch), math.radians(self.roll))
