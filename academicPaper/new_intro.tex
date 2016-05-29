@@ -24,8 +24,8 @@ a device-specific viewing angle (typically 120 degrees), which delimits horizont
 vertically the scene from the head direction center, called \ac{FoV} center. To get a good 
 immersion, the pixel 
 resolution of
-the displayed \ac{FoV} should be high, typically 4k ($3840\,\times\,2160$). It means that
-the resolution of the full 360-degree video should be at least 12k ($11520\,\times\,6480$). 
+the displayed \ac{FoV} should be high, typically 4k ($3840\times2160$). It means that
+the resolution of the full 360-degree video should be at least 12k ($11520\times6480$). 
 Furthermore, to prevent the so-called \emph{simulator sickness}~\cite{moss2011characteristics}, the \ac{HMD} 
 vendors recommend to make the system react to head movement as fast as the \ac{HMD}
 refresh rate.\footnote{\url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}} Given that the refresh rate of 
@@ -38,8 +38,7 @@ at 60\,\acp{fps} encoded in \ac{HEVC} is around \SI{100}{Mbps}~\cite{7398367}.
 
 As we will see in Section~\ref{sec:relatedwork}, none of the current solutions 
 for the delivery of 360-degree videos is entirely
-satisfactory. Sending only FoV videos is the least bandwidth-hungry 
-implementation. However, it does
+satisfactory. Sending only FoV videos does
 not enable fast
 navigation within the 360-degree video: When the client moves the head, the FoV 
 center changes, requiring a new FoV video to be immediately displayed. However, since 
