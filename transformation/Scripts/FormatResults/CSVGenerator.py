@@ -15,9 +15,8 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList, commentStri
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in distanceToQualityRAW:
                     distanceToQualityRAW[name] = {}
-                for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
-                    distance = qec.ComputeDistance(y,p)
-                    print ('d={}; qec={}; ({},{})'.format(distance,qec.GetStrId(),y,p))
+                for (q, qec, rot) in qualityStorage.goodQuality[lId]:
+                    distance = qec.ComputeDistance(rot)
                     maxDist = max(maxDist, distance)
                     if distance in distanceToQualityRAW[name]:
                         print ('ERROR distance already exist')
@@ -26,9 +25,8 @@ def WriteQualityInTermsOfDistanceCSV(outputPath, outputDir, qecList, commentStri
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in distanceToQualityRAW:
                     distanceToQualityRAW[name] = {}
-                for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
-                    distance = qec.ComputeDistance(y,p)
-                    print ('d={}; qec={}; ({},{})'.format(distance,qec.GetStrId(),y,p))
+                for (q, qec, rot) in qualityStorage.badQuality[lId]:
+                    distance = qec.ComputeDistance(rot)
                     maxDist = max(maxDist, distance)
                     if distance in distanceToQualityRAW[name]:
                         print ('ERROR distance already exist')
@@ -115,8 +113,8 @@ def WriteQualityInTermsOfDistanceCSVFixedDistance(outputPath, outputDir, qecList
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in distanceToQualityRAW:
                     distanceToQualityRAW[name] = {}
-                for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
-                    distance = qec.ComputeDistance(y,p)
+                for (q, qec, rot) in qualityStorage.goodQuality[lId]:
+                    distance = qec.ComputeDistance(rot)
                     matchInListDist = None
                     for d in distanceList:
                         if abs(distance-d) < 10**-5:
@@ -126,12 +124,15 @@ def WriteQualityInTermsOfDistanceCSVFixedDistance(outputPath, outputDir, qecList
                         if matchInListDist not in distanceToQualityRAW[name]:
                             distanceToQualityRAW[name][matchInListDist] = []
                         distanceToQualityRAW[name][matchInListDist].append(q)
+                    else:
+                        print('No match for distance ',distance, ' for qec ',qecId, 'and  name ', name, ' rot ', rot.GetStrId())
+                        print('qec ', qec.rotation.GetStrId(), ' rot ', rot.GetStrId())
             for lId in qualityStorage.badQuality:
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in distanceToQualityRAW:
                     distanceToQualityRAW[name] = {}
-                for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
-                    distance = qec.ComputeDistance(y,p)
+                for (q, qec, rot) in qualityStorage.badQuality[lId]:
+                    distance = qec.ComputeDistance(rot)
                     matchInListDist = None
                     for d in distanceList:
                         if abs(distance-d) < 10**-5:
@@ -157,6 +158,7 @@ def WriteQualityInTermsOfDistanceCSVFixedDistance(outputPath, outputDir, qecList
                     msssimList = [ q[0] for q in distanceToQualityRAW[name][dist] ]
                     avgMsssim = sum(msssimList)/len(msssimList)
                 else:
+                    print('Name: ',name, 'dist ', dist ,' not in ', distanceToQualityRAW[name])
                     avgMsssim = -1
                 o.write(' {}'.format(avgMsssim))
             o.write('\n')
@@ -185,7 +187,12 @@ def WriteQualityInTermsOfDistanceCSVFixedDistance(outputPath, outputDir, qecList
                         else:
                             avgPsnr = -1
                         o.write(' {}'.format(avgPsnr-avgPsnrForAvgVid))
-                o.write('\n')
+            else:
+                for name in sorted(distanceToQualityRAW.keys()):
+                    if name != 'AverageEquiTiled' :
+                        o.write(' -1')
+            o.write('\n')
+
 
 
 def WriteQualityCdfCSV(outputPath, outputDir, qecList, commentString = None):
@@ -202,13 +209,13 @@ def WriteQualityCdfCSV(outputPath, outputDir, qecList, commentString = None):
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in goodQuality:
                     goodQuality[name] = []
-                for (q, qec, (y,p)) in qualityStorage.goodQuality[lId]:
+                for (q, qec, rot) in qualityStorage.goodQuality[lId]:
                     goodQuality[name].append(q[0])
             for lId in qualityStorage.badQuality:
                 name = lId[:-len(qecId)] if 'AverageEq' not in lId else lId
                 if name not in badQuality:
                     badQuality[name] = []
-                for (q, qec, (y,p)) in qualityStorage.badQuality[lId]:
+                for (q, qec, rot) in qualityStorage.badQuality[lId]:
                     badQuality[name].append(q[0])
 
     for name in goodQuality:
@@ -227,6 +234,6 @@ def WriteQualityCdfCSV(outputPath, outputDir, qecList, commentString = None):
             o.write('{}'.format(r))
             for name in sorted(goodQuality.keys()):
                 qGood = np.percentile(goodQuality[name], r)
-                qBad = np.percentile(badQuality[name], r)
+                qBad = np.percentile(badQuality[name], r) if name in badQuality else -1
                 o.write(' {} {}'.format(qGood, qBad))
             o.write('\n')

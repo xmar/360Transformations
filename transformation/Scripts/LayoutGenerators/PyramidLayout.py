@@ -2,11 +2,8 @@ from . import Constants
 from .Layout import Layout
 
 class PyramidLayout(Layout):
-    def __init__(self, layoutName, ypr, base, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
-        self.yaw = ypr[0]
-        self.pitch = ypr[1]
-        self.roll = ypr[2]
+    def __init__(self, layoutName, rotation, base, refWidth = None, refHeight = None):
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
         self.base = base
 
     def GenerateLayout(self, mediumRatio):
@@ -15,18 +12,15 @@ class PyramidLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+='pyramidBaseEdge={}\n'.format(self.base)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
+        c+=super().GetYawPitchRoll()
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramidHeight{}={}\n'.format(f, mediumRatio)
         return c
 
 class PyramidHigherQualityLayout(Layout):
-    def __init__(self, layoutName, ypr, base, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
-        self.yaw = ypr[0]
-        self.pitch = ypr[1]
-        self.roll = ypr[2]
+    def __init__(self, layoutName, rotation, base, refWidth = None, refHeight = None):
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
         self.base = base
 
     def GenerateLayout(self, mediumRatio):
@@ -35,18 +29,15 @@ class PyramidHigherQualityLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+='pyramidBaseEdge={}\n'.format(self.base)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
+        c+=super().GetYawPitchRoll()
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramidHeight{}={}\n'.format(f, Constants.GOOD_QUALITY)
         return c
 
 class PyramidLowerQualityLayout(Layout):
-    def __init__(self, layoutName, ypr, base, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
-        self.yaw = ypr[0]
-        self.pitch = ypr[1]
-        self.roll = ypr[2]
+    def __init__(self, layoutName, rotation, base, refWidth = None, refHeight = None):
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
         self.base = base
 
     def GenerateLayout(self, mediumRatio):
@@ -55,9 +46,8 @@ class PyramidLowerQualityLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+='pyramidBaseEdge={}\n'.format(self.base)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
+        c+=super().GetYawPitchRoll()
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramidHeight{}={}\n'.format(f, Constants.BAD_QUALITY)
         return c
-

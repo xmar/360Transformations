@@ -1,9 +1,12 @@
 from . import Constants
 from .Layout import Layout
+from .Rotation import Rotation
 
 class EquirectangularTiledLayout(Layout):
     def __init__(self, layoutName, qec, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
+        rotation = qec.GetRotMat() if qec is not None else Rotation(0,0,0)
+        rotation.SetOffset(45, -22.5, 0, inDegrees=True)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
         self.qec = qec
 
 
@@ -11,8 +14,7 @@ class EquirectangularTiledLayout(Layout):
         c = '[{}]\ntype=equirectangularTiled\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
-        (y, p, r) = self.qec.GetEulerAngles() if self.qec is not None else (0, 0, 0)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(y-45, p+22.5, r)
+        c+=super().GetYawPitchRoll()
         if self.qec is not None:
             if a is None:
                 a = Constants.MEDIUM_QUALITY
@@ -30,7 +32,9 @@ class EquirectangularTiledLayout(Layout):
 
 class EquirectangularTiledHigherQualityLayout(Layout):
     def __init__(self, layoutName, qec, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
+        rotation = qec.GetRotMat()
+        rotation.SetOffset(45, -22.5, 0, inDegrees=True)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
         self.qec = qec
 
 
@@ -38,8 +42,7 @@ class EquirectangularTiledHigherQualityLayout(Layout):
         c = '[{}]\ntype=equirectangularTiled\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
-        (y, p, r) = self.qec.GetEulerAngles() if self.qec is not None else (0, 0, 0)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(y-45, p+22.5, r)
+        c+=super().GetYawPitchRoll()
         for i in range(0,8):
             for j in range (0,8):
                 nbTileDistance = self.qec.DistanceInTileNb(i,j)
@@ -48,7 +51,9 @@ class EquirectangularTiledHigherQualityLayout(Layout):
 
 class EquirectangularTiledLowerQualityLayout(Layout):
     def __init__(self, layoutName, qec, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
+        rotation = qec.GetRotMat()
+        rotation.SetOffset(45, -22.5, 0, inDegrees=True)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
         self.qec = qec
 
 
@@ -56,8 +61,7 @@ class EquirectangularTiledLowerQualityLayout(Layout):
         c = '[{}]\ntype=equirectangularTiled\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
-        (y, p, r) = self.qec.GetEulerAngles() if self.qec is not None else (0, 0, 0)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(y-45, p+22.5, r)
+        c+=super().GetYawPitchRoll()
         for i in range(0,8):
             for j in range (0,8):
                 nbTileDistance = self.qec.DistanceInTileNb(i,j)
@@ -66,7 +70,9 @@ class EquirectangularTiledLowerQualityLayout(Layout):
 
 class EquirectangularTiledMediumQualityLayout(Layout):
     def __init__(self, layoutName, qec, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
+        rotation = qec.GetRotMat()
+        rotation.SetOffset(45, -22.5, 0, inDegrees=True)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
         self.qec = qec
 
 
@@ -74,8 +80,7 @@ class EquirectangularTiledMediumQualityLayout(Layout):
         c = '[{}]\ntype=equirectangularTiled\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
-        (y, p, r) = self.qec.GetEulerAngles() if self.qec is not None else (0, 0, 0)
-        c+='yaw={}\npitch={}\nroll={}\n'.format(y-45, p+22.5, r)
+        c+=super().GetYawPitchRoll()
         for i in range(0,8):
             for j in range (0,8):
                 nbTileDistance = self.qec.DistanceInTileNb(i,j)

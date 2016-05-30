@@ -44,23 +44,23 @@ class QualityStorage:
         self.badQuality = {}
         self.names = []
 
-    def AddGood(self, name, LayoutId_quality, qec, centerYP):
+    def AddGood(self, name, LayoutId_quality, qec, centerRot):
         if name not in self.names:
             self.names.append(name)
             for (lId,q) in LayoutId_quality:
                 if lId in self.goodQuality:
-                    self.goodQuality[lId].append((q,qec,centerYP))
+                    self.goodQuality[lId].append((q,qec,centerRot))
                 else:
-                    self.goodQuality[lId] = [(q,qec,centerYP)]
+                    self.goodQuality[lId] = [(q,qec,centerRot)]
 
-    def AddBad(self, name, LayoutId_quality, qec, centerYP):
+    def AddBad(self, name, LayoutId_quality, qec, centerRot):
         if name not in self.names:
             self.names.append(name)
             for (lId,q) in LayoutId_quality:
                 if lId in self.badQuality:
-                    self.badQuality[lId].append((q,qec,centerYP))
+                    self.badQuality[lId].append((q,qec,centerRot))
                 else:
-                    self.badQuality[lId] = [(q,qec,centerYP)]
+                    self.badQuality[lId] = [(q,qec,centerRot)]
 
     def IsNameInside(self, name):
         return name in self.names
@@ -86,7 +86,7 @@ def GetAverageQuality(fileName):
             n += 1
     return (q/n, p/n) if n != 0 else 0
 
-def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideos, outputDirQEC, qec, flatFixedCenterYP, isGood):
+def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideos, outputDirQEC, qec, flatFixedCenterRot, isGood):
     if len(layoutsToTest) != len(inputVideos):
         raise ValueError("layoutsToTest and inputVideos should have the same lenth")
     layouts = []
@@ -113,9 +113,9 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                 newIv.append(nivp)
             with open(config, 'w') as cf:
                 cf.write(GenerateConf(layouts, newIv, '/tmp/test.mkv', '/tmp/test.txt', n, fps, 0))
-    
+
             sub.check_call([trans, '-c', config])
-    
+
             i = 1
             for ls in layouts:
                 (l,a) = ls[-2]
@@ -126,10 +126,14 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                 outputQualityName = '/tmp/test{}{}.txt'.format(i,name2)
                 resultVideoName = '{}/{}_{}.mkv'.format(outputDirQEC, name1, name2)
                 resultQualityName = '{}/{}_{}.txt'.format(outputDirQEC, name1, name2)
+                resultLogName = '{}/{}_{}_log.txt'.format(outputDirQEC, name1, name2)
                 shutil.move(outputVideoName, resultVideoName)
+                shutil.copy(config, resultLogName)
                 if i != 1:
                     shutil.move(outputQualityName, resultQualityName)
                 i += 1
+        except:
+            raise
         finally:
             for iv in newIv:
                 if os.path.isfile(iv):
@@ -147,7 +151,7 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                 if os.path.isfile(outputQualityName):
                     os.remove(outputQualityName)
                 i += 1
-    
+
         lName_quality = []
         i = 1
         for ls in layouts:
@@ -161,8 +165,8 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
             i += 1
 
         if isGood:
-            qs.AddGood(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterYP)
+            qs.AddGood(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterRot)
         else:
-            qs.AddBad(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterYP)
+            qs.AddBad(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterRot)
 
         qs.Dump(outputQualityStorageName)

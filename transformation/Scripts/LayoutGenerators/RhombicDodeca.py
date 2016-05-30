@@ -1,19 +1,19 @@
 from . import Constants
 from .Layout import Layout
+import copy
 
 class RhombicDodecaLayout(Layout):
-    def __init__(self, layoutName, ypr, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
-        self.yaw = ypr[0] +19.4712 #+ 35.2643 #- 19.4712
-        self.pitch = ypr[1] - 26.5650
-        self.roll = ypr[2]
+    def __init__(self, layoutName, rotation, refWidth = None, refHeight = None):
+        rotation = copy.deepcopy(rotation)
+        rotation.SetOffset(19.4712, -26.5650, 0, inDegrees=True)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
 
     def GenerateLayout(self, mediumRatio):
         c = '[{}]\ntype=rhombicDodeca\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
 
-        c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
+        c+=super().GetYawPitchRoll()
         for i in [1,5]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,4,6,7,8,10,11]:
@@ -23,18 +23,17 @@ class RhombicDodecaLayout(Layout):
         return c
 
 class RhombicDodecaHigherQualityLayout(Layout):
-    def __init__(self, layoutName, ypr, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
-        self.yaw = ypr[0] + 96.512194  #+ 35.2643 #- 19.4712
-        self.pitch = ypr[1] -133.458231
-        self.roll = ypr[2]
+    def __init__(self, layoutName, rotation, refWidth = None, refHeight = None):
+        rotation = copy.deepcopy(rotation)
+        rotation.SetOffset(96.512194, -133.458231, 0, inDegrees=True)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
 
     def GenerateLayout(self, mediumRatio):
         c = '[{}]\ntype=rhombicDodeca\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
 
-        c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
+        c+=super().GetYawPitchRoll()
         for i in [1,5,4]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,6,7,8,9,10,11,12]:
@@ -42,18 +41,17 @@ class RhombicDodecaHigherQualityLayout(Layout):
         return c
 
 class RhombicDodecaMediumQualityLayout(Layout):
-    def __init__(self, layoutName, ypr, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
-        self.yaw = ypr[0] + 96.512194 #+ 35.2643 #- 19.4712
-        self.pitch = ypr[1] -133.458231
-        self.roll = ypr[2]
+    def __init__(self, layoutName, rotation, refWidth = None, refHeight = None):
+        rotation = copy.deepcopy(rotation)
+        rotation.SetOffset(96.512194, -133.458231, 0, inDegrees=True)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
 
     def GenerateLayout(self, mediumRatio):
         c = '[{}]\ntype=rhombicDodeca\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
 
-        c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
+        c+=super().GetYawPitchRoll()
         for i in [1,5,4]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,6,7,10,11]:
@@ -63,23 +61,18 @@ class RhombicDodecaMediumQualityLayout(Layout):
         return c
 
 class RhombicDodecaEqualQualityLayout(Layout):
-    def __init__(self, layoutName, ypr, refWidth = None, refHeight = None):
-        super().__init__(layoutName, refWidth, refHeight)
-        self.yaw = ypr[0] 
-        self.pitch = ypr[1]
-        self.roll = ypr[2]
+    def __init__(self, layoutName, rotation, refWidth = None, refHeight = None):
+        rotation = copy.deepcopy(rotation)
+        super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
 
     def GenerateLayout(self, mediumRatio):
         c = '[{}]\ntype=rhombicDodeca\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
 
-        c+='yaw={}\npitch={}\nroll={}\n'.format(self.yaw, self.pitch, self.roll)
+        c+=super().GetYawPitchRoll()
         for i in [1,2,3,4,5]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [6,7,8,9,10,11,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, mediumRatio)
         return c
-
-
-
