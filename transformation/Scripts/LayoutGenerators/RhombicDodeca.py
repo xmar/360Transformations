@@ -58,8 +58,8 @@ class RhombicDodecaMediumQualityLayout(Layout):
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,6,7,10,11]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, mediumRatio)
-	for i in [8,9,12]:
-	    c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.BAD_QUALITY)
+        for i in [8,9,12]:
+            c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.BAD_QUALITY)
         return c
 
 class RhombicDodecaEqualQualityLayout(Layout):
