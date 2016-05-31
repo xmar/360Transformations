@@ -67,7 +67,7 @@ def main():
                                                 videoDic[video.fileName] = video
                                             jobArg = MultiProcess.JobArg(nbQEC, step,
                                                 nbT, n, config[section]['i'], reuse, r,
-                                                videoDic[video.fileName], bitrateGoal)
+                                                videoDic[video.fileName], bitrateGoal, averageEqTileRatio)
                                             job = MultiProcess.JobFixedAverageAndFixedDistances(jobArg)
                                             outDir = '{}/{}'.format(args.outputDir, job.ToDirName())
                                             if os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
