@@ -1,6 +1,6 @@
 from .Client import RunClient
 from .Server import RunServer
-from .Job import Job
+from .Job import JobFixedAverageAndFixedDistances
 from .Job import JobArg
 from .Results import Results
 from .Worker import WorkerArg

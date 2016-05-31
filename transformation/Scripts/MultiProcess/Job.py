@@ -1,6 +1,8 @@
+import MultiProcess
+
 class JobArg(object):
     def __init__(self, nbQec, distStep, nbTest, nbFrames, nbDicothomicInteration,
-        reuseVideo, res, inputVideo, bitrateGoal):
+        reuseVideo, res, inputVideo, bitrateGoal, averageEqTileRatio=0.5117):
         self.nbQec = nbQec
         self.distStep = distStep
         self.nbTest = nbTest
@@ -9,6 +11,7 @@ class JobArg(object):
         self.reuseVideo = reuseVideo
         self.res = res
         self.inputVideo = inputVideo
+        self.averageEqTileRatio = averageEqTileRatio
         self.bitrateGoal = int(bitrateGoal)
 
 class GenericJob(object):
@@ -34,9 +37,9 @@ class GenericJob(object):
             self.__class__.__name__))
 
 
-class Job(GenericJob):
-    def __init__(self, jobArgs, workerCls):
-        super().__init__(jobArgs, workerCls)
+class JobFixedAverageAndFixedDistances(GenericJob):
+    def __init__(self, jobArgs):
+        super().__init__(jobArgs, MultiProcess.FixedAverageAndFixedDistances)
         self.printBitrateGoal = self.jobArgs.bitrateGoal != 0
 
     def ToDirName(self):
@@ -47,16 +50,17 @@ class Job(GenericJob):
                     self.jobArgs.res, self.jobArgs.bitrateGoal,
                     self.jobArgs.distStep, self.reuseVideo)
         else:
-            return '{}NbQec{}NbFrames{}Res{}distStep{}ReuseVideo{}'.format(
+            return '{}NbQec{}NbFrames{}Res{}averageEqTileRatio{}distStep{}ReuseVideo{}'.format(
                     self.jobArgs.inputVideo.fileName.split('.')[0], self.jobArgs.nbQec,
-                    self.jobArgs.nbFrames, self.jobArgs.res, self.jobArgs.distStep,
-                    self.jobArgs.reuseVideo)
+                    self.jobArgs.nbFrames, self.jobArgs.res, self.jobArgs.averageEqTileRatio,
+                    self.jobArgs.distStep, self.jobArgs.reuseVideo)
 
 
     def ToComment(self):
         return 'Nb QEC = {}, Nb Frames = {}, Distance step = {}, NbTest = {},\
             use HEVC = {}, FlatFixedResolution = {}, BitrateGoal = {}\
-             inputVideo={}'.format(self.jobArgs.nbQec, self.jobArgs.nbFrames,
+             inputVideo={}, averageEqTileRatio = {}'.format(self.jobArgs.nbQec, self.jobArgs.nbFrames,
              self.jobArgs.distStep, self.jobArgs.nbTest, self.jobArgs.reuseVideo,
              self.jobArgs.res, self.jobArgs.bitrateGoal,
-             self.jobArgs.inputVideo.fileName.replace('_','-'))
+             self.jobArgs.inputVideo.fileName.replace('_','-'),
+             self.jobArgs.averageEqTileRatio)

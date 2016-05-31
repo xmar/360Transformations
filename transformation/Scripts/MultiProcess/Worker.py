@@ -190,7 +190,7 @@ class FixedAverageAndFixedDistances(GenericWorker):
             outLayoutId = '{}/AverageEquiTiled'.format(self.outputDir)
             layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None, self.refWidth, self.refHeight)
             GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-              [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(layoutAverage, 0.5117)], 24, self.n, self.inputVideo, outLayoutId, 0)
+              [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(layoutAverage, self.job.jobArgs.averageEqTileRatio)], 24, self.n, self.inputVideo, outLayoutId, 0)
             self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
         goalSize = os.stat(self.averageNameVideo).st_size
         self.bitrateGoal = int(self.n*goalSize/24.0)
