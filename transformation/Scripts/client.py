@@ -15,9 +15,9 @@ def main():
     args = parser.parse_args()
 
     #SpecializedWorker = MultiProcess.FixedBitrateAndFixedDistances( args.trans, args.config, args.outputDir, args.hostname)
-    SpecializedWorker = MultiProcess.FixedAverageAndFixedDistances( args.trans, args.config, args.outputDir, args.hostname)
+    workerArg = MultiProcess.WorkerArg( args.trans, args.config, args.outputDir, args.hostname)
 
-    MultiProcess.RunClient(SpecializedWorker, args.hostname, args.serverPort, args.authkey)
+    MultiProcess.RunClient(workerArg, args.hostname, args.serverPort, args.authkey)
 
 if __name__ == '__main__':
     main()

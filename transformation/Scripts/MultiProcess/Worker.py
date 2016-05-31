@@ -16,10 +16,17 @@ import FormatResults
 from .Results import Results
 import MultiProcess.Video as Video
 
-def WorkerManager(GenericWorker, shared_job_q, shared_result_q, exit_event):
+class WorkerArg(object):
+    def __init__(self, trans, config, outDir, hostname):
+        self.trans = trans
+        self.config = config
+        self.outDir = outDir
+        self.hostname = hostname
+
+def WorkerManager(workerArg, shared_job_q, shared_result_q, exit_event):
     """Run a unique process that will run the SpecializedWorker"""
-    proc = mp.Process(target=GenericWorker.Run,
-            args=(shared_job_q, shared_result_q))
+    proc = mp.Process(target=WorkerManagerProcess,
+            args=(workerArg, shared_job_q, shared_result_q))
 
     proc.start()
 
@@ -35,78 +42,80 @@ def WorkerManager(GenericWorker, shared_job_q, shared_result_q, exit_event):
             proc.terminate()
             proc.join(5)
 
+def WorkerManagerProcess(workerArg, shared_job_q, shared_result_q):
+    try:
+        while True:
+            job = None
+            job = shared_job_q.get_nowait()
+            job.RunJob(workerArg, shared_job_q, shared_result_q)
 
+    except KeyboardInterrupt:
+        print('Test interrupted')
+        raise
+    except queue.Empty:
+        print('All jobs done')
+        return
 
 class GenericWorker(object):
-    def __init__(self, trans, config, outDir, hostname):
-        self.trans = trans
-        self.config = config
-        self.outDir = outDir
-        self.hostname = hostname
+    def __init__(self, workerArg):
+        self.trans = workerArg.trans
+        self.config = workerArg.config
+        self.outDir = workerArg.outDir
+        self.hostname = workerArg.hostname
 
-    def Run(self, shared_job_q, shared_result_q):
+    def Run(self, job, shared_job_q, shared_result_q):
         self.outputVideoDir = '{}/InputVideos'.format(self.outDir)
+        self.job = job
+        self.n = self.job.jobArgs.nbFrames
+        self.video = self.job.jobArgs.inputVideo
+        if not os.path.exists(self.outputVideoDir):
+            os.mkdir(self.outputVideoDir)
+        self.video.UpdateVideoDir(self.outputVideoDir)
+        if not os.path.exists(self.video.realPath) or Video.Video(self.video.realPath) != self.video:
+            Video.VideoReceiver(self.video, self.hostname)
+        self.inputVideo = self.video.realPath
+        self.maxIteration = self.job.jobArgs.nbDicothomicInteration
+        self.reuseVideo = self.job.jobArgs.reuseVideo
+        self.outputResolution = self.job.jobArgs.res.split('x')
+        self.outputResolution = (int(self.outputResolution[0]), int(self.outputResolution[1]))
+        self.k = self.job.jobArgs.nbTest
+        self.nbQec = self.job.jobArgs.nbQec
+        self.averageGoalSize = (0,0)
+        self.bitrateGoal = int(self.job.jobArgs.bitrateGoal)
+        self.distStep = self.job.jobArgs.distStep
+        self.outputDir = '{}/{}'.format(self.outDir, self.job.ToDirName())
+        if not os.path.exists(self.outputDir):
+            os.mkdir(self.outputDir)
+
+        self.comment = self.job.ToComment()
+        print('Start job {}'.format(self.comment))
+        startTime = timer()
+        workDone = False
         try:
-            while True:
-                self.job = None
-                self.job = shared_job_q.get_nowait()
-                self.n = self.job.nbFrames
-                self.video = self.job.inputVideo
-                if not os.path.exists(self.outputVideoDir):
-                    os.mkdir(self.outputVideoDir)
-                self.video.UpdateVideoDir(self.outputVideoDir)
-                if not os.path.exists(self.video.realPath) or Video.Video(self.video.realPath) != self.video:
-                    Video.VideoReceiver(self.video, self.hostname)
-                self.inputVideo = self.video.realPath
-                self.maxIteration = self.job.nbDicothomicInteration
-                self.reuseVideo = self.job.reuseVideo
-                self.outputResolution = self.job.res.split('x')
-                self.outputResolution = (int(self.outputResolution[0]), int(self.outputResolution[1]))
-                self.k = self.job.nbTest
-                self.nbQec = self.job.nbQec
-                self.averageGoalSize = (0,0)
-                self.bitrateGoal = int(self.job.bitrateGoal)
-                self.distStep = self.job.distStep
-                self.outputDir = '{}/{}'.format(self.outDir, self.job.ToDirName())
-                if not os.path.exists(self.outputDir):
-                    os.mkdir(self.outputDir)
-
-                self.comment = self.job.ToComment()
-                print('Start job {}'.format(self.comment))
-                startTime = timer()
-                workDone = False
-                try:
-                    (workDone, result) = self.SpecializedWorker()
-                except KeyboardInterrupt:
-                    raise
-                except Exception as e:
-                    print(e)
-                    raise e
-                finally:
-                    endTime = timer()
-                    print('Elapsed time = {}s'.format(endTime-startTime))
-                    if workDone:
-                        try:
-                            result.SetElapsedTime(endTime-startTime)
-                            shared_result_q.put(result)
-                            print('Result sent to the server')
-                        except ConnectionResetError:
-                            print('Connection with the server lost...')
-                            return
-                    else:
-                        try:
-                            shared_job_q.put(self.job)
-                            print('Job sent back to the server')
-                        except ConnectionResetError:
-                            print('Connection with the server lost...')
-                            return
-
-
+            (workDone, result) = self.SpecializedWorker()
         except KeyboardInterrupt:
-            print('Test interrupted')
             raise
-        except queue.Empty:
-            return
+        except Exception as e:
+            print(e)
+            raise e
+        finally:
+            endTime = timer()
+            print('Elapsed time = {}s'.format(endTime-startTime))
+            if workDone:
+                try:
+                    result.SetElapsedTime(endTime-startTime)
+                    shared_result_q.put(result)
+                    print('Result sent to the server')
+                except ConnectionResetError:
+                    print('Connection with the server lost...')
+                    return
+            else:
+                try:
+                    shared_job_q.put(self.job)
+                    print('Job sent back to the server')
+                except ConnectionResetError:
+                    print('Connection with the server lost...')
+                    return
 
     def SpecializedWorker(self):
         return self.RunningTests()
@@ -115,8 +124,8 @@ class GenericWorker(object):
         raise NotImplementedError
 
 class FixedAverageAndFixedDistances(GenericWorker):
-    def __init__(self, trans, config, outDir, hostname):
-        super().__init__(trans, config, outDir, hostname)
+    def __init__(self, workerArg):
+        super().__init__(workerArg)
         #super().RunningTests = self.__RunningTests__
 
     def RunningTests(self):
@@ -185,7 +194,7 @@ class FixedAverageAndFixedDistances(GenericWorker):
             self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
         goalSize = os.stat(self.averageNameVideo).st_size
         self.bitrateGoal = int(self.n*goalSize/24.0)
-        self.job.bitrateGoal = self.bitrateGoal
+        self.job.jobArgs.bitrateGoal = self.bitrateGoal
 
     def __RunFlatFixedViewTest__(self, rot, currentQec):
         closestQec = LayoutGenerators.QEC.GetClosestQecFromTestQec(rot, self.nbQec)
@@ -229,10 +238,10 @@ class FixedAverageAndFixedDistances(GenericWorker):
             distList = [ min(dist, math.pi) for dist in np.arange(0, math.pi+self.distStep, self.distStep) ]
             for dist in distList:
                 LayoutGenerators.FlatFixedLayout.SetRandomSeed(dist)
-                k = self.job.nbTest
+                k = self.job.jobArgs.nbTest
                 while k != 0:
                     for qec in LayoutGenerators.QEC.TestQecGenerator(self.nbQec):
-                        print('Start computation for QEC({}) for test id {} and distance {}'.format(qec.GetStrId(), self.job.nbTest-k, dist))
+                        print('Start computation for QEC({}) for test id {} and distance {}'.format(qec.GetStrId(), self.job.jobArgs.nbTest-k, dist))
                         rot = LayoutGenerators.FlatFixedLayout.GetRandomCenterAtDistance(qec, dist) #Get the good flat fixed center
                         if abs(dist - qec.ComputeDistance(rot)) > 10**-5:
                             print('ERROR distance of the random point too far compare to expected distance: expect', dist, 'but got', qec.ComputeDistance(y,p))

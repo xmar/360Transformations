@@ -51,8 +51,8 @@ def RunServer(jobList, outputDir, PortAuthkey):
     listenPort = PortAuthkey[0]+1
     for job in jobList:
         shared_job_q.put(job)
-        if not job.inputVideo in videoList:
-            videoList.append(job.inputVideo)
+        if not job.jobArgs.inputVideo in videoList:
+            videoList.append(job.jobArgs.inputVideo)
     results = []
 
     videoSender = mp.Process( target= Video.VideoSenderManager, args=(videoList, server_exit_event) )

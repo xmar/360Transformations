@@ -94,8 +94,15 @@ def VideoSenderManager(videoList, exit_event):
         p.start()
 
     try:
-        for p in procs:
-            p.join()
+        while True:
+            for p in procs:
+                while True:
+                    p.join(5)
+                    if not p.is_alive():
+                        return
+                    elif exit_event.is_set():
+                        p.terminate()
+                        p.join(5)
     except KeyboardInterrupt:
         return
 

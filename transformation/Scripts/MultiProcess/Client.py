@@ -22,7 +22,7 @@ def MakeClientManager(host, port, authkey):
     return manager
 
 
-def RunClient(mp_job_worker, host, port, authkey):
+def RunClient(workerArg, host, port, authkey):
     """The function that connect to the server and start to process the jobs. OutputDir is the path to the local output directory. mp_job_worker the function that take the input_queue and the results_queue and process the results."""
     manager = MakeClientManager(host, port, authkey)
 
@@ -31,5 +31,5 @@ def RunClient(mp_job_worker, host, port, authkey):
     server_exit_event = manager.get_server_exit_event()
 
     #Do the job (only one process)
-    WorkerManager(mp_job_worker, job_q, result_q, server_exit_event)
+    WorkerManager(workerArg, job_q, result_q, server_exit_event)
     del manager

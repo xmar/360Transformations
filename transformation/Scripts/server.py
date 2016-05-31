@@ -39,7 +39,11 @@ def main():
                                         video.SetTcpPort(listenPort)
                                         listenPort += 1
                                         videoDic[video.fileName] = video
-                                    job = MultiProcess.Job(nbQEC, step, nbT, n, args.i, reuse, r, videoDic[video.fileName], bitrateGoal)
+                                    jobArg = MultiProcess.JobArg(nbQEC, step,
+                                        nbT, n, args.i, reuse, r,
+                                        videoDic[video.fileName], bitrateGoal)
+                                    workerCls = MultiProcess.FixedAverageAndFixedDistances
+                                    job = MultiProcess.Job(jobArg, workerCls)
                                     outDir = '{}/{}'.format(args.outputDir, job.ToDirName())
                                     if os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
                                             os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
