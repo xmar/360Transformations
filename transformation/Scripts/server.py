@@ -73,6 +73,7 @@ def main():
                                             if os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
                                                     os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\
                                                     os.path.exists('{}/cdfQuality.csv'.format(outDir)):
+                                                print('Results for {} already exist'.format(outDir))
                                                 FormatResults.GeneratePDF(outDir, '{}/plots'.format(outDir), job.ToComment())
                                             else:
                                                 jobList.append( job )

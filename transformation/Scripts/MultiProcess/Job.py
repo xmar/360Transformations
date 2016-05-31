@@ -44,16 +44,17 @@ class JobFixedAverageAndFixedDistances(GenericJob):
 
     def ToDirName(self):
         if self.printBitrateGoal:
-            return '{}NbQec{}NbFrames{}Res{}Bitrate{}distStep{}ReuseVideo{}'.format(
+            return '{}NbQec{}NbFrames{}NbT{}Res{}Bitrate{}distStep{}ReuseVideo{}'.format(
                     self.jobArgs.inputVideo.fileName.split('.')[0],
-                    self.jobArgs.nbQec, self.jobArgs.nbFrames,
+                    self.jobArgs.nbQec, self.jobArgs.nbFrames, self.jobArgs.nbTest,
                     self.jobArgs.res, self.jobArgs.bitrateGoal,
                     self.jobArgs.distStep, self.reuseVideo)
         else:
-            return '{}NbQec{}NbFrames{}Res{}averageEqTileRatio{}distStep{}ReuseVideo{}'.format(
+            return '{}NbQec{}NbFrames{}NbT{}Res{}averageEqTileRatio{}distStep{}ReuseVideo{}'.format(
                     self.jobArgs.inputVideo.fileName.split('.')[0], self.jobArgs.nbQec,
-                    self.jobArgs.nbFrames, self.jobArgs.res, self.jobArgs.averageEqTileRatio,
-                    self.jobArgs.distStep, self.jobArgs.reuseVideo)
+                    self.jobArgs.nbFrames, self.jobArgs.nbTest, self.jobArgs.res,
+                    self.jobArgs.averageEqTileRatio, self.jobArgs.distStep,
+                    self.jobArgs.reuseVideo)
 
 
     def ToComment(self):
