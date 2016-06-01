@@ -272,3 +272,45 @@ class FixedAverageAndFixedDistances(GenericWorker):
             else:
                 return (workDone, Results(self.outputDir, self.job))
             print('Job done')
+
+class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
+    def __init__(self, workerArg):
+        super().__init__(workerArg)
+
+    #override parent implementation
+    def __GenerateAverageVideos__(self):
+        #First we re-encode the original Equirectangular video for fair comparaison later
+        outEquiNameStorage = '{}/equirectangular_storage.dat'.format(self.outputDir)
+        outEquiNameVideo = '{}/equirectangular.mkv'.format(self.outputDir)
+        outEquiId = '{}/equirectangular'.format(self.outputDir)
+        GenerateVideo.GenerateVideoAndStore(self.config, self.trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None)], 24, self.n,
+                self.inputVideo, outEquiId, 0)
+
+        #We get the resolution of the video
+        ffmpegProcess = sub.Popen(['ffmpeg', '-i', outEquiNameVideo], stderr=sub.PIPE)
+        regex = re.compile('.*\s(\d+)x(\d+)\s.*')
+        regexBitrate = re.compile('.*\sbitrate:\s+(\d+)\skb/s.*')
+        for line in iter(ffmpegProcess.stderr.readline, b''):
+            m = regex.match(line.decode('utf-8'))
+            if m is not None:
+                self.refWidth = int(m.group(1))
+                self.refHeight = int(m.group(2))
+            m = regex.match(line.decode('utf-8'))
+            if m is not None:
+                self.bitrateGoal = int(self.job.jobArgs.averageEqTileRatio*int(m.group(1)))
+                self.job.jobArgs.bitrateGoal = self.bitrateGoal
+
+        #Compute the average equirectangularTiled video
+        averageNameStorage = '{}/AverageEquiTiled_storage.dat'.format(self.outputDir)
+        self.averageNameVideo = '{}/AverageEquiTiled.mkv'.format(self.outputDir)
+        skip = False
+        if os.path.isfile(averageNameStorage) and os.path.isfile(self.averageNameVideo):
+            self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
+            if self.n == self.lsAverage.nbFrames:
+                skip = True
+        if not skip:
+            outLayoutId = '{}/AverageEquiTiled'.format(self.outputDir)
+            layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None, self.refWidth, self.refHeight)
+            GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
+              [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
+            self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)

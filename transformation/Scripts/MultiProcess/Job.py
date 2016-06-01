@@ -65,3 +65,8 @@ class JobFixedAverageAndFixedDistances(GenericJob):
              self.jobArgs.res, self.jobArgs.bitrateGoal,
              self.jobArgs.inputVideo.fileName.replace('_','-'),
              self.jobArgs.averageEqTileRatio)
+
+class JobFixedBitrateAndFixedDistances(JobFixedAverageAndFixedDistances):
+    def __init__(self, jobArgs):
+        super().__init__(jobArgs)
+        self.workerCls = MultiProcess.FixedBitrateAndFixedDistances
