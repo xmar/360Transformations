@@ -73,7 +73,7 @@
 
 
 % ===== client
-\node[element,left=\ecartElement of server] (client) {};
+\node[element,right=\ecartElement of server] (client) {};
 \node[elementtitle, above=-5pt of client] {\vphantom{pt}client};
 % the equirecntagular
 %\draw([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) pic {equirec={\sizeSphere}{0}{0}};
@@ -98,11 +98,11 @@
 
 %\draw[-latex] (client.east) -- (server.west);
 %\draw[-latex] (client) to[bend left] node[above] {getManifest()} (server);
-\tikzset{every loop/.style={in=0,out=30,looseness=5}}
+\tikzset{every loop/.style={in=170,out=145,looseness=5}}
 
-\path[->] (client) edge [loop] node[above, near start] {updateFoV()} (client);
-\draw[-latex] (client.-15) to[bend left=30] node[below, outer sep=8pt] {getSegment(FoV)} (server.195);
-\draw[-latex] (server) to[bend left=30] node[below] {videoVersion}(client);
+\path[->] (client) edge [loop] node[above, near start] {updateQEC()} (client);
+\draw[-latex] (client.190) to node[above, outer sep=0pt] {getSegment(QEC)} (server.-10);
+\draw[-latex] (server.-25) to node[below] {videoVersion}(client.205);
 
 % the equirecntagular
 %\draw([xshift=3*\sizeSphere + 5*\ecartObjet pt, yshift=-2*\ecartYVersions]client.east) pic {equirec={\sizeSphere}{0}{0}};
@@ -127,7 +127,7 @@
 %\draw[-latex] (server.west) -- (client.east);
 
 % ===== server
-\node[element,right=\ecartElement of client] (server) {};
+\node[element,left=\ecartElement of client] (server) {};
 \node[elementtitle, above=-5pt of server] {\vphantom{pt}server};
 \draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
 \draw ([xshift=-\sizeSphere - \ecartObjet pt]server.east) pic {equirec={\sizeSphere}{2}{1}};
@@ -142,6 +142,6 @@
 
 
 \end{tikzpicture}
-\caption{360-degree video delivery system architecture}
+\caption{Navigable 360-degree video delivery system architecture}
 \label{fig:videoDeliveryArchitecture}
 \end{figure} 
