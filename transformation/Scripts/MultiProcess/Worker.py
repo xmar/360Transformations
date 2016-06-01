@@ -314,5 +314,5 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
             outLayoutId = '{}/AverageEquiTiled'.format(self.outputDir)
             layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None, self.refWidth, self.refHeight)
             GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-              [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
+              [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(layoutAverage, 1)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
             self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
