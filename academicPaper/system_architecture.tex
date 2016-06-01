@@ -6,15 +6,15 @@ This section describes the proposed adaptive video delivery system. The video de
 
 A server maintains several video versions. It takes as an input a 360-degree video in equirectangular format and transforms each frame into desired geometrical layout. From there it creates a number of different video versions, each with a different QEC and encoded in 5 different bitrates. The server splits all such encoded video versions in short duration video segments that are classified in different representations (based on their respective resolution, bitrate, and QEC value), and delivered to the client on request.
 
-A DASH manifest file is extended with new information to support the navigable 360-degree video delivery. Each representation contains information about the QEC coordinates, besides the resolution and bitrate of each video segment. The manifest file also specifies the geometrical layout, quality arrangement (for video encoder to be able to encode the video), and the segment size of all video segments. The proposed changes are illustrated in Figure \ref{fig:mpdChanges}.
+A DASH manifest file is extended with new information to support the navigable 360-degree video delivery. Each representation contains the QEC coordinates in degrees, besides the parameters that are already defined in the standard \cite{}. Similarly, an adaptation set is extended with geometrical layout and quality arrangement attributes, for video encoder to know how to encode the video. The proposed changes are added as new attributes of \textit{Representation} and \textit{AdaptationSet} tags, as illustrated in Figure \ref{fig:mpdChanges}. With such extensions we maintain the conformance with the standard, ensuring the interworking with the legacy DASH clients that can simply ignore these newly introduced attributes.
 
 \begin{lstlisting}[language=xml, frame=single, backgroundcolor=\color{white}, caption=Extensions of MPD file]
 <?xml version="1.0"?>
     <MPD>
     ...
-        <AdaptationSet geometricLayout="cubeMap" qualityArrangement="">
-            <Representation id="1" qec="4,3" bandwidth="9876" width="1920" height="1080" frameRate="30">
-                <SegmentList timescale="2000" duration="10000">
+        <AdaptationSet geometricLayout="cubeMap" qualityArrangement="4/1/1">
+            <Representation id="1" qec="90,60" bandwidth="9876" width="1920" height="1080" frameRate="30">
+                <SegmentList timescale="1000" duration="2000">
                 ...
             </Representation>
         </AdaptationSet>
@@ -41,7 +41,7 @@ Many bitrate adaptation logic algorithms for adaptive streaming have been develo
 
 A video segment size determines how often requests are sent to the server. It typically ranges from 2 seconds to 10 seconds per segment. Short segments are good to quickly adapt to head movement and bandwidth changes, but the video encoding requires a higher number of segments and streaming of this video results in larger manifest files. Shorter segments also increase the network overhead by frequent requests, as well as network delay because of the round trip time that is needed to establish a TCP connection\footnote{In case of non-persistent HTTP connection TCP connection is established with the server after each request.} and request a segment (which can both take significant time in case of very short segment sizes). Longer segments are better in coding efficiency and quality than the shorter ones, however loose on the flexibility to adapt the stream to changes.
 
-A user's head movements affect the "optimal" segment size selection and quality of the displayed video. If the user watches relatively static video content, his/her head will not move that much, leading to slower head movements. Slower head movements usually cause shorter FoV center distances, requiring only a small portion of video to be encoded in high quality (while the rest can be given in the lowest quality) in order to optimize the user experience. They also need less frequent video segment updates. On the contrary, faster head movements typically produce longer FoV center distances,  requiring larger portions of video to be encoded in higher quality and more frequent segment updates to optimize the user experience. 
+A user's head movements affect the "optimal" segment size selection and quality of the displayed video. If the user watches relatively static video content, his/her head will not move that much, leading to slower head movements. Slower head movements usually cause shorter FoV center distances, requiring only a small portion of video to be encoded in high quality (while the rest can be given in the lowest quality) in order to optimize the user experience. They also need less frequent video segment updates. On the contrary, faster head movements typically produce longer FoV center distances,  requiring larger portions of video to be encoded in higher quality and more frequent segment updates to optimize the user experience.
 %If the user moves his head a lot, he needs to get more frequently segments with new QECs.
 
 We study, in the remainder of the paper, the impact of the segment size/request rate and the FoV center distance on the viewport quality that is displayed to the user, using a single head motion dataset. More studies with different datasets and video content types are needed in the future to generalize these results. We are also interested to find out how many representations are needed to achieve a desired video quality, using the particular geometrical layout.
