@@ -286,6 +286,7 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
         GenerateVideo.GenerateVideoAndStore(self.config, self.trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None)], 24, self.n,
                 self.inputVideo, outEquiId, 0)
 
+        self.inputVideo = outEquiNameVideo
         #We get the resolution of the video
         ffmpegProcess = sub.Popen(['ffmpeg', '-i', self.inputVideo], stderr=sub.PIPE)
         regex = re.compile('.*\s(\d+)x(\d+)\s.*')
