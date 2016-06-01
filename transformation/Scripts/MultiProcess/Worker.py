@@ -287,7 +287,7 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
                 self.inputVideo, outEquiId, 0)
 
         #We get the resolution of the video
-        ffmpegProcess = sub.Popen(['ffmpeg', '-i', outEquiNameVideo], stderr=sub.PIPE)
+        ffmpegProcess = sub.Popen(['ffmpeg', '-i', self.inputVideo], stderr=sub.PIPE)
         regex = re.compile('.*\s(\d+)x(\d+)\s.*')
         regexBitrate = re.compile('.*\sbitrate:\s+(\d+)\skb/s.*')
         for line in iter(ffmpegProcess.stderr.readline, b''):
@@ -297,8 +297,10 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
                 self.refHeight = int(m.group(2))
             m = regex.match(line.decode('utf-8'))
             if m is not None:
-                self.bitrateGoal = int(self.job.jobArgs.averageEqTileRatio*int(m.group(1)))
+                originalBitrate = int(m.group(1))
+                self.bitrateGoal = int(self.job.jobArgs.averageEqTileRatio*originalBitrate)
                 self.job.jobArgs.bitrateGoal = self.bitrateGoal
+        print('Original bitrate {} kbps, goal bitrate {} kbps'.format(originalBitrate, self.bitrateGoal))
 
         #Compute the average equirectangularTiled video
         averageNameStorage = '{}/AverageEquiTiled_storage.dat'.format(self.outputDir)
