@@ -87,6 +87,7 @@ def GetAverageQuality(fileName):
     return (q/n, p/n) if n != 0 else 0
 
 def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, inputVideos, outputDirQEC, qec, flatFixedCenterRot, isGood):
+    noOutputVideo = True
     if len(layoutsToTest) != len(inputVideos):
         raise ValueError("layoutsToTest and inputVideos should have the same lenth")
     layouts = []
@@ -112,7 +113,7 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                 shutil.copy(iv, nivp)
                 newIv.append(nivp)
             with open(config, 'w') as cf:
-                cf.write(GenerateConf(layouts, newIv, '/tmp/test.mkv', '/tmp/test.txt', n, fps, 0))
+                cf.write(GenerateConf(layouts, newIv, '' if noOutputVideo else '/tmp/test.mkv', '/tmp/test.txt', n, fps, 0))
 
             sub.check_call([trans, '-c', config])
 
@@ -127,7 +128,8 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                 resultVideoName = '{}/{}_{}.mkv'.format(outputDirQEC, name1, name2)
                 resultQualityName = '{}/{}_{}.txt'.format(outputDirQEC, name1, name2)
                 resultLogName = '{}/{}_{}_log.txt'.format(outputDirQEC, name1, name2)
-                shutil.move(outputVideoName, resultVideoName)
+                if not noOutputVideo:
+                    shutil.move(outputVideoName, resultVideoName)
                 shutil.copy(config, resultLogName)
                 if i != 1:
                     shutil.move(outputQualityName, resultQualityName)

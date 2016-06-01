@@ -295,12 +295,12 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
             if m is not None:
                 self.refWidth = int(m.group(1))
                 self.refHeight = int(m.group(2))
-            m = regex.match(line.decode('utf-8'))
+            m = regexBitrate.match(line.decode('utf-8'))
             if m is not None:
                 originalBitrate = int(m.group(1))
                 self.bitrateGoal = int(self.job.jobArgs.averageEqTileRatio*originalBitrate)
                 self.job.jobArgs.bitrateGoal = self.bitrateGoal
-        print('Original bitrate {} kbps, goal bitrate {} kbps'.format(originalBitrate, self.bitrateGoal))
+        print('ffmpeg', '-i', self.inputVideo, ': Original bitrate {} kbps, goal bitrate {} kbps'.format(originalBitrate, self.bitrateGoal))
 
         #Compute the average equirectangularTiled video
         averageNameStorage = '{}/AverageEquiTiled_storage.dat'.format(self.outputDir)
