@@ -98,20 +98,23 @@
 		    		at (bigA.west) (legbwhi) {high};
 		    \fi
 		    \ifnum#3>0
-				\node[font=\scriptsize,anchor=south] at (bigA.north) {seg$_{#3}$};
+				\node[font=\scriptsize,anchor=south] at (bigA.north) {$s_{#3}$};
 			\fi
-			\pic[local bounding box=medA] at ([yshift=\ecartMed]bigA.south) {equirec={\sizeMed}{#4}{#5}};
-			\ifnum#1>0
-				\node[font=\scriptsize,anchor=west, inner sep=0pt] 
-					at (legbwhi.west |- medA) (legbwme) {\vphantom{g}med};
-			\fi
-			\pic[local bounding box=lowA] at ([yshift=\ecartLow]medA.south) {equirec={\sizeLow}{#4}{#5}};
+%			\pic[local bounding box=medA] at ([yshift=\ecartMed]bigA.south) {equirec={\sizeMed}{#4}{#5}};
+%			\ifnum#1>0
+%				\node[font=\scriptsize,anchor=west, inner sep=0pt] 
+%					at (legbwhi.west |- medA) (legbwme) {\vphantom{g}med};
+%			\fi
+%			\pic[local bounding box=lowA] at ([yshift=\ecartLow]medA.south) 
+%				{equirec={\sizeLow}{#4}{#5}};
+			\pic[local bounding box=lowA] at ([yshift=\ecartLow]bigA.south) 
+				{equirec={\sizeLow}{#4}{#5}};
 			\ifnum#1>0
 				\node[font=\scriptsize, inner sep=0pt, anchor=west] 
 					at (legbwhi.west |- lowA) {\vphantom{g}low};
 			\fi
 			\ifnum#2>0
-				\node[font=\footnotesize,anchor=east] at (legbwme.west) {QEC$_#2$};
+				\node[font=\footnotesize,anchor=east] at (legbwhi.south west) {QEC$_#2$};
 			\fi
 		}
 	}
@@ -193,8 +196,8 @@
 \def\sizeMed{9}
 \def\ecartMed{-6 pt}
 \def\sizeLow{7}
-\def\ecartLow{-5 pt}
-\def\ecartInterThree{-0.29}
+\def\ecartLow{-6 pt}
+\def\ecartInterThree{-0.52}
 
 
 \pic[local bounding box=leftup] at (0,0) {threerep={1}{1}{1}{2}{1}};
@@ -216,12 +219,22 @@
 	  {threerep={0}{0}{0}{0}{0}};	
 	  
 \begin{scope}[on background layer]
-	\draw[fill=gray!10,draw=none] (leftmid.north west) rectangle 
-				([xshift=3pt]rightmid.south east);
+	\draw[fill=gray!10,draw=none] ([yshift=4.5pt]leftmid.north west) rectangle 
+				([xshift=3pt, yshift=-4.5pt]rightmid.south east);
 \end{scope}
 
+% axis time
+\node[inner sep=1pt] (timeleg) at ([xshift=8pt, yshift=-8pt]rightdown.south) {t};
+\draw [thick, ->] ([yshift=-8pt] leftdown.south) to (timeleg);
+
+\draw[dotted] ([xshift = 4pt]leftdown.east |- timeleg.south) to 
+	([xshift = 4pt]leftdown.east |- leftup.north);
+	
+\draw[dotted] ([xshift = 4 pt]centerdown.east |- timeleg.south) to 
+	([xshift = 4pt]centerdown.east |- centerup.north);	
+
 \draw[element] ([yshift=3pt]leftup.north west) rectangle
-				 ([yshift=-3pt,xshift=3pt]rightdown.south east);
+				 ([yshift=-3pt,xshift=3pt]rightdown.east |- timeleg.south);
 \node[elementtitle,anchor=east,above=-1pt of leftup] (serverLeg) {\vphantom{pt}server};
 
 % ===== client
@@ -229,7 +242,7 @@
 % draw the guys
 \def\ecartGuys{0.25}
 
-\pic[local bounding box=leftguy] at (4.5,-2.75) {leftVR=1.5};
+\pic[local bounding box=leftguy, anchor=south] at (4.5, -2.59) {leftVR=1.5};
 \pic[local bounding box=frontguy, right=\ecartGuys cm of leftguy.south east]  {frontVR=1.5};
 \pic[local bounding box=rightguy, right=\ecartGuys cm of frontguy.south east]  {rightVR=1.5};
 
@@ -260,8 +273,8 @@
 	([xshift =0.04cm]frontfov.east |- highpoint);	
 	
 	
-\pic[local bounding box=leftBW] at ([yshift=18pt] leftguy.north){emptyEquirec={\sizeMed}};
-\node[font=\scriptsize] at (leftBW) {\vphantom{h}med};
+\pic[local bounding box=leftBW] at ([yshift=18pt] leftguy.north){emptyEquirec={\sizeLow}};
+\node[font=\scriptsize] at (leftBW) {\vphantom{h}low};
 \pic[local bounding box=frontBW] at ([yshift=18pt] frontguy.north){emptyEquirec={\sizeBig}};
 \node[font=\scriptsize] at (frontBW) {\vphantom{h}high};
 \pic[local bounding box=rightBW] at ([yshift=18pt] rightguy.north){emptyEquirec={\sizeLow}};
@@ -308,16 +321,16 @@
 \pic[local bounding box=mpd] at (client) {reqresp={connect}
 	{\node[font=\tiny,inner sep=1pt,thin,draw=gray,fill=white] at (0,0) {mpd};\\}
 	};
-\pic[local bounding box=oneseg] at ([yshift=-4pt]client|-mpd.south) {reqresp=
-	{QEC$_2$ med}
-	{\pic at (0,0) {equirec={\sizeMed}{-2}{-1}};\\}
+\pic[local bounding box=oneseg] at ([yshift=-3pt]client|-mpd.south) {reqresp=
+	{s$_1$:QEC$_2$\,lo}
+	{\pic at (0,0) {equirec={\sizeLow}{-2}{-1}};\\}
 	};
-\pic[local bounding box=twoseg] at ([yshift=-4pt]client|-oneseg.south) 
-	{reqresp={QEC$_3$ high}
+\pic[local bounding box=twoseg] at ([yshift=-3pt]client|-oneseg.south) 
+	{reqresp={s$_2$:QEC$_3$\,hi}
 	{\pic at (0,0) {equirec={\sizeBig}{0}{0}};\\}
 	};
-\pic[local bounding box=thirdseg] at ([yshift=-4pt]client|-twoseg.south) 
-	{reqresp={QEC$_1$ low}
+\pic[local bounding box=thirdseg] at ([yshift=-3pt]client|-twoseg.south) 
+	{reqresp={s$_3$:QEC$_1$\,lo}
 	{\pic at (0,0) {equirec={\sizeLow}{2}{1}};\\}
 	};
 
@@ -328,6 +341,6 @@
 
 
 \end{tikzpicture}
-\caption{\ac{FoV}-adaptive streaming system: the server offers nine representations (three QECs at three bit-rates). Here we show three segments of the video stream. The client moves the head from left to right, while the available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the throughput.}
+\caption{\ac{FoV}-adaptive streaming system: the server offers six representations (three QECs at two bit-rates). The streams lasts three segments from $s_1$ to $s_3$. The client moves the head from left to right, while the available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the throughput.}
 \label{fig:newdelivery}
 \end{figure}
