@@ -39,6 +39,12 @@
 	}
 }
 
+\tikzset{
+	emptyEquirec/.pic={
+		\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+	}
+}
+
 \def\convCmPt{0.0352778}
 \def\convCmPtRec{0.019844}
 \def\convCmPtRecThird{0.0066147}
@@ -48,10 +54,18 @@
          minimum size=2*(#1-\pgflinewidth),
          inner sep=0pt, outer sep=0pt}}
 
+% here is for the FoV
 \tikzset{
-	fov/.pic ={
-		\draw[densely dotted, thick, red!70!black] (-0.07,0.10) rectangle (0.37,-0.20);
-		\draw (0.15,-0.05) node[cross=2pt,red!70!black] {};
+	pics/fov/.style n args={2}{
+		% the first parameter is the size of the screen
+		% the second parameter is the x coordinate of the FoV center (0, 1 or 2)
+		code = {
+			\draw (-0.5*#1, -0.28*#1) rectangle (0.5*#1, 0.28*#1);
+			\draw[densely dotted, thick, red!70!black] (-0.45*#1 + #2*#1*0.24, 0.15*#1)
+				 rectangle 
+			 	(-0.4*#1 + #2*#1*0.24 + 0.4*#1, -0.15*#1);
+			\draw (-0.4*#1 + #2*#1*0.24 + 0.2*#1, 0.05*#1) node[cross=2pt,red!70!black] {};
+	   }
 	}
 }
 
@@ -81,7 +95,7 @@
 			\pic[local bounding box=bigA] at (0,0) {equirec={\sizeBig}{#4}{#5}};
 			\ifnum#1>0
 		    	\node[font=\scriptsize, anchor=east, inner sep=0pt] 
-		    		at (bigA.west) (legbwhi) {high bw};
+		    		at (bigA.west) (legbwhi) {high};
 		    \fi
 		    \ifnum#3>0
 				\node[font=\scriptsize,anchor=south] at (bigA.north) {seg$_{#3}$};
@@ -89,15 +103,15 @@
 			\pic[local bounding box=medA] at ([yshift=\ecartMed]bigA.south) {equirec={\sizeMed}{#4}{#5}};
 			\ifnum#1>0
 				\node[font=\scriptsize,anchor=west, inner sep=0pt] 
-					at (legbwhi.west |- medA) (legbwme) {\vphantom{g}med bw};
+					at (legbwhi.west |- medA) (legbwme) {\vphantom{g}med};
 			\fi
 			\pic[local bounding box=lowA] at ([yshift=\ecartLow]medA.south) {equirec={\sizeLow}{#4}{#5}};
 			\ifnum#1>0
 				\node[font=\scriptsize, inner sep=0pt, anchor=west] 
-					at (legbwhi.west |- lowA) {\vphantom{g}low bw};
+					at (legbwhi.west |- lowA) {\vphantom{g}low};
 			\fi
 			\ifnum#2>0
-				\node[font=\normalsize,anchor=east] at (legbwme.west) {QEC$_#2$};
+				\node[font=\footnotesize,anchor=east] at (legbwme.west) {QEC$_#2$};
 			\fi
 		}
 	}
@@ -180,7 +194,6 @@
 \def\ecartMed{-6 pt}
 \def\sizeLow{7}
 \def\ecartLow{-5 pt}
-
 \def\ecartInterThree{-0.29}
 
 
@@ -209,70 +222,112 @@
 
 \draw[element] ([yshift=3pt]leftup.north west) rectangle
 				 ([yshift=-3pt,xshift=3pt]rightdown.south east);
-\node[elementtitle,anchor=east,above=-1pt of leftup] {\vphantom{pt}server};
+\node[elementtitle,anchor=east,above=-1pt of leftup] (serverLeg) {\vphantom{pt}server};
 
 % ===== client
 
-\def\ecartGuys{10pt}
+% draw the guys
+\def\ecartGuys{0.25}
 
-\pic[local bounding box=leftguy] at (4,0) {leftVR=1.5};
-%\draw[thin] (leftguy.north west) rectangle (leftguy.south east);
-\pic[local bounding box=frontguy, right=\ecartGuys of leftguy.south east]  {frontVR=1.5};
-\pic[local bounding box=rightguy, right=\ecartGuys of frontguy.south east]  {rightVR=1.5};
+\pic[local bounding box=leftguy] at (4.5,-2.75) {leftVR=1.5};
+\pic[local bounding box=frontguy, right=\ecartGuys cm of leftguy.south east]  {frontVR=1.5};
+\pic[local bounding box=rightguy, right=\ecartGuys cm of frontguy.south east]  {rightVR=1.5};
 
+% draw the associated FoVs
+\pic[local bounding box=leftfov, below=10 pt of leftguy.south] {fov={0.8}{0}};
+\pic[local bounding box=frontfov, below=10 pt of frontguy.south] {fov={0.8}{1}};
+\pic[local bounding box=rightfov, below=10 pt of rightguy.south] {fov={0.8}{2}};
 
-%\node[element] at (0,0) (server) {};
-%\node[elementtitle, above=-5pt of server] {\vphantom{pt}server};
-%\draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
+% ==== draw the bandwidth
 
+% axis
+\node[font=\footnotesize, inner sep=1pt] (highpoint) at ([yshift=-3pt]leftfov.west |- leftup.north) {bw};
+\draw[thick,->] ([yshift=10pt]leftfov.west |- leftguy.north) to (highpoint);
+\node[font=\footnotesize, inner sep=1pt] (rightpoint) at ([yshift=10pt]rightfov.east |- rightguy.north) {t};
+\draw[thick,->] ([yshift=10pt]leftfov.west |- leftguy.north) to (rightpoint);
 
+% curve
+\draw[ultra thick] plot [smooth] coordinates {([yshift=35pt]leftfov.west |- leftguy.north)
+		([yshift=50pt]frontfov.west |- leftguy.north)
+		([yshift=25pt]rightfov.west |- leftguy.north)
+		([yshift=40pt]rightfov.east |- leftguy.north)};
+		
+% separating lines
+\draw[dotted] ([xshift =0.04cm]leftfov.south east) to 
+	([xshift =0.04cm]leftfov.east |- highpoint);
+	
+\draw[dotted] ([xshift =0.04cm]frontfov.south east) to 
+	([xshift =0.04cm]frontfov.east |- highpoint);	
+	
+	
+\pic[local bounding box=leftBW] at ([yshift=18pt] leftguy.north){emptyEquirec={\sizeMed}};
+\node[font=\scriptsize] at (leftBW) {\vphantom{h}med};
+\pic[local bounding box=frontBW] at ([yshift=18pt] frontguy.north){emptyEquirec={\sizeBig}};
+\node[font=\scriptsize] at (frontBW) {\vphantom{h}high};
+\pic[local bounding box=rightBW] at ([yshift=18pt] rightguy.north){emptyEquirec={\sizeLow}};
+\node[font=\scriptsize] at (rightBW) {\vphantom{h}low};
 
-% \draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=\ecartYVersions]server.east) pic {equirec={\sizeSphere}{-2}{-1}};
-%\draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=-\ecartYVersions]server.east) pic {equirec={\sizeSphere}{0}{0}};
+% draw the enclosing element
+\draw[element] ([yshift=3pt]highpoint.west |- leftup.north) rectangle
+				 ([yshift=-3pt,xshift=3pt]rightfov.south east);
+\node[elementtitle, anchor=east] at (rightguy |- serverLeg) {\vphantom{pt}client};
 
-%% the three arrows in the server
-%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]server.east);
-%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=\ecartYVersions]server.east);
-%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=-\ecartYVersions]server.east);
-%
-%% between capture and server
-%\draw[-latex] ([xshift=2pt]capturing.east) to ([xshift=-2pt]server.west);
-%
-%
-%% ===== client
-%\node[element,right=\ecartElement of server] (client) {};
-%\node[elementtitle, above=-5pt of client] {\vphantom{pt}client};
-%% the equirecntagular
-%\draw([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) pic {equirec={\sizeSphere}{0}{0}};
-%% the old vr
-%%\draw ([xshift=-\sizeSphere - \ecartObjet pt]client.east) pic {vr=\sizeSphere};
-%% the fov
-%\pic[local bounding box=thisfov] at ([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) {fov};
-%%\node[anchor=west, font=\tiny,red, text width=23pt,align=center]
-%%		at ([yshift=10pt]client.west) (fovleg) {\ac{FoV} and \ac{FoV} center};
-%%
-%%\draw[red] (fovleg) -- (thisfov);
-%
-%% vr headset
-%\pgfdeclareimage[width=24 pt]{vrheadset}{vr_icon.png}
-%\node at ([xshift=-28 pt]client.east) (headset)
-%    {\pgfbox[left,center]{\pgfuseimage{vrheadset}}};
-%
-%% old vr
-%%
-%
-%% the arrow in the client
-%\draw[-latex] 
-%%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to 
-%	(thisfov.60) to
-%		([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
-%
-%
-%% between server and client
-%\draw[-latex] ([xshift=2pt, yshift=-\ecartYVersions]server.east) to ([xshift=-2pt, yshift=-\ecartYVersions]client.west);
+% =============
+
+\coordinate (client) at (highpoint.west);
+\coordinate (server) at ([xshift=3pt]rightdown.east);
+
+\tikzset{
+	proto/.style={
+     	-latex, thick
+     }
+}
+
+\tikzset{
+	protoleg/.style={
+		sloped,
+		inner sep=1pt,
+		font=\tiny,
+		above
+     }
+}
+
+\tikzset{
+	pics/reqresp/.style n args={2}{
+	% first parameter is the req message
+	% second parameter is the resp message
+		code={
+			\draw[proto] (0,0) to 
+				node[protoleg, midway] {#1} ([yshift=-10 pt]server |- 0,0);
+			\draw[proto] ([yshift=-11 pt] server |- 0,0) to 
+				node[draw=none,midway,matrix] {#2} ([yshift=-21pt] 0,0);
+			}
+	}
+}
+
+\pic[local bounding box=mpd] at (client) {reqresp={connect}
+	{\node[font=\tiny,inner sep=1pt,thin,draw=gray,fill=white] at (0,0) {mpd};\\}
+	};
+\pic[local bounding box=oneseg] at ([yshift=-4pt]client|-mpd.south) {reqresp=
+	{QEC$_2$ med}
+	{\pic at (0,0) {equirec={\sizeMed}{-2}{-1}};\\}
+	};
+\pic[local bounding box=twoseg] at ([yshift=-4pt]client|-oneseg.south) 
+	{reqresp={QEC$_3$ high}
+	{\pic at (0,0) {equirec={\sizeBig}{0}{0}};\\}
+	};
+\pic[local bounding box=thirdseg] at ([yshift=-4pt]client|-twoseg.south) 
+	{reqresp={QEC$_1$ low}
+	{\pic at (0,0) {equirec={\sizeLow}{2}{1}};\\}
+	};
+
+%\draw[proto] (client) to node[protoleg] {\pgfmathset\baisse-\traitement} ([yshift=-\baisse pt] server |-client);
+%\draw[proto] ([yshift=-\baisse-\traitement pt] server |- client) to 
+%	node[protoleg]{mpd} ([\yshift=-\baisse - \baisse-\traitement pt] client);
+
 
 
 \end{tikzpicture}
-\caption{\ac{FoV}-adaptive streaming system}
+\caption{\ac{FoV}-adaptive streaming system: the server offers nine representations (three QECs at three bit-rates). Here we show three segments of the video stream. The client moves the head from left to right, while the available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the throughput.}
 \label{fig:newdelivery}
 \end{figure}
