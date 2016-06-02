@@ -1,6 +1,7 @@
 import multiprocessing as mp
 from multiprocessing.managers import SyncManager
 import queue
+import time
 from .Worker import WorkerManager
 from .Video import VideoReceiver
 
@@ -24,12 +25,21 @@ def MakeClientManager(host, port, authkey):
 
 def RunClient(workerArg, host, port, authkey):
     """The function that connect to the server and start to process the jobs. OutputDir is the path to the local output directory. mp_job_worker the function that take the input_queue and the results_queue and process the results."""
-    manager = MakeClientManager(host, port, authkey)
+    while True:
+        try:
+            manager = MakeClientManager(host, port, authkey)
 
-    job_q = manager.get_job_q()
-    result_q = manager.get_result_q()
-    server_exit_event = manager.get_server_exit_event()
+            job_q = manager.get_job_q()
+            result_q = manager.get_result_q()
+            server_exit_event = manager.get_server_exit_event()
 
-    #Do the job (only one process)
-    WorkerManager(workerArg, job_q, result_q, server_exit_event)
-    del manager
+            #Do the job (only one process)
+            WorkerManager(workerArg, job_q, result_q, server_exit_event)
+            del manager
+        except ConnectionRefusedError:
+            pass
+        except:
+            break
+            raise
+        finally:
+            time.sleep(15)

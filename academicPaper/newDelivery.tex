@@ -1,0 +1,192 @@
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+
+
+\tikzset{
+     element/.style={
+     	rounded corners,
+     	rectangle,
+  	 	thick,
+  	 	draw=black,
+  	 	minimum height=2cm,minimum width=2.5cm
+     }
+}
+
+\tikzset{
+	elementtitle/.style={
+		rectangle,
+		rounded corners,
+		fill=gray!80,
+		font=\footnotesize,
+		text=white,
+		anchor=north
+	}
+}
+
+\tikzset{
+	pics/equirec/.style n args={3}{
+		code={
+			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
+			\draw[draw,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			\draw[color=black,fill=black] (0.0088194*#2*#1, 0.0066147*#3*#1) circle (1pt);
+		}		
+	}
+}
+
+\def\convCmPt{0.0352778}
+\def\convCmPtRec{0.019844}
+\def\convCmPtRecThird{0.0066147}
+\def\convCmPtFourth{0.0088194}
+
+\tikzset{cross/.style={cross out, draw,
+         minimum size=2*(#1-\pgflinewidth),
+         inner sep=0pt, outer sep=0pt}}
+
+\tikzset{
+	fov/.pic ={
+		\draw[densely dotted, thick, red!70!black] (-0.07,0.10) rectangle (0.37,-0.20);
+		\draw (0.15,-0.05) node[cross=2pt,red!70!black] {};
+	}
+}
+
+
+\tikzset{
+	vr/.pic = {
+		\draw[rounded corners] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+		\draw[rounded corners, thick] (-0.032*#1, -0.019844*#1) rectangle (0.032*#1, 0.016*#1);
+		\node[font=\scriptsize,rectangle,red, draw=red, thick,
+					densely dotted, anchor=east, inner sep=2pt,
+					yshift=-1pt, xshift=-1pt] at (0,0) {L};
+		\node[font=\scriptsize,rectangle,red, draw=red, thick,
+					densely dotted, anchor=west, inner sep=2pt,
+					yshift=-1pt,xshift=0.5pt] at (0,0) {R};
+	}
+}
+
+\tikzset{
+	pics/threerep/.style n args={5}{
+	% first parameter is a bool if bw must be written
+	% second parameter is the QEC number (0 if not)
+	% third parameter is the segment number (0 if not)
+	% fourth parameter is the x pos of QEC
+	% fifth paramerer is the y pos of QEC
+		code={
+			\pic[local bounding box=bigA] at (0,0) {equirec={\sizeBig}{#4}{#5}};
+			\ifnum#1>0
+		    	\node[font=\scriptsize, anchor=east, inner sep=0pt] 
+		    		at (bigA.west) (legbwhi) {high bw};
+		    \fi
+		    \ifnum#3>0
+				\node[font=\scriptsize,anchor=south] at (bigA.north) {seg$_{#3}$};
+			\fi
+			\pic[local bounding box=medA] at ([yshift=\ecartMed]bigA.south) {equirec={\sizeMed}{#4}{#5}};
+			\ifnum#1>0
+				\node[font=\scriptsize,anchor=west, inner sep=0pt] 
+					at (legbwhi.west |- medA) (legbwme) {\vphantom{g}med bw};
+			\fi
+			\pic[local bounding box=lowA] at ([yshift=\ecartLow]medA.south) {equirec={\sizeLow}{#4}{#5}};
+			\ifnum#1>0
+				\node[font=\scriptsize, inner sep=0pt, anchor=west] 
+					at (legbwhi.west |- lowA) {\vphantom{g}low bw};
+			\fi
+			\ifnum#2>0
+				\node[font=\normalsize,anchor=east] at (legbwme.west) {QEC$_#2$};
+			\fi
+		}
+	}
+}
+		
+\def\sizeBig{11}
+\def\sizeMed{9}
+\def\ecartMed{-6 pt}
+\def\sizeLow{7}
+\def\ecartLow{-5 pt}
+
+\def\ecartInterThree{-0.29}
+
+
+\pic[local bounding box=leftup] at (0,0) {threerep={1}{1}{1}{2}{1}};
+\pic[anchor=east, local bounding box=leftmid] at ($(-0.4,\ecartInterThree)+(leftup.east |- leftup.south)$)
+	  {threerep={1}{2}{0}{-2}{-1}};
+\pic[anchor=east, local bounding box=leftdown] at ($(-0.4,\ecartInterThree)+(leftmid.east |- leftmid.south)$)
+	  {threerep={1}{3}{0}{0}{0}};	
+
+\pic[local bounding box=centerup] at (1,0) {threerep={0}{0}{2}{2}{1}};
+\pic[anchor=east, local bounding box=centermid] at ($(-0.4,\ecartInterThree)+(centerup.east |- centerup.south)$)
+	  {threerep={0}{0}{0}{-2}{-1}};
+\pic[anchor=east, local bounding box=centerdown] at ($(-0.4,\ecartInterThree)+(centermid.east |- centermid.south)$)
+	  {threerep={0}{0}{0}{0}{0}};	
+
+\pic[local bounding box=rightup] at (2,0) {threerep={0}{0}{3}{2}{1}};
+\pic[anchor=east, local bounding box=rightmid] at ($(-0.4,\ecartInterThree)+(rightup.east |- rightup.south)$)
+	  {threerep={0}{0}{0}{-2}{-1}};
+\pic[anchor=east, local bounding box=rightdown] at ($(-0.4,\ecartInterThree)+(rightmid.east |- rightmid.south)$)
+	  {threerep={0}{0}{0}{0}{0}};	
+	  
+\begin{scope}[on background layer]
+	\draw[fill=gray!10,draw=none] (leftmid.north west) rectangle 
+				([xshift=3pt]rightmid.south east);
+\end{scope}
+
+\draw[element] ([yshift=3pt]leftup.north west) rectangle
+				 ([yshift=-3pt,xshift=3pt]rightdown.south east);
+\node[elementtitle,anchor=east,above=-1pt of leftup] {\vphantom{pt}server};
+
+% ===== server
+%\node[element] at (0,0) (server) {};
+%\node[elementtitle, above=-5pt of server] {\vphantom{pt}server};
+%\draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
+
+
+
+% \draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=\ecartYVersions]server.east) pic {equirec={\sizeSphere}{-2}{-1}};
+%\draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=-\ecartYVersions]server.east) pic {equirec={\sizeSphere}{0}{0}};
+
+%% the three arrows in the server
+%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]server.east);
+%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=\ecartYVersions]server.east);
+%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=-\ecartYVersions]server.east);
+%
+%% between capture and server
+%\draw[-latex] ([xshift=2pt]capturing.east) to ([xshift=-2pt]server.west);
+%
+%
+%% ===== client
+%\node[element,right=\ecartElement of server] (client) {};
+%\node[elementtitle, above=-5pt of client] {\vphantom{pt}client};
+%% the equirecntagular
+%\draw([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) pic {equirec={\sizeSphere}{0}{0}};
+%% the old vr
+%%\draw ([xshift=-\sizeSphere - \ecartObjet pt]client.east) pic {vr=\sizeSphere};
+%% the fov
+%\pic[local bounding box=thisfov] at ([xshift=\sizeSphere + \ecartObjet pt, yshift=-\ecartYVersions]client.west) {fov};
+%%\node[anchor=west, font=\tiny,red, text width=23pt,align=center]
+%%		at ([yshift=10pt]client.west) (fovleg) {\ac{FoV} and \ac{FoV} center};
+%%
+%%\draw[red] (fovleg) -- (thisfov);
+%
+%% vr headset
+%\pgfdeclareimage[width=24 pt]{vrheadset}{vr_icon.png}
+%\node at ([xshift=-28 pt]client.east) (headset)
+%    {\pgfbox[left,center]{\pgfuseimage{vrheadset}}};
+%
+%% old vr
+%%
+%
+%% the arrow in the client
+%\draw[-latex] 
+%%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to 
+%	(thisfov.60) to
+%		([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
+%
+%
+%% between server and client
+%\draw[-latex] ([xshift=2pt, yshift=-\ecartYVersions]server.east) to ([xshift=-2pt, yshift=-\ecartYVersions]client.west);
+
+
+\end{tikzpicture}
+\caption{\ac{FoV}-adaptive streaming system}
+\label{fig:newdelivery}
+\end{figure}
