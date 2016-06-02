@@ -24,8 +24,12 @@
 	}
 }
 
+% this is the equirectangular with QEC and qualities
 \tikzset{
 	pics/equirec/.style n args={3}{
+	% the first parameter is the size
+	% the second parameter is the x coordinate of the QEC
+	% the third parameter is the y coordinate of the QEC
 		code={
 			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
 			\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
@@ -65,11 +69,12 @@
 	}
 }
 
+% this is for three representations at different sizes for a given QEC
 \tikzset{
 	pics/threerep/.style n args={5}{
 	% first parameter is a bool if bw must be written
-	% second parameter is the QEC number (0 if not)
-	% third parameter is the segment number (0 if not)
+	% second parameter is the QEC number (0 if not displayed)
+	% third parameter is the segment number (0 if not displayed)
 	% fourth parameter is the x pos of QEC
 	% fifth paramerer is the y pos of QEC
 		code={
@@ -97,6 +102,78 @@
 		}
 	}
 }
+
+% this is for the guy looking at the left
+\tikzset{
+	leftVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.05*#1,0.2*#1) 
+			(0.25*#1,0.2*#1) 
+			(0.3*#1,0)};
+		\draw (0,0) -- (0.3*#1,0);
+		% then the head
+		\draw[fill=white] (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		% then the VR headset
+		\draw[rounded corners=0.3*#1, fill=black] (-0.03*#1, 0.55*#1) rectangle
+			(0.1*#1, 0.35*#1);
+		\begin{scope}
+			\clip (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+			\draw[fill=black] (0.1*#1, 0.5*#1) rectangle (0.3*#1, 0.46*#1);
+			\draw plot [smooth] coordinates {(-0.01*#1,0.3*#1)
+			 (0.04*#1,0.27*#1)
+			 (0.09*#1,0.3*#1)};
+		\end{scope}
+	}
+}
+
+% this is for the guy looking at the right
+\tikzset{
+	rightVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.05*#1,0.2*#1) 
+			(0.25*#1,0.2*#1) 
+			(0.3*#1,0)};
+		\draw (0,0) -- (0.3*#1,0);
+		% then the head
+		\draw[fill=white] (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		% then the VR headset
+		\draw[rounded corners=0.3*#1, fill=black] (0.33*#1, 0.55*#1) rectangle
+			(0.2*#1, 0.35*#1);
+		\begin{scope}
+			\clip (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+			\draw[fill=black] (0.2*#1, 0.5*#1) rectangle (0, 0.46*#1);
+			\draw plot [smooth] coordinates {(0.22*#1,0.3*#1)
+			 (0.27*#1,0.27*#1)
+			 (0.32*#1,0.3*#1)};
+		\end{scope}
+	}
+}
+
+% this is for the guy looking at the front
+\tikzset{
+	frontVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.08*#1,0.2*#1) 
+			(0.42*#1,0.2*#1) 
+			(0.5*#1,0)};
+		\draw (0,0) -- (0.5*#1,0);
+		% then the head
+		\draw[fill=white] (0.25*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		\draw plot [smooth] coordinates {(0.18*#1,0.3*#1)
+			 (0.25*#1,0.27*#1)
+			 (0.32*#1,0.3*#1)};
+		% then the VR headset
+		\draw[rounded corners=0.5*#1, fill=black] (0.07*#1, 0.55*#1) rectangle
+			(0.43*#1, 0.35*#1);
+	}
+}
+
 		
 \def\sizeBig{11}
 \def\sizeMed{9}
@@ -134,7 +211,16 @@
 				 ([yshift=-3pt,xshift=3pt]rightdown.south east);
 \node[elementtitle,anchor=east,above=-1pt of leftup] {\vphantom{pt}server};
 
-% ===== server
+% ===== client
+
+\def\ecartGuys{10pt}
+
+\pic[local bounding box=leftguy] at (4,0) {leftVR=1.5};
+%\draw[thin] (leftguy.north west) rectangle (leftguy.south east);
+\pic[local bounding box=frontguy, right=\ecartGuys of leftguy.south east]  {frontVR=1.5};
+\pic[local bounding box=rightguy, right=\ecartGuys of frontguy.south east]  {rightVR=1.5};
+
+
 %\node[element] at (0,0) (server) {};
 %\node[elementtitle, above=-5pt of server] {\vphantom{pt}server};
 %\draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
