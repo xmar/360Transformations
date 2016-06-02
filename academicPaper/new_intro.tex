@@ -10,15 +10,46 @@ has grown with the advent of both capturing systems
 systems (including head-mounted devices).
 However, the delivery of 360-degree video content, from servers
 to the end-users,
-is still a challenge.
+has still to deal with a problem of resource waste: What you see in your device, 
+which is called the \textit{\ac{FoV}},
+is only a fraction of what you get, which is an omnidirectional view of the scene.
+New solutions have to be designed to secure high-quality delivery despite
+this waste.
 
-Let us provide some numbers to illustrate the challenge.
-A 360-degree video is either a real scene captured in every direction
-to form one global video, or in the case of gaming, a virtual scene from which the
-game engine pre-computes views in all directions around the main player.
-In the same manner that a human
-views the real world from a given perspective, an \ac{HMD} displays only a portion
-of the 360-degree video. The displayed scene is called the \textit{\ac{FoV}}. It is commonly
+The resource waste is the price to pay for interactivity.
+To prevent \emph{simulator sickness}~\cite{moss2011characteristics}
+and to provide a good \ac{QoE}, the vendors of \acp{HMD} recommend the multimedia 
+systems to react
+to head movements as fast as the \ac{HMD}
+refresh rate.%
+\footnote{\url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}}
+Since the refresh rate of 
+state-of-the-art \acp{HMD} is \SI{120}{Hz},%
+\footnote{\url{http://www.vrnerds.de/vr-brillen-vergleich/}}
+Òthe whole system should react in less than
+\SI{10}{ms}. This delay constraint prevents the implementation of traditional delivery
+architecture where the client notifies a server about changes and waits for reception
+of adjusted content. Instead, the \acp{HMD} extract \ac{FoV} video from the full
+360-degree video in real time with respect to head movements, but most pixels
+of the delivered video stream are not used.
+
+%Furthermore,  the \ac{HMD} 
+%vendors recommend to make the system react to head movement as fast as 
+%Sending only \ac{FoV} videos does
+%not enable fast
+%navigation within the 360-degree video: When the client moves the head, the \ac{FoV} 
+%center changes, requiring a new \ac{FoV} video to be immediately displayed. However, since 
+%the device has no knowledge about other parts of the spherical video, it has to notify 
+%the server about the viewer head's movement and wait for reception of the newly 
+%adjusted \ac{FoV} video.
+%Another delivery implementation is to send the full spherical video
+%and to let the device
+%extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth 
+%requirements are
+%significant.
+
+Let us provide some numbers to illustrate the problem.
+The \ac{FoV} is commonly
 defined by 
 a device-specific viewing angle (typically 120 degrees), which delimits horizontally or 
 vertically the scene from the head direction center, called \ac{FoV} center. To get a good 
@@ -26,62 +57,45 @@ immersion, the pixel
 resolution of
 the displayed \ac{FoV} should be high, typically 4k ($3840\times2160$). It means that
 the resolution of the full 360-degree video should be at least 12k ($11520\times6480$). 
-Furthermore, to prevent the so-called \emph{simulator sickness}~\cite{moss2011characteristics}, the \ac{HMD} 
-vendors recommend to make the system react to head movement as fast as the \ac{HMD}
-refresh rate.\footnote{\url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}} Given that the refresh rate of 
-state-of-the-art \acp{HMD} is \SI{90}{Hz}, the video frame rate should thus be high,
+In addition, the immersion requires frame rate in the order of refresh rate, so
 typically around 100\,\acp{fps}.
-Overall, high-quality 360-degree videos combine both large resolution (up to 12k) and high
-frame rate (up to 100\,\acp{fps}), which makes them impossible to stream on any
-state-of-the-art access network technology. To compare, the bit-rate of 8k videos 
+Overall, high-quality 360-degree videos combine both very large resolution (up to 12k) 
+and very high
+frame rate (up to 100\,\acp{fps}). To compare, the bit-rate of 8k videos 
 at 60\,\acp{fps} encoded in \ac{HEVC} is around \SI{100}{Mbps}~\cite{7398367}.
 
-As we will see in Section~\ref{sec:relatedwork}, none of the current solutions 
-for the delivery of 360-degree videos is entirely
-satisfactory. Sending only FoV videos does
-not enable fast
-navigation within the 360-degree video: When the client moves the head, the FoV 
-center changes, requiring a new FoV video to be immediately displayed. However, since 
-the device has no knowledge about other parts of the spherical video, it has to notify 
-the server about the viewer head's movement and wait for reception of the newly 
-adjusted FoV video.
-Another delivery implementation is to send the full spherical video
-and to let the device
-extract the \ac{FoV} videos. This solution enables fast navigation but the bandwidth 
-requirements are
-significant.
-
 We propose in this paper a solution where, following the same principles as in
-rate-adaptive streaming technologies, the server offers multiple \emph{versions} of the same
-360-degree video. But instead of offering versions that only differ by
-their bit-rate and their resolution, the server offers here versions that differ by 
+rate-adaptive streaming technologies, the server offers multiple \emph{representations}
+of the same
+360-degree video. But instead of offering representations that only differ by
+their bit-rate, the server offers here representations that differ by 
 having a better quality in a given region of the video.
-Our proposal is a \emph{region-adaptive streaming system} and is depicted in 
+Our proposal is a \emph{\ac{FoV}-adaptive streaming system} and is depicted in 
 Figure~\ref{fig:deliverychain}.
-Each version is characterized by a \emph{\ac{QEC}}, which is a given
+Each representation is characterized by a \emph{\ac{QEC}}, which is a given
 position in the spherical video. Around the \ac{QEC}, the quality of the video is maximum,
-while it is lower for video areas that are far from the \ac{QEC}. Similarly as 
+while it is lower for video parts that are far from the \ac{QEC}. Similarly as 
 in \ac{DASH}, the video is cut into segments and the client periodically selects
-the video version with respect to an adaptation logic algorithm. Here, the client downloads 
-the video version
+the video representation with respect to an adaptation logic algorithm. Here, the client downloads 
+the video representation
 such that, not only the bit-rate fits with their bandwidth, but also
-the \ac{QEC} is the closest to their \AD{FoV center}.
+the \ac{QEC} is close to their \ac{FoV} center.
 
 \input{deliveryChain.tex}
 
-This region-adaptive 360-degree streaming system has three advantages:
+This \ac{FoV}-adaptive 360-degree streaming system has three advantages:
 $(i)$ the bit-rate of the delivered video is lower than the original full-quality video.
 $(ii)$ When the end-user does not move, the \ac{FoV} video is extracted from the highest
 quality spherical video.
-And $(iii)$ when the end-user moves the head, the video does not stop. The device can
+And $(iii)$ when the end-user moves the head, the device can
 always extract
 a new \ac{FoV} video because it has the full spherical video. If the 
 new \ac{FoV} center is far from the
-\ac{QEC} of the video version, the quality of the extracted video is lower but this
+\ac{QEC} of the video representation, the quality of the extracted video is lower but this
 degradation is transient until the
-device selects another video version with a closer \ac{QEC}.
+device selects another video representation with a closer \ac{QEC}.
 
-In this paper, we introduce region-adaptive streaming systems for navigable 360-degree
+In this paper, we introduce \ac{FoV}-adaptive streaming systems for navigable 360-degree
 videos and we discuss the key design points of such system. We address
 the choice of the projection from a spherical video into a geometric two-dimensional layout
 with a focus on the impact of this projection into the quality of the video encoding. We evaluate
@@ -90,18 +104,19 @@ cube map layout offers the best performance regarding the quality of the extract
 \ac{FoV}.
 Furthermore, based on a dataset of
 real users navigating in 360-degree videos, we study the length of the video segments
-for region-adaptive streaming system. We show that head movements are significant
+for \ac{FoV}-adaptive streaming system. We show that head movements are significant
 in short period, so the video segments have to be short enough to enable 
 frequent region switches.
 
 Finally, we introduce a tool (released on open source in a public
-repository\footnote{url is hidden for blind
-preservation.}), which create video versions for region-adaptive 360-degree videos.
+repository\footnote{\url{https://github.com/xmar/360Transformations}}), 
+which create video representations for 
+\ac{FoV}-adaptive 360-degree videos.
 The tool is highly configurable: from a given 360-degree video, it allows
 any arrangement of video quality depending on any geometric layout, and it
 extracts the
 \ac{FoV} video from any point in the sphere. This tool thus provides the
-main software modules for the implementation of region-adaptive streaming
+main software modules for the implementation of \ac{FoV}-adaptive streaming
 for navigable 360-degree videos.
 
 %is characterized by an \emph{angle of vision}. It contains the full spherical
@@ -112,7 +127,8 @@ for navigable 360-degree videos.
 \section{Related Work}
 \label{sec:relatedwork}
 
-The principle of delivering different qualities within a given navigable omnidirectional video is sketched
+The principle of delivering different qualities within a given navigable 
+omnidirectional video is sketched
 in a recent short paper by~\citet{ochi_live_2015}. Their proposal is based on the idea of video
 tiling, which has been implemented for navigable panorama
 video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}:
@@ -143,10 +159,10 @@ question of arranging various video qualities on the layout has not been studied
 
 Finally, a major content provider of 360-degree videos has recently released details about the
 implementation of its delivery platform~\cite{facebook}. The depicted system is based
-on the same idea as our proposal, where up to 30 versions of the same video are available depending on
+on the same idea as our proposal, where up to 30 representations of the same video are available depending on
 \acp{QEC}. This implementation corroborates that, from an industrial perspective, the
 extra-cost of
-generating and storing multiple versions of the same video is worth the bandwidth
+generating and storing multiple representations of the same video is worth the bandwidth
 savings and the system usability. The authors project the spherical videos into a \emph{pyramid}
 where the
 base is the front
@@ -170,7 +186,7 @@ information loss and distorted extraction of \ac{FoV} videos. \AD{Additionally, 
 %video quality on 360-degree video. We address the main questions raised
 %by~\citet{facebook}: which layout provides the best trade-off
 %between bit-rate and
-%quality, how many video versions should be offered by the server, and what geometric
+%quality, how many video representations should be offered by the server, and what geometric
 %quality arrangement
 %enables the smoothest navigation.
 %\end{itemize}
