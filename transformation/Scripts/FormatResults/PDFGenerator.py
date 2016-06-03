@@ -300,7 +300,7 @@ def GetDistTex(plotPSNR, listId):
     s += '        ]\n'
     s += '\n'
     for layoutId in listId:
-        s += '        \\addplot+ table [x=distance, y={}]{../distanceQuality'.format(layoutId)+('_psnr' if plotPSNR else '')+'.csv};\n'
+        s += '        \\addplot+ table [x=distance, y={}]{{../distanceQuality{}.csv}};\n'.format(layoutId, '_psnr' if plotPSNR else '')
     s += '        \\legend{'
     for layoutId in listId:
         s += layoutId
