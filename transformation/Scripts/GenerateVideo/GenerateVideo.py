@@ -53,6 +53,7 @@ def GenerateVideo(config, trans, layouts_a, fps, nbFrames,  inputVideo, outputId
         raise
     except Exception as inst:
         print (inst)
+        raise
     finally:
         if os.path.isfile('/tmp/tmp1{}.mkv'.format(lastName)):
             os.remove('/tmp/tmp1{}.mkv'.format(lastName))
@@ -72,5 +73,3 @@ def GenerateVideoAndStore(config, trans, layouts_a, fps, nbFrames,  inputVideo, 
             ls.Dump(outStorage)
         else:
             raise Exception('Error while processing')
-
-

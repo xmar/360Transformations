@@ -57,7 +57,7 @@ class EquirectangularTiledLowerQualityLayout(Layout):
         self.qec = qec
 
 
-    def GenerateLayout(self):
+    def GenerateLayout(self, a=None):
         c = '[{}]\ntype=equirectangularTiled\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
@@ -76,7 +76,7 @@ class EquirectangularTiledMediumQualityLayout(Layout):
         self.qec = qec
 
 
-    def GenerateLayout(self):
+    def GenerateLayout(self, a=None):
         c = '[{}]\ntype=equirectangularTiled\n'.format(self.GetName())
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
