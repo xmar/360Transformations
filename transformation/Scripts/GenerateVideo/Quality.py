@@ -6,6 +6,15 @@ import pickle
 
 import LayoutGenerators
 
+def FlatFixedResolutionToBitrate(ffLayout):
+    height = ffLayout.height
+    resToBitrate = {360:1000, 480: 2500, 720:5000, 1080:8000, 1440: 16000, 2160: 4000} #youtube recommandation
+    closestRes = 360
+    for res in resToBitrateresToBitrate:
+        if abs(res-height) < abs(closestRes - height):
+            closestRes = res
+    return resToBitrate[closestRes]
+
 def GenerateConf(ls, inputVideos, outputVideo, outputQuality, nbFrames, fps, bitrate):
     c = '[Global]\n'
     c += 'fps= {}\n'.format(fps)
@@ -113,7 +122,7 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                 shutil.copy(iv, nivp)
                 newIv.append(nivp)
             with open(config, 'w') as cf:
-                cf.write(GenerateConf(layouts, newIv, '' if noOutputVideo else '/tmp/test.mkv', '/tmp/test.txt', n, fps, 0))
+                cf.write(GenerateConf(layouts, newIv, '' if noOutputVideo else '/tmp/test.mkv', '/tmp/test.txt', n, fps, FlatFixedResolutionToBitrate(flatFixedLayout)))
 
             sub.check_call([trans, '-c', config])
 

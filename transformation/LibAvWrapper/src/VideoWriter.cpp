@@ -66,7 +66,7 @@ void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, u
 
     //Detect output container
     PRINT_DEBUG_VideoWrite("Detect container")
-    AVOutputFormat *outformat = nullptr;
+    AVOutputFormat* outformat = nullptr;
     outformat = av_guess_format(0, m_outputFileName.c_str(), 0);
     if (!outformat)
     {
@@ -96,6 +96,7 @@ void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, u
     m_codec_ctx->time_base.den = fps;
     m_codec_ctx->gop_size = gop_size;
     m_codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
+    m_codec_ctx->max_b_frames = 2;
     m_vstream->time_base.num = 1;
     m_vstream->time_base.den = fps;
 
