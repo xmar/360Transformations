@@ -140,17 +140,24 @@ class FixedAverageAndFixedDistances(GenericWorker):
         #for each QEC we compute the EquirectangularTiled layout associated + the other layout with a fixed bitrate
         for qec in LayoutGenerators.QEC.TestQecGenerator(self.nbQec):
             qecId = qec.GetStrId()
+            layoutList = [
+                    ('equirectangularTiled{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledLayout(n, qec, self.refWidth, self.refHeight)))
+                    ]
+            if self.extraLayout:
+                layoutList += [
+                    ('EquirectangularTiledHigherQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledHigherQualityLayout(n, qec, self.refWidth, self.refHeight))),
+                    ('EquirectangularTiledLowerQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledLowerQualityLayout(n, qec, self.refWidth, self.refHeight))),
+                    ('EquirectangularTiledMediumQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledMediumQualityLayout(n, qec, self.refWidth, self.refHeight))),
+                    ]
             print('Start computation for QEC({})'.format(qecId))
-            outEquiTiledNameStorage = '{}/equirectangularTiled{}_storage.dat'.format(self.outputDir,qecId)
-            outEquiTiledNameVideo = '{}/equirectangularTiled{}.mkv'.format(self.outputDir,qecId)
-            outEquiTiledId = '{}/equirectangularTiled{}'.format(self.outputDir,qecId)
-            GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-                    [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),
-                     (LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId),qec, self.refWidth, self.refHeight), None)],
-                    24, self.n,  self.inputVideo, outEquiTiledId, self.bitrateGoal)
-
-            goalSize = os.stat(outEquiTiledNameVideo).st_size
-            self.averageGoalSize = (self.averageGoalSize[0] + goalSize, self.averageGoalSize[1]+1)
+            for layoutId, layoutGenerator in layoutList:
+                outEquiTiledNameStorage = '{}/{}_storage.dat'.format(self.outputDir,layoutId)
+                outEquiTiledNameVideo = '{}/{}.mkv'.format(self.outputDir,layoutId)
+                outEquiTiledId = '{}/{}'.format(self.outputDir,layoutId)
+                GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
+                        [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),
+                         (layoutGenerator(layoutId), None)],
+                        24, self.n,  self.inputVideo, outEquiTiledId, self.bitrateGoal)
 
             layoutList = [('CubeMap{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLayout(n, ypr, self.refWidth, self.refHeight))),\
                     ('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5, self.refWidth, self.refHeight))),\
@@ -160,9 +167,6 @@ class FixedAverageAndFixedDistances(GenericWorker):
                                ('CubeMapHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
                                ('CubeMapLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLowerQualityLayout(n, ypr, self.refWidth, self.refHeight))),
                                ('CubeMapMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               ('EquirectangularTiledHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.EquirectangularTiledHigherQualityLayout(n, qec, self.refWidth, self.refHeight))),
-                               ('EquirectangularTiledLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.EquirectangularTiledLowerQualityLayout(n, qec, self.refWidth, self.refHeight))),
-                               ('EquirectangularTiledMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.EquirectangularTiledMediumQualityLayout(n, qec, self.refWidth, self.refHeight))),
                                ('PyramidHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidHigherQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
                                ('PyramidLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidLowerQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
                                ('RhombicDodecaHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
