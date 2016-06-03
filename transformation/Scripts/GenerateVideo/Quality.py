@@ -10,7 +10,7 @@ def FlatFixedResolutionToBitrate(ffLayout):
     height = ffLayout.height
     resToBitrate = {360:1000, 480: 2500, 720:5000, 1080:8000, 1440: 16000, 2160: 4000} #youtube recommandation
     closestRes = 360
-    for res in resToBitrateresToBitrate:
+    for res in resToBitrate:
         if abs(res-height) < abs(closestRes - height):
             closestRes = res
     return resToBitrate[closestRes]
