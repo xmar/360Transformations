@@ -1,0 +1,176 @@
+\section{Background and Related Work}
+\label{sec:related}
+
+We first introduce some geometric concepts for 360-degree videos, and then we discuss
+some delivery proposals for navigable video streaming.
+
+\subsection{Geometric Layouts for 360-degree Videos}
+
+A 360-degree video is captured in every direction from a unique 
+point, so it is essentially a \emph{spherical} video. Since video encoders apply on a
+two-dimensional rectangular image, a key step of the encoding chain is to project the spherical 
+video into a planar
+surface.
+The projection of a sphere into a plane (known as mapping) has been studied
+for centuries. In this paper, we consider the four projections that are the most discussed for 
+360-degree video encoding~\cite{yu_framework_2015}. These layouts are depicted in 
+Figure~\ref{fig:mapping}.
+%The advantages and shortcomings of every projection have been 
+%studied in the literature. 
+From
+the images that are
+projected on an \textit{equirectangular}, a \textit{cube map}, and a 
+\textit{rhombic dodecahedron}, it is possible
+to generate a \ac{FoV}
+for any position and angle in the sphere without any information 
+loss~\cite{Ng2005, fu_rhombic_2009}. However, some pixels
+are over-sampled (a pixel on the sphere is projected to a pair of pixels in the 
+projected image). This is typically the case at the pole for the equirectangular projection.
+This over-sampling degrades the
+performance of traditional video encoders~\cite{wojciechowski_h.264_2006,
+yu_framework_2015}. 
+On the
+contrary, the projection into a pyramid layout causes under-sampling: some pairs of pixels 
+on the sphere (i.e., those that are 
+in the back of the view face) are merged into a single pixel in 
+the projected image by interpolating their 
+color values. This under-sampling can cause distortions and information losses in the extracted 
+FoV. 
+%Hence, the back 
+%view is the least probable head orientation of the video viewer, therefore the impact on the 
+%user experience is minimal.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\def\sizeSphere{20}%pt
+\def\ecartY{-1.2}%cm
+\def\ecartX{6}
+
+% da sphere
+\pic [local bounding box=spher]  at (0,0) {spherical=15};
+
+% recantagular
+\pic [local bounding box=equi] at (-3,\ecartY) {equirectangular={\sizeSphere}{-1}{0}};
+
+% cupe map
+\pic [local bounding box=cubemap] at (-1,\ecartY) {cubemap=\sizeSphere};
+
+% pyramid
+\pic [local bounding box=pyra] at (1,\ecartY) {pyramid=\sizeSphere};
+
+% rhombic
+%\pgfdeclareimage[width=36 pt]{dodecahedron}{RhombicDodecahedron.png}
+%\node at (3,\ecartY) (dodec)
+%    {\pgfbox[center,center]{\pgfuseimage{dodecahedron}}};
+
+\def\unitused{0.22}
+
+\pic [local bounding box=dodeca] at (3,0.88*\ecartY) {dodecahedron=\unitused};
+
+% links
+\draw[-latex] (spher.180) -| (equi);
+\draw[-latex] (spher.200) -| (cubemap);
+\draw[-latex] (spher.340) -| (pyra);
+\draw[-latex] (spher) -| (dodeca);
+
+\node[font=\scriptsize,anchor=north] at (equi.south) {equirectangular};
+\node[font=\scriptsize,anchor=north] at (cubemap.south) {cube map};
+\node[font=\scriptsize,anchor=north] at (pyra.south) {pyramid};
+\node[font=\scriptsize,anchor=north] at (dodeca.south) {\vphantom{y}dodecahedron};
+
+\end{tikzpicture}
+\caption{Projections into four geometric layouts}\label{fig:mapping}
+\end{figure}
+
+Each geometric layout is characterized by a number of \emph{faces} (\textit{e.g.}, 6 for 
+the cube map, 12 for the dodecahedron) and a given \emph{central point} (\textit{e.g.} the earth 
+maps are usually centered so that the equator is in the middle of the map, but the longitude 
+of the central $x$ point is not the same whether the map targets European, Asian or American 
+people).
+From a given central point and a given layout, our main idea is to arrange video qualities of 
+the layout faces (e.g., encoding the front face in full resolution and the back face in 
+the low resolution). 
+To the best of our knowledge, such idea has not been studied yet.
+The previous work regarding projection of spherical videos into different
+geometric layouts focuses on enabling efficient implementation of signal processing
+functions~\cite{kazhdan_metric-aware_2010} and improving the video
+encoding~\cite{tosic_low_2009}. In this paper, we study several face quality arrangements
+for the four considered projections with a focus on the quality of the FoV video extracted at 
+various 
+distance of the central point.
+
+\subsection{Tiling for Adaptive Video Streaming}
+
+An intuitive idea to address the problem of resource waste due to the delivery of non-FoV video
+is to stream only the part of the video that corresponds to the \ac{FoV}. This solution however
+does not enable fast navigation within the 360-degree video: when the client moves the head, 
+the FoV
+center changes, requiring a new FoV video to be immediately displayed. Since
+the device has no knowledge about other parts of the spherical video, it has to notify
+the server about the viewer head's movement and wait for reception of the newly
+adjusted FoV video. As seen in other interactive multimedia systems~\cite{ChoyWSR14},
+this solution cannot meet the 10-ms latency requirement in the standard Internet, even 
+with the assistance of \ac{CDN}. More generally, this solution requires the server to extract
+a part of the video (thus to reserve computing resources) for each 
+client connection. Yet, to
+meet scalability requirements, the multimedia content providers have adopted opposite 
+strategies (such as \ac{DASH}) where the server management is simplified and the 
+processing is made at the client side.
+
+Another delivery solution for \ac{FoV}-adaptive streaming is based on the concept of \emph{tiling}.
+This proposal has been implemented for navigable panorama
+video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015} and 
+large-resolution video~\cite{jean16mmsys}.
+The idea is to spatially cut a video into independent tiles. The server offers 
+multiple video representations of each tile; the client periodically selects a representation 
+for each tile 
+and it has to reconstruct
+the full video from these tiles before the \ac{FoV} extraction. In a recent short 
+paper,~\citet{ochi_live_2015} have sketched a tile-based streaming system for 360-degree 
+videos.
+In their proposal, the spherical video is mapped into an \emph{equirectangular} video, which
+is cut into independent \emph{tiles} (typically $8\times 8$).
+
+A tile-based adaptive streaming
+system provides the same features as our proposal regarding the navigability (the clients 
+get the full video), the reduction of bandwidth 
+waste (the video at low quality for non-\ac{FoV} part) and the maintain of \ac{QoE} (at the 
+FoV). It has however several critical weaknesses. First, the client has to first reconstruct
+the video from independent tiles before the FoV extraction, which requires energy and 
+time at each frame. Second, the more tiles, the less efficient the video encoding due to the
+tile independence~\cite{sanchez_compressed_2015}. Third, the management at the server is
+heavier because the number of files 
+is much larger. For example, a typical $8\times8$ tiling offered at six quality levels makes 
+384~independent files for each video segment, and by consequence larger manifest files.
+Finally, the management at the client side is heavier. For each tile, the client should run
+a representation selection process 
+and manage a specific network connection with the server.
+
+In our proposal, the server prepares (once and for all) \emph{one} video version per
+\ac{QEC}, each version being then encoded at several global quality levels.  Each version
+is an arrangement of tile
+qualities such that the tiles that are close to the \ac{QEC} are at high-quality
+and the other tiles
+are at a lower quality. The main advantages include an easier management of the server
+(less files so smaller manifest file), a simpler selection process for the client (by
+a distance computation), and no need of re-constructing the video before the \ac{FoV} extraction.
+
+Finally, a major content provider of 360-degree videos (Facebook) has recently
+released details about the
+implementation of its delivery platform~\cite{facebook}. The depicted system is based
+on the same idea as our concept of \ac{QEC}. Up to 30 representations of the same video 
+are available depending on
+\acp{QEC}. This implementation corroborates that, from an industrial perspective, the
+extra-cost of
+generating and storing multiple \ac{FoV}-based representations of the same video 
+is worth the bandwidth
+savings and the system usability. The authors propose two projections of the spherical videos:
+into a pyramid (where the
+base is the front
+view and the peak is in the back) and into a cube map. However, they use the same video quality 
+on each face of the geometric layouts. In this paper, we provide a complete study of 
+the system with the refinement of having different quality across the video based on \ac{QEC}. 
+Moreover, our 
+paper includes an evaluation of several geometric layouts, an analysis of the best segment
+duration, and the first step toward the integration into MPEG \ac{DASH}.
