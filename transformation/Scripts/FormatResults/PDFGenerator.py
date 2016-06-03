@@ -6,7 +6,7 @@ import shutil
 def GetMainTex(title):
     #s = '\\documentclass{sig-alternate}\n'
     s = '\\documentclass{article}\n'
-    
+
     s += '\\usepackage{multirow}\n'
     s += '\\usepackage{amsfonts}\n'
     s += '\\usepackage{epsfig}\n'
@@ -252,7 +252,7 @@ def GetBoxTex():
     s += '\\end{tikzpicture}\n'
     return s
 
-def GetDistTex(plotPSNR):
+def GetDistTex(plotPSNR, listId):
     s = '\\pgfplotscreateplotcyclelist{My color list}{%\n'
     s += '    {gray,solid, very thick},%\n'
     s += '    {black!25, dashed, very thick},%\n'
@@ -265,7 +265,7 @@ def GetDistTex(plotPSNR):
     s += 'anchor=south west,\n'
     s += 'draw=none,\n'
     s += 'fill=none,\n'
-    s += 'legend columns=-1,\n'
+    s += 'legend columns=3,\n'
     s += 'column sep=15pt,\n'
     s += '/tikz/every odd column/.append style={column sep=0cm},\n'
     s += '%font=\\tiny\n'
@@ -299,13 +299,12 @@ def GetDistTex(plotPSNR):
     s += '            %y filter/.code={\\pgfmathparse{#1/1000000}\\pgfmathresult},\n'
     s += '        ]\n'
     s += '\n'
-    s += '        \\addplot+ table [x=distance, y=qualityEquirectangularTiled]{../distanceQuality'+('_psnr' if plotPSNR else '')+'.csv};\n'
-    s += '        \\addplot+ table [x=distance, y=qualityCubeMap]{../distanceQuality'+('_psnr' if plotPSNR else '')+'.csv};\n'
-    s += '        \\addplot+ table [x=distance, y=qualityPyramidal]{../distanceQuality'+('_psnr' if plotPSNR else '')+'.csv};\n'
-    s += '        \\addplot+ table [x=distance, y=qualityRhombicDodeca]{../distanceQuality'+('_psnr' if plotPSNR else '')+'.csv};\n'
-    if not plotPSNR:
-        s += '        \\addplot+ table [x=distance, y=qualityAverageEquiTiled]{../distanceQuality'+('_psnr' if plotPSNR else '')+'.csv};\n'
-    s += '        \\legend{EqTiled,CubeMap,Pyramid,RhombicDodeca'+(',AverageEqui'if plotPSNR else '')+'}\n'
+    for layoutId in listId:
+        s += '        \\addplot+ table [x=distance, y={}]{../distanceQuality'.format(layoutId)+('_psnr' if plotPSNR else '')+'.csv};\n'
+    s += '        \\legend{'
+    for layoutId in listId:
+        s += layoutId
+    s += '}\n'
     s += '\n'
     s += '    \\end{axis}\n'
     s += '\\end{tikzpicture}\n'
@@ -324,12 +323,22 @@ def GeneratePDF(pathToCsv, outputPath, title):
     with open('{}/box_plot.tex'.format(outputPath), 'w') as box:
         box.write(GetBoxTex())
 
+    listId = []
+    with open('{}/{}'.format(pathToCsv, 'distanceQuality.csv'), 'r') as i:
+        for line in i:
+            if line[0] != '%':
+                ids = line.split(' ')
+                listId = ids[1:]
     with open('{}/plot_distance.tex'.format(outputPath), 'w') as dist:
-        dist.write(GetDistTex(False))
-   
+        dist.write(GetDistTex(False, listId))
+
+    with open('{}/{}'.format(pathToCsv, 'distanceQuality_psnr.csv'), 'r') as i:
+        for line in i:
+            if line[0] != '%':
+                ids = line.split(' ')
+                listId = ids[1:]
     with open('{}/plot_distance_psnr.tex'.format(outputPath), 'w') as dist:
-        dist.write(GetDistTex(True))
+        dist.write(GetDistTex(True, listId))
 
     shutil.copyfile('../../academicPaper/sig-alternate.cls', '{}/sig-alternate.cls'.format(outputPath))
     sub.Popen([os.path.abspath('../../academicPaper/latexrun'), 'main.tex'], cwd=outputPath).wait()
-
