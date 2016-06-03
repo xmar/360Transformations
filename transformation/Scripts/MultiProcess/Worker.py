@@ -84,6 +84,7 @@ class GenericWorker(object):
         self.bitrateGoal = int(self.job.jobArgs.bitrateGoal)
         self.distStep = self.job.jobArgs.distStep
         self.outputDir = '{}/{}'.format(self.outDir, self.job.ToDirName())
+        self.extraLayout = self.job.jobArgs.extraLayout
         if not os.path.exists(self.outputDir):
             os.mkdir(self.outputDir)
 
