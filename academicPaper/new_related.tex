@@ -34,8 +34,12 @@ contrary, the projection into a pyramid layout causes under-sampling: some pairs
 on the sphere (i.e., those that are 
 in the back of the view face) are merged into a single pixel in 
 the projected image by interpolating their 
-color values. This under-sampling can cause distortions and information losses in the extracted 
+color values. This under-sampling cause distortions and information losses in the extracted 
 FoV. 
+The previous work regarding projection of spherical videos into different
+geometric layouts focuses on enabling efficient implementation of signal processing
+functions~\cite{kazhdan_metric-aware_2010} and improving the video
+encoding~\cite{tosic_low_2009}. 
 %Hence, the back 
 %view is the least probable head orientation of the video viewer, therefore the impact on the 
 %user experience is minimal.
@@ -83,24 +87,24 @@ FoV.
 \caption{Projections into four geometric layouts}\label{fig:mapping}
 \end{figure}
 
-Each geometric layout is characterized by a number of \emph{faces} (\textit{e.g.}, 6 for 
-the cube map, 12 for the dodecahedron) and a given \emph{central point} (\textit{e.g.} the earth 
-maps are usually centered so that the equator is in the middle of the map, but the longitude 
-of the central $x$ point is not the same whether the map targets European, Asian or American 
-people).
-From a given central point and a given layout, our main idea is to arrange video qualities of 
-the layout faces (e.g., encoding the front face in full resolution and the back face in 
-the low resolution). 
-To the best of our knowledge, such idea has not been studied yet.
-The previous work regarding projection of spherical videos into different
-geometric layouts focuses on enabling efficient implementation of signal processing
-functions~\cite{kazhdan_metric-aware_2010} and improving the video
-encoding~\cite{tosic_low_2009}. In this paper, we study several face quality arrangements
-for the four considered projections with a focus on the quality of the FoV video extracted at 
-various 
-distance of the central point.
+\parag{Our contributions}We propose to leverage the geometric structure of the layouts
+to implement a video encoding based on \ac{QEC}. Each geometric layout is characterized 
+by a number of \emph{faces} (\textit{e.g.}, 6 for 
+the cube map, 12 for the dodecahedron) and a given \emph{central point} (which corresponds
+to a position and an angle in the sphere).
+%(\textit{e.g.} the earth 
+%maps are usually centered so that the equator is in the middle of the map, but the longitude 
+%of the central $x$ point is not the same whether the map targets European, Asian or American 
+%people).
+From a given central point and a given layout, our idea is to encode the front face in full 
+quality while the furthest faces (\textit{e.g.} the back face) are in low quality.
+To the best of our knowledge, such idea has not been studied yet. Another originality of
+our work is that we measure the \ac{QoE} by measuring the quality of several extracted
+\ac{FoV} 
+videos instead
+of the full video.
 
-\subsection{Tiling for Adaptive Video Streaming}
+\subsection{Personalized FoV-Only Streaming}
 
 An intuitive idea to address the problem of resource waste due to the delivery of non-FoV video
 is to stream only the part of the video that corresponds to the \ac{FoV}. This solution however
@@ -111,14 +115,24 @@ the device has no knowledge about other parts of the spherical video, it has to 
 the server about the viewer head's movement and wait for reception of the newly
 adjusted FoV video. As seen in other interactive multimedia systems~\cite{ChoyWSR14},
 this solution cannot meet the 10-ms latency requirement in the standard Internet, even 
-with the assistance of \ac{CDN}. More generally, this solution requires the server to extract
-a part of the video (thus to reserve computing resources) for each 
-client connection. Yet, to
-meet scalability requirements, the multimedia content providers have adopted opposite 
-strategies (such as \ac{DASH}) where the server management is simplified and the 
-processing is made at the client side.
+with the assistance of \ac{CDN}. In addition, this solution requires the server to extract
+a part of the video (thus to spend computing resources) for each 
+client connection. 
 
-Another delivery solution for \ac{FoV}-adaptive streaming is based on the concept of \emph{tiling}.
+\parag{Our contributions} In our proposal the server always delivers the full video, but it
+has different versions of this video depending on the quality emphasis (characterized by the QEC).
+The client
+device selects the right representation and extracts the \ac{FoV} video. The storage 
+requirements at the
+server side increases but all the processing is done at the client side (representation selection
+and FoV extraction). 
+This idea conforms to the adaptive delivery solutions 
+that content providers have adopted in the recent years (\textit{e.g.}~\ac{DASH}) with
+a trade-off between simple server management and personalized delivery.
+
+\subsection{Tiling for Adaptive Video Streaming}
+
+A delivery solution when the end-users consumes only a fraction of the video is based on the concept of \emph{tiling}.
 This proposal has been implemented for navigable panorama
 video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015} and 
 large-resolution video~\cite{jean16mmsys}.
@@ -135,8 +149,8 @@ is cut into independent \emph{tiles} (typically $8\times 8$).
 A tile-based adaptive streaming
 system provides the same features as our proposal regarding the navigability (the clients 
 get the full video), the reduction of bandwidth 
-waste (the video at low quality for non-\ac{FoV} part) and the maintain of \ac{QoE} (at the 
-FoV). It has however several critical weaknesses. First, the client has to first reconstruct
+waste (the video at low quality for non-\ac{FoV} part) and the maintain of \ac{QoE} (the downloaded video is at full quality near the 
+FoV center). It has however several critical weaknesses. First, the client has to first reconstruct
 the video from independent tiles before the FoV extraction, which requires energy and 
 time at each frame. Second, the more tiles, the less efficient the video encoding due to the
 tile independence~\cite{sanchez_compressed_2015}. Third, the management at the server is
@@ -147,29 +161,35 @@ Finally, the management at the client side is heavier. For each tile, the client
 a representation selection process 
 and manage a specific network connection with the server.
 
-In our proposal, the server prepares (once and for all) \emph{one} video version per
-\ac{QEC}, each version being then encoded at several global quality levels.  Each version
-is an arrangement of tile
-qualities such that the tiles that are close to the \ac{QEC} are at high-quality
-and the other tiles
-are at a lower quality. The main advantages include an easier management of the server
+\parag{Our contributions} In our proposal, the server prepares (once and for 
+all) \emph{one} video version per
+\ac{QEC}, each version being then encoded at several global quality levels. Each version
+is a pre-processed set of tile representations. The main advantages include an easier 
+management of the server
 (less files so smaller manifest file), a simpler selection process for the client (by
 a distance computation), and no need of re-constructing the video before the \ac{FoV} extraction.
 
-Finally, a major content provider of 360-degree videos (Facebook) has recently
+\subsection{QEC-Based Streaming}
+
+A major content provider of 360-degree videos (Facebook) has recently
 released details about the
 implementation of its delivery platform~\cite{facebook}. The depicted system is based
 on the same idea as our concept of \ac{QEC}. Up to 30 representations of the same video 
 are available depending on
 \acp{QEC}. This implementation corroborates that, from an industrial perspective, the
 extra-cost of
-generating and storing multiple \ac{FoV}-based representations of the same video 
+generating and storing multiple \ac{QEC}-based representations of the same video 
 is worth the bandwidth
-savings and the system usability. The authors propose two projections of the spherical videos:
-into a pyramid (where the
+savings and the system usability. The authors propose the projections of the spherical videos into two layouts: a pyramid (where the
 base is the front
-view and the peak is in the back) and into a cube map. However, they use the same video quality 
-on each face of the geometric layouts. In this paper, we provide a complete study of 
+view and the peak is in the back) and a cube map. However, they use the same video quality 
+on each face of the geometric layouts.
+
+\parag{Our contribution}
+The
+solution we propose is based on the same idea of offering multiple video representation 
+for various \acp{QEC}. 
+In this paper, we provide a complete study of 
 the system with the refinement of having different quality across the video based on \ac{QEC}. 
 Moreover, our 
 paper includes an evaluation of several geometric layouts, an analysis of the best segment
