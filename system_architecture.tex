@@ -1,0 +1,70 @@
+\input{newDelivery.tex}
+
+\section{System architecture}
+
+This section describes a system architecture of the proposed navigable 360-degree video delivery. The principles of the navigable video delivery are similar as in adaptive bit-rate
+video systems such as \ac{DASH}\cite{Stockhammer11}. The server offers multiple versions of the same video
+and the client selects the most appropriate version according to some criteria. %These versions
+%are cut into second-long segments such that the client can regularly switch from one
+%version to another.
+
+The server takes as an input a 360-degree video in equirectangular format and transforms each frame into desired geometrical layout. From there it creates \textit{N} different video versions, each with a different QEC and encoded in \textit{k} different bitrates, as illustrated in Figure \ref{fig:newdelivery}. The server splits all such encoded video versions into second-long segments that are classified in \textit{N*k} representations (based on their respective resolution, bitrate, and QEC value), enabling the client to regularly switch from one representation to another.
+
+The specifics of 360-degree video delivery, when compared to DASH, are that only a portion of the video that is delivered to the client is actually displayed on the user's HMD (i.e., where the user looks at). Based on the user's head movements, the client decides where to put the QEC of the video and selects the representation (containing this QEC) whose bitrate fits the current throughput. Around the QEC the video is in full quality, with gradually degrading quality that decreases with the distance from the QEC. If the client moves the head before receiving a new video segment, he/she will be displayed a new FoV video with degraded quality that is adjusted to the head movement. Exactly how many seconds should pass until receiving a new video version depends on he viewer's head movements, video content (i.e., whether he/she watches a football match, news, or plays a computer game), and the experienced quality degradations variations, which needs to be investigated in the future work.}{}
+
+The client periodically sends a request to the server for the next video segment, specifying a new QEC. The server replies with the requested 360-degree video version, from which the client extracts the FoV video, displaying it on the user's HMD. Note that this is possible with the state-of-the-art HMDs \cite{}.
+
+The head movements are forward and backwards, side to side, and shoulder to shoulder, referred to as \emph{pitch}, \emph{yaw}, and \emph{roll}, respectively. The center of the \ac{FoV} is a point on the sphere, while the size of the FoV depends on the device (typically
+around 100$^\circ$ in state-of-the-art devices). As the end-user moves the head, it is important to select the QEC. Around this QEC the video will be in full quality with gradually degrading quality as moving away from it. If the client moves the head before receiving a new video version, he/she will be displayed a new FoV video with lower quality depending on the distance of the new FoV center from the QEC (as described in Section \ref{sec:context}). Therefore, it is important to select the QEC that is close to the FoV center, but also based on the pattern of user's head movements, which needs to be investigated in the future work.
+
+The video version that is selected for 360 video delivery is then based on the bitrate that fits the throughput and the QEC that is close to the FoV center. If the client moves the head before receiving a new video version,
+he/she is displayed a new FoV video with gradually degrading quality that is adjusted to the head movement (as described in Section \ref{sec:context}). Exactly how many seconds should pass until receiving a new video version depends on the video content, the viewer's head movements (i.e., whether he/she watches a football match, news, or plays a computer game), and the experienced quality degradations variations, which needs to be investigated in the future work.
+
+%At the client side, the end-user moves its head to decide the \ac{FoV}. The head movements
+%are \AD{forward and backwards, side to side, and should to shoulder, referred to as \emph{pitch}, \emph{yaw}, and \emph{roll}, respectively.}{}
+% The center of the \ac{FoV} is a point on the sphere, while the size of the \ac{FoV} depends on the device (typically
+%around 100$^\circ$ in state-of-the-art devices).
+
+
+%\input{videoDeliveryArchitecture.tex}
+
+A DASH manifest file is extended with new information to support the navigable 360-degree video delivery. Each representation contains the QEC coordinates in degrees, besides the parameters that are already defined in the standard \cite{}. Similarly, an adaptation set is extended with geometrical layout and quality arrangement attributes, for video encoder to know how to encode the video. The proposed changes are added as new attributes of \textit{Representation} and \textit{AdaptationSet} tags, as illustrated in Figure \ref{fig:mpdChanges}. With such extensions we maintain the conformance with the standard, ensuring the interworking with the legacy DASH clients that can simply ignore these newly introduced attributes.
+
+
+\begin{lstlisting}[language=xml, frame=single, backgroundcolor=\color{white}, caption=Extensions of MPD file]
+<?xml version="1.0"?>
+   <MPD>
+    ...
+        <AdaptationSet geometricLayout="cubeMap" qualityArrangement="4/1/1">
+            <Representation id="1" qec="90,60" bandwidth="9876" width="1920" height="1080" frameRate="30">
+                <SegmentList timescale="1000" duration="2000">
+                ...
+            </Representation>
+        </AdaptationSet>
+    </MPD>
+</xml>
+\end{lstlisting}
+\label{fig:mpdChanges}
+
+%The number of different QECs and their positions, the geometrical layout, resolutions of video versions, bitrates, and segment size are specified in the DASH manifest file, which is extended to support all these parameters.
+%Note that all parameter values need to be fixed before the video streaming starts (based on for example the calibration phase in which the user head movements are tracked, and from which the segment size, geometrical layout, and quality arrangement that produce the best video quality are determined).
+
+ %based on the number of QECs, encoding each version in 5 different bitrates.
+ %Figure \ref{} illustrates the proposed extensions of an MPD file.
+
+ %delivered to the client in the bitrate that is just below the Internet speed connection.
+
+%A DASH manifest file is extended to contain all information regarding navigable 360-degree video delivery: number of QECs and their coordinates in the equirectangular layout, the geometrical layout for transforming all video segments, and the segment size.
+
+%A client detects the user's head movements, computes the FoV center, and selects a video version with the closest QEC to this FoV center. These actions are represented by an \textit{updateQEC()} function in Figure \ref{fig:videoDeliveryArchitecture}.  Then based on the information from MPD file, the buffer occupancy, the estimated and predicted throughput the client selects the representation for the next video segment. This segment selection algorithm is shown in Figure \ref{}. The client periodically sends a request to the server for the next video segment, specifying a new QEC. The server replies with the requested 360-degree video version, from which the client extracts the FoV video, displaying it on the user's HMD. Note that this is possible with the state-of-the-art HMDs \cite{}.
+
+The adaptive video streaming systems are based on the "bet" that the selected representation will match the configuration for the next X seconds (i.e., X being the segment duration). The requested bitrate needs to match the current throughput for the duration of the segment, otherwise the user might experience the video stalls, interruptions, and delays. In the proposed navigable 360-degree video delivery the bet is not only that the throughput will accomodate the requested bitrate, but also that the chosen QEC will be close to the FOV center for the next X seconds. If the user's head moves during this time, the consequences for the user will be even worse than with the adaptive streaming, including the deteriorated video quality. A new FoV video will be extrapolated from the existing video version stored on the client. The longer the time between the requests, the longer the potential distance from the old to the new FoV center (i.e., FoV center distance) and the larger the video quality degradation of the displayed FoV video.
+
+Many bitrate adaptation logic algorithms for adaptive streaming have been developed over time to optimize the user experience \cite{}. Most of these algorithms focus on predicting the expected throughput for the next few chunks in order to make optimal bitrate decisions for maximizing the Quality of Experience (QoE). Similarly to different bitrate adaptation algorithms, we expect that 360-degree video adaptation algorithms will be developed in the future to predict the user's head movements for the next few seconds in order to adjust the video segment size and arrange the qualities in 360-degree video accordingly. %This head movement prediction will be based on the user's previous head movements and the video content type. If the content is static, the user will not move his/her head so much compared to when watching an action move.
+
+A video segment size determines how often requests are sent to the server. It typically ranges from 2 seconds to 10 seconds per segment. Short segments are good to quickly adapt to head movement and bandwidth changes, but the video encoding requires a higher number of segments and streaming of this video results in larger manifest files. Shorter segments also increase the network overhead by frequent requests, as well as network delay because of the round trip time that is needed to establish a TCP connection\footnote{In case of non-persistent HTTP connection TCP connection is established with the server after each request.} and request a segment (which can both take significant time in case of very short segment sizes). Longer segments are better in coding efficiency and quality than the shorter ones, however loose on the flexibility to adapt the stream to changes.
+
+A user's head movements affect the "optimal" segment size selection and quality of the displayed video. If the user watches relatively static video content, his/her head will not move that much, leading to slower head movements. Slower head movements usually cause shorter FoV center distances, requiring only a small portion of video to be encoded in high quality (while the rest can be given in the lowest quality) in order to optimize the user experience. They also need less frequent video segment updates. On the contrary, faster head movements typically produce longer FoV center distances,  requiring larger portions of video to be encoded in higher quality and more frequent segment updates to optimize the user experience.
+%If the user moves his head a lot, he needs to get more frequently segments with new QECs.
+
+We study, in the remainder of the paper, the impact of the segment size/request rate and the FoV center distance on the viewport quality that is displayed to the user, using a single head motion dataset. More studies with different datasets and video content types are needed in the future to generalize these results. We are also interested to find out how many representations are needed to achieve a desired video quality, using the particular geometrical layout.
