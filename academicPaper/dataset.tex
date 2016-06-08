@@ -1,0 +1,26 @@
+\section{Dataset and Head Movements}
+
+One of the critical aspects of our proposal is the sensibility to head movement. Once a QEC is chosen and the 
+segment selected, any head movement that increases the distance between the QEC and the FoV center 
+may result in a degradation of the video quality until the next segment selection time. 
+
+Similarly as in rate-adaptive
+streaming, the duration of the segment is a key setting of the system. The longer the segment, the easier
+the management of the system (both at client and server side), however the less reactive to changes.
+For FoV-adaptive streaming, we should deal with the same trade-off except that the changes come from 
+the navigation of the end-users (instead of network conditions for rate-adaptive systems).
+
+To validate the principle behind FoV-adaptive streaming and to estimate adequate values for
+the segment duration, we have used a dataset of the head movements of real users watching
+a 360-degree video. The dataset is the same as in~\cite{yu_framework_2015}. It comes from
+Jaunt, Inc and consists of ten omnidirectional videos of length ten seconds. These videos include
+different typical scenarios of 360-degree video. The dataset consists of the head movements of
+ten people who were asked to watch the videos on a state-of-the-art \ac{HMD} (Occulus Rift DK2).
+The subjects were standing and they were given the freedom to turn around, so the head movements
+are of wider importance than if they were asked to watch the video while sitting. Given the length of
+the video and the experiment conditions, we believe that the head movements thus correspond to 
+an extreme configuration of abrupt and wide head movements.
+
+\citet{yu_framework_2015} have studied the head position of users: where does the FoV center lie 
+during the video playback. They show that the FoV center is around the equator of the 360-degree video
+during the majority of time but that lateral movements are frequent.
