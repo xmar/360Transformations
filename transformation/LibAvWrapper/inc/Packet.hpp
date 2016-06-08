@@ -9,7 +9,6 @@ namespace IMT
 {
 namespace LibAv
 {
-class VideoEncoder;
 class Packet
 {
     public:
@@ -21,6 +20,7 @@ class Packet
 
     private:
         friend class VideoWriter;
+        friend class VideoReader;
 
         AVPacket m_pkt;
         bool m_isInit;
@@ -35,6 +35,7 @@ class Packet
          *
          */
         bool SetAvPacketWithEncoder(AVCodecContext* context, AVFrame* frame);
+        int GetNextPacket(AVFormatContext* fmt_ctx);
         void Free(void);
 };
 }
