@@ -19,7 +19,7 @@ extern "C"
 using namespace IMT::LibAv;
 
 VideoWriter::VideoWriter(const std::string& outputFileName): m_outputFileName(outputFileName),  m_fmt_ctx(NULL),
- m_codec_ctx(nullptr), m_vstream(nullptr), m_isInit(false), m_pts(0)
+ m_codec_ctx(), m_vstream(), m_isInit(false), m_pts(0)
 {}
 
 VideoWriter::VideoWriter(VideoWriter&& vw): m_outputFileName(), m_fmt_ctx(NULL), m_isInit(false)
@@ -37,20 +37,27 @@ VideoWriter::~VideoWriter(void)
 {
     if (!m_isInit)
     {
-        Flush();
+        for (auto& stream:  m_vstream)
+        {
+            Flush(stream->index);
+        }
+
         m_isInit = false;
         av_write_trailer(m_fmt_ctx);
-        avcodec_close(m_codec_ctx);
+        for (auto& codec_ctx: m_codec_ctx)
+        {
+            avcodec_close(codec_ctx);
+        }
         //av_free(m_vstream);
         avformat_close_input(&m_fmt_ctx);
         av_free(m_fmt_ctx);
         m_fmt_ctx = nullptr;
-        m_vstream = nullptr;
-        m_codec_ctx = nullptr;
+        m_vstream.clear();
+        m_codec_ctx.clear();
     }
 }
 
-void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, unsigned fps, unsigned gop_size, unsigned bit_rate)
+void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
 {
     //av_log_set_level(AV_LOG_DEBUG);
     PRINT_DEBUG_VideoWrite("Start init video writer")
@@ -75,39 +82,46 @@ void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, u
 
     m_fmt_ctx->oformat = outformat;
 
-    //Get the codec
-    PRINT_DEBUG_VideoWrite("Find the codec by name")
-    AVCodec* codec = avcodec_find_encoder_by_name(codecName.c_str());
-    if (!codec)
+    for (auto& bit_rate: bit_rateVect)
     {
-        throw std::runtime_error("Codec"+codecName+"not found");
-    }
+        //Get the codec
+        PRINT_DEBUG_VideoWrite("Find the codec by name")
+        AVCodec* codec = avcodec_find_encoder_by_name(codecName.c_str());
+        if (!codec)
+        {
+            throw std::runtime_error("Codec"+codecName+"not found");
+        }
 
-    //New video stream
-    PRINT_DEBUG_VideoWrite("Create the new video stream")
-    m_vstream = avformat_new_stream(m_fmt_ctx, codec);
-    m_codec_ctx = m_vstream->codec;
-    m_codec_ctx->bit_rate = bit_rate;
-    m_codec_ctx->sample_aspect_ratio.num = 1;
-    m_codec_ctx->sample_aspect_ratio.den = 1;
-    m_codec_ctx->width = width;
-    m_codec_ctx->height = height + height%2;
-    m_codec_ctx->time_base.num = 1;
-    m_codec_ctx->time_base.den = fps;
-    m_codec_ctx->gop_size = gop_size;
-    m_codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
-    m_codec_ctx->max_b_frames = 2;
-    m_vstream->time_base.num = 1;
-    m_vstream->time_base.den = fps;
+        //New video stream
+        PRINT_DEBUG_VideoWrite("Create the new video stream")
+        m_vstream.push_back(avformat_new_stream(m_fmt_ctx, codec));
+        unsigned id = m_vstream.size()-1;
+        m_vstream[id]->id = id;
+        m_codec_ctx.push_back(m_vstream[id]->codec);
+        avcodec_get_context_defaults3(m_codec_ctx[id], codec);
+        m_codec_ctx[id]->bit_rate = bit_rate;
+        m_codec_ctx[id]->sample_aspect_ratio.num = 1;
+        m_codec_ctx[id]->sample_aspect_ratio.den = 1;
+        m_codec_ctx[id]->width = width;
+        m_codec_ctx[id]->height = height + height%2;
+        m_codec_ctx[id]->time_base.num = 1;
+        m_codec_ctx[id]->time_base.den = fps;
+        m_codec_ctx[id]->gop_size = gop_size;
+        m_codec_ctx[id]->pix_fmt = AV_PIX_FMT_YUV420P;
+        m_codec_ctx[id]->max_b_frames = 2;
+        m_vstream[id]->time_base.num = 1;
+        m_vstream[id]->time_base.den = fps;
 
 
-    //Open codec
-    PRINT_DEBUG_VideoWrite("Open the codec")
-    AVDictionary* voptions = nullptr;
-    //av_dict_set(&voptions, "profile", "baseline", 0);
-    if (avcodec_open2(m_codec_ctx, codec, nullptr/*&voptions*/) < 0)
-    {
-        throw std::runtime_error("Cannot open "+codecName);
+        //Open codec
+        PRINT_DEBUG_VideoWrite("Open the codec")
+        AVDictionary* voptions = nullptr;
+        //av_dict_set(&voptions, "profile", "baseline", 0);
+        if (avcodec_open2(m_codec_ctx[id], codec, nullptr/*&voptions*/) < 0)
+        {
+            throw std::runtime_error("Cannot open "+codecName);
+        }
+        outformat->video_codec = codec->id;
     }
 
     //Open output file:
@@ -121,12 +135,13 @@ void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, u
         }
     }
 
-    outformat->video_codec = codec->id;
-
     PRINT_DEBUG_VideoWrite("Write header")
     if (m_fmt_ctx->oformat->flags & AVFMT_GLOBALHEADER)
     {
-         m_codec_ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        for (auto& codec_ctx: m_codec_ctx)
+        {
+            codec_ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        }
     }
 
     auto ret = avformat_write_header(m_fmt_ctx, NULL);
@@ -138,42 +153,50 @@ void VideoWriter::Init(std::string codecName, unsigned width, unsigned height, u
 
 VideoWriter& VideoWriter::operator<<(const cv::Mat& pict)
 {
-    auto sharedPkt = Encode(pict);
+    Write(pict, 0);
+    return *this;
+}
+
+void VideoWriter::Write(const cv::Mat& pict, int streamId)
+{
+    auto sharedPkt = Encode(pict, streamId);
     if (sharedPkt != nullptr)
     {
-        PrivateWrite(sharedPkt);
+        PrivateWrite(sharedPkt, streamId);
     }
 }
 
-void VideoWriter::Flush(void)
+void VideoWriter::Flush(int streamId)
 {
-    auto sharedPkt = Encode(nullptr);
+    auto sharedPkt = Encode(nullptr, streamId);
     while (sharedPkt != nullptr)
     {
-        PrivateWrite(sharedPkt);
-        sharedPkt = Encode(nullptr);
+        PrivateWrite(sharedPkt, streamId);
+        sharedPkt = Encode(nullptr, streamId);
     }
 }
 
-void VideoWriter::PrivateWrite(std::shared_ptr<Packet> sharedPkt)
+void VideoWriter::PrivateWrite(std::shared_ptr<Packet> sharedPkt, int streamId)
 {
     auto& pkt = sharedPkt->GetPkt();
+    std::cout << "TEST" << std::endl;
     if (pkt.pts != AV_NOPTS_VALUE)
     {
-        pkt.pts = av_rescale_q(pkt.pts, m_codec_ctx->time_base, m_vstream->time_base);
+        pkt.pts = av_rescale_q(pkt.pts, m_codec_ctx[streamId]->time_base, m_vstream[streamId]->time_base);
     }
     if (pkt.dts != AV_NOPTS_VALUE)
     {
-        pkt.dts = av_rescale_q(pkt.dts, m_codec_ctx->time_base, m_vstream->time_base);
+        pkt.dts = av_rescale_q(pkt.dts, m_codec_ctx[streamId]->time_base, m_vstream[streamId]->time_base);
     }
-    pkt.stream_index = m_vstream->index;
+    pkt.stream_index = m_vstream[streamId]->index;
+    std::cout << "StreamId = " << streamId << " stream_index = " << pkt.stream_index << std::endl;
     if (av_interleaved_write_frame(m_fmt_ctx, &pkt) < 0)
     {
         throw std::runtime_error("Error while writing pkt");
     }
 }
 
-std::shared_ptr<Packet> VideoWriter::Encode(const cv::Mat& pict)
+std::shared_ptr<Packet> VideoWriter::Encode(const cv::Mat& pict, int streamId)
 {
     PRINT_DEBUG_VideoWrite("Start Encode")
     AVFrame* frame = av_frame_alloc();
@@ -187,8 +210,8 @@ std::shared_ptr<Packet> VideoWriter::Encode(const cv::Mat& pict)
     src.linesize[2] = 0;
 
     frame->format = AV_PIX_FMT_YUV420P;
-    frame->width = m_codec_ctx->width;
-    frame->height = m_codec_ctx->height;
+    frame->width = m_codec_ctx[streamId]->width;
+    frame->height = m_codec_ctx[streamId]->height;
     int buffSize = av_image_alloc(frame->data, frame->linesize, frame->width, frame->height, (enum AVPixelFormat)frame->format, 1);
 //    frame->data[0] = pict.data;
 //    frame->data[1] = pict.data;
@@ -204,14 +227,14 @@ std::shared_ptr<Packet> VideoWriter::Encode(const cv::Mat& pict)
 
 
     PRINT_DEBUG_VideoWrite("Encode: frame generated")
-    return Encode(frame);
+    return Encode(frame, streamId);
 }
 
-std::shared_ptr<Packet> VideoWriter::Encode(AVFrame* frame)
+std::shared_ptr<Packet> VideoWriter::Encode(AVFrame* frame, int streamId)
 {
     auto pkt = std::make_shared<Packet>();
     PRINT_DEBUG_VideoWrite("Get pkt")
-    if (pkt->SetAvPacketWithEncoder(m_codec_ctx, frame))
+    if (pkt->SetAvPacketWithEncoder(m_codec_ctx[streamId], frame))
     {
         PRINT_DEBUG_VideoWrite("Encode: ok")
         av_frame_free(&frame);

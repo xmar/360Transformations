@@ -33,17 +33,18 @@ namespace LibAv
             VideoWriter& operator=(VideoWriter&& vw);
             ~VideoWriter(void);
 
-            void Init(std::string codecName, unsigned width, unsigned height, unsigned fps, unsigned gop_size, unsigned bit_rate);
+            void Init(std::string codecName, unsigned width, unsigned height, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rate);
 
             VideoWriter& operator<<(const cv::Mat& pict);
+            void Write(const cv::Mat& pict, int streamId);
 
-            void Flush(void);
+            void Flush(int streamId);
 
         private:
             std::string m_outputFileName;
             AVFormatContext* m_fmt_ctx;
-            AVCodecContext* m_codec_ctx;
-            AVStream* m_vstream;
+            std::vector<AVCodecContext*> m_codec_ctx;
+            std::vector<AVStream*> m_vstream;
             unsigned m_pts;
 
             bool m_isInit;
@@ -51,9 +52,9 @@ namespace LibAv
             VideoWriter(const VideoWriter& vw) = delete;
             VideoWriter& operator=(const VideoWriter& vw) = delete;
 
-            std::shared_ptr<Packet> Encode(const cv::Mat& pict);
-            std::shared_ptr<Packet> Encode(AVFrame* frame);
-            void PrivateWrite(std::shared_ptr<Packet> sharedPkt);
+            std::shared_ptr<Packet> Encode(const cv::Mat& pict, int streamId);
+            std::shared_ptr<Packet> Encode(AVFrame* frame, int streamId);
+            void PrivateWrite(std::shared_ptr<Packet> sharedPkt, int streamId);
     };
 }
 }
