@@ -130,6 +130,11 @@ def GetMainTex(title):
     s += '    \\input{plot_distance_psnr.tex}\n'
     s += '    \\caption{Orthodromic distance to PSNR}\n'
     s += '\\end{figure}\n'
+    for layoutId in ['cube', 'rhombic', 'pyramid', 'EquiTiled']:
+        s += '\\begin{figure}\n'
+        s += '    \\input{plot_distance_'+layoutId+'_psnr.tex}\n'
+        s += '    \\caption{Orthodromic distance to PSNR for '+layoutId+'}\n'
+        s += '\\end{figure}\n'
     s += '\\end{document}\n'
     return s
 
@@ -252,7 +257,7 @@ def GetBoxTex():
     s += '\\end{tikzpicture}\n'
     return s
 
-def GetDistTex(plotPSNR, listId):
+def GetDistTex(plotPSNR, listId, filter=None):
     s = '\\pgfplotscreateplotcyclelist{My color list}{%\n'
     s += '    {gray,solid, very thick},%\n'
     s += '    {black!25, dashed, very thick},%\n'
@@ -265,7 +270,7 @@ def GetDistTex(plotPSNR, listId):
     s += 'anchor=south west,\n'
     s += 'draw=none,\n'
     s += 'fill=none,\n'
-    s += 'legend columns=3,\n'
+    s += 'legend columns=1,\n'
     s += 'column sep=15pt,\n'
     s += '/tikz/every odd column/.append style={column sep=0cm},\n'
     s += '%font=\\tiny\n'
@@ -300,10 +305,17 @@ def GetDistTex(plotPSNR, listId):
     s += '        ]\n'
     s += '\n'
     for layoutId in listId:
-        s += '        \\addplot+ table [x=distance, y={}]{{../distanceQuality{}.csv}};\n'.format(layoutId, '_psnr' if plotPSNR else '')
+        if filter is None or filter in layoutId:
+            s += '        \\addplot+ table [x=distance, y={}]{{../distanceQuality{}.csv}};\n'.format(layoutId, '_psnr' if plotPSNR else '')
     s += '        \\legend{'
+    first = True
     for layoutId in listId:
-        s += layoutId
+        if filter is None or filter in layoutId:
+            if first:
+                first = False
+            else:
+                s+=', '
+            s += layoutId
     s += '}\n'
     s += '\n'
     s += '    \\end{axis}\n'
@@ -329,6 +341,7 @@ def GeneratePDF(pathToCsv, outputPath, title):
             if line[0] != '%':
                 ids = line.split(' ')
                 listId = ids[1:]
+                break
     with open('{}/plot_distance.tex'.format(outputPath), 'w') as dist:
         dist.write(GetDistTex(False, listId))
 
@@ -337,8 +350,22 @@ def GeneratePDF(pathToCsv, outputPath, title):
             if line[0] != '%':
                 ids = line.split(' ')
                 listId = ids[1:]
+                break
+
     with open('{}/plot_distance_psnr.tex'.format(outputPath), 'w') as dist:
         dist.write(GetDistTex(True, listId))
+
+    with open('{}/plot_distance_cube_psnr.tex'.format(outputPath), 'w') as dist:
+        dist.write(GetDistTex(True, listId, 'CubeMap'))
+
+    with open('{}/plot_distance_rhombic_psnr.tex'.format(outputPath), 'w') as dist:
+        dist.write(GetDistTex(True, listId, 'Rhombic'))
+
+    with open('{}/plot_distance_pyramid_psnr.tex'.format(outputPath), 'w') as dist:
+        dist.write(GetDistTex(True, listId, 'Pyramidal'))
+
+    with open('{}/plot_distance_EquiTiled_psnr.tex'.format(outputPath), 'w') as dist:
+        dist.write(GetDistTex(True, listId, 'EquirectangularTiled'))
 
     shutil.copyfile('../../academicPaper/sig-alternate.cls', '{}/sig-alternate.cls'.format(outputPath))
     sub.Popen([os.path.abspath('../../academicPaper/latexrun'), 'main.tex'], cwd=outputPath).wait()
