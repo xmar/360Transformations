@@ -149,3 +149,61 @@ Layout::NormalizedFaceInfo LayoutCubeMap2::From2dToNormalizedFaceInfo(const Coor
     double normalizedJ = double(pixel.y-JStartOffset(f))/GetRes(f);
     return NormalizedFaceInfo(CoordF(normalizedI, normalizedJ), static_cast<int>(f));
 }
+
+std::shared_ptr<Picture> LayoutCubeMap2::ReadNextPictureFromVideoImpl(void)
+{
+    bool isInit = false;
+    cv::Mat outputMat;
+    for (unsigned i = 0; i < 6; ++i)
+    {
+        Faces f = static_cast<Faces>(i);
+        cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
+        auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
+        if (!isInit)
+        {
+            outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
+            isInit = true;
+        }
+        cv::Mat facePictMat ( outputMat, roi);
+        facePictPtr->copyTo(facePictMat);
+    }
+    return std::make_shared<Picture>(outputMat);
+}
+
+void LayoutCubeMap2::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
+{
+    for (unsigned i = 0; i < 6; ++i)
+    {
+        Faces f = static_cast<Faces>(i);
+        cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
+        cv::Mat facePictMat ( pict->GetMat(), roi);
+        m_outputVideoPtr->Write( facePictMat, i);
+    }
+}
+
+std::shared_ptr<IMT::LibAv::VideoReader> LayoutCubeMap2::InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame)
+{
+    std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
+    vrPtr->Init(nbFrame);
+    if (vrPtr->GetNbStream() != 6)
+    {
+        std::cout << "Unsupported number of stream for CubeMap input video: "<<vrPtr->GetNbStream() <<" instead of 6" << std::endl;
+        return nullptr;
+    }
+    //we could add some other check for instance on the width, height of each stream
+    return vrPtr;
+}
+
+std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap2::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
+{
+    std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
+    std::array<unsigned, 6> br;
+    std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 6, br.begin());
+    std::array<unsigned, 6> resArr;
+    for (unsigned i = 0; i < 6; ++i)
+    {
+        resArr[i] = GetRes(static_cast<Faces>(i));
+    }
+    vwPtr->Init<6>(codecId, resArr, resArr, fps, gop_size, br);
+    return vwPtr;
+}

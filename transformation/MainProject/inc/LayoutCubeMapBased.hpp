@@ -10,7 +10,7 @@ class LayoutCubeMapBased : public Layout
     protected:
         struct FaceResolutions;//Forward declaration
     public:
-        enum class Faces: int {Front, Back, Top, Bottom, Left, Right, Black, Last, First=Front};
+        enum class Faces: int {Front, Back, Right, Left, Top, Bottom, Black, Last, First=Front};
         LayoutCubeMapBased(unsigned int outWidth, unsigned int outHeight, double yaw, double pitch, double roll,
                            FaceResolutions fr):
             Layout(outWidth, outHeight), m_fr(std::move(fr)), m_rotMat(GetRotMatrice(yaw,pitch,roll)),
@@ -26,7 +26,7 @@ class LayoutCubeMapBased : public Layout
                 FaceResolutions(unsigned int front, unsigned int back, unsigned int right,
                                 unsigned int left, unsigned int top, unsigned int bottom):
                          m_faces{{front, back, right, left, top, bottom}}   {}
-                FaceResolutions(std::array<unsigned int, 6> faceResVect)://front, back, right, left, top, bottom
+                FaceResolutions(std::array<unsigned int, 6> faceResVect)://front, back, left, right, top, bottom
                     m_faces(std::move(faceResVect))
                     {}
                 unsigned int GetRes(const Faces& f) const
@@ -42,9 +42,9 @@ class LayoutCubeMapBased : public Layout
                         case Faces::Bottom:
                             return m_faces[5];
                         case Faces::Right:
-                            return m_faces[2];
-                        case Faces::Left:
                             return m_faces[3];
+                        case Faces::Left:
+                            return m_faces[2];
                         case Faces::Black:
                             throw std::invalid_argument("GetRes: Black is not a valid face");
                         case Faces::Last:

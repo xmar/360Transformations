@@ -258,3 +258,149 @@ CoordF LayoutPyramidal2::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo
     }
 */
 }
+
+std::shared_ptr<Picture> LayoutPyramidal2::ReadNextPictureFromVideoImpl(void)
+{
+    bool isInit = false;
+    cv::Mat outputMat;
+    for (unsigned i = 0; i < 6; ++i)
+    {
+        Faces f = static_cast<Faces>(i);
+        unsigned width, height;
+        if (f != Faces::Top && f != Faces::Bottom)
+        {
+            width = GetRes(f);
+        }
+        else
+        {
+            width = GetRes(Faces::Base);
+        }
+
+        if (f != Faces::Left && f != Faces::Right)
+        {
+             height = GetRes(f);
+        }
+        else
+        {
+            height = GetRes(Faces::Base);
+        }
+        unsigned startI , startJ;
+        if (f != Faces::Top || f != Faces::Bottom)
+        {
+            startI = IStartOffset(f, 0);
+        }
+        else
+        {
+            startI = IStartOffset(Faces::Base, 0);
+        }
+        if (f != Faces::Left || f != Faces::Right)
+        {
+            startJ = JStartOffset(f, 0);
+        }
+        else
+        {
+            startJ = JStartOffset(Faces::Base, 0);
+        }
+        cv::Rect roi( startI,  startJ, height, width );
+        auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
+        if (!isInit)
+        {
+            outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
+            isInit = true;
+        }
+        cv::Mat facePictMat ( outputMat, roi);
+        facePictPtr->copyTo(facePictMat);
+    }
+    return std::make_shared<Picture>(outputMat);
+}
+
+void LayoutPyramidal2::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
+{
+    for (unsigned i = 0; i < 6; ++i)
+    {
+        Faces f = static_cast<Faces>(i);
+        unsigned width, height;
+        if (f != Faces::Top && f != Faces::Bottom)
+        {
+            width = GetRes(f);
+        }
+        else
+        {
+            width = GetRes(Faces::Base);
+        }
+
+        if (f != Faces::Left && f != Faces::Right)
+        {
+             height = GetRes(f);
+        }
+        else
+        {
+            height = GetRes(Faces::Base);
+        }
+        unsigned startI , startJ;
+        if (f != Faces::Top || f != Faces::Bottom)
+        {
+            startI = IStartOffset(f, 0);
+        }
+        else
+        {
+            startI = IStartOffset(Faces::Base, 0);
+        }
+        if (f != Faces::Left || f != Faces::Right)
+        {
+            startJ = JStartOffset(f, 0);
+        }
+        else
+        {
+            startJ = JStartOffset(Faces::Base, 0);
+        }
+        cv::Rect roi( startI,  startJ, height, width );
+        cv::Mat facePictMat ( pict->GetMat(), roi);
+        m_outputVideoPtr->Write( facePictMat, i);
+    }
+}
+
+std::shared_ptr<IMT::LibAv::VideoReader> LayoutPyramidal2::InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame)
+{
+    std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
+    vrPtr->Init(nbFrame);
+    if (vrPtr->GetNbStream() != 5)
+    {
+        std::cout << "Unsupported number of stream for Pyramidal input video: "<<vrPtr->GetNbStream() <<" instead of 5" << std::endl;
+        return nullptr;
+    }
+    //we could add some other check for instance on the width, height of each stream
+    return vrPtr;
+}
+
+std::shared_ptr<IMT::LibAv::VideoWriter> LayoutPyramidal2::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
+{
+    std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
+    std::array<unsigned, 5> br;
+    std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 5, br.begin());
+    std::array<unsigned, 5> widthArr;
+    std::array<unsigned, 5> heightArr;
+    for (unsigned i = 0; i < 5; ++i)
+    {
+        Faces f = static_cast<Faces>(i);
+        if (f != Faces::Top && f != Faces::Bottom)
+        {
+            widthArr[i] = GetRes(f);
+        }
+        else
+        {
+            widthArr[i] = GetRes(Faces::Base);
+        }
+
+        if (f != Faces::Left && f != Faces::Right)
+        {
+             heightArr[i] = GetRes(f);
+        }
+        else
+        {
+            heightArr[i] = GetRes(Faces::Base);
+        }
+    }
+    vwPtr->Init<5>(codecId, widthArr, heightArr, fps, gop_size, br);
+    return vwPtr;
+}

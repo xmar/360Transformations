@@ -4,6 +4,8 @@
 #include <cmath>
 #include <memory>
 #include "Picture.hpp"
+#include "VideoReader.hpp"
+#include "VideoWriter.hpp"
 
 #include "Common.hpp"
 
@@ -20,7 +22,7 @@ class Layout
             CoordF m_normalizedFaceCoordinate;
             int m_faceId;
         };
-        Layout(void): m_outWidth(0), m_outHeight(0), m_isInit(false) {};
+        Layout(void): m_outWidth(0), m_outHeight(0), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
         Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight), m_isInit(false) {};
         virtual ~Layout(void) = default;
 
@@ -51,14 +53,55 @@ class Layout
         std::shared_ptr<Picture> FromLayout(const Picture& picFromOtherLayout, const Layout& originalLayout) const
         {return originalLayout.ToLayout(picFromOtherLayout, *this);}
 
+        void InitInputVideo(std::string pathToInputVideo, unsigned nbFrame)
+        {
+            std::cout << "Call input init frm base layout" << std::endl;
+            if (m_inputVideoPtr == nullptr)
+            {
+                std::cout << "Call input init frm base layout: step 2" << std::endl;
+                m_inputVideoPtr = InitInputVideoImpl(pathToInputVideo, nbFrame);
+            }
+        }
+        void InitOutputVideo(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
+        {
+            if (m_outputVideoPtr == nullptr)
+            {
+                m_outputVideoPtr = InitOutputVideoImpl(pathToOutputVideo, codecId, fps, gop_size, bit_rateVect);
+            }
+        }
+        std::shared_ptr<Picture> ReadNextPictureFromVideo(void)
+        {
+            if (m_inputVideoPtr != nullptr)
+            {
+                return ReadNextPictureFromVideoImpl();
+            }
+            else
+            {
+                return nullptr;
+            }
+        }
+        void WritePictureToVideo(std::shared_ptr<Picture> pic)
+        {
+            if (m_outputVideoPtr != nullptr)
+            {
+                WritePictureToVideoImpl(pic);
+            }
+        }
+
     protected:
         unsigned int m_outWidth;
         unsigned int m_outHeight;
         bool m_isInit;
+        std::shared_ptr<IMT::LibAv::VideoReader> m_inputVideoPtr;
+        std::shared_ptr<IMT::LibAv::VideoWriter> m_outputVideoPtr;
 
         /** \brief Protected function called by Init to initialized the layout object. Can be override. By default do nothing.
          */
         virtual void InitImpl(void) {}
+        virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void)  = 0;
+        virtual void WritePictureToVideoImpl(std::shared_ptr<Picture>)  = 0;
+        virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) = 0;
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) = 0;
         void SetWidth(unsigned int w) {m_outWidth = w;}
         void SetHeight(unsigned int h) {m_outHeight = h;}
 

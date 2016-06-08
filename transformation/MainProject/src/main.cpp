@@ -32,6 +32,13 @@
 #include "VideoWriter.hpp"
 #include "VideoReader.hpp"
 
+#define DEBUG 1
+#ifdef DEBUG
+#define PRINT_DEBUG(x) std::cout << x << std::endl;
+#elif
+#define PRINT_DEBUG(x) {}
+#endif // DEBUG
+
 using namespace IMT;
 
 int main( int argc, const char* argv[] )
@@ -111,16 +118,6 @@ int main( int argc, const char* argv[] )
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
       auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate");
 
-      std::vector<cv::VideoCapture> capVect;
-      for (auto& inputPath:pathToInputVideos)
-      {
-          IMT::LibAv::VideoReader vr(inputPath);
-          vr.Init(nbFrames);
-          auto matPtr = vr.GetNextPicture(0);
-          exit(0);
-          capVect.push_back(cv::VideoCapture(inputPath));
-      }
-
         std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
 
         unsigned j = 0;
@@ -128,7 +125,7 @@ int main( int argc, const char* argv[] )
         {
             bool isFirst = true;
             layoutFlowVect.push_back(std::vector<std::shared_ptr<Layout>>());
-            CoordI refResolution ( capVect[j].get(CV_CAP_PROP_FRAME_WIDTH), capVect[j].get(CV_CAP_PROP_FRAME_HEIGHT) );
+            CoordI refResolution ( 0, 0 );
             unsigned k = 0;
             for(auto& lfs: lfsv)
             {
@@ -141,7 +138,15 @@ int main( int argc, const char* argv[] )
             ++j;
         }
 
-        std::vector<std::shared_ptr<IMT::LibAv::VideoWriter>> cvVideoWriters;
+      j = 0;
+      for (auto& inputPath:pathToInputVideos)
+      {
+          PRINT_DEBUG("Start init input video for flow "<<j+1)
+          layoutFlowVect[j][0]->InitInputVideo(inputPath, nbFrames);
+          PRINT_DEBUG("Done init input video for flow "<<j+1)
+          ++j;
+      }
+
         if (!pathToOutputVideo.empty())
         {
             size_t lastindex = pathToOutputVideo.find_last_of(".");
@@ -154,13 +159,9 @@ int main( int argc, const char* argv[] )
                 const auto& l = layoutFlowVect[j].back();
                 std::string path = pathToOutputVideo+std::to_string(j+1)+lfsv.back()+pathToOutputVideoExtension;
                 std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
-                cvVideoWriters.push_back(std::make_shared<IMT::LibAv::VideoWriter>(path));//, IMT::LibAv::VideoWriter::fourcc('H','E','V','C'), fps,
-                                            //cv::Size(l->GetWidth(), l->GetHeight()));
-                //gopSize = fps/2 is youtube recommandation for the GOP size
-                std::vector<unsigned> bitrate;
-                bitrate.push_back(videoOutputBitRate*std::pow(10,3));
-                bitrate.push_back(videoOutputBitRate*std::pow(10,3));
-                cvVideoWriters.back()->Init("libx265", l->GetWidth(), l->GetHeight(), fps, int(fps/2), bitrate);
+
+                auto bitrate = GetBitrateVector(lfsv.back(), ptree, videoOutputBitRate);
+                l->InitOutputVideo(path, "libx265", fps, int(fps/2), bitrate);
                 ++j;
             }
         }
@@ -184,7 +185,7 @@ int main( int argc, const char* argv[] )
             }
         }
 //      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), sga.fps, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
-      std::cout << "Nb frames: " << capVect[0].get(CV_CAP_PROP_FRAME_COUNT)<< std::endl;
+
       cv::Mat img;
       int count = 0;
       double averageDuration = 0;
@@ -198,8 +199,7 @@ int main( int argc, const char* argv[] )
         std::shared_ptr<Picture> firstPict(nullptr);
         for(auto& lf: layoutFlowVect)
         {
-            capVect[j].read(img);
-            auto pict = std::make_shared<Picture>(img);
+            std::shared_ptr<Picture> pict = lf[0]->ReadNextPictureFromVideo();
             auto pictOut = pict;
             std::cout << "Flow " << j << ": " << layoutFlowSections[j][0];
             for (unsigned int i = 1; i < lf.size(); ++i)
@@ -223,10 +223,10 @@ int main( int argc, const char* argv[] )
                 std::cout << "Flow " << j << ": MS-SSIM = " << msssim << " PSNR = " << psnr << std::endl;
                 *qualityWriterVect[j-1] << msssim << " " << psnr << std::endl;
             }
-            if (!cvVideoWriters.empty())
+            if (!pathToOutputVideo.empty())
             {
-                cvVideoWriters[j]->Write(pictOut->GetMat(), 0);
-                cvVideoWriters[j]->Write(pict->GetMat(), 1);
+                PRINT_DEBUG("Send picture to encoder "<<j+1)
+                lf.back()->WritePictureToVideo(pictOut);
             }
             ++j;
         }

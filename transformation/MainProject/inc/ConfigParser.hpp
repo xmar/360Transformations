@@ -18,8 +18,99 @@
 
 namespace IMT {
 
-
 namespace pt = boost::property_tree;
+std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, unsigned bitrateGoal)
+{
+    std::string layoutType;
+    std::vector<unsigned> bitrateVect;
+    try {
+        layoutType = ptree.get<std::string>(layoutSection+".type");
+        if (layoutType == "equirectangular")
+        {
+            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+
+            bitrateVect.push_back(bitrateGoal * bitrate);
+            return bitrateVect;
+        }
+        if (layoutType == "cubeMap" || layoutType == "cubeMap2")
+        {
+            auto bitrateFront = ptree.get<double>(layoutSection+".bitrateFront");
+            auto bitrateBack = ptree.get<double>(layoutSection+".bitrateBack");
+            auto bitrateLeft = ptree.get<double>(layoutSection+".bitrateLeft");
+            auto bitrateRight = ptree.get<double>(layoutSection+".bitrateRight");
+            auto bitrateTop = ptree.get<double>(layoutSection+".bitrateTop");
+            auto bitrateBottom = ptree.get<double>(layoutSection+".bitrateBottom");
+            auto sum = bitrateFront+bitrateBack+bitrateLeft+bitrateRight+bitrateTop+bitrateBottom;
+            bitrateVect.push_back(bitrateGoal*bitrateFront/sum);
+            bitrateVect.push_back(bitrateGoal*bitrateBack/sum);
+            bitrateVect.push_back(bitrateGoal*bitrateLeft/sum);
+            bitrateVect.push_back(bitrateGoal*bitrateRight/sum);
+            bitrateVect.push_back(bitrateGoal*bitrateTop/sum);
+            bitrateVect.push_back(bitrateGoal*bitrateBottom/sum);
+            return bitrateVect;
+        }
+        if (layoutType == "flatFixed")
+        {
+            bitrateVect.push_back(bitrateGoal);
+            return bitrateVect;
+        }
+        if (layoutType == "pyramid" || layoutType == "pyramid2")
+        {
+            double pyramidBaseBitrate = ptree.get<double>(layoutSection+".pyramidBaseBitrate");
+            double pyramidTopBitrate = ptree.get<double>(layoutSection+".pyramidTopBitrate");
+            double pyramidBottomBitrate = ptree.get<double>(layoutSection+".pyramidBottomBitrate");
+            double pyramidLeftBitrate = ptree.get<double>(layoutSection+".pyramidLeftBitrate");
+            double pyramidRightBitrate = ptree.get<double>(layoutSection+".pyramidRightBitrate");
+            auto sum = pyramidBaseBitrate+pyramidTopBitrate+pyramidBottomBitrate+pyramidLeftBitrate+pyramidRightBitrate;
+            bitrateVect.push_back(bitrateGoal*pyramidBaseBitrate/sum);
+            bitrateVect.push_back(bitrateGoal*pyramidTopBitrate/sum);
+            bitrateVect.push_back(bitrateGoal*pyramidBottomBitrate/sum);
+            bitrateVect.push_back(bitrateGoal*pyramidLeftBitrate/sum);
+            bitrateVect.push_back(bitrateGoal*pyramidRightBitrate/sum);
+            return bitrateVect;
+        }
+        if (layoutType == "rhombicDodeca")
+        {
+            std::array<double, 12> faceBitrate;
+            for (unsigned int i = 0; i < 12; ++i)
+            {
+                faceBitrate[i] = ptree.get<double>(layoutSection+".rhombFace"+std::to_string(i+1)+"Bitrate");
+            }
+            unsigned sum = 0;
+            for (auto b: faceBitrate) {sum += b;}
+            for (auto b: faceBitrate) { bitrateVect.push_back(bitrateGoal*b/sum); }
+            return bitrateVect;
+        }
+        if (layoutType == "equirectangularTiled")
+        {
+            std::array<std::array<unsigned, 8>, 8> faceBitrate;
+            unsigned sum = 0;
+            for (unsigned i = 0; i < 8; ++i)
+            {
+                for (unsigned j = 0; j < 8; ++j)
+                {
+                    faceBitrate[i][j] = ptree.get<double>(layoutSection+".equirectangularTileBitrate_"+std::to_string(i)+"_"+std::to_string(j));
+                    sum += faceBitrate[i][j];
+                }
+            }
+            for (unsigned i = 0; i < 8; ++i)
+            {
+                for (unsigned j = 0; j < 8; ++j)
+                {
+                    bitrateVect.push_back(bitrateGoal*faceBitrate[i][j]/sum);
+                }
+            }
+            return bitrateVect;
+        }
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "Error while parsing in configuration file the "<<layoutSection<<" layout: " << e.what() << std::endl;
+        throw e;
+    }
+    throw std::invalid_argument("Not supported type: "+layoutType);
+}
+
 std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& ptree, bool isInput, unsigned int inputWidth, unsigned int inputHeight)
 {
     std::string layoutType;
@@ -27,6 +118,21 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
     try {
         layoutType = ptree.get<std::string>(layoutSection+".type");
         bool infer = isInput ? true : ptree.get<bool>(layoutSection+".relativeResolution");
+        CoordI refRes(0,0);
+        if (isInput)
+        {
+            try
+            {
+                int width = ptree.get<double>(layoutSection+".refWidth");
+                int height = ptree.get<double>(layoutSection+".refHeight");
+                refRes = CoordI(width, height);
+            }
+            catch(...)
+            {
+                std::cout << "Could not find " << layoutSection+".refWidth" << " or " << layoutSection+".refHeight" <<
+                    "for layoutSection=" << layoutSection << std::endl;
+            }
+        }
         if (layoutType == "equirectangular")
         {
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
@@ -34,6 +140,8 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
             if (isInput)
             {
+                inputWidth = refRes.x;
+                inputHeight = refRes.y;
                 return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, yaw, pitch, roll));
             }
             else
@@ -50,21 +158,6 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 }
             }
 
-        }
-        CoordI refRes(0,0);
-        if (isInput)
-        {
-            try
-            {
-                int width = ptree.get<double>(layoutSection+".refWidth");
-                int height = ptree.get<double>(layoutSection+".refHeight");
-                refRes = CoordI(width, height);
-            }
-            catch(...)
-            {
-                std::cout << "Could not find " << layoutSection+".refWidth" << " or " << layoutSection+".refHeight" <<
-                    "for layoutSection=" << layoutSection << std::endl;
-            }
         }
         if (layoutType == "cubeMap")
         {
@@ -162,8 +255,8 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidBaseEdgeLength = ptree.get<double>(layoutSection+".pyramidBaseEdgeLength");
             double pyramidHeightTop = ptree.get<double>(layoutSection+".pyramidHeightTop");
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
-            double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightBottom");
-            double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightBottom");
+            double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
+            double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
             if (isInput)
             {
                 if (!infer)

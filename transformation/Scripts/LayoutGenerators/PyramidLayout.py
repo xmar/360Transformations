@@ -15,7 +15,10 @@ class PyramidLayout(Layout):
         c+=super().GetYawPitchRoll()
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
-            c+='pyramidHeight{}={}\n'.format(f, mediumRatio)
+            c+='pyramidHeight{}={}\n'.format(f, Constants.GOOD_QUALITY)
+        c+='pyramidBaseBitrate={}\n'.format(Constants.GOOD_QUALITY)
+        for f in ['Left','Right','Top','Bottom']:
+            c+='pyramid{}Bitrate={}\n'.format(f, mediumRatio)
         return c
 
 class PyramidHigherQualityLayout(Layout):
@@ -33,6 +36,9 @@ class PyramidHigherQualityLayout(Layout):
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramidHeight{}={}\n'.format(f, Constants.GOOD_QUALITY)
+        c+='pyramidBaseBitrate={}\n'.format(Constants.GOOD_QUALITY)
+        for f in ['Left','Right','Top','Bottom']:
+            c+='pyramid{}Bitrate={}\n'.format(f, Constants.GOOD_QUALITY)
         return c
 
 class PyramidLowerQualityLayout(Layout):
@@ -49,5 +55,8 @@ class PyramidLowerQualityLayout(Layout):
         c+=super().GetYawPitchRoll()
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
-            c+='pyramidHeight{}={}\n'.format(f, Constants.BAD_QUALITY)
+            c+='pyramidHeight{}={}\n'.format(f, Constants.GOOD_QUALITY)
+        c+='pyramidBaseBitrate={}\n'.format(Constants.GOOD_QUALITY)
+        for f in ['Left','Right','Top','Bottom']:
+            c+='pyramid{}Bitrate={}\n'.format(f, Constants.BAD_QUALITY)
         return c

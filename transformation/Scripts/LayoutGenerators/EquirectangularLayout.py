@@ -1,8 +1,8 @@
 from .Layout import Layout
 
 class EquirectangularLayout(Layout):
-    def __init__(self, layoutName):
-        super().__init__(layoutName)
+    def __init__(self, layoutName, refWidth = None, refHeight = None):
+        super().__init__(layoutName, refWidth, refHeight)
 
 
     def GenerateLayout(self, a=None):
@@ -12,4 +12,5 @@ class EquirectangularLayout(Layout):
         if a is None:
             a = 1
         c += 'relativeResolution=true\nwidth={0}\nheight={0}\n'.format(a)
+        c += 'bitrate={}'.format(a)
         return c

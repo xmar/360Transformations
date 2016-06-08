@@ -69,6 +69,10 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const override;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 
+        virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override;
+        virtual void WritePictureToVideoImpl(std::shared_ptr<Picture>) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override;
     private:
         LayoutPyramidal2(double baseEdge, double yaw, double pitch, double roll, unsigned int width, unsigned int height, const FaceResolutions& fr):
                 LayoutPyramidalBased(baseEdge, yaw, pitch, roll, width, height, fr) {}

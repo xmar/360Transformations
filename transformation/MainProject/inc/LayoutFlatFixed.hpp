@@ -21,6 +21,11 @@ class LayoutFlatFixed: public Layout
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override;
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override;
+
+        virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override;
+        virtual void WritePictureToVideoImpl(std::shared_ptr<Picture>) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override;
     private:
         double m_yaw;
         double m_pitch;

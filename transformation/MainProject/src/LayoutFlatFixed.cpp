@@ -44,3 +44,34 @@ Coord3dCart LayoutFlatFixed::FromNormalizedInfoTo3d(const Layout::NormalizedFace
     Coord3dSpherical coordBefRot(1.f, (coord.x-0.5)*m_horizontalAngleOfVision, PI()/2+(coord.y-0.5)*m_verticalAngleOfVision);
     return Rotation(coordBefRot, m_rotationMat);
 }
+
+std::shared_ptr<Picture> LayoutFlatFixed::ReadNextPictureFromVideoImpl(void)
+{
+    auto matptr = m_inputVideoPtr->GetNextPicture(0);
+    return std::make_shared<Picture>(matptr->clone());
+}
+
+void LayoutFlatFixed::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
+{
+    m_outputVideoPtr->Write( pict->GetMat(), 0);
+}
+
+std::shared_ptr<IMT::LibAv::VideoReader> LayoutFlatFixed::InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame)
+{
+    std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
+    vrPtr->Init(nbFrame);
+    if (vrPtr->GetNbStream() != 1)
+    {
+        std::cout << "Unsupported number of stream for FlatFixed input video: "<<vrPtr->GetNbStream() <<" instead of 1" << std::endl;
+        return nullptr;
+    }
+    //we could add some other check for instance on the width, height of each stream
+    return vrPtr;
+}
+
+std::shared_ptr<IMT::LibAv::VideoWriter> LayoutFlatFixed::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
+{
+    std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
+    vwPtr->Init<1>(codecId, {{m_outWidth}}, {{m_outHeight}}, fps, gop_size, {{bit_rateVect[0]}});
+    return vwPtr;
+}

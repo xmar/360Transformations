@@ -69,6 +69,10 @@ class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
         {
             return inInterval(i, IStartOffset(f), IEndOffset(f)) && inInterval(j, JStartOffset(f), JEndOffset(f));
         }
+        virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override;
+        virtual void WritePictureToVideoImpl(std::shared_ptr<Picture>) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override;
     private:
         typedef std::array<unsigned int, 6> ColsOffsetArray;
         typedef std::array<unsigned int, 2> RowsOffsetArray;
