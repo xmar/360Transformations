@@ -9,10 +9,10 @@ has grown with the advent of both omnidirectional capturing systems
 %(including multi-camera with stitching systems)
 and interactive displaying
 systems, like \acp{HMD}.
-However, to deliver 360-degree video content on the Internet, the content providers 
+However, to deliver 360-degree video content on the Internet, the content providers
 have to deal with a problem of resource waste: What is displayed in the device,
-which is called the \textit{\ac{FoV}}, is only a fraction of what is downloaded, which is an omnidirectional view of the scene.
-As epitomized by the launch of a dedicated activity at the June 2016 MPEG \ac{DASH} meeting, 
+the so-called \textit{\ac{FoV}}, is only a fraction of what is downloaded, which is an omnidirectional view of the scene.
+As epitomized by the launch of a dedicated activity at the June 2016 MPEG \ac{DASH} meeting,
 new solutions have to be designed to secure high-quality delivery of 360-degree video.
 
 The resource waste is the price to pay for interactivity.
@@ -51,13 +51,13 @@ at 60\,\acp{fps} encoded in \ac{HEVC} is around \SI{100}{Mbps}~\cite{7398367}.
 We propose in this paper a solution where, following the same principles as in
 rate-adaptive streaming technologies, the server offers multiple \emph{representations}
 of the same 360-degree video. But instead of offering representations that only differ by
-their bit-rate, the server offers here representations that differ by 
+their bit-rate, the server offers here representations that differ by
 having a better quality in a given region of the video.
 Our proposal is a \emph{FoV-adaptive streaming system} and is depicted in Figure~\ref{fig:deliverychain}.
 Each representation is characterized by a \emph{\ac{QEC}}, which is a given
 position in the spherical video. Around the \ac{QEC}, the quality of the video is maximum,
 while it is lower for video parts that are far from the \ac{QEC}. Similarly as
-in \ac{DASH}, the video is cut into segments and the client periodically runs 
+in \ac{DASH}, the video is cut into segments and the client periodically runs
 an \emph{adaptive algorithm} to select
 a video representation for the next segment. In a \ac{FoV}-adaptive system, the clients select
 the video representation such that, not only the bit-rate fits with their bandwidth, but also
@@ -66,8 +66,8 @@ the \ac{QEC} is close to their \ac{FoV} center.
 \input{deliveryChain.tex}
 
 This \ac{FoV}-adaptive 360-degree streaming system has three advantages:
-$(i)$ the bit-rate of the delivered video is lower than the original full-quality video because the 
-part of the video that are far from the \ac{QEC} are encoded at low quality.
+$(i)$ the bit-rate of the delivered video is lower than the original full-quality video because the
+parts of the video that are far from the \ac{QEC} are encoded at low quality.
 $(ii)$ When the end-user does not move, the \ac{FoV} video is extracted from the highest
 quality spherical video.
 And $(iii)$ when the end-user moves the head, the device can
@@ -79,8 +79,8 @@ degradation is transient until the
 device selects another video representation with a closer \ac{QEC}.
 
 In this paper, we introduce \ac{FoV}-adaptive streaming systems for navigable 360-degree
-videos. We discuss some key design points. First, we present the overall processes that have to 
-be implemented at both client and server side, and we show how our proposal can be integrated 
+videos. We discuss some key design points. First, we present the overall processes that have to
+be implemented at both client and server side, and we show how our proposal can be integrated
 into the MPEG \ac{DASH} standard. Then, we address
 the choice of the projection from a spherical video into a geometric two-dimensional layout
 with a focus on the impact of this projection into the quality of the video encoding. We evaluate
