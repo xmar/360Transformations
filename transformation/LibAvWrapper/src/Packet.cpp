@@ -53,3 +53,16 @@ bool Packet::SetAvPacketWithEncoder(AVCodecContext* context, AVFrame* frame)
     }
     return m_isInit;
 }
+
+int Packet::GetNextPacket(AVFormatContext* fmt_ctx)
+{
+
+    if (fmt_ctx == nullptr) return -1;
+    Free();
+    int ret = -1;
+    if ((ret = av_read_frame(fmt_ctx, &m_pkt)) >= 0 )
+    {
+        m_isInit = true;
+    }
+    return ret;
+}

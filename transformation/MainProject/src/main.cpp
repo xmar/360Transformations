@@ -30,6 +30,7 @@
 #include "Layout.hpp"
 #include "ConfigParser.hpp"
 #include "VideoWriter.hpp"
+#include "VideoReader.hpp"
 
 using namespace IMT;
 
@@ -113,6 +114,10 @@ int main( int argc, const char* argv[] )
       std::vector<cv::VideoCapture> capVect;
       for (auto& inputPath:pathToInputVideos)
       {
+          IMT::LibAv::VideoReader vr(inputPath);
+          vr.Init(nbFrames);
+          auto matPtr = vr.GetNextPicture(0);
+          exit(0);
           capVect.push_back(cv::VideoCapture(inputPath));
       }
 
@@ -152,7 +157,10 @@ int main( int argc, const char* argv[] )
                 cvVideoWriters.push_back(std::make_shared<IMT::LibAv::VideoWriter>(path));//, IMT::LibAv::VideoWriter::fourcc('H','E','V','C'), fps,
                                             //cv::Size(l->GetWidth(), l->GetHeight()));
                 //gopSize = fps/2 is youtube recommandation for the GOP size
-                cvVideoWriters.back()->Init("libx265", l->GetWidth(), l->GetHeight(), fps, int(fps/2), videoOutputBitRate*std::pow(10,3));
+                std::vector<unsigned> bitrate;
+                bitrate.push_back(videoOutputBitRate*std::pow(10,3));
+                bitrate.push_back(videoOutputBitRate*std::pow(10,3));
+                cvVideoWriters.back()->Init("libx265", l->GetWidth(), l->GetHeight(), fps, int(fps/2), bitrate);
                 ++j;
             }
         }
@@ -200,7 +208,6 @@ int main( int argc, const char* argv[] )
                 pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
                 lf[i]->NextStep();
             }
-            std::cout << std::endl;
             if (firstPict == nullptr)
             {
                 firstPict = pictOut;
@@ -218,7 +225,8 @@ int main( int argc, const char* argv[] )
             }
             if (!cvVideoWriters.empty())
             {
-                *cvVideoWriters[j] << pictOut->GetMat();
+                cvVideoWriters[j]->Write(pictOut->GetMat(), 0);
+                cvVideoWriters[j]->Write(pict->GetMat(), 1);
             }
             ++j;
         }
