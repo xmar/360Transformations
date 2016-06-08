@@ -1,4 +1,4 @@
-\begin{figure}[h]
+\begin{figure}[hptb]
 \centering
 \begin{tikzpicture}
 
@@ -62,7 +62,7 @@
 		code = {
 			\draw (-0.5*#1, -0.28*#1) rectangle (0.5*#1, 0.28*#1);
 			\draw[densely dotted, thick, red!70!black] (-0.45*#1 + #2*#1*0.24, 0.15*#1)
-				 rectangle 
+				 rectangle
 			 	(-0.4*#1 + #2*#1*0.24 + 0.4*#1, -0.15*#1);
 			\draw (-0.4*#1 + #2*#1*0.24 + 0.2*#1, 0.05*#1) node[cross=2pt,red!70!black] {};
 	   }
@@ -94,7 +94,7 @@
 		code={
 			\pic[local bounding box=bigA] at (0,0) {equirec={\sizeBig}{#4}{#5}};
 			\ifnum#1>0
-		    	\node[font=\scriptsize, anchor=east, inner sep=0pt] 
+		    	\node[font=\scriptsize, anchor=east, inner sep=0pt]
 		    		at (bigA.west) (legbwhi) {high};
 		    \fi
 		    \ifnum#3>0
@@ -102,15 +102,15 @@
 			\fi
 %			\pic[local bounding box=medA] at ([yshift=\ecartMed]bigA.south) {equirec={\sizeMed}{#4}{#5}};
 %			\ifnum#1>0
-%				\node[font=\scriptsize,anchor=west, inner sep=0pt] 
+%				\node[font=\scriptsize,anchor=west, inner sep=0pt]
 %					at (legbwhi.west |- medA) (legbwme) {\vphantom{g}med};
 %			\fi
-%			\pic[local bounding box=lowA] at ([yshift=\ecartLow]medA.south) 
+%			\pic[local bounding box=lowA] at ([yshift=\ecartLow]medA.south)
 %				{equirec={\sizeLow}{#4}{#5}};
-			\pic[local bounding box=lowA] at ([yshift=\ecartLow]bigA.south) 
+			\pic[local bounding box=lowA] at ([yshift=\ecartLow]bigA.south)
 				{equirec={\sizeLow}{#4}{#5}};
 			\ifnum#1>0
-				\node[font=\scriptsize, inner sep=0pt, anchor=west] 
+				\node[font=\scriptsize, inner sep=0pt, anchor=west]
 					at (legbwhi.west |- lowA) {\vphantom{g}low};
 			\fi
 			\ifnum#2>0
@@ -126,8 +126,8 @@
 	% the only parameter is the size
 		% first the body
 		\draw plot [smooth] coordinates {(0,0)
-			(0.05*#1,0.2*#1) 
-			(0.25*#1,0.2*#1) 
+			(0.05*#1,0.2*#1)
+			(0.25*#1,0.2*#1)
 			(0.3*#1,0)};
 		\draw (0,0) -- (0.3*#1,0);
 		% then the head
@@ -151,8 +151,8 @@
 	% the only parameter is the size
 		% first the body
 		\draw plot [smooth] coordinates {(0,0)
-			(0.05*#1,0.2*#1) 
-			(0.25*#1,0.2*#1) 
+			(0.05*#1,0.2*#1)
+			(0.25*#1,0.2*#1)
 			(0.3*#1,0)};
 		\draw (0,0) -- (0.3*#1,0);
 		% then the head
@@ -176,8 +176,8 @@
 	% the only parameter is the size
 		% first the body
 		\draw plot [smooth] coordinates {(0,0)
-			(0.08*#1,0.2*#1) 
-			(0.42*#1,0.2*#1) 
+			(0.08*#1,0.2*#1)
+			(0.42*#1,0.2*#1)
 			(0.5*#1,0)};
 		\draw (0,0) -- (0.5*#1,0);
 		% then the head
@@ -217,9 +217,9 @@
 	  {threerep={0}{0}{0}{-2}{-1}};
 \pic[anchor=east, local bounding box=rightdown] at ($(-0.4,\ecartInterThree)+(rightmid.east |- rightmid.south)$)
 	  {threerep={0}{0}{0}{0}{0}};	
-	  
+	
 %\begin{scope}[on background layer]
-%	\draw[fill=gray!10,draw=none] ([yshift=4.5pt]leftmid.north west) rectangle 
+%	\draw[fill=gray!10,draw=none] ([yshift=4.5pt]leftmid.north west) rectangle
 %				([xshift=3pt, yshift=-4.5pt]rightmid.south east);
 %\end{scope}
 
@@ -227,10 +227,10 @@
 \node[inner sep=1pt] (timeleg) at ([xshift=8pt, yshift=-8pt]rightdown.south) {t};
 \draw [thick, ->] ([yshift=-8pt] leftdown.south) to (timeleg);
 
-\draw[dotted] ([xshift = 4pt]leftdown.east |- timeleg.south) to 
+\draw[dotted] ([xshift = 4pt]leftdown.east |- timeleg.south) to
 	([xshift = 4pt]leftdown.east |- leftup.north);
 	
-\draw[dotted] ([xshift = 4 pt]centerdown.east |- timeleg.south) to 
+\draw[dotted] ([xshift = 4 pt]centerdown.east |- timeleg.south) to
 	([xshift = 4pt]centerdown.east |- centerup.north);	
 
 \draw[element] ([yshift=3pt]leftup.north west) rectangle
@@ -266,10 +266,10 @@
 		([yshift=40pt]rightfov.east |- leftguy.north)};
 		
 % separating lines
-\draw[dotted] ([xshift =0.04cm]leftfov.south east) to 
+\draw[dotted] ([xshift =0.04cm]leftfov.south east) to
 	([xshift =0.04cm]leftfov.east |- highpoint);
 	
-\draw[dotted] ([xshift =0.04cm]frontfov.south east) to 
+\draw[dotted] ([xshift =0.04cm]frontfov.south east) to
 	([xshift =0.04cm]frontfov.east |- highpoint);	
 	
 	
@@ -310,9 +310,9 @@
 	% first parameter is the req message
 	% second parameter is the resp message
 		code={
-			\draw[proto] (0,0) to 
+			\draw[proto] (0,0) to
 				node[protoleg, midway] {#1} ([yshift=-10 pt]server |- 0,0);
-			\draw[proto] ([yshift=-11 pt] server |- 0,0) to 
+			\draw[proto] ([yshift=-11 pt] server |- 0,0) to
 				node[draw=none,midway,matrix] {#2} ([yshift=-21pt] 0,0);
 			}
 	}
@@ -325,22 +325,21 @@
 	{s$_1$:QEC$_2$\,lo}
 	{\pic at (0,0) {equirec={\sizeLow}{-2}{-1}};\\}
 	};
-\pic[local bounding box=twoseg] at ([yshift=-3pt]client|-oneseg.south) 
+\pic[local bounding box=twoseg] at ([yshift=-3pt]client|-oneseg.south)
 	{reqresp={s$_2$:QEC$_3$\,hi}
 	{\pic at (0,0) {equirec={\sizeBig}{0}{0}};\\}
 	};
-\pic[local bounding box=thirdseg] at ([yshift=-3pt]client|-twoseg.south) 
+\pic[local bounding box=thirdseg] at ([yshift=-3pt]client|-twoseg.south)
 	{reqresp={s$_3$:QEC$_1$\,lo}
 	{\pic at (0,0) {equirec={\sizeLow}{2}{1}};\\}
 	};
 
 %\draw[proto] (client) to node[protoleg] {\pgfmathset\baisse-\traitement} ([yshift=-\baisse pt] server |-client);
-%\draw[proto] ([yshift=-\baisse-\traitement pt] server |- client) to 
+%\draw[proto] ([yshift=-\baisse-\traitement pt] server |- client) to
 %	node[protoleg]{mpd} ([\yshift=-\baisse - \baisse-\traitement pt] client);
 
 
 
-\end{tikzpicture}
-\caption{\ac{FoV}-adaptive streaming system: the server offers six representations (three QECs at two bit-rates). The streams lasts three segments from $s_1$ to $s_3$. The client moves the head from left to right, while the available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the throughput.}
+\end{tikzpicture}\caption{\ac{FoV}-adaptive streaming system: the server offers \textit{n*k} representations (\textit{n} QECs at \textit{k} bit-rates). The streams lasts three segments from $s_1$ to $s_3$. The client moves the head from left to right, while the available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the throughput.}
 \label{fig:newdelivery}
 \end{figure}
