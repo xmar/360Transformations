@@ -1,7 +1,5 @@
 \begin{abstract}
-Here is the Abstract.
-
-
+The delivery and display of ultra high resolution 360-degree videos on Head-Mounted Displays (HMDs) presents a number of technical challenges. 360-degree videos are full spherical videos that contain an omnidirectional view of the scene, however only a portion of this scene can be displayed at a given time on the user's HMD. HMDs require large video bitrates to provide a good immersion to the users, which creates a waste of network resources since most of the pixels are never used. With high refresh rates, they require a system to react in less than 10 ms. This prevents the dynamic adjustments of video quality at the server side based on the client's feedback. Instead, an entire 360-degree video needs to be delivered to the client to extract the correct fraction of the video according to the user's head movements. This paper proposes a view-adaptive video streaming system that prepares and delivers different representations of the video that differ not only by bitrate, but also by providing a better quality in the given region of the video. Similarly as in DASH, the client selects the representation of a new segment whose bitrate fits the available throughput and whose center of the full quality region is close to the center of the user's head direction. We investigate the impact of different projections and quality arrangements on the displayed video quality, showing that cubemap layout offers the best performance on the video encoding. Based on evaluation of proposed video streaming on the dataset of users navigating in 360-degree videos, we show that duration of segments needs to be short enough to enable frequent view switches.
 \end{abstract}
 %%% Local Variables:
 %%% mode: latex
