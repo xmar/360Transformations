@@ -45,7 +45,7 @@ class DatasetReader:
         for timestamp in keys:
             if timestamp <= self.maxTimestamp - window:
                 for t in keysToLook:
-                    if t < timestamp + window:
+                    if t > timestamp and t < timestamp + window:
                         distance = self.headPositionMap[timestamp].OrthodromicDistance(self.headPositionMap[t])
                         r.append(distance)
                 keysToLook.remove(timestamp)
