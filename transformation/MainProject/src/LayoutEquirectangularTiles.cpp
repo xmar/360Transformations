@@ -92,7 +92,6 @@ CoordI LayoutEquirectangularTiles::TileIdTo2dEndOffset(const TileId& ti) const
 
 std::shared_ptr<Picture> LayoutEquirectangularTiles::ReadNextPictureFromVideoImpl(void)
 {
-    std::cout << "Call next frame for cube map video" << std::endl;
     bool isInit = false;
     cv::Mat outputMat;
     for (unsigned i = 0; i < 8; ++i)
@@ -103,6 +102,7 @@ std::shared_ptr<Picture> LayoutEquirectangularTiles::ReadNextPictureFromVideoImp
             auto offset = TileIdTo2dOffset(ti);
             cv::Rect roi( offset.x,  offset.y, m_tr.GetResWidth(ti), m_tr.GetResHeight(ti) );
             auto facePictPtr = m_inputVideoPtr->GetNextPicture(FromTileId(ti));
+            //std::cout << "Expected Width: "<< m_tr.GetResWidth(ti) << "; Height " << m_tr.GetResHeight(ti) << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
             if (!isInit)
             {
                 outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());

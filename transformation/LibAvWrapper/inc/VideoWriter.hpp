@@ -16,7 +16,7 @@ extern "C"
    #include <libswscale/swscale.h>
 }
 
-#define DEBUG_VideoWrite 1
+#define DEBUG_VideoWrite 0
 #if DEBUG_VideoWrite
 #define PRINT_DEBUG_VideoWrite(s) std::cout << s << std::endl;
 #else
@@ -149,6 +149,9 @@ namespace LibAv
             void Write(const cv::Mat& pict, int streamId);
 
             void Flush(int streamId);
+
+            unsigned GetWidth(int streamId) {return m_codec_ctx[streamId]->width;}
+            unsigned GetHeight(int streamId) {return m_codec_ctx[streamId]->height;}
 
         private:
             std::string m_outputFileName;

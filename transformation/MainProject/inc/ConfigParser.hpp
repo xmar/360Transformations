@@ -40,7 +40,7 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
             auto bitrateRight = ptree.get<double>(layoutSection+".bitrateRight");
             auto bitrateTop = ptree.get<double>(layoutSection+".bitrateTop");
             auto bitrateBottom = ptree.get<double>(layoutSection+".bitrateBottom");
-            auto sum = bitrateFront+bitrateBack+bitrateLeft+bitrateRight+bitrateTop+bitrateBottom;
+            double sum = bitrateFront+bitrateBack+bitrateLeft+bitrateRight+bitrateTop+bitrateBottom;
             bitrateVect.push_back(bitrateGoal*bitrateFront/sum);
             bitrateVect.push_back(bitrateGoal*bitrateBack/sum);
             bitrateVect.push_back(bitrateGoal*bitrateLeft/sum);
@@ -61,7 +61,7 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
             double pyramidBottomBitrate = ptree.get<double>(layoutSection+".pyramidBottomBitrate");
             double pyramidLeftBitrate = ptree.get<double>(layoutSection+".pyramidLeftBitrate");
             double pyramidRightBitrate = ptree.get<double>(layoutSection+".pyramidRightBitrate");
-            auto sum = pyramidBaseBitrate+pyramidTopBitrate+pyramidBottomBitrate+pyramidLeftBitrate+pyramidRightBitrate;
+            double sum = pyramidBaseBitrate+pyramidTopBitrate+pyramidBottomBitrate+pyramidLeftBitrate+pyramidRightBitrate;
             bitrateVect.push_back(bitrateGoal*pyramidBaseBitrate/sum);
             bitrateVect.push_back(bitrateGoal*pyramidTopBitrate/sum);
             bitrateVect.push_back(bitrateGoal*pyramidBottomBitrate/sum);
@@ -76,15 +76,15 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
             {
                 faceBitrate[i] = ptree.get<double>(layoutSection+".rhombFace"+std::to_string(i+1)+"Bitrate");
             }
-            unsigned sum = 0;
+            double sum = 0;
             for (auto b: faceBitrate) {sum += b;}
             for (auto b: faceBitrate) { bitrateVect.push_back(bitrateGoal*b/sum); }
             return bitrateVect;
         }
         if (layoutType == "equirectangularTiled")
         {
-            std::array<std::array<unsigned, 8>, 8> faceBitrate;
-            unsigned sum = 0;
+            std::array<std::array<double, 8>, 8> faceBitrate;
+            double sum = 0;
             for (unsigned i = 0; i < 8; ++i)
             {
                 for (unsigned j = 0; j < 8; ++j)
@@ -127,10 +127,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 int height = ptree.get<double>(layoutSection+".refHeight");
                 refRes = CoordI(width, height);
             }
-            catch(...)
+            catch(std::exception &e)
             {
                 std::cout << "Could not find " << layoutSection+".refWidth" << " or " << layoutSection+".refHeight" <<
                     "for layoutSection=" << layoutSection << std::endl;
+                throw e;
             }
         }
         if (layoutType == "equirectangular")

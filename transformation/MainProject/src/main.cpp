@@ -32,10 +32,10 @@
 #include "VideoWriter.hpp"
 #include "VideoReader.hpp"
 
-#define DEBUG 1
-#ifdef DEBUG
+#define DEBUG 0
+#if DEBUG
 #define PRINT_DEBUG(x) std::cout << x << std::endl;
-#elif
+#else
 #define PRINT_DEBUG(x) {}
 #endif // DEBUG
 
@@ -116,7 +116,7 @@ int main( int argc, const char* argv[] )
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
-      auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate");
+      auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate")*1000;
 
         std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
 
@@ -208,6 +208,7 @@ int main( int argc, const char* argv[] )
                 pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
                 lf[i]->NextStep();
             }
+            std::cout << std::endl;
             if (firstPict == nullptr)
             {
                 firstPict = pictOut;

@@ -72,7 +72,6 @@ void VideoWriter::Flush(int streamId)
 void VideoWriter::PrivateWrite(std::shared_ptr<Packet> sharedPkt, int streamId)
 {
     auto& pkt = sharedPkt->GetPkt();
-    std::cout << "TEST" << std::endl;
     if (pkt.pts != AV_NOPTS_VALUE)
     {
         pkt.pts = av_rescale_q(pkt.pts, m_codec_ctx[streamId]->time_base, m_vstream[streamId]->time_base);
@@ -82,7 +81,6 @@ void VideoWriter::PrivateWrite(std::shared_ptr<Packet> sharedPkt, int streamId)
         pkt.dts = av_rescale_q(pkt.dts, m_codec_ctx[streamId]->time_base, m_vstream[streamId]->time_base);
     }
     pkt.stream_index = m_vstream[streamId]->index;
-    std::cout << "StreamId = " << streamId << " stream_index = " << pkt.stream_index << std::endl;
     if (av_interleaved_write_frame(m_fmt_ctx, &pkt) < 0)
     {
         throw std::runtime_error("Error while writing pkt");
