@@ -10,7 +10,7 @@ class DatasetReader:
         '''Will read the whole dataset file and store the results inside self.headPositionMap'''
         self.headPositionMap = {}
         self.maxTimestamp = 0
-        with open(self.pathToDatasetFile, 'r') as i:
+        with open(self.pathToDatasetFile,'r') as i:
             for line in i:
                 frameId, timestamp, r11, r12, r13, r21, r22, r23, r31, r32, r33 = line.split(',')
                 #fovc = FoVCenters.FoVCenters([[r11, r12, r13],[r21, r22, r23],[r31, r32, r33]])
@@ -35,6 +35,20 @@ class DatasetReader:
                         maxD = max(distance, maxD)
                 keysToLook.remove(timestamp)
                 r.append(maxD)
+        return r
+        
+    def ComputeAllPositions(self, window):
+        '''Compute all the distances between the FoV center and the initial Fov in the window'''
+        r = []
+        keys = sorted(self.headPositionMap.keys())
+        keysToLook = sorted(self.headPositionMap.keys())
+        for timestamp in keys:
+            if timestamp <= self.maxTimestamp - window:
+                for t in keysToLook:
+                    if t < timestamp + window:
+                        distance = self.headPositionMap[timestamp].OrthodromicDistance(self.headPositionMap[t])
+                        r.append(distance)
+                keysToLook.remove(timestamp)
         return r
 
 

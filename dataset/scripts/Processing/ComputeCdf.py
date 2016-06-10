@@ -11,6 +11,7 @@ def ComputeCdf(pathToDatasets, pathToOutput):
             for filename in filenames:
                 filepath = os.path.join(dirpath, filename)
                 print ('Start processing of dataset: {}'.format(filepath))
+                print ('window = {}'.format(window))
                 videoId = dirpath.split('/')[-1]
                 print('Video id = {}'.format(videoId))
 
@@ -22,7 +23,8 @@ def ComputeCdf(pathToDatasets, pathToOutput):
                     dic[videoId][window] = []
                 if window not in globalDic:
                     globalDic[window] = []
-                r = dr.ComputeStatistic(window)
+                # r = dr.ComputeStatistic(window)
+                r = dr.ComputeAllPositions(window)
                 dic[videoId][window] += r
                 globalDic[window] += r
 
