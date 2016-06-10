@@ -159,6 +159,7 @@ std::shared_ptr<Picture> LayoutCubeMap2::ReadNextPictureFromVideoImpl(void)
         Faces f = static_cast<Faces>(i);
         cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
         auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
+        //std::cout << "Expected Width: "<< GetRes(f) << "; Height " << GetRes(f)  << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
         if (!isInit)
         {
             outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());

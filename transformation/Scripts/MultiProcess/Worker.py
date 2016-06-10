@@ -154,6 +154,7 @@ class FixedAverageAndFixedDistances(GenericWorker):
                 outEquiTiledNameStorage = '{}/{}_storage.dat'.format(self.outputDir,layoutId)
                 outEquiTiledNameVideo = '{}/{}.mkv'.format(self.outputDir,layoutId)
                 outEquiTiledId = '{}/{}'.format(self.outputDir,layoutId)
+                print('\033[31m\033[31mBitrate goal', self.bitrateGoal,'\033[0m')
                 GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
                         [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),
                          (layoutGenerator(layoutId), None)],
@@ -354,7 +355,7 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
                 skip = True
         if not skip:
             outLayoutId = '{}/AverageEquiTiled'.format(self.outputDir)
-            layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None, self.refWidth, self.refHeight)
+            layoutAverage = LayoutGenerators.EquirectangularLayout('AverageEqui', self.refWidth, self.refHeight)
             GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
               [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),(layoutAverage, 1)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
             self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
