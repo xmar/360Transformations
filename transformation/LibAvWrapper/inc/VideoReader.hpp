@@ -40,10 +40,12 @@ class VideoReader
         std::vector<unsigned int> m_videoStreamIds;
         std::map<unsigned int, unsigned int> m_streamIdToVecId;
         //First version: we totaly decode the video and store in a vector the output frames
-        bool m_wasDecoded;
         std::vector<std::queue<std::shared_ptr<cv::Mat>>> m_outputFrames;
+        unsigned m_nbFrames;
+        std::vector<bool> m_doneVect;
+        std::vector<bool> m_gotOne;
 
-        void DecodeAllFrames(unsigned nbFrames);
+        void DecodeNextStep(void);
 };
 }
 }

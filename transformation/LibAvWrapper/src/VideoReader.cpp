@@ -20,7 +20,7 @@ extern "C"
 using namespace IMT::LibAv;
 
 VideoReader::VideoReader(std::string inputPath): m_inputPath(inputPath), m_fmt_ctx(nullptr), m_videoStreamIds(),
-    m_wasDecoded(false), m_outputFrames(), m_streamIdToVecId()
+    m_outputFrames(), m_streamIdToVecId(), m_nbFrames(0), m_doneVect(), m_gotOne()
 {
     //ctor
 }
@@ -50,6 +50,7 @@ std::cout << "long name   " << _a->iformat->long_name << "\n";
 
 void VideoReader::Init(unsigned nbFrames)
 {
+    m_nbFrames = nbFrames;
     PRINT_DEBUG_VideoReader("Register codecs");
     av_register_all();
 
@@ -110,7 +111,8 @@ void VideoReader::Init(unsigned nbFrames)
             }
         }
     }
-    DecodeAllFrames(nbFrames);
+    m_doneVect = std::vector<bool>(m_outputFrames.size(), false);
+    m_gotOne = std::vector<bool>(m_outputFrames.size(), false);
 }
 
 static bool AllDone(const std::vector<bool>& vect)
@@ -144,16 +146,13 @@ static std::shared_ptr<cv::Mat> ToMat(AVCodecContext* codecCtx, AVFrame* frame_p
     return returnMat;
 }
 
-void VideoReader::DecodeAllFrames(unsigned nbFrames)
+void VideoReader::DecodeNextStep(void)
 {
-    PRINT_DEBUG_VideoReader("Decode all video frames");
     Packet pkt;
-    std::vector<bool> doneVect(m_outputFrames.size(), false);
-    std::vector<bool> gotOne(m_outputFrames.size(), false);
-    while ( pkt.GetNextPacket(m_fmt_ctx) >= 0 )//otherwise no packet left to read
+    if ( pkt.GetNextPacket(m_fmt_ctx) >= 0 )
     {
         unsigned streamId = pkt.GetPkt().stream_index;
-        if (m_streamIdToVecId.count(streamId) > 0 && !doneVect[m_streamIdToVecId[streamId]])
+        if (m_streamIdToVecId.count(streamId) > 0 && !m_doneVect[m_streamIdToVecId[streamId]])
         { //then the pkt belong to a stream we care about.
             PRINT_DEBUG_VideoReader("Got a pkt for streamId "<<streamId)
             AVFrame* frame_ptr = av_frame_alloc();
@@ -163,55 +162,58 @@ void VideoReader::DecodeAllFrames(unsigned nbFrames)
             int ret = avcodec_decode_video2(codecCtx, frame_ptr, &got_a_frame, packet_ptr);
             if (got_a_frame)
             {
-                gotOne[m_streamIdToVecId[streamId]] = true;
+                m_gotOne[m_streamIdToVecId[streamId]] = true;
                 m_outputFrames[m_streamIdToVecId[streamId]].push(ToMat(codecCtx, frame_ptr));
                 av_frame_free(&frame_ptr);
             }
-            doneVect[m_streamIdToVecId[streamId]] = (gotOne[m_streamIdToVecId[streamId]] && (!got_a_frame)) || (m_outputFrames[m_streamIdToVecId[streamId]].size() >= nbFrames);
+            m_doneVect[m_streamIdToVecId[streamId]] = (m_gotOne[m_streamIdToVecId[streamId]] && (!got_a_frame)) || (m_outputFrames[m_streamIdToVecId[streamId]].size() >= m_nbFrames);
         }
+        return;
     }
-    unsigned streamVectId = 0;
-    AVPacket pktNull;
-    av_init_packet(&pktNull);
-    pktNull.data = nullptr;
-    pktNull.size = 0;
-    while(!AllDone(doneVect))
-    {
-        if (!doneVect[streamVectId])
+    else
+    { //flush all the rest
+        unsigned streamVectId = 0;
+        AVPacket pktNull;
+        av_init_packet(&pktNull);
+        pktNull.data = nullptr;
+        pktNull.size = 0;
+        while(!AllDone(m_doneVect))
         {
-            PRINT_DEBUG_VideoReader("Flush streamVectId "<<streamVectId)
-            AVFrame* frame_ptr = av_frame_alloc();
-            const AVPacket* const packet_ptr = &pktNull;
-            int got_a_frame = 0;
-            auto* codecCtx = m_fmt_ctx->streams[m_videoStreamIds[streamVectId]]->codec;
-            int ret = avcodec_decode_video2(m_fmt_ctx->streams[m_videoStreamIds[streamVectId]]->codec, frame_ptr, &got_a_frame, packet_ptr);
-            if (got_a_frame)
+            if (!m_doneVect[streamVectId])
             {
-                m_outputFrames[streamVectId].push(ToMat(codecCtx, frame_ptr));
-                //m_outputFrames[streamVectId].emplace();
-                av_frame_free(&frame_ptr);
+                PRINT_DEBUG_VideoReader("Flush streamVectId "<<streamVectId)
+                AVFrame* frame_ptr = av_frame_alloc();
+                const AVPacket* const packet_ptr = &pktNull;
+                int got_a_frame = 0;
+                auto* codecCtx = m_fmt_ctx->streams[m_videoStreamIds[streamVectId]]->codec;
+                int ret = avcodec_decode_video2(m_fmt_ctx->streams[m_videoStreamIds[streamVectId]]->codec, frame_ptr, &got_a_frame, packet_ptr);
+                if (got_a_frame)
+                {
+                    m_outputFrames[streamVectId].push(ToMat(codecCtx, frame_ptr));
+                    //m_outputFrames[streamVectId].emplace();
+                    av_frame_free(&frame_ptr);
+                }
+                m_doneVect[streamVectId] = (!got_a_frame) || (m_outputFrames[streamVectId].size() >= m_nbFrames);
+                streamVectId = (streamVectId + 1) % m_outputFrames.size();
             }
-            doneVect[streamVectId] = (!got_a_frame) || (m_outputFrames[streamVectId].size() >= nbFrames);
-            streamVectId = (streamVectId + 1) % m_outputFrames.size();
         }
     }
-
-    for (auto i = 0; i <  m_outputFrames.size(); ++i)
-    {
-        PRINT_DEBUG_VideoReader(m_outputFrames[i].size() << " frames decoded from stream vect id "<<i)
-    }
-    m_wasDecoded = true;
 }
 
 std::shared_ptr<cv::Mat> VideoReader::GetNextPicture(unsigned streamId)
 {
-    if (m_wasDecoded && streamId < m_outputFrames.size())
+    if (streamId < m_outputFrames.size())
     {
         if (!m_outputFrames[streamId].empty())
         {
             auto matPtr = m_outputFrames[streamId].front();
             m_outputFrames[streamId].pop();
             return matPtr;
+        }
+        else if (!AllDone(m_doneVect))
+        {
+            DecodeNextStep();
+            return GetNextPicture(streamId);
         }
     }
     return nullptr;
