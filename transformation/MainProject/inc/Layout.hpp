@@ -55,10 +55,8 @@ class Layout
 
         void InitInputVideo(std::string pathToInputVideo, unsigned nbFrame)
         {
-            std::cout << "Call input init frm base layout" << std::endl;
             if (m_inputVideoPtr == nullptr)
             {
-                std::cout << "Call input init frm base layout: step 2" << std::endl;
                 m_inputVideoPtr = InitInputVideoImpl(pathToInputVideo, nbFrame);
             }
         }

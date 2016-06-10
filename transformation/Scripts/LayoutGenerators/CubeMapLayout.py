@@ -8,6 +8,7 @@ def GetFaceRes(front, left, right, top, bottom, back):
     c+='cubeEdgeLengthTop={}\n'.format(top)
     c+='cubeEdgeLengthBottom={}\n'.format(bottom)
     c+='cubeEdgeLengthBack={}\n'.format(back)
+    return c
 
 def GetFaceBitrate(front, left, right, top, bottom, back):
     c='bitrateFront={}\n'.format(front)
@@ -16,6 +17,7 @@ def GetFaceBitrate(front, left, right, top, bottom, back):
     c+='bitrateTop={}\n'.format(top)
     c+='bitrateBottom={}\n'.format(bottom)
     c+='bitrateBack={}\n'.format(back)
+    return c
 
 class CubeMapLayout(Layout):
     def __init__(self, layoutName, rotation, refWidth = None, refHeight = None):
@@ -27,8 +29,8 @@ class CubeMapLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+=super().GetYawPitchRoll()
-        GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
-        GetFaceBitrate(Constants.GOOD_QUALITY, mediumRatio, mediumRatio, mediumRatio, mediumRatio, Constants.BAD_QUALITY)
+        c+=GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
+        c+=GetFaceBitrate(Constants.GOOD_QUALITY, mediumRatio, mediumRatio, mediumRatio, mediumRatio, Constants.BAD_QUALITY)
         return c
 
 class CubeMapHigherQualityLayout(Layout):
@@ -41,8 +43,8 @@ class CubeMapHigherQualityLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+=super().GetYawPitchRoll()
-        GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
-        GetFaceBitrate(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.BAD_QUALITY)
+        c+=GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
+        c+=GetFaceBitrate(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.BAD_QUALITY)
         return c
 
 class CubeMapLowerQualityLayout(Layout):
@@ -55,8 +57,8 @@ class CubeMapLowerQualityLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+=super().GetYawPitchRoll()
-        GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
-        GetFaceBitrate(Constants.GOOD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY)
+        c+=GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
+        c+=GetFaceBitrate(Constants.GOOD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY, Constants.BAD_QUALITY)
         return c
 
 class CubeMapMediumQualityLayout(Layout):
@@ -69,8 +71,8 @@ class CubeMapMediumQualityLayout(Layout):
         c += 'relativeResolution=true\n'
 
         c+=super().GetYawPitchRoll()
-        GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
-        GetFaceBitrate(Constants.GOOD_QUALITY, mediumRatio, mediumRatio, mediumRatio, mediumRatio, mediumRatio)
+        c+=GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
+        c+=GetFaceBitrate(Constants.GOOD_QUALITY, mediumRatio, mediumRatio, mediumRatio, mediumRatio, mediumRatio)
         return c
 
 class CubeMapLayoutCompact(Layout):
@@ -83,6 +85,6 @@ class CubeMapLayoutCompact(Layout):
         c += 'relativeResolution=true\n'
 
         c+=super().GetYawPitchRoll()
-        GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
-        GetFaceBitrate(Constants.GOOD_QUALITY, mediumRatio, mediumRatio, mediumRatio, mediumRatio, Constants.BAD_QUALITY)
+        c+=GetFaceRes(Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY, Constants.GOOD_QUALITY)
+        c+=GetFaceBitrate(Constants.GOOD_QUALITY, mediumRatio, mediumRatio, mediumRatio, mediumRatio, Constants.BAD_QUALITY)
         return c

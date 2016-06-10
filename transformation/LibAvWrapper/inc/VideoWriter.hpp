@@ -150,6 +150,9 @@ namespace LibAv
 
             void Flush(int streamId);
 
+            unsigned GetWidth(int streamId) {return m_codec_ctx[streamId]->width;}
+            unsigned GetHeight(int streamId) {return m_codec_ctx[streamId]->height;}
+
         private:
             std::string m_outputFileName;
             AVFormatContext* m_fmt_ctx;
