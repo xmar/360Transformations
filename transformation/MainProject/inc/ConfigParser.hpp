@@ -127,10 +127,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 int height = ptree.get<double>(layoutSection+".refHeight");
                 refRes = CoordI(width, height);
             }
-            catch(...)
+            catch(std::exception &e)
             {
                 std::cout << "Could not find " << layoutSection+".refWidth" << " or " << layoutSection+".refHeight" <<
                     "for layoutSection=" << layoutSection << std::endl;
+                throw e;
             }
         }
         if (layoutType == "equirectangular")

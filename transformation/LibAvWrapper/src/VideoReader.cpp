@@ -3,7 +3,7 @@
 #include <iostream>
 #include <Packet.hpp>
 
-#define DEBUG_VideoReader 1
+#define DEBUG_VideoReader 0
 #if DEBUG_VideoReader
 #define PRINT_DEBUG_VideoReader(s) std::cout << s << std::endl;
 #else

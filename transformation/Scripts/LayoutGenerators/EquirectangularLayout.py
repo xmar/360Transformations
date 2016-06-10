@@ -12,5 +12,5 @@ class EquirectangularLayout(Layout):
         if a is None:
             a = 1
         c += 'relativeResolution=true\nwidth={0}\nheight={0}\n'.format(a)
-        c += 'bitrate={}'.format(a)
+        c += 'bitrate={}\n'.format(a)
         return c

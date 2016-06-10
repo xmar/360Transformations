@@ -155,7 +155,7 @@ class FixedAverageAndFixedDistances(GenericWorker):
                 outEquiTiledNameVideo = '{}/{}.mkv'.format(self.outputDir,layoutId)
                 outEquiTiledId = '{}/{}'.format(self.outputDir,layoutId)
                 GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-                        [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),
+                        [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),
                          (layoutGenerator(layoutId), None)],
                         24, self.n,  self.inputVideo, outEquiTiledId, self.bitrateGoal)
 
@@ -178,14 +178,14 @@ class FixedAverageAndFixedDistances(GenericWorker):
                 outLayoutId = '{}/{}'.format(self.outputDir,lName)
                 #SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, goalSize, layout, maxIteration)
                 GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-                        [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(layout, 0.5)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
+                        [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),(layout, 0.5)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
 
     def __GenerateAverageVideos__(self):
         #First we re-encode the original Equirectangular video for fair comparaison later
         outEquiNameStorage = '{}/equirectangular_storage.dat'.format(self.outputDir)
         outEquiNameVideo = '{}/equirectangular.mkv'.format(self.outputDir)
         outEquiId = '{}/equirectangular'.format(self.outputDir)
-        GenerateVideo.GenerateVideoAndStore(self.config, self.trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None)], 24, self.n,
+        GenerateVideo.GenerateVideoAndStore(self.config, self.trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None)], 24, self.n,
                 self.inputVideo, outEquiId, 0)
 
         #We get the resolution of the video
@@ -209,7 +209,7 @@ class FixedAverageAndFixedDistances(GenericWorker):
             outLayoutId = '{}/AverageEquiTiled'.format(self.outputDir)
             layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None, self.refWidth, self.refHeight)
             GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-              [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(layoutAverage, self.job.jobArgs.averageEqTileRatio)], 24, self.n, self.inputVideo, outLayoutId, 0)
+              [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),(layoutAverage, self.job.jobArgs.averageEqTileRatio)], 24, self.n, self.inputVideo, outLayoutId, 0)
             self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)
         goalSize = os.stat(self.averageNameVideo).st_size
         self.bitrateGoal = int(self.n*goalSize/24.0)
@@ -224,7 +224,7 @@ class FixedAverageAndFixedDistances(GenericWorker):
         outputDirQEC = '{}/QEC{}'.format(self.outputDir, qecId)
         if not os.path.isdir(outputDirQEC):
             os.makedirs(outputDirQEC)
-        eqL = LayoutGenerators.EquirectangularLayout('Equirectangular')
+        eqL = LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight)
         if self.reuseVideo:
             inputVideos = ['{}/equirectangular.mkv'.format(self.outputDir), '{}/equirectangularTiled{}.mkv'.format(self.outputDir,qecId), self.averageNameVideo]
             layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)], \
@@ -313,11 +313,18 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
 
     #override parent implementation
     def __GenerateAverageVideos__(self):
+        ffmpegProcess = sub.Popen(['ffmpeg', '-i', self.inputVideo], stderr=sub.PIPE)
+        regex = re.compile('.*\s(\d+)x(\d+)\s.*')
+        for line in iter(ffmpegProcess.stderr.readline, b''):
+            m = regex.match(line.decode('utf-8'))
+            if m is not None:
+                self.refWidth = int(m.group(1))
+                self.refHeight = int(m.group(2))
         #First we re-encode the original Equirectangular video for fair comparaison later
         outEquiNameStorage = '{}/equirectangular_storage.dat'.format(self.outputDir)
         outEquiNameVideo = '{}/equirectangular.mkv'.format(self.outputDir)
         outEquiId = '{}/equirectangular'.format(self.outputDir)
-        GenerateVideo.GenerateVideoAndStore(self.config, self.trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None)], 24, self.n,
+        GenerateVideo.GenerateVideoAndStore(self.config, self.trans, [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None)], 24, self.n,
                 self.inputVideo, outEquiId, 0)
 
         self.inputVideo = outEquiNameVideo
@@ -349,5 +356,5 @@ class FixedBitrateAndFixedDistances(FixedAverageAndFixedDistances):
             outLayoutId = '{}/AverageEquiTiled'.format(self.outputDir)
             layoutAverage = LayoutGenerators.EquirectangularTiledLayout('AverageEquiTiled', None, self.refWidth, self.refHeight)
             GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-              [(LayoutGenerators.EquirectangularLayout('Equirectangular'), None),(layoutAverage, 1)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
+              [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),(layoutAverage, 1)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
             self.lsAverage = LayoutGenerators.LayoutStorage.Load(averageNameStorage)

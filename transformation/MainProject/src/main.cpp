@@ -32,10 +32,10 @@
 #include "VideoWriter.hpp"
 #include "VideoReader.hpp"
 
-#define DEBUG 1
-#ifdef DEBUG
+#define DEBUG 0
+#if DEBUG
 #define PRINT_DEBUG(x) std::cout << x << std::endl;
-#elif
+#else
 #define PRINT_DEBUG(x) {}
 #endif // DEBUG
 
