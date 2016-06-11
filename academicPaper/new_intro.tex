@@ -5,17 +5,17 @@
 %\label{sec:context}
 
 The popularity of navigable 360-degree video systems
-has grown with the advent of both omnidirectional capturing systems
+has grown with the advent of omnidirectional capturing systems
 %(including multi-camera with stitching systems)
 and interactive displaying
 systems, like \acp{HMD}.
 However, to deliver 360-degree video content on the Internet, the content providers
-have to deal with a problem of resource waste: What is displayed in the device,
+have to deal with a problem of bandwidth waste: What is displayed in the device,
 the so-called \textit{\ac{FoV}}, is only a fraction of what is downloaded, which is an omnidirectional view of the scene.
-As epitomized by the launch of a dedicated activity at the June 2016 MPEG \ac{DASH} meeting,
-new solutions have to be designed to secure high-quality delivery of 360-degree video.
-
-The resource waste is the price to pay for interactivity.
+%New delivery solutions have to be designed to provide high-quality \ac{FoV} video despite 
+%As epitomized by the launch of a dedicated activity at the June 2016 MPEG \ac{DASH} meeting,
+%new solutions have to be designed to secure high-quality delivery of 360-degree video.
+This bandwidth waste is the price to pay for interactivity.
 To prevent \emph{simulator sickness}~\cite{moss2011characteristics}
 and to provide a good \ac{QoE}, the vendors of \acp{HMD} recommend the multimedia
 systems to react
@@ -28,8 +28,9 @@ state-of-the-art \acp{HMD} is \SI{120}{Hz},%
 the whole system should react in less than
 \SI{10}{ms}. This delay constraint prevents the implementation of traditional delivery
 architecture where the client notifies a server about changes and waits for reception
-of adjusted content. Instead, the \acp{HMD} gets the full 360-degree stream, from which
-it extracts the \ac{FoV} video in real time with respect to head movements. Most pixels
+of adjusted content. Instead, in the current \ac{VR} video delivery systems, the server sends the 
+full 360-degree stream, from which the \ac{HMD} 
+extracts the \ac{FoV} video in real time with respect to head movements. Most pixels
 of the delivered video stream are not used.
 
 Let us provide some numbers to illustrate the problem.
@@ -45,8 +46,6 @@ typically around 100\,\acp{fps}.
 Overall, high-quality 360-degree videos combine both very large resolution (up to 12k)
 and very high frame rate (up to 100\,\acp{fps}). To compare, the bit-rate of 8k videos
 at 60\,\acp{fps} encoded in \ac{HEVC} is around \SI{100}{Mbps}~\cite{7398367}.
-
-
 
 We propose in this paper a solution where, following the same principles as in
 rate-adaptive streaming technologies, the server offers multiple \emph{representations}
@@ -79,20 +78,21 @@ degradation is transient until the
 device selects another video representation with a closer \ac{QEC}.
 
 In this paper, we introduce \ac{FoV}-adaptive streaming systems for navigable 360-degree
-videos. We discuss some key design points. First, we present the overall processes that have to
+videos. 
+We discuss some key design points. First, we present the overall processes that have to
 be implemented at both client and server side, and we show how our proposal can be integrated
-into the MPEG \ac{DASH} standard. Then, we address
-the choice of the projection from a spherical video into a geometric two-dimensional layout
-with a focus on the impact of this projection into the quality of the video encoding. We evaluate
+into the MPEG \ac{DASH} standard. Our proposal is thus a contribution to the 
+\ac{VR} group that was launched by MPEG \ac{DASH} in May 2016.
+Second, we address the choice of the geometric layout into which the spherical video should
+be projected for encoding. We evaluate 
 several video quality arrangement into the geometric layouts and we show that the
 cube map layout offers the best performance regarding the quality of the extracted
 \ac{FoV}.
-Furthermore, based on a dataset of
-real users navigating in 360-degree videos, we study the duration of the video segments
-for \ac{FoV}-adaptive streaming system. We show that head movements are significant
+Third, we study  the length of the video segments
+for \ac{FoV}-adaptive streaming system. Based on a dataset of
+real users navigating in 360-degree videos, we show that head movements are significant
 in short period, so the video segments have to be short enough to enable
 frequent \ac{QEC} switches.
-
 Finally, we introduce a tool (released on open source in a public
 repository\footnote{\url{https://github.com/xmar/360Transformations}}),
 which create video representations for

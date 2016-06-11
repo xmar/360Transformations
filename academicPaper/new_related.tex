@@ -157,7 +157,8 @@ time at each frame. Second, the more tiles, the less efficient the video encodin
 tile independence~\cite{sanchez_compressed_2015}. Third, the management at the server is
 heavier because the number of files
 is much larger. For example, a typical $8\times8$ tiling offered at six quality levels makes
-384~independent files for each video segment, and by consequence larger manifest files.
+384~independent files for each video segment, and by consequence larger \ac{MPD} files (also known as
+manifest files).
 Finally, the management at the client side is heavier. For each tile, the client should run
 a representation selection process
 and manage a specific network connection with the server.
@@ -167,7 +168,7 @@ all) \emph{one} video version per
 \ac{QEC}, each version being then encoded at several global quality levels. Each version
 is a pre-processed set of tile representations. The main advantages include an easier
 management of the server
-(less files so smaller manifest file), a simpler selection process for the client (by
+(less files so smaller \ac{MPD} file), a simpler selection process for the client (by
 a distance computation), and no need of re-constructing the video before the \ac{FoV} extraction.
 
 \subsection{QEC-Based Streaming}
