@@ -143,6 +143,7 @@ static std::shared_ptr<cv::Mat> ToMat(AVCodecContext* codecCtx, AVFrame* frame_p
 
     auto returnMat = std::make_shared<cv::Mat>(mat.clone());
     av_frame_free(&frame_ptr2);
+    mat.release();
     return returnMat;
 }
 
@@ -164,8 +165,8 @@ void VideoReader::DecodeNextStep(void)
             {
                 m_gotOne[m_streamIdToVecId[streamId]] = true;
                 m_outputFrames[m_streamIdToVecId[streamId]].push(ToMat(codecCtx, frame_ptr));
-                av_frame_free(&frame_ptr);
             }
+            av_frame_free(&frame_ptr);
             m_doneVect[m_streamIdToVecId[streamId]] = (m_gotOne[m_streamIdToVecId[streamId]] && (!got_a_frame)) || (m_outputFrames[m_streamIdToVecId[streamId]].size() >= m_nbFrames);
         }
         return;
@@ -191,8 +192,8 @@ void VideoReader::DecodeNextStep(void)
                 {
                     m_outputFrames[streamVectId].push(ToMat(codecCtx, frame_ptr));
                     //m_outputFrames[streamVectId].emplace();
-                    av_frame_free(&frame_ptr);
                 }
+                av_frame_free(&frame_ptr);
                 m_doneVect[streamVectId] = (!got_a_frame) || (m_outputFrames[streamVectId].size() >= m_nbFrames);
                 streamVectId = (streamVectId + 1) % m_outputFrames.size();
             }
@@ -212,7 +213,10 @@ std::shared_ptr<cv::Mat> VideoReader::GetNextPicture(unsigned streamId)
         }
         else if (!AllDone(m_doneVect))
         {
-            DecodeNextStep();
+            for (auto i = 0; i < 10 && !AllDone(m_doneVect); ++i)
+            {
+                DecodeNextStep();
+            }
             return GetNextPicture(streamId);
         }
     }
