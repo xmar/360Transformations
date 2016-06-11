@@ -111,7 +111,11 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
     else:
         qs = QualityStorage()
 
-    if not qs.IsNameInside(flatFixedLayout.GetName()):
+    name = layouts[-1][-2][0].GetName() + flatFixedLayout.GetName()
+    #name = flatFixedLayout.GetName()
+    print ('TEST name = ', name)
+    if not qs.IsNameInside(name):
+        print ('TEST name = ', name, ' start computation')
 
         newIv = []
         try:
@@ -175,9 +179,11 @@ def ComputeFlatFixedQoE(config, trans, layoutsToTest, flatFixedLayout, fps, n, i
                 lName_quality.append((name1, GetAverageQuality(resultQualityName)))
             i += 1
 
+        print ("Add quality: ", lName_quality)
+
         if isGood:
-            qs.AddGood(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterRot)
+            qs.AddGood(name, lName_quality, qec, flatFixedCenterRot)
         else:
-            qs.AddBad(flatFixedLayout.GetName(), lName_quality, qec, flatFixedCenterRot)
+            qs.AddBad(name, lName_quality, qec, flatFixedCenterRot)
 
         qs.Dump(outputQualityStorageName)
