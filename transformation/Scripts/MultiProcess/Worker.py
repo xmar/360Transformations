@@ -145,9 +145,9 @@ class FixedAverageAndFixedDistances(GenericWorker):
                     ]
             if self.extraLayout:
                 layoutList += [
-                    ('EquirectangularTiledHigherQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledHigherQualityLayout(n, qec, self.refWidth, self.refHeight))),
+                    #('EquirectangularTiledHigherQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledHigherQualityLayout(n, qec, self.refWidth, self.refHeight))),
                     ('EquirectangularTiledLowerQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledLowerQualityLayout(n, qec, self.refWidth, self.refHeight))),
-                    ('EquirectangularTiledMediumQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledMediumQualityLayout(n, qec, self.refWidth, self.refHeight))),
+                    #('EquirectangularTiledMediumQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledMediumQualityLayout(n, qec, self.refWidth, self.refHeight))),
                     ]
             print('Start computation for QEC({})'.format(qecId))
             for layoutId, layoutGenerator in layoutList:
@@ -159,19 +159,21 @@ class FixedAverageAndFixedDistances(GenericWorker):
                          (layoutGenerator(layoutId), None)],
                         24, self.n,  self.inputVideo, outEquiTiledId, self.bitrateGoal)
 
-            layoutList = [('CubeMap{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLayout(n, ypr, self.refWidth, self.refHeight))),\
-                    ('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5, self.refWidth, self.refHeight))),\
-                    ('RhombicDodeca{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaLayout(n, ypr, self.refWidth, self.refHeight)))]
+            layoutList = [#('CubeMap{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLayout(n, ypr, self.refWidth, self.refHeight))),\
+                    #('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5, self.refWidth, self.refHeight))),\
+                    #('RhombicDodeca{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaLayout(n, ypr, self.refWidth, self.refHeight)))
+                    ]
             if self.extraLayout:
                 layoutList += [
-                               ('CubeMapHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+                               #('CubeMapHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
                                ('CubeMapLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLowerQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               ('CubeMapMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               ('PyramidHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidHigherQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
+                               #('CubeMapMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+                               #('PyramidHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidHigherQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
                                ('PyramidLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidLowerQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
-                               ('RhombicDodecaHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               ('RhombicDodecaMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               ('RhombicDodecaEqualQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaEqualQualityLayout(n, ypr, self.refWidth, self.refHeight)))
+                               #('RhombicDodecaHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+                               #('RhombicDodecaMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+                               #('RhombicDodecaEqualQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaEqualQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+                               ('RhombicDodecaLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaEqualQualityLayout(n, ypr, self.refWidth, self.refHeight)))
                                ]
             for (lName, lGenerator) in layoutList:
                 layout = lGenerator(lName, qec.rotation)
@@ -233,23 +235,25 @@ class FixedAverageAndFixedDistances(GenericWorker):
             inputVideos = [self.inputVideo, self.inputVideo, self.inputVideo]
             layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)], \
                     [(eqL, None),(self.lsAverage.layout, self.lsAverage.a)]]
-        layoutIdList = ['CubeMap', \
+        layoutIdList = [#'CubeMap', \
                 #'CubeMapCompact', \
-                'Pyramidal', \
-                'RhombicDodeca']
+                #'Pyramidal', \
+                #'RhombicDodeca'
+                ]
         if self.extraLayout:
             layoutIdList += [
-                           'CubeMapHigherQuality',
+                           #'CubeMapHigherQuality',
                            'CubeMapLowerQuality',
-                           'CubeMapMediumQuality',
-                           'EquirectangularTiledHigherQuality',
+                           #'CubeMapMediumQuality',
+                           #'EquirectangularTiledHigherQuality',
                            'EquirectangularTiledLowerQuality',
-                           'EquirectangularTiledMediumQuality',
-                           'PyramidHigherQuality',
+                           #'EquirectangularTiledMediumQuality',
+                           #'PyramidHigherQuality',
                            'PyramidLowerQuality',
-                           'RhombicDodecaHigherQuality',
-                           'RhombicDodecaMediumQuality',
-                           'RhombicDodecaEqualQuality'
+                           #'RhombicDodecaHigherQuality',
+                           #'RhombicDodecaMediumQuality',
+                           #'RhombicDodecaEqualQuality',
+                           'RhombicDodecaLowerQuality'
                            ]
         for layoutId in layoutIdList:
             storageName = '{}/{}{}_storage.dat'.format(self.outputDir,layoutId,qecId)
