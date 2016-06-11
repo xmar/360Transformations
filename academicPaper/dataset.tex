@@ -1,4 +1,5 @@
 \section{Dataset and Head Movements}
+\label{sec:dataset}
 
 One of the critical aspects of our proposal is the sensibility to head movement. Once a QEC is chosen and the 
 segment selected, any head movement that increases the distance between the QEC and the FoV center 
@@ -54,7 +55,7 @@ Segment length of 2\,s appears like a good trade-off: such a length is acceptabl
 management at the server (the number of segments to deal with and the size of the manifest)
 and at the client (the frequency of representation selection and the number of requests
 to send). And, for 2\,s-long segment, people watch
-at a position that is lower than 1 from the initial head position, so in full quality, during three quarters 
-of the time. Please note that, as previously said, the configuration of the measures is among
-the worst case for the system. In the case of sitting people and longer videos, we can expect less
+at a position that is less than 1 from the initial head position during three quarters 
+of the time. Please note that, as previously said, the configuration of the measures is one of
+the worst cases for the system. In the case of sitting people and longer videos, we can expect less
 wide and less abrupt head movements, which would turn into longer segment lengths.
