@@ -228,13 +228,19 @@ class FixedAverageAndFixedDistances(GenericWorker):
             os.makedirs(outputDirQEC)
         eqL = LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight)
         if self.reuseVideo:
-            inputVideos = ['{}/equirectangular.mkv'.format(self.outputDir), '{}/equirectangularTiled{}.mkv'.format(self.outputDir,qecId), self.averageNameVideo]
-            layoutsToTest = [[(eqL, None)], [(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)], \
+            baseInputVideo = '{}/equirectangular.mkv'.format(self.outputDir)
+            inputVideos = ['{}/equirectangularTiled{}.mkv'.format(self.outputDir,qecId), self.averageNameVideo]
+            baseLayout = [(eqL, None)]
+            layoutsToTest = [[(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)], \
                     [(self.lsAverage.layout, self.lsAverage.a)]]
         else:
-            inputVideos = [self.inputVideo, self.inputVideo, self.inputVideo]
-            layoutsToTest = [[(eqL, None)], [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)], \
-                    [(eqL, None),(self.lsAverage.layout, self.lsAverage.a)]]
+            baseInputVideo = self.inputVideo
+            inputVideos = [self.inputVideo, self.inputVideo]
+            baseLayout = [(eqL, None)]
+            layoutsToTest = [
+                [(eqL, None),(self.lsAverage.layout, self.lsAverage.a)],
+                [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)]
+                ]
         layoutIdList = [#'CubeMap', \
                 #'CubeMapCompact', \
                 #'Pyramidal', \
@@ -249,11 +255,11 @@ class FixedAverageAndFixedDistances(GenericWorker):
                            'EquirectangularTiledLowerQuality',
                            #'EquirectangularTiledMediumQuality',
                            #'PyramidHigherQuality',
-                           'PyramidLowerQuality',
+                           #'PyramidLowerQuality',
                            #'RhombicDodecaHigherQuality',
                            #'RhombicDodecaMediumQuality',
                            #'RhombicDodecaEqualQuality',
-                           'RhombicDodecaLowerQuality'
+                           #'RhombicDodecaLowerQuality'
                            ]
         for layoutId in layoutIdList:
             storageName = '{}/{}{}_storage.dat'.format(self.outputDir,layoutId,qecId)
@@ -268,7 +274,14 @@ class FixedAverageAndFixedDistances(GenericWorker):
 
         #Test Layout
         flatFixedLayout = LayoutGenerators.FlatFixedLayout('FlatFixed{}'.format(rot.GetStrId()), self.outputResolution[0], self.outputResolution[1], 110, rot)
-        GenerateVideo.ComputeFlatFixedQoE(self.config, self.trans, layoutsToTest, flatFixedLayout, 24, self.n, inputVideos, outputDirQEC, currentQec, rot, goodPoint)
+        for layoutId in range(len(layoutsToTest)):
+            layoutTT = layoutsToTest[layoutId]
+            iv = inputVideos[layoutId]
+            ltt = [baseLayout]
+            inputVid = [baseInputVideo]
+            ltt.append(layoutTT)
+            inputVid.append(iv)
+            GenerateVideo.ComputeFlatFixedQoE(self.config, self.trans, ltt, flatFixedLayout, 24, self.n, inputVid, outputDirQEC, currentQec, rot, goodPoint)
 
     def __RunTest__(self):
         workDone = False
