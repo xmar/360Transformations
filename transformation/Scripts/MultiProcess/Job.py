@@ -2,7 +2,7 @@ import MultiProcess
 
 class JobArg(object):
     def __init__(self, nbQec, distStep, nbTest, nbFrames, nbDicothomicInteration,
-        reuseVideo, res, inputVideo, bitrateGoal, averageEqTileRatio=0.5117, extraLayout = True):
+        reuseVideo, res, inputVideo, bitrateGoal, layoutManager, averageEqTileRatio=0.5117):
         self.nbQec = nbQec
         self.distStep = distStep
         self.nbTest = nbTest
@@ -13,7 +13,7 @@ class JobArg(object):
         self.inputVideo = inputVideo
         self.averageEqTileRatio = averageEqTileRatio
         self.bitrateGoal = int(bitrateGoal)
-        self.extraLayout = extraLayout
+        self.layoutManager = layoutManager
 
 class GenericJob(object):
     def __init__(self, jobArgs, workerCls):

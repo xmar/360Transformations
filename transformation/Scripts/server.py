@@ -6,6 +6,7 @@ import os
 
 import MultiProcess
 import FormatResults
+from LayoutGenerators import LayoutManager
 
 def SetDefaultValue(config, section):
     if 'nbQEC' not in config[section]:
@@ -65,9 +66,12 @@ def main():
                                                 video.SetTcpPort(listenPort)
                                                 listenPort += 1
                                                 videoDic[video.fileName] = video
+                                            layoutManager = LayoutManager()
+                                            for layoutId in  config[section]['layoutIds'].split(','):
+                                                layoutManager.AddLayout(layoutId)
                                             jobArg = MultiProcess.JobArg(nbQEC, step,
                                                 nbT, n, config[section]['i'], reuse, r,
-                                                videoDic[video.fileName], bitrateGoal, averageEqTileRatio)
+                                                videoDic[video.fileName], bitrateGoal, layoutManager, averageEqTileRatio)
                                             job = MultiProcess.JobFixedBitrateAndFixedDistances(jobArg)
                                             outDir = '{}/{}'.format(args.outputDir, job.ToDirName())
                                             if os.path.exists('{}/cdfQuality.csv'.format(outDir)) and\

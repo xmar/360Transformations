@@ -84,7 +84,7 @@ class GenericWorker(object):
         self.bitrateGoal = int(self.job.jobArgs.bitrateGoal)
         self.distStep = self.job.jobArgs.distStep
         self.outputDir = '{}/{}'.format(self.outDir, self.job.ToDirName())
-        self.extraLayout = self.job.jobArgs.extraLayout
+        self.layoutManager = self.job.jobArgs.layoutManager
         if not os.path.exists(self.outputDir):
             os.mkdir(self.outputDir)
 
@@ -140,47 +140,57 @@ class FixedAverageAndFixedDistances(GenericWorker):
         #for each QEC we compute the EquirectangularTiled layout associated + the other layout with a fixed bitrate
         for qec in LayoutGenerators.QEC.TestQecGenerator(self.nbQec):
             qecId = qec.GetStrId()
-            layoutList = [
-                    ('equirectangularTiled{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledLayout(n, qec, self.refWidth, self.refHeight)))
-                    ]
-            if self.extraLayout:
-                layoutList += [
-                    #('EquirectangularTiledHigherQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledHigherQualityLayout(n, qec, self.refWidth, self.refHeight))),
-                    ('EquirectangularTiledLowerQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledLowerQualityLayout(n, qec, self.refWidth, self.refHeight))),
-                    #('EquirectangularTiledMediumQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledMediumQualityLayout(n, qec, self.refWidth, self.refHeight))),
-                    ]
-            print('Start computation for QEC({})'.format(qecId))
-            for layoutId, layoutGenerator in layoutList:
-                outEquiTiledNameStorage = '{}/{}_storage.dat'.format(self.outputDir,layoutId)
-                outEquiTiledNameVideo = '{}/{}.mkv'.format(self.outputDir,layoutId)
+            for layoutGen in self.layoutManager.layoutList:
+                layoutId = '{}{}'.format(layoutGen.GetName(), qecId)
+                generator = layoutGen.GetGeneratorFct(qec, self.refWidth, self.refHeight)
                 outEquiTiledId = '{}/{}'.format(self.outputDir,layoutId)
+
                 GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
                         [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),
-                         (layoutGenerator(layoutId), None)],
+                         (generator(layoutId, qec.rotation), None if 'quirectangular' in layoutId else 0.5)],
                         24, self.n,  self.inputVideo, outEquiTiledId, self.bitrateGoal)
-
-            layoutList = [#('CubeMap{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLayout(n, ypr, self.refWidth, self.refHeight))),\
-                    #('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5, self.refWidth, self.refHeight))),\
-                    #('RhombicDodeca{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaLayout(n, ypr, self.refWidth, self.refHeight)))
-                    ]
-            if self.extraLayout:
-                layoutList += [
-                               #('CubeMapHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               ('CubeMapLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLowerQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               #('CubeMapMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               #('PyramidHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidHigherQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
-                               ('PyramidLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidLowerQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
-                               #('RhombicDodecaHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               #('RhombicDodecaMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               #('RhombicDodecaEqualQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaEqualQualityLayout(n, ypr, self.refWidth, self.refHeight))),
-                               ('RhombicDodecaLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaEqualQualityLayout(n, ypr, self.refWidth, self.refHeight)))
-                               ]
-            for (lName, lGenerator) in layoutList:
-                layout = lGenerator(lName, qec.rotation)
-                outLayoutId = '{}/{}'.format(self.outputDir,lName)
-                #SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, goalSize, layout, maxIteration)
-                GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
-                        [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),(layout, 0.5)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
+            ####
+            # layoutList = [
+            #         ('equirectangularTiled{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledLayout(n, qec, self.refWidth, self.refHeight)))
+            #         ]
+            # if self.extraLayout:
+            #     layoutList += [
+            #         #('EquirectangularTiledHigherQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledHigherQualityLayout(n, qec, self.refWidth, self.refHeight))),
+            #         ('EquirectangularTiledLowerQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledLowerQualityLayout(n, qec, self.refWidth, self.refHeight))),
+            #         #('EquirectangularTiledMediumQuality{}'.format(qecId), (lambda n: LayoutGenerators.EquirectangularTiledMediumQualityLayout(n, qec, self.refWidth, self.refHeight))),
+            #         ]
+            # print('Start computation for QEC({})'.format(qecId))
+            # for layoutId, layoutGenerator in layoutList:
+            #     outEquiTiledNameStorage = '{}/{}_storage.dat'.format(self.outputDir,layoutId)
+            #     outEquiTiledNameVideo = '{}/{}.mkv'.format(self.outputDir,layoutId)
+            #     outEquiTiledId = '{}/{}'.format(self.outputDir,layoutId)
+            #     GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
+            #             [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),
+            #              (layoutGenerator(layoutId), None)],
+            #             24, self.n,  self.inputVideo, outEquiTiledId, self.bitrateGoal)
+            #
+            # layoutList = [#('CubeMap{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLayout(n, ypr, self.refWidth, self.refHeight))),\
+            #         #('Pyramidal{}'.format(qecId),  (lambda n,ypr: LayoutGenerators.PyramidLayout(n,ypr,2.5, self.refWidth, self.refHeight))),\
+            #         #('RhombicDodeca{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaLayout(n, ypr, self.refWidth, self.refHeight)))
+            #         ]
+            # if self.extraLayout:
+            #     layoutList += [
+            #                    #('CubeMapHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+            #                    ('CubeMapLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapLowerQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+            #                    #('CubeMapMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.CubeMapMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+            #                    #('PyramidHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidHigherQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
+            #                    ('PyramidLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.PyramidLowerQualityLayout(n, ypr, 2.5, self.refWidth, self.refHeight))),
+            #                    #('RhombicDodecaHigherQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaHigherQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+            #                    #('RhombicDodecaMediumQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaMediumQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+            #                    #('RhombicDodecaEqualQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaEqualQualityLayout(n, ypr, self.refWidth, self.refHeight))),
+            #                    ('RhombicDodecaLowerQuality{}'.format(qecId), (lambda n,ypr: LayoutGenerators.RhombicDodecaEqualQualityLayout(n, ypr, self.refWidth, self.refHeight)))
+            #                    ]
+            # for (lName, lGenerator) in layoutList:
+            #     layout = lGenerator(lName, qec.rotation)
+            #     outLayoutId = '{}/{}'.format(self.outputDir,lName)
+            #     #SearchTools.DichotomousSearch(trans, config, n, inputVideo, outLayoutId, goalSize, layout, maxIteration)
+            #     GenerateVideo.GenerateVideoAndStore(self.config, self.trans,
+            #             [(LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight), None),(layout, 0.5)], 24, self.n, self.inputVideo, outLayoutId, self.bitrateGoal)
 
     def __GenerateAverageVideos__(self):
         #First we re-encode the original Equirectangular video for fair comparaison later
@@ -229,38 +239,19 @@ class FixedAverageAndFixedDistances(GenericWorker):
         eqL = LayoutGenerators.EquirectangularLayout('Equirectangular', self.refWidth, self.refHeight)
         if self.reuseVideo:
             baseInputVideo = '{}/equirectangular.mkv'.format(self.outputDir)
-            inputVideos = ['{}/equirectangularTiled{}.mkv'.format(self.outputDir,qecId), self.averageNameVideo]
+            inputVideos = [self.averageNameVideo]
             baseLayout = [(eqL, None)]
-            layoutsToTest = [[(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)], \
-                    [(self.lsAverage.layout, self.lsAverage.a)]]
+            layoutsToTest = [[(self.lsAverage.layout, self.lsAverage.a)]]
         else:
             baseInputVideo = self.inputVideo
-            inputVideos = [self.inputVideo, self.inputVideo]
+            inputVideos = [self.inputVideo]
             baseLayout = [(eqL, None)]
             layoutsToTest = [
-                [(eqL, None),(self.lsAverage.layout, self.lsAverage.a)],
-                [(eqL, None),(LayoutGenerators.EquirectangularTiledLayout('EquirectangularTiled{}'.format(qecId), currentQec, self.refWidth, self.refHeight), None)]
+                [(eqL, None),(self.lsAverage.layout, self.lsAverage.a)]
                 ]
-        layoutIdList = [#'CubeMap', \
-                #'CubeMapCompact', \
-                #'Pyramidal', \
-                #'RhombicDodeca'
-                ]
-        if self.extraLayout:
-            layoutIdList += [
-                           #'CubeMapHigherQuality',
-                           'CubeMapLowerQuality',
-                           #'CubeMapMediumQuality',
-                           #'EquirectangularTiledHigherQuality',
-                           'EquirectangularTiledLowerQuality',
-                           #'EquirectangularTiledMediumQuality',
-                           #'PyramidHigherQuality',
-                           #'PyramidLowerQuality',
-                           #'RhombicDodecaHigherQuality',
-                           #'RhombicDodecaMediumQuality',
-                           #'RhombicDodecaEqualQuality',
-                           #'RhombicDodecaLowerQuality'
-                           ]
+        layoutIdList = []
+        for layoutGen in self.layoutManager.layoutList:
+            layoutIdList.append(layoutGen.GetName())
         for layoutId in layoutIdList:
             storageName = '{}/{}{}_storage.dat'.format(self.outputDir,layoutId,qecId)
             layoutVideoName = '{}/{}{}.mkv'.format(self.outputDir,layoutId,qecId)

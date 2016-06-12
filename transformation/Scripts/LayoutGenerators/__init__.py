@@ -16,6 +16,8 @@ from .RhombicDodeca import RhombicDodecaLayout
 from .RhombicDodeca import RhombicDodecaHigherQualityLayout
 from .RhombicDodeca import RhombicDodecaMediumQualityLayout
 from .RhombicDodeca import RhombicDodecaEqualQualityLayout
+from .RhombicDodeca import RhombicDodecaLowerQualityLayout
 from .FlatFixedLayout import FlatFixedLayout
 from .LayoutStorage import LayoutStorage
 from .Rotation import Rotation
+from .LayoutManager import LayoutManager
