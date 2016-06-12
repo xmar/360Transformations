@@ -30,9 +30,9 @@ def ComputeCdf(pathToDatasets, pathToOutput):
 
     #compute the cdf:
     for videoId in dic:
-    	print ("Compute CDF for video {}".format(videoId))
+        print ("Compute CDF for video {}".format(videoId))
         WritePercentile('{}/{}.csv'.format(pathToOutput, videoId), dic[videoId])
-	print ("Compute CDF for global")
+    print ("Compute CDF for global")
     WritePercentile('{}/global.csv'.format(pathToOutput), globalDic)
 
 def WritePercentile(path, dic):
@@ -47,4 +47,3 @@ def WritePercentile(path, dic):
                 r = np.percentile(dic[window], n)
                 o.write(' {}'.format(r))
             o.write('\n')
-

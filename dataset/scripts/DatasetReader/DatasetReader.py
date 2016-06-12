@@ -36,7 +36,7 @@ class DatasetReader:
                 keysToLook.remove(timestamp)
                 r.append(maxD)
         return r
-        
+
     def ComputeAllPositions(self, window):
         '''Compute all the distances between the FoV center and the initial Fov in the window'''
         r = []
@@ -51,5 +51,16 @@ class DatasetReader:
                 keysToLook.remove(timestamp)
         return r
 
-
-
+    def ComputeAllPositionsWithTimestamp(self, window):
+        '''Compute all the distances between the FoV center and the initial Fov in the window'''
+        r = {}
+        keys = sorted(self.headPositionMap.keys())
+        keysToLook = sorted(self.headPositionMap.keys())
+        for timestamp in keys:
+            if timestamp <= self.maxTimestamp - window and timestamp in keysToLook:
+                for t in keysToLook:
+                    if t > timestamp and t < timestamp + window:
+                        distance = self.headPositionMap[timestamp].OrthodromicDistance(self.headPositionMap[t])
+                        r[t] = distance
+                        keysToLook.remove(t)
+        return r

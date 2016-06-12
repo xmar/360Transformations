@@ -1,0 +1,133 @@
+
+%\documentclass[10pt,onecolumn,twoside]{IEEEtran} %!PN
+%  \documentclass[10pt,twocolumn,twoside]{IEEEtran} %!PN
+% \documentclass[12pt,onecolumn,twoside,draft]{IEEEtran} %!PN
+%\documentclass[conference]{IEEEtran} %!PN
+%\documentclass[conference]{IEEEtran}
+
+\documentclass{sig-alternate}
+
+%\usepackage[hidelinks]{hyperref}
+\pdfminorversion=4
+\usepackage{multirow}
+\usepackage{amsfonts}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage[nolist]{acronym}
+\usepackage[acronym]{glossaries}
+\newcommand\acro[2]{\newacronym{#1}{#1}{#2}}
+\newcommand\acroAlwaysShort[1]{\newglossaryentry{#1}{type=\acronymtype, name={#1}, description={#1}, text={#1}, first={#1}, plural={#1s}, firstplural={#1s}}}
+\newcommand\ac[1]{\gls{#1}}
+\newcommand\acp[1]{\glspl{#1}}
+\newcommand\acs[1]{\glsname{#1}}
+\newcommand\acl[1]{\glsentrylong{#1}}
+\usepackage[english]{babel}
+\usepackage{cite}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+%\usepackage{stfloats}
+%\usepackage{dblfloatfix}
+%\usepackage{pst-gantt}
+% \usepackage{algorithm}
+% \usepackage{algorithmic}
+\usepackage[linesnumbered,ruled,vlined,boxed,commentsnumbered]{algorithm2e}
+\usepackage[noend]{algorithmic}
+\usepackage{float}
+\algsetup{linenosize=\tiny}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepgfplotslibrary{statistics}
+\pgfplotsset{compat=1.8} 
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{todonotes}
+%\usetikzlibrary{plotmarks}
+\usetikzlibrary{shapes,positioning}
+\usetikzlibrary{decorations,decorations.pathmorphing}
+\usetikzlibrary{calc}
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{url}
+
+\usepackage[squaren,Gray]{SIunits}
+\newcommand\byte{B}
+\newcommand\bit{b}
+\renewcommand\per{p}
+\renewcommand\unit[2]{$#1$\,#2}
+\usepackage{tabularx}
+
+\lstset{%
+  backgroundcolor=\color{gray!25},
+  basicstyle=\sffamily \scriptsize,
+  breaklines=true
+}
+
+% fix the issue of white character in acronym package
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\@acf{\hskip\z@}{}{}{}
+\patchcmd\@acf{\hskip\z@}{}{}{}
+\makeatother
+
+\definecolor{gray11}{HTML}{000000}
+\definecolor{gray12}{HTML}{777777}
+\definecolor{gray13}{HTML}{aaaaaa}
+\definecolor{gray14}{HTML}{cccccc}
+
+
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.8}
+
+%\pgfplotsset{compat=1.8}
+
+\newcommand{\parag}[1]{\vspace{5pt}\noindent\textbf{#1}.\quad}
+\newcommand\algoFontSize{8}
+\newcommand{\mat}{\pmb}
+\newcommand{\TD}{T_{\text{D}}}
+\newcommand{\TB}{T_{\text{B}}}
+\newcommand{\Nf}{N_{\text{f}}}
+\newcommand{\Dist}{ Dist }
+\newcommand{\virg}[1] {``{{#1}}''}
+\newcommand{\ist}[1]    {{#1}^{\underline{\text{st}}}}
+\newcommand{\latin}[1]{{\it #1}}
+\newcommand{\red}[1] {\textcolor[rgb]{1.0,0.0,0.0}{{#1}}}
+\newcommand{\blue}[1] {\textcolor[rgb]{0.0,0.0,1.0}{{#1}}}
+\newcommand{\green}[1] {\textcolor[rgb]{0.0,1.0,0.0}{{#1}}}
+\newcommand\newpara[1]{\vspace{0.15cm}\noindent\textbf{#1}.\hspace{0.15cm}}
+
+\newcommand {\otoprule }{\midrule [\heavyrulewidth]}
+
+\title{Demo}
+
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+\floatstyle{ruled}
+\newfloat{ilp}{ht}{aux}
+\floatname{ilp}{Integer Linear Program}
+
+
+%\numberofauthors{1}
+%
+%\author{ 
+%\alignaudthor
+%	Demo
+%    \affaddr{demo}
+%}
+
+
+\begin{document}
+%    \maketitle
+      \foreach \window in {0.5, 1, 2, 5} {
+        \begin{figure}
+            \input{plot_instant_qoe.tex}
+            \caption{Plot for BMX instant QoE with segment size \window{} s}
+        \end{figure}
+     }
+\end{document}
+
