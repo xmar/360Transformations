@@ -32,7 +32,7 @@ is closest to the given direction. We extracted the \ac{FoV} from this version. 
 the quality of four different \ac{FoV} videos against the reference video generated
 without quality loss from the spherical video.
 
-\input{testbed.tex}
+\input{plots/testbed.tex}
 
 To generate the different videos, we made some choices, which are mostly in conformance to the
 literature and to real implementation of 360-degree video delivery systems. Our future work
@@ -87,3 +87,25 @@ both points as the origin and the destination \ac{FoV} centers. The selection of
 is based on the distance between the origin \ac{FoV} center and the \ac{QEC}. To compare the
 quality of the \ac{FoV} video against the reference video, we use the \emph{MS-SSIM} quality
 evaluation tool.
+
+
+\subsection{Results}
+\label{subsec:results}
+
+\begin{figure}
+    \input{plots/plot_box.tex}
+    \caption{A caption}
+    \label{fig:box_plot}
+\end{figure}
+
+\begin{figure}
+    \input{plots/distance_quality.tex}
+    \caption{A caption}
+    \label{fig:dist_quality}
+\end{figure}
+
+\begin{figure}
+    \input{plots/distance_quality_psnr.tex}
+    \caption{A caption}
+    \label{fig:dist_quality_psnr}
+\end{figure}

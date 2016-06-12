@@ -31,7 +31,7 @@
 			\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
 			\draw[draw,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
 			\draw[color=black,fill=black] (0.0088194*#2*#1, 0.0066147*#3*#1) circle (1pt);
-		}		
+		}
 	}
 }
 
@@ -67,7 +67,7 @@
 					yshift=-1pt,xshift=0.5pt] at (0,0) {R};
 	}
 }
-		
+
 \def\ecartElement{20pt}
 \def\sizeSphere{11}
 \def\ecartObjet{2}
@@ -78,7 +78,7 @@
 \node[element] (0,0) (capturing) {};
 \node[elementtitle, above=-5pt of capturing] {capturing};
 \draw ([xshift=-\sizeSphere - \ecartObjet pt]capturing.east) pic {spherical=\sizeSphere};
-\pgfdeclareimage[width=18 pt]{camera}{video-camera-icon-hi.png}
+\pgfdeclareimage[width=18 pt]{camera}{plots/pictures/video-camera-icon-hi.png}
 \node at ([xshift=21 pt]capturing.west) (camera1)
     {\pgfbox[right,center]{\pgfuseimage{camera}}};
 
@@ -118,7 +118,7 @@
 %\draw[red] (fovleg) -- (thisfov);
 
 % vr headset
-\pgfdeclareimage[width=24 pt]{vrheadset}{vr_icon.png}
+\pgfdeclareimage[width=24 pt]{vrheadset}{plots/pictures/vr_icon.png}
 \node at ([xshift=-28 pt]client.east) (headset)
     {\pgfbox[left,center]{\pgfuseimage{vrheadset}}};
 
@@ -126,8 +126,8 @@
 %
 
 % the arrow in the client
-\draw[-latex] 
-%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to 
+\draw[-latex]
+%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to
 	(thisfov.60) to
 		([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
 
