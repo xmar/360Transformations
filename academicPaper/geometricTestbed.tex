@@ -1,111 +1,242 @@
 \section{Geometric Layout Evaluation}
 
-Our objective is to identify the layout that offers the best performance regarding the quality of
-the extracted \ac{FoV} video and the bit-rate of the delivered 360-degree video. We first introduce
-the tool that we release to generate and exploit quality-differentiated
-360-degree videos on geometric layouts. Then, we describe the testbed that we set up to evaluate the
-performance of the four main geometric layouts. Finally, we present our first results.
+Our objective is to identify the layout that offers the best
+performance regarding the quality of the extracted \ac{FoV} video and
+the bit-rate of the delivered 360-degree video. We first introduce the
+tool that we release to generate and exploit quality-differentiated
+360-degree videos on geometric layouts. Then, we describe the testbed
+that we set up to evaluate the performance of the four main geometric
+layouts. Finally, we present our first results.
 
-\subsection{Our Tool to Project 360-degree Video Into Quality-Differentiated Layouts}
+\subsection{Our Tool to Project 360-degree Video Into
+Quality-Differentiated Layouts}
 
-The code and all the details are available at \textit{hidden url}. The main features of this tool include:
+The code and all the details are available at
+\textit{https://github.com/xmar/360Transformations}. The main features
+of this tool include:
 \begin{itemize}
-\item Projection from a spherical video into any of the four geometric layouts and vice versa. Our tool is in
-particular able to re-project the 360-degree videos that are encoded and stored in the equirectangular layout,
-which corresponds to a large fraction of current catalogs of 360-degree videos.
-\item Adjusting video qualities for each geometric face of any layout by setting \AD{a resolution of the face in the number of pixels. In the cubemap and rhombic dodecahadron the edge length of each face is specified, while in the pyramid layout a height of the pyramid is adjusted to yield the desired resolution. The equirectangular layout enables resolution of each tile to be defined.}{}
-\item \ac{FoV} extraction for any spherical coordinate and any angle, in particular for quality-differentiated videos.
+   \item Projection from a spherical video into any of the four
+   geometric layouts and vice versa. Our tool is in particular able to
+   re-project the 360-degree videos that are encoded and stored in the
+   equirectangular layout, which corresponds to a large fraction of
+   current catalogs of 360-degree videos.
+
+   \item Adjusting video qualities for each geometric face of any
+   layout by setting \XC{the resolution of the face in number of
+   pixels and the encoding bitrate goal. In order to allow different
+   bitrate goal per face, each face is encoded into its own video
+   track. The equirectangular layout can be split into $8\times8$
+   tiles that can each have their own resolution and encoding test
+   bitrate.}{}
+
+   \item \ac{FoV} extraction for any \XC{head positions}{}, in
+   particular for quality-differentiated videos.
 \end{itemize}
 
-The software can thus be used by the scientific community to study geometric layouts, quality arrangement over the tiles, and \ac{FoV} extraction strategies.
+The software can thus be used by the scientific community to study
+geometric layouts, quality arrangement over the tiles, and \ac{FoV}
+extraction strategies.
 
 \subsection{Testbed Description}
 
-The testbed that we
-set up is depicted in Figure~\ref{fig:testbed}. From the original spherical video, we considered the
-projection
-into the four geometric layouts (equirectangular, cube map, pyramid, dodecahedron). For
-each layout, we built
-$x$ video versions characterized by different \acp{QEC}. Then we simulated
-a client watching in a specific direction. We selected, for each layout, the version such that the \ac{QEC}
-is closest to the given direction. We extracted the \ac{FoV} from this version. Finally, we compared
-the quality of four different \ac{FoV} videos against the reference video generated
-without quality loss from the spherical video.
+The testbed that we set up is depicted in Figure~\ref{fig:testbed}.
+From the original spherical video, we considered the projection into
+the four geometric layouts (equirectangular, cube map, pyramid,
+dodecahedron). For each layout, we built $x$ video versions
+characterized by different \acp{QEC}. Then we simulated a client
+watching in a specific direction. \XC{For each video version of each
+layout we extract the \ac{FoV} associated with the client head
+position. We compute the orthodromic distance between the \ac{FoV}
+center and the \ac{QEC} of the video version. We also extract the
+\ac{FoV} from the original equirectangular video and from the
+equirectangular video that have the same overall bitrate budget as the
+other layouts. Finally we compared the quality of all those extracted
+\ac{FoV} with the \ac{FoV} extracted from the original equirectangular
+video.}
 
 \input{plots/testbed.tex}
 
-To generate the different videos, we made some choices, which are mostly in conformance to the
-literature and to real implementation of 360-degree video delivery systems. Our future work
-includes to study in more details the impact of some of these choices on
-the overall performance of the system; it is not our objective here.
+To generate the different videos, we made some choices, which are
+mostly in conformance to the literature and to real implementation of
+$360$-degree video delivery systems. Our future work includes to study
+in more details the impact of some of these choices on the overall
+performance of the system; it is not our objective here.
 
-We generated $x=16$ different video versions for each layout. This number of versions is smaller than
-the number of videos (with pyramid layouts) given by~\citet{facebook}. It is however closer to the
-number of video representations that are recommended in rate-adaptive streaming
-systems~\cite{Aparicio-PardoP15}. We describe now specific quality arrangements per layout:
-%\begin{description}
-%\item[equirectangular]
+\XC{ Each layout is made of faces: portions of the spherical for the
+equirectangular layout with tiles and faces of the $3$D object for the
+cube map, pyramid, and rhombic dodecahedron layouts. For each layout
+we define a central face and we rotate the $3$D sphere so that the
+\ac{QEC} of the representation is always located at the center of the
+center of the central face. We fix a \emph{global bitrate budget}.
+Then  each face is encoded with its own bitrate goal, fixed by the
+definition of the layout, so that the global bitrate of the video fit
+the global budget. It is not possible with current video encoder to
+fix different bitrate goal to different spatial area of the same
+video. To bypass this problem, each face is encoded into its own video
+track and then all tracks for the same representation are stored into
+the same video container. }
 
-\parag{Equirectangular}We cut the equirectangular layout into $8\times 8$ tiles as proposed in
-the literature related to panorama video~\cite{gaddam_tiling_2015}. Tiles are thus rectangular.
-We considered three different qualities: the \emph{full quality}, which corresponds to the quality of the
-input spherical video, a \emph{medium quality}, which is set as half as good as the full quality, and a
-\emph{low quality}, which is one quarter of the full quality. The quality arrangement is done such that
-the $3\times 3$ tiles that are around the \ac{QEC} are full quality, the $7\times 7$ tiles around
-the \ac{QEC} (excluding the closest $3\times 3$) are with the medium quality, and the remaining tiles
-are with the low quality.
+% \noteXC{This number of QEC is not right anymore. In the results we
+% present, the number of QEC is not  important.} We generated $x=16$
+% different video versions for each layout. This number of versions is
+% smaller than the number of videos (with pyramid layouts) given
+% by~\citet{facebook}. It is however closer to the number of video
+% representations that are recommended in rate-adaptive streaming
+% systems~\cite{Aparicio-PardoP15}. We describe now specific quality
+% arrangements per layout:
 
-\parag{Cube Map}To generate the $x=16$ \acp{QEC}, we rotate the cube in the sphere so that the
-center of the square front face matches the \ac{QEC}. The front face is at full quality, while the left, right,
-top, and bottom faces are mid quality and the back face is low quality.
+\parag{Equirectangular with tiles}We cut the equirectangular layout into
+$8\times8$ tiles as proposed in the literature related to panorama
+video~\cite{gaddam_tiling_2015}. Tiles are thus rectangular. We
+considered two different qualities: the \emph{full quality}, which
+corresponds to the \XC{bitrate}{} of the input spherical video, and
+a \emph{low quality}, which is one quarter of the full quality. The
+quality arrangement is done such that the $3\times3$
+tiles that are around the \ac{QEC} are full quality, and the
+remaining tiles are with the low quality.
 
-\parag{Pyramid}This layout differs from other layouts. First, it does not preserve
-the pixel information of the spherical videos. Second, the distortion depends on the size of the square
-base face and on the distance from the peak. As for the cube map, we rotate the pyramid to adjust
-the center of the base face to the \ac{QEC}. The base is at full quality while the other faces are
-at a medium quality. \noteGS{To be written}
+\parag{Cube Map} The central face is set to be the front face. The
+front face is at full quality, while the left, right, top, bottom, and
+back faces are low quality.
 
-\parag{Rhombic Dodecahedron}We rotated the dodecahedron such that the \ac{QEC} is between
-the two same faces (say face\,1 and face\,2). Both faces are at full quality. Then, the eight
-faces that are around
-these faces are at medium quality, and the two remaining faces are at low quality.
+\parag{Pyramid} The pyramid layout is made of five faces: The square
+base face and four triangle faces. The central face is the base face.
+This layout differs from other layouts. First, it does not preserve
+the pixel information of the original spherical videos. Information
+are lost on the triangle faces. Second, the distortion depends on the
+size of the square base face and on the distance from the peak.  The
+base is at full quality while the other faces are at a low quality.
+For our simulation we chose a base face of size $2.5$ distance units.
 
-We observed that, for the quality setting that we decided for the equirectangular (medium quality and
-low quality at half and a quarter quality of the full quality respectively), the bit-rate of the
-generated equirectangular layouts are larger than for the other layouts. To get the
-same bit-rate for each video version, we apply the following process. We set that, for a given
-360-degree video, the projection on the equirectangular provides the \emph{bit-rate budget}. For the
-other layout, the low quality is kept at a quarter of the full quality, but we select the video quality of the medium quality such that the bit-rate of the generated video version is equal to the
-bit-rate budget.
+\parag{Rhombic Dodecahedron} The center of the layout is set on one of
+the node of the Rhombic Dodecahedron. The three faces that contain
+this node are at full quality and the other faces are at low quality.
 
-Other settings are as follows.
-The 360-degree video that we chose is \noteGS{To be given}. The encoding of the video in each
-geometric layout is done by HEVC \noteGS{To be given}. The direction of the client heads is as follows.
-First we chose a \ac{FoV} center by a uniform random choice. Then we selected a second \ac{FoV} center
-by a random choice that increases the chances to select a position near the equator. We consider
-both points as the origin and the destination \ac{FoV} centers. The selection of the selected version
-is based on the distance between the origin \ac{FoV} center and the \ac{QEC}. To compare the
-quality of the \ac{FoV} video against the reference video, we use the \emph{MS-SSIM} quality
-evaluation tool.
+\parag{Default equirectangular} To fairly compare our results with the
+state-of-the-art, we encode the regular equirectangular video with the
+same bitrate budget as the other layout. This layout will be our point
+of reference. Please, note that the objective \ac{QoE} metric is
+always computed using the original equirectangular video for
+reference, not this re-encoded layout.
+
+% We observed that, for the quality setting that we decided for the
+% equirectangular (medium quality and low quality at half and a quarter
+% quality of the full quality respectively), the bit-rate of the
+% generated equirectangular layouts are larger than for the other
+% layouts. To get the same bit-rate for each video version, we apply the
+% following process. We set that, for a given 360-degree video, the
+% projection on the equirectangular provides the \emph{bit-rate budget}.
+% For the other layout, the low quality is kept at a quarter of the full
+% quality, but we select the video quality of the medium quality such
+% that the bit-rate of the generated video version is equal to the
+% bit-rate budget.
+
+% Other settings are as follows. The 360-degree video that we chose is
+% \noteGS{To be given}. The encoding of the video in each geometric
+% layout is done by HEVC \noteGS{To be given}. The direction of the
+% client heads is as follows. First we chose a \ac{FoV} center by a
+% uniform random choice. Then we selected a second \ac{FoV} center by a
+% random choice that increases the chances to select a position near the
+% equator. We consider both points as the origin and the destination
+% \ac{FoV} centers. The selection of the selected version is based on
+% the distance between the origin \ac{FoV} center and the \ac{QEC}. To
+% compare the quality of the \ac{FoV} video against the reference video,
+% we use the \emph{MS-SSIM} quality evaluation tool.
 
 
 \subsection{Results}
 \label{subsec:results}
 
-\begin{figure}
-    \input{plots/plot_box.tex}
-    \caption{A caption}
-    \label{fig:box_plot}
-\end{figure}
+To run this simulation we chose the following settings. We used the
+``\textit{$4$K $360\degree{}$ Bridge
+jumping}''\footnote{\url{https://youtu.be/yarcdW91djQ}} video from
+Youtube. This video is a $4$K equirectangular video. From this video
+we can only generate $1080$\acp{p} \acp{FoV}. Layout faces are encoded
+with the \ac{HEVC} codec, using the \textit{x265} encoder with the
+default parameters and with a fixed Average Bit-Rate goal.
 
 \begin{figure}
     \input{plots/distance_quality.tex}
-    \caption{A caption}
+    \caption{Average \acs{MS-SSIM} depending on the distance from the
+    \acs{QEC}. Global bitrate budget \SI{6}{\mega bps}, distance step
+    $0.25$, test per point $4$, \SI{1}{\second} segment from the ``Bidge jumping'' video}
     \label{fig:dist_quality}
 \end{figure}
 
 \begin{figure}
     \input{plots/distance_quality_psnr.tex}
-    \caption{A caption}
+    \caption{Average \acs{PSNR} gap compared to the Equirectagular layout encoded with the same bitrate budget depending on the distance from the \acs{QEC}. Global bitrate budget \SI{6}{\mega bps}, distance step $0.25$, test per point $4$, \SI{1}{\second} segment from the ``Bidge jumping'' video}
     \label{fig:dist_quality_psnr}
 \end{figure}
+
+In our first simulation we want to observe the \ac{QoE} degradation
+depending on the distance between a \ac{FoV} center and a
+\ac{QEC}. We consider the video is projected on the unit sphere. The
+distance is measured using the orthodromic distance on this sphere. We
+used a distance step of 0.25 units. For each distance $d$, for each
+layout, and for each \ac{QEC} we randomly select $10$ \ac{FoV} center
+located at the distance $d$ from the \ac{QEC} and we extract the
+associated \acp{FoV}. Then we use the \ac{FoV} at the same position
+extracted from the original video to compute the \ac{MS-SSIM} and the
+\ac{PSNR} of each \ac{FoV}.
+
+The Figure~\ref{fig:dist_quality} displays the average \ac{MS-SSIM} of
+the \acp{FoV} depending on their distance from the different \acp{QEC}
+and Figure~\ref{fig:dist_quality_psnr} represents the average
+\ac{PSNR} gap from the equirectagular layout encoded with the same
+bitrate budget. Both Figures are from the same simulation results. We
+observe that the cube map layout generates the best results. The
+\ac{QoE} from the pyramid layout decreases quickly: After a distance of
+$1$ the quality is under the default equirectangular layout quality.
+The quality of the cube map layout is never under the
+quality of the default equirectangular layout. This was not expected. It may
+be because we used tiles inside the equirectangular layout, this avoid
+the encoder to efficiently compress the video. \noteXC{There is still
+some simulation running to see if we can show better results}
+
+\begin{figure}
+    \input{plots/plot_instant_distance.tex}
+    \caption{Instantaneous distance from the \ac{QEC} depending on the segment duration}
+    \label{fig:instant_dist}
+\end{figure}
+
+\foreach \window in {1, 5} {
+\begin{figure}
+
+    \input{plots/plot_instant_qoe.tex}
+    \caption{Instantaneous \ac{QoE} depending on the layout selected with a segment duration of \SI{\window}{\second}}
+    \label{fig:instant_qoe_\window}
+\end{figure}
+}
+
+% \begin{figure}
+%     \input{plots/plot_instant_qoe_segmentSize.tex}
+%     \caption{Instantaneous \ac{QoE} depending on the segment duration with the cube map layout}
+%     \label{fig:instant_qoe_segmentSize}
+% \end{figure}
+
+In our second simulation we aggregated the results from the
+head-position dataset and the results from the first simulation to
+estimate the \ac{QoE} a real user would  observed using the different
+layouts and using different segment sizes.
+Figure~\ref{fig:instant_dist} shows the instantaneous variation of the
+distance from the current \ac{QEC} depending on the video segment
+duration. Figures~\ref{fig:instant_qoe_1} and \ref{fig:instant_qoe_5}
+represent the instantaneous estimated \ac{MS-SSIM} depending on the
+layout selected respectively for a video segment duration of
+\SI{1}{\second} and \SI{5}{\second}. We observe that with a segment of
+\SI{1}{\second}, the quality of the \ac{FoV} generated from the cube
+map layout is pretty constant. The pyramid layout has a maximum
+quality equal to the cube map layout but has abrupt quality variations
+that are often not appreciated by the watchers. The rhombicDodeca and
+the equirectangular tiled layout have a smooth \ac{QoE} variation but
+have an average \ac{QoE} that is lower than the cube map layout.
+Anyway they are almost always better than the default equirectangular
+layout. With a \SI{5}{\second} video segment duration, the observation
+are quite similar for the cube map and the rhombic dodeca layouts. The
+average quality for the rhombic dodeca is now close the the quality of
+the cube map layout. The quality variation for the equirectangular
+tiled layout and the pyramid layout are even more brutal. Such a
+quality variation will be noticed by the user. Moreover the quality of
+those two layouts is often worse than the quality of the default
+equirectangular video.
