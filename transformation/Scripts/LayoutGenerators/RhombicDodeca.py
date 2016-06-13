@@ -90,7 +90,7 @@ class RhombicDodecaEqualQualityLayout(Layout):
 class RhombicDodecaLowerQualityLayout(Layout):
     def __init__(self, layoutName, rotation, refWidth = None, refHeight = None):
         rotation = copy.deepcopy(rotation)
-        rotation.SetOffset(96.512194, -133.458231, 0, inDegrees=True)
+        rotation.SetOffset(19.4712, -26.5650, 0, inDegrees=True)
         super().__init__(layoutName, refWidth, refHeight, rotation=rotation)
 
     def GenerateLayout(self, mediumRatio):
@@ -102,8 +102,9 @@ class RhombicDodecaLowerQualityLayout(Layout):
         for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
 
-        for i in [1,5, 4]:
+        for i in [1,5]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.GOOD_QUALITY)
-        for i in [2,3,6,7,8,9,10,11,12]:
+        for i in [2,3,4,6,7,8,10,11, 9,12]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.BAD_QUALITY)
         return c
+
