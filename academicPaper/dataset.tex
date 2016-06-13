@@ -1,43 +1,54 @@
 \section{Dataset and Head Movement}
 \label{sec:dataset}
 
-%One of the critical aspects of our proposal is the sensibility to head movement. Once a QEC is chosen and the
-%segment selected, any head movement that increases the distance between the QEC and the FoV center
-%may result in a degradation of the video quality until the next segment selection time.
-%Similarly as in rate-adaptive
-%streaming, the length of the segment is a key setting of the system. The longer is the segment, the easier is
-%the management of the system (at both client and server sides), however the less reactive to changes is the system.
-%For FoV-adaptive streaming, we should deal with the same trade-off between management and adaptation
-%as in rate-adaptive streaming,
-%except that the changes come from
-%the navigation of the end-users (instead of network conditions).
-We now focus on the setting of the segment length, which is a critical aspect of viewport-adaptive streaming.
-First, we must validate that observed head movements are not too rapid for a segment-based
-adaptive system, and then our goal is to
-estimate practically relevant values for the segment length.
-We have used a dataset of the head movements of real users watching
-a 360-degree video. The dataset is the same as in~\cite{yu_framework_2015}. It comes from
-Jaunt, Inc and consists of ten omnidirectional videos of length ten seconds. These videos include
-different typical scenarios of 360-degree video. The dataset contains the head movements of
-ten people who were asked to watch the videos on a state-of-the-art \ac{HMD} (Occulus Rift DK2).
-The subjects were standing and they were given the freedom to turn around, so the head movements
-are of wider importance than if they were asked to watch the video while sitting. Given the length of
-the video and the experiment conditions, we believe that the head movements thus correspond to
-a configuration of abrupt and wide head movements, which is the most challenging case for our viewport-adaptive streaming system.
+% One of the critical aspects of our proposal is the sensibility to head
+% movement. Once a QEC is chosen and the segment selected, any head
+% movement that increases the distance between the QEC and the FoV
+% center may result in a degradation of the video quality until the next
+% segment selection time. Similarly as in rate-adaptive streaming, the
+% length of the segment is a key setting of the system. The longer is
+% the segment, the easier is the management of the system (at both
+% client and server sides), however the less reactive to changes is the
+% system. For FoV-adaptive streaming, we should deal with the same
+% trade-off between management and adaptation as in rate-adaptive
+% streaming, except that the changes come from the navigation of the
+% end-users (instead of network conditions).
+We now focus on the setting of the segment length, which is a critical
+aspect of viewport-adaptive streaming. First, we must validate that
+observed head movements are not too rapid for a segment-based adaptive
+system, and then our goal is to estimate practically relevant values
+for the segment length. We have used a dataset of the head movements
+of real users watching a 360-degree video. The dataset is the same as
+in~\cite{yu_framework_2015}. It comes from Jaunt, Inc and consists of
+ten omnidirectional videos of length ten seconds. These videos include
+different typical scenarios of 360-degree video. The dataset contains
+the head movements of ten people who were asked to watch the videos on
+a state-of-the-art \ac{HMD} (Occulus Rift DK2). The subjects were
+standing and they were given the freedom to turn around, so the head
+movements are of wider importance than if they were asked to watch the
+video while sitting. Given the length of the video and the experiment
+conditions, we believe that the head movements thus correspond to a
+configuration of abrupt and wide head movements, which is the most
+challenging case for our viewport-adaptive streaming system.
 
-\citet{yu_framework_2015} have studied the head position of users. They show that the
-FoV center is around the equator of the 360-degree video
-during the majority of time but that lateral movements are frequent. In our case, we are interested in head
-movements during the length of a segment.
+\citet{yu_framework_2015} have studied the head position of users.
+They show that the FoV center is around the equator of the 360-degree
+video during the majority of time but that lateral movements are
+frequent. In our case, we are interested in head movements during the
+length of a segment.
 
-We show the distribution of head movements for various segment lengths in Figure~\ref{cdf-dataset}.
-For each video
-and each person watching it, we set timestamps that correspond to the starting time of a video segment,
-\textit{i.e.,} the time at which the users select a QEC based on their FoV centers.
-Then, we measure the \emph{orthodromic distance} between this initial head position and every FoV center
-during the $x$ next seconds, where $x$ is the segment length. In Figure~\ref{cdf-dataset}, we show the \ac{CDF} of the time spent at a distance
-$d$ from the initial head position. A point at $(1.5,0.6)$ means that, on average, users spend $60\%$ of
-their time with a FoV center at less than $1.5$ distance units from the FoV center on the beginning of the segment.
+We show the distribution of head movements for various segment lengths
+in Figure~\ref{cdf-dataset}. For each video and each person watching
+it, we set timestamps that correspond to the starting time of a video
+segment, \textit{i.e.,} the time at which the users select a QEC based
+on their FoV centers. Then, we measure the \emph{orthodromic distance}
+between this initial head position and every FoV center during the $x$
+next seconds, where $x$ is the segment length. In
+Figure~\ref{cdf-dataset}, we show the \ac{CDF} of the time spent at a
+distance $d$ from the initial head position. A point at $(1.5,0.6)$
+means that, on average, users spend $60\%$ of their time with a FoV
+center at less than $1.5$ distance units from the FoV center on the
+beginning of the segment.
 
 \begin{figure}[htbp]
 \centering
@@ -46,15 +57,20 @@ their time with a FoV center at less than $1.5$ distance units from the FoV cent
 segment, for various segment lengths.}\label{cdf-dataset}
 \end{figure}
 
-Our main observation is that viewport-adaptive streaming requires short segment lengths, typically
-smaller than 3\,s. Indeed, for a segment length of five seconds,
-users spend on average half of their time watching at a position that is at more than
-1.3 distance units away from the initial head position,
-which corresponds to a wide head movement and, as we will see later, results in a degraded video quality.
-A segment length of 2\,s appears to be a good trade-off: such a length is acceptable regarding the
-management at the server (the number of segments to deal with and the size of the \ac{MPD})
-and at the client (the frequency of representation selection and the number of requests
-to send). Furthermore, for a 2\,s-long segment, 75\% of users never diverged to
-a head position that is further than 1 distance unit away from the initial head position. Please recall that these experiments represent the most challenging (worst) case scenario for our system.
-We can expect less abrupt and narrower head movements, and thus longer possible segment lengths, for sitting
-users and longer videos.
+Our main observation is that viewport-adaptive streaming requires
+short segment lengths, typically smaller than 3\,s. Indeed, for a
+segment length of five seconds, users spend on average half of their
+time watching at a position that is at more than 1.3 distance units
+away from the initial head position, which corresponds to a wide head
+movement and, as we will see later, results in a degraded video
+quality. A segment length of 2\,s appears to be a good trade-off: such
+a length is acceptable regarding the management at the server (the
+number of segments to deal with and the size of the \ac{MPD}) and at
+the client (the frequency of representation selection and the number
+of requests to send). Furthermore, for a 2\,s-long segment, 75\% of
+users never diverged to a head position that is further than 1
+distance unit away from the initial head position. Please recall that
+these experiments represent the most challenging (worst) case scenario
+for our system. We can expect less abrupt and narrower head movements,
+and thus longer possible segment lengths, for sitting users and longer
+videos.

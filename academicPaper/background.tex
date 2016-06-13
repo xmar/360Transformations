@@ -7,24 +7,33 @@ Then, we recall the main geometric layouts for spherical videos.
 
 \subsection{Navigable 360-degree Video Delivery}
 
-The principles of a navigable video delivery system are similar as in adaptive bit-rate
-video systems such as \ac{DASH}. The server offers multiple versions of the same video
-and the client
-selects the most appropriate version according to some criteria. These versions
-are cut into second-long segments such that the client can regularly switch from one
-version to another. \AD{If the client moves the head before receiving a new video version,
-he/she is displayed a new FoV video with gradually degrading quality that is adjusted to the head movement (as described in Section \ref{sec:context}). Exactly how many seconds should pass until receiving a new video version depends on the video content, the viewer's head movements (i.e., whether he/she watches a football match, news, or plays a computer game), and the experienced quality degradations variations, which needs to be investigated in the future work.}{}
+The principles of a navigable video delivery system are similar as in
+adaptive bit-rate video systems such as \ac{DASH}. The server offers
+multiple versions of the same video and the client selects the most
+appropriate version according to some criteria. These versions are cut
+into second-long segments such that the client can regularly switch
+from one version to another. \AD{If the client moves the head before
+receiving a new video version, he/she is displayed a new FoV video
+with gradually degrading quality that is adjusted to the head movement
+(as described in Section \ref{sec:context}). Exactly how many seconds
+should pass until receiving a new video version depends on the video
+content, the viewer's head movements (i.e., whether he/she watches a
+football match, news, or plays a computer game), and the experienced
+quality degradations variations, which needs to be investigated in the
+future work.}{}
 
-At the client side, the end-user moves its head to decide the \ac{FoV}. The head movements
-are \AD{forward and backwards, side to side, and should to shoulder, referred to as \emph{pitch}, \emph{yaw}, and \emph{roll}, respectively.}{}
- The center of the \ac{FoV} is a
-point on the sphere, the size of the \ac{FoV} depends on the device (typically
-around 100$^\circ$ in state-of-the-art devices), and the orientation of the extracted video
-is related to the roll.
+At the client side, the end-user moves its head to decide the
+\ac{FoV}. The head movements are \AD{forward and backwards, side to
+side, and should to shoulder, referred to as \emph{pitch}, \emph{yaw},
+and \emph{roll}, respectively.}{} The center of the \ac{FoV} is a
+point on the sphere, the size of the \ac{FoV} depends on the device
+(typically around 100$^\circ$ in state-of-the-art devices), and the
+orientation of the extracted video is related to the roll.
 
-The complete analysis and evaluation of the navigable 360-degree video delivery system
-is left for future work. Due to lack of space, we focus here on the geometric layout
-of the video versions and the tile quality arrangement.
+The complete analysis and evaluation of the navigable 360-degree video
+delivery system is left for future work. Due to lack of space, we
+focus here on the geometric layout of the video versions and the tile
+quality arrangement.
 
 
 %\subsection{Geometric Layouts for Spherical Videos}
@@ -87,4 +96,4 @@ of the video versions and the tile quality arrangement.
 %the equirectangular layout, for which the projection generates a significant over-sampling at the poles. On the
 %contrary, the pyramid is not a geometric layout for lossless projections. Some pixels (those who are in the back
 %of the view face) are under-sampled, so two pixels can be projected into one pixel by interpolating their color
-%values. A \ac{FoV} that is extracted for positions near the back can suffer from distortion. \AD{Hence, this is the least probable head orientation of the video viewer.}{} 
+%values. A \ac{FoV} that is extracted for positions near the back can suffer from distortion. \AD{Hence, this is the least probable head orientation of the video viewer.}{}
