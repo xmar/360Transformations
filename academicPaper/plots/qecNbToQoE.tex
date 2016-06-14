@@ -50,10 +50,10 @@ column sep=15pt,
             %y filter/.code={\pgfmathparse{#1/100}\pgfmathresult},
         ]
 
-        \foreach  \window in {0.5, 1, 2, 3, 5}{
+        \foreach  \window in {1, 2, 3, 5}{
          \addplot+ table [x =nbQec, y =qoe]{results/qoeForWindow\window s.csv};
         }
-        \legend{0.5\,s, 1\,s, 2\,s, 3\,s, 5\,s}
+        \legend{1\,s, 2\,s, 3\,s, 5\,s}
         %\legend{CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}
 
     \end{axis}

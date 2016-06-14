@@ -50,7 +50,7 @@ column sep=15pt,
         ]
 
 
-        \foreach \layout in {AverageEquiTiled, CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}{
+        \foreach \layout in {AverageEquiTiled, CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodecaLower}{
         %\foreach \layout in {CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}{
            \addplot+ table [x =timestamp, y =qoe, smooth, each nth point=5]{results/bmxp01_00_expectedLiveQoE_\window s_quality\layout .csv};
       }
