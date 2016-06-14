@@ -13,7 +13,7 @@ at being exhaustive in this paper. Some of these settings require a deeper study
 signal processing and video encoding, while some other depend on business considerations and infrastructure investment. In this paper, we restrict our study
 to three key questions: what is the best geometric layout to support quality-differentiated 360-degree
 video? What is the best segment length to support head movements while maintaining low
-management overhead? What is the best number of \acp{QEC} $n$ \XC{to spare disk space while keeping a good \ac{QoE}}? To answer these three questions,
+management overhead? What is the best number of \acp{QEC} $n$ to spare disk space while keeping a good \ac{QoE}? To answer these three questions,
 we have developed a software tool and we have used a dataset of real user watching 360-degree
 video.
 
@@ -22,9 +22,9 @@ video.
 \parag{Dataset}We graciously got from Jaunt, Inc a dataset of the head movements
 of real users watching a 360-degree video. The dataset is the same as
 in~\cite{yu_framework_2015}. It consists of
-\XC{eleven}{} omnidirectional videos of length ten seconds. These videos include
+eleven omnidirectional videos of length ten seconds. These videos include
 typical scenarios of 360-degree video. The dataset contains
-the head movements of \XC{eleven}{} people who were asked to watch the videos on
+the head movements of eleven people who were asked to watch the videos on
 a state-of-the-art \ac{HMD} (Occulus Rift DK2). The subjects were
 standing and they were given the freedom to turn around, so the head
 movements are of wider importance than if they were asked to watch the
@@ -48,7 +48,9 @@ geometric layouts and vice versa}. The spherical video is the pivot format from 
 is possible to project in any layout.
 Note that the majority of 360-degree videos that are currently available are encoded and stored after
 an equirectangular projection, but our tools enables re-projecting these videos
-in another layout without information loss. \noteXC{I don't like this without information loss because their is loss due to the spatial quantifications (the pixels) that cannot be avoid. Our software tries to introduce the lowest distortion possible.}{} $(ii)$ \emph{Adjusting video qualities for each
+in another layout. 
+%\noteXC{I don't like this without information loss because their is loss due to the spatial quantifications (the pixels) that cannot be avoid. Our software tries to introduce the lowest distortion possible.}{} 
+$(ii)$ \emph{Adjusting video qualities for each
 geometric face of any
 layout}. We set the resolution of the face in number of
 pixels and the encoding bitrate goal. Each face is encoded into its own video
@@ -107,7 +109,7 @@ full-quality original video to get an objective video quality measure.
 We represent in Figure~\ref{fig:dist_quality_psnr} the difference of \ac{PSNR} between
 the extracted viewport from our quality-differentiated layouts and the same viewport extracted from
 the reference \textit{uniEqui} layout. For each geometric layout (equirectangular
-panorama with $8\times 8$ tiles, cube map, pyramid, and dodecahedron), we have tested
+panorama with $8\!\times\! 8$ tiles, cube map, pyramid, and dodecahedron), we have tested
 numerous quality arrangements with respect to the overall bit-rate budget. We selected
 here the ``best" arrangement for each layout.
 
