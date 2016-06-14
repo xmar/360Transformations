@@ -6,12 +6,13 @@
 }
 
 \pgfplotsset{every axis legend/.append style={
-        at={(0,0.97)},
+        at={(-0.03,0.97)},
 anchor=south west,
 draw=none,
 fill=none,
-legend columns=3,
-column sep=15pt,
+legend columns=4,
+column sep=6pt,
+font = \scriptsize,
 /tikz/every odd column/.append style={column sep=0cm},
 %font=\tiny
 }}
@@ -43,13 +44,20 @@ column sep=15pt,
 %            axis on top,
             %y filter/.code={\pgfmathparse{#1/1000000}\pgfmathresult},
         ]
+         \pgfplotsextra{\begin{scope}[on layer=axis background]
+                \draw[draw=gray!50] (axis cs:0,0.951642) -- (axis cs:3.14,0.951642);
+                \node[rounded corners, fill=gray!50, 
+                			font=\tiny, inner sep=2pt, 
+                			anchor=west] at (axis cs:0,0.951642) {\textit{\vphantom{lj}uniEqui}};
+            \end{scope}
+        }
 
         \addplot+ table [x=distance, y=qualityEquirectangularTiledLower]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityCubeMapLower]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityPyramidLower]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityRhombicDodeca]{results/distanceQuality.csv};
-        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
-        \legend{Equirec,CubeMap,Pyramid,Dodeca,UniEqui}
+%        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
+        \legend{Equirec,CubeMap,Pyramid,Dodeca}
 
     \end{axis}
 \end{tikzpicture}
