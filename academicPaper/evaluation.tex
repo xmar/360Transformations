@@ -1,0 +1,58 @@
+\section{Experiments and Guidelines}
+\label{sec:evaluation}
+
+To validate the concept of viewport-adaptive 360-degree video streaming, we have developed
+a software tool, which provides the main features that the system should offer at both client and 
+server side. This tool allowed us to run some first experiments, which we report hereafter, and to
+enunciate a few guidelines for the design of these systems.
+
+We first describe the main features of our software tool to better explain our experiments.
+Since the code and all the details are publicly available,%
+\footnote{\url{https://github.com/xmar/360Transformations}} the software can be used and enhanced
+by the scientific community to make further studies and to develop real systems. The main
+features include: $(i)$ \emph{Projection from a spherical video into any of the four
+geometric layouts and vice versa}. The spherical video is the pivot format from which it
+is possible to project in any layout.
+Note that the majority of 360-degree videos that are currently available are encoded and stored after
+an equirectangular projection, but our tools enables re-projecting these videos
+in another layout without information loss. $(ii)$ \emph{Adjusting video qualities for each 
+geometric face of any
+layout}. We set the resolution of the face in number of
+pixels and the encoding bitrate goal. Each face is encoded into its own video
+track to get different
+bitrate goal per face. And $(iii)$ \emph{Viewport extraction for any \ac{FoV} center in the
+sphere}. This feature includes the management of different video bit-rate and resolutions
+when the extracted viewport overlaps several faces with different qualities.
+
+In the following, we report the experiment of measuring the video quality of viewports, which
+are extracted from 360-degree videos that are projected onto various geometric layouts and 
+with various
+face quality arrangements. We evaluate video quality against two reference videos.
+\begin{itemize}
+\item \emph{The original video at full quality}. We used the
+``\emph{Bridge
+jumping}''\footnote{\url{https://youtu.be/yarcdW91djQ}} video, which is a 4k equirectangular
+video, from which it is possible to extract viewports at 1080p resolution. This original video 
+enables the use of objective video quality assessment tools such as \ac{MS-SSIM} and
+\ac{PSNR}. Since we compare several encoded versions of the same video against an original
+one, these tools provide
+a fair performance evaluation.
+\item \emph{The same video re-encoded at a target bit-rate}. Recall that our ultimate motivation 
+is to reduce the bit-rate of the delivered video, while maintaining a high video quality. We set
+a bit-rate target, which corresponds to half of the bit-rate of the original video. With this bit-rate
+\emph{budget}, our competitor is the original equirectangular video re-encoded with 
+\ac{HEVC} by specifying this bit-rate target. We call it \emph{uniEqui} to state that, in this
+video, the quality is uniform. 
+\end{itemize}
+
+\subsection{Geometric Layout and Face Quality}
+\label{sec:geometry}
+The preparation of the 360-degree video in our viewport-adaptive streaming system
+requires several settings. We distinguish some global settings (the number of \acp{QEC} ($n$), 
+the number of representations ($k$), the segment length ($x$) and the geometric layout) 
+and settings \emph{per representation}
+(the target bit-rate, the number of qualities settings, the quality arrangement onto the different
+faces).
+
+\subsection{Dynamic Viewport Quality}
+\label{sec:qoe}
