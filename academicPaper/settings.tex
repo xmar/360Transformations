@@ -1,0 +1,198 @@
+\section{System Settings}
+\label{sec:settings}
+
+The preparation of the 360-degree video in our viewport-adaptive streaming system
+requires several settings. We distinguish some global settings (the number of \acp{QEC} ($n$), 
+the number of representations ($k$), the segment length and the geometric layout) 
+and some settings \emph{per representation}
+(the target bit-rate, the number of different qualities in the representation, the quality 
+arrangement onto the different
+faces). We do not aim
+at being exhaustive in this paper. Some of these settings require a deeper study related to
+signal processing and video encoding, while some other depend on business considerations and infrastructure investment. In this paper, we restrict our study
+to three key questions: what is the best geometric layout to support quality-differentiated 360-degree
+video? What is the best segment length to support head movements while maintaining low 
+management overhead? What is the best number of \acp{QEC} $n$? To answer these three questions,
+we have developed a software tool and we have used a dataset of real user watching 360-degree
+video. 
+
+%\subsection{Software and Dataset}
+
+\parag{Dataset}We graciously got from Jaunt, Inc a dataset of the head movements
+of real users watching a 360-degree video. The dataset is the same as
+in~\cite{yu_framework_2015}. It consists of
+ten omnidirectional videos of length ten seconds. These videos include
+typical scenarios of 360-degree video. The dataset contains
+the head movements of ten people who were asked to watch the videos on
+a state-of-the-art \ac{HMD} (Occulus Rift DK2). The subjects were
+standing and they were given the freedom to turn around, so the head
+movements are of wider importance than if they were asked to watch the
+video while sitting. Given the length of the video and the experiment
+conditions, we believe that the head movements thus correspond to a
+configuration of abrupt and wide head movements, which is the most
+challenging case for our viewport-adaptive streaming system.
+\citet{yu_framework_2015} have studied the most frequent head position of users.
+In our case, we are interested in head movements during the
+length of a segment.
+%They show that the FoV center is around the equator of the spherical
+%video during the majority of time but that lateral movements are
+%frequent.
+
+\parag{Software}We have developed our own tool to manipulate the main concepts
+of viewport-adaptive streaming. Since the code is publicly available,%
+\footnote{\url{https://github.com/xmar/360Transformations}} the software can be used and enhanced
+to make further studies and to develop real systems. The main
+features include: $(i)$ \emph{Projection from a spherical video into any of the four
+geometric layouts and vice versa}. The spherical video is the pivot format from which it
+is possible to project in any layout.
+Note that the majority of 360-degree videos that are currently available are encoded and stored after
+an equirectangular projection, but our tools enables re-projecting these videos
+in another layout without information loss. $(ii)$ \emph{Adjusting video qualities for each 
+geometric face of any
+layout}. We set the resolution of the face in number of
+pixels and the encoding bitrate goal. Each face is encoded into its own video
+track to get different
+bit-rate goal per face. And $(iii)$ \emph{Viewport extraction for any \ac{FoV} center in the
+sphere}. It includes the management of video bit-rates and resolutions
+when the extracted viewport overlaps several faces with different qualities.
+
+\subsection{Geometric Layout}
+
+We report now the experiment of measuring the video quality of viewports, which
+are extracted from 360-degree videos projected onto various geometric layouts and 
+with various
+face quality arrangements. We evaluate video quality against two reference videos.
+\begin{itemize}[leftmargin=7pt, itemindent=0pt, topsep=2pt, itemsep=0pt]	
+\item \emph{The original video at full quality}. We used the
+``\emph{Bridge
+jumping}''\footnote{\url{https://youtu.be/yarcdW91djQ}} video. We can extract viewports at 1080p resolution from this 4k equirectangular
+video. This original video 
+is the reference for the objective video quality assessment tools: \ac{MS-SSIM} and
+\ac{PSNR}. Since we compare several encoded versions of the same video against an original
+one, these tools provide
+a fair performance evaluation.
+\item \emph{The same video re-encoded at a target bit-rate}. We set
+a bit-rate target (here \SI{6}{\mega bps}). We 
+re-encoded the original full-quality video with \ac{HEVC} by specifying this bit-rate target. We call it \emph{uniEqui} to state that, in this
+video, the quality is uniform. This video is the basic delivered stream in a regular delivery
+system.
+%ith this bit-rate
+%\emph{budget}, our competitor is the original equirectangular video re-encoded with 
+%\ac{HEVC} by specifying this bit-rate target. We call it \emph{uniEqui} to state that, in this
+%video, the quality is uniform. 
+\end{itemize}
+
+%Recall that our ultimate motivation 
+%is to reduce the bit-rate of the delivered video, while maintaining a high video quality.
+
+A \textit{quality-differentiated layout} is the combination of a geometric layout and video quality 
+arrangement onto the geometric faces. The performance of the layout can be studied with
+regards to two scales: \emph{the best viewport quality}, which is the quality of the extracted viewport 
+when the FoV center and the QEC perfectly matches, and the \emph{sensitivity to head movements}, 
+which is the degradation of the viewport quality when the distance between the FoV center 
+and the QEC increases. 
+To evaluate both scales, we chose one origin point \ac{QEC} in the spherical video. And then we iterated
+over the \emph{orthodromic distance} $d$, which increases from 0 to $\pi$ (the furthest point). For each
+value $d$, we randomly picked ten \ac{FoV} centers at the distance $d$ from the origin \ac{QEC}
+and we extracted the viewport, which we compared to the same viewport extracted from the 
+full-quality original video to get an objective video quality measure.
+
+\begin{figure}
+    \input{plots/distance_quality_psnr.tex}
+    \caption{Average \acs{PSNR} gap compared to the \emph{uniEqui} layout, depending on the distance from the \acs{QEC}. Global bitrate budget \SI{6}{\mega bps}}
+    \label{fig:dist_quality_psnr}
+\end{figure}
+
+We represent in Figure~\ref{fig:dist_quality_psnr} the difference of \ac{PSNR} between
+the extracted viewport from our quality-differentiated layouts and the same viewport extracted from
+the reference \textit{uniEqui} layout. For each geometric layout (equirectangular 
+panorama with $8\times 8$ tiles, cube map, pyramid, and dodecahedron), we have tested 
+numerous quality arrangements with respect to the overall bit-rate budget. We selected
+here the ``best" arrangement for each layout.
+
+The projection on a cube map appears to be the best choice for the content provider. The quality of
+the viewport when QEC and FoV center matches ($d=0$) is 3dB better than the viewport extracted
+from the reference uniformly encoded 360-degree video at the same bit-rate. The gain in quality 
+decreases when the distance $d$ increases but the quality of the cube map layout is always greater 
+than the other layouts. Note that the pyramid projection (which is the layout chosen 
+by Facebook~\cite{facebook}) is more sensitive to head movements than
+the other layouts, due to the projection under-sampling. The video quality is worse than
+the standard \emph{uniEqui} for distance greater than $1.2$. This choice requires thus
+that the segment length are short enough to prevent head movements greater than this
+distance during the length of a segment.
+
+\subsection{Segment Length}
+
+The segment length is a key
+aspect of viewport-adaptive streaming. Long segment are easier to manage and better for video encoding, 
+but short segments enable fast re-synchronisation to head movement. With respect to 
+Figure~\ref{fig:dist_quality_psnr}, the 
+segment length should be chosen so that the 
+distance between the FoV center and the QEC are rarely greater than 1.5 distance units.
+
+Based on the dataset, we show the distribution of head movements for various segment lengths
+in Figure~\ref{cdf-dataset}. For each video and each person watching
+it, we set timestamps that correspond to the starting time of a video
+segment, \textit{i.e.,} the time at which the users select a QEC. Then, we measure the orthodromic distance
+between this initial head position and every FoV center during the $x$
+next seconds, where $x$ is the segment length. In
+Figure~\ref{cdf-dataset}, we show the \ac{CDF} of the time spent at a
+distance $d$ from the initial head position. A point at $(1.5,0.6)$
+means that, on average, users spend $60\%$ of their time with a FoV
+center at less than $1.5$ distance units from the FoV center on the
+beginning of the segment.
+
+\begin{figure}[htbp]
+\centering
+\input{plots/cdf-dataset.tex}
+\caption{CDF of the time spent at distance $d$ from the head position on the beginning of the
+segment, for various segment lengths.}\label{cdf-dataset}
+\end{figure}
+
+Our main observation is that viewport-adaptive streaming requires
+short segment lengths, typically smaller than 3\,s. Indeed, for a
+segment length of five seconds, users spend on average half of their
+time watching at a position that is at more than 1.3 distance units
+away from the initial head position, which results in a degraded video
+quality. A segment length of \SI{2}{\second} appears to be a good trade-off: 
+85\% of
+users never diverged to a head position that is further than 1.5~
+distance unit away from the initial head position, and users can experience the full
+video quality half of the time (head distance lesser than 0.5~distance unit). Please recall that
+these experiments represent the most challenging (worst) case scenario
+for our system. We can expect less abrupt and narrower head movements,
+and thus longer possible segment lengths, for sitting users and longer
+videos.
+
+%such
+%a length is acceptable regarding the management at the server (the
+%number of segments to deal with and the size of the \ac{MPD}) and at
+%the client (the frequency of representation selection and the number
+%of requests to send). Furthermore, for a \SI{2}{\second}-long segment, 
+
+\subsection{Number of \acp{QEC}}
+
+The number of QECs ($n$) is another key trade-off. The more QECs, the better coverage
+of the spherical video, and thus the better viewport quality due to a better match 
+between QEC and FoV centers. However, the more QECs also means more storage
+at the server side (to be multiplied by the number of bit-rate representations) and
+more management (including longer \ac{MPD}).
+
+We show in Figure~\ref{fig:QEC} the average \acs{MS-SSIM} quality of the viewports as
+would the users of our datasets see them if the 360-degree video had been prepared
+with a given number of QECs $n$. We used the best configuration, \textit{i.e.}, a cube map projection
+and \SI{2}{\second} segment. We computed $n$ QEC positions in the video (uniform distribution over the sphere) and we generated $n$ quality-differentiated video representations from these $n$ QECs. 
+For each head position in the dataset, we compute the distance between the
+FoV center and the QEC that was chosen at the beginning of the segment and we compute
+the viewport quality accordingly.
+
+\begin{figure}[htbp]
+\centering
+\input{plots/cdf-dataset.tex}
+\caption{Average \acs{MS-SSIM} quality of the viewports of users depending 
+on the number of QECs. Video projected on a cube map with \SI{2}{\second}-long segment. 
+Bit-rate: \SI{6}{\mega bps}}
+\label{fig:QEC}
+\end{figure}
+
+The best number of QECs in this configuration is between $xx$ and $yy$.
