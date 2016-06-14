@@ -17,11 +17,14 @@ def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE, pathToQec)
 
             drDict[videoId] = DatasetReader.DatasetReader(filepath)
             drDict[videoId].ReadDataset()
+
     for window in windowRange:
         print ('Start processing of  window = {}'.format(window))
         with open('{}/qoeForWindow{}s.csv'.format(pathToOutput, window), 'w') as o:
             o.write('nbQec qoe\n')
-            for nbQec in range(2,33):
+            qMin = {}
+            qMax = {}
+            for nbQec in range(1,33):
                 if nbQec == 13:
                     continue
                 dic = {}
@@ -42,9 +45,23 @@ def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE, pathToQec)
                 #compute the QoE
                 qoeList = []
                 layout = 'qualityCubeMapLower'
+
                 for videoId in dic:
-                    qoeList += ComputeExpectedLiveQoE(dic[videoId], distToQoEReader, layout, window)
+                    r = ComputeExpectedLiveQoE(dic[videoId], distToQoEReader, layout, window)
+                    qoeList += r #[sum(r)/len(r)]
+                    if nbQec == 1:
+                        qMin[videoId] = sum(qoeList)/len(qoeList)
+                    if nbQec == 7:
+                        qMax[videoId] = sum(qoeList)/len(qoeList)
                 o.write('{} {}\n'.format(nbQec, sum(qoeList)/len(qoeList)))
+        best = None
+        qBest = None
+        for videoId in qMin:
+            q = qMax[videoId]-qMin[videoId]
+            if qBest is None or qBest < q:
+                qBest = q
+                best = videoId
+        print (best, qBest)
 
 
 def ComputeExpectedLiveQoE(dic, distToQoEReader, layout, window):

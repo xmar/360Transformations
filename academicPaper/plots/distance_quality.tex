@@ -10,7 +10,7 @@
 anchor=south west,
 draw=none,
 fill=none,
-legend columns=2,
+legend columns=3,
 column sep=15pt,
 /tikz/every odd column/.append style={column sep=0cm},
 %font=\tiny
@@ -48,8 +48,8 @@ column sep=15pt,
         \addplot+ table [x=distance, y=qualityCubeMapLower]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityPyramidLower]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityRhombicDodeca]{results/distanceQuality.csv};
-%        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
-        \legend{Equirec,CubeMap,Pyramid,RhombicDodeca}%,Equi}
+        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
+        \legend{Equirec,CubeMap,Pyramid,Dodeca,UniEqui}
 
     \end{axis}
 \end{tikzpicture}
