@@ -11,7 +11,7 @@
 anchor=south west,
 draw=none,
 fill=none,
-legend columns=2,
+legend columns=5,
 column sep=15pt,
 /tikz/every odd column/.append style={column sep=0cm},
 %font=\tiny
@@ -24,12 +24,14 @@ column sep=15pt,
 
 \begin{tikzpicture}
     \begin{axis}[
-            ylabel={QoE},
-            xlabel={Timestamp},
+            ylabel={Average MS-SSIM},
+            %ylabel={PSNR},
+            xlabel={Number of QEC},
             width=1.05\linewidth,
             height=0.5\linewidth,
             %x=2cm,
-%    	    xtick={-10,-5,0,5,...,50},
+    	    xtick={0,5,...,50},
+          minor x tick num={4},
             %ytick={0,0.1,0.2,...,1},
             %x tick label as interval,
             %xticklabels={%
@@ -40,20 +42,19 @@ column sep=15pt,
             %},
             cycle list name={My color list},
             legend cell align=left,
-            xmin = 0,
+            xmin = 2,
             %ymin = 0,
-            xmax = 10,
-            ymax = 1,
+            xmax = 32,
+            %ymax = 1,
             ymajorgrids,
             %y filter/.code={\pgfmathparse{#1/100}\pgfmathresult},
         ]
 
-
-			%\foreach \layout in {AverageEquiTiled, CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodecaLower}{
-         \foreach \layout in {AverageEquiTiled, CubeMapLower}{
-            \addplot+ table [x =timestamp, y =qoe, smooth, each nth point=5]{outputs2/\videoId p\userId _expectedLiveQoE_\window s_quality\layout .csv};
+        \foreach  \window in {0.5, 1, 2, 3, 5}{
+         \addplot+ table [x =nbQec, y =qoe]{results/qoeForWindow\window s.csv};
         }
-        	\legend{AverageEqui, CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodecaLower}
+        \legend{0.5\,s, 1\,s, 2\,s, 3\,s, 5\,s}
+        %\legend{CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}
 
     \end{axis}
 \end{tikzpicture}

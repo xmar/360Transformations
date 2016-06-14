@@ -51,16 +51,16 @@ class DatasetReader:
                 keysToLook.remove(timestamp)
         return r
 
-    def ComputeAllPositionsWithTimestamp(self, window):
+    def ComputeAllPositionsWithTimestamp(self, window, qecReader, nbQec):
         '''Compute all the distances between the FoV center and the initial Fov in the window'''
         r = {}
         keys = sorted(self.headPositionMap.keys())
-        keysToLook = sorted(self.headPositionMap.keys())
+        currentDecisionTimestamp = keys[0] - 2 *window
+        currentQec = None
         for timestamp in keys:
-            if timestamp <= self.maxTimestamp - window and timestamp in keysToLook:
-                for t in keysToLook:
-                    if t > timestamp and t < timestamp + window:
-                        distance = self.headPositionMap[timestamp].OrthodromicDistance(self.headPositionMap[t])
-                        r[t] = distance
-                        keysToLook.remove(t)
+            if timestamp - currentDecisionTimestamp >= window:
+                currentDecisionTimestamp = timestamp
+                currentQec = qecReader.GetClosestQEC(nbQec, self.headPositionMap[currentDecisionTimestamp])
+            distance = currentQec.OrthodromicDistance(self.headPositionMap[timestamp])
+            r[timestamp] = distance
         return r

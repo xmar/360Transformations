@@ -22,6 +22,11 @@ class DistanceToQoEReader(object):
                         for QoE in line[1:]:
                             self.distToQoE[counter][dist] = float(QoE)
                             counter += 1
+        if 'qualityAverageEquiTiled' in self.layoutToId:
+            QoEs = self.distToQoE[self.layoutToId['qualityAverageEquiTiled']].values()
+            averageQoE = sum(QoEs)/len(QoEs)
+            for dist in self.distToQoE[self.layoutToId['qualityAverageEquiTiled']]:
+                self.distToQoE[self.layoutToId['qualityAverageEquiTiled']][dist] = averageQoE
 
     def GetQoE(self, distance, layout):
         if layout not in self.layoutToId:

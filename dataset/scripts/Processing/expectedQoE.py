@@ -2,46 +2,55 @@ import os
 import DatasetReader
 import numpy as np
 
-def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE):
-    dic = {}
-    globalDic = {}
-    windowRange = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
-    for window in windowRange:
-        for (dirpath, dirnames, filenames) in os.walk(pathToDatasets):
-            for filename in filenames:
-                filepath = os.path.join(dirpath, filename)
-                print ('Start processing of dataset: {}'.format(filepath))
-                print ('window = {}'.format(window))
-                videoId = dirpath.split('/')[-1] + filename[:-4]
-                print('Video id = {}'.format(videoId))
-
-                dr = DatasetReader.DatasetReader(filepath)
-                dr.ReadDataset()
-                if videoId not in dic:
-                    dic[videoId] = {}
-                if window not in dic[videoId]:
-                    dic[videoId][window] = []
-                if window not in globalDic:
-                    globalDic[window] = []
-                # r = dr.ComputeStatistic(window)
-                r = dr.ComputeAllPositionsWithTimestamp(window)
-                dic[videoId][window] = r
-                #globalDic[window] = r
-
+def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE, pathToQec):
+    #windowRange = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+    windowRange = [0.5,1,2,3,5]
+    qecReader = DatasetReader.QECReader(pathToQec)
     distToQoEReader = DatasetReader.DistanceToQoEReader(pathToDistToQoE)
-    #compute the QoE
-    for window in sorted(windowRange):
-        for layout in distToQoEReader.layoutToId.keys():
-            for videoId in dic:
-                print ("Compute CDF for video {}_expectedLiveQoE_{}s_{}".format(videoId, window, layout))
-                WriteExpectedLiveQoE('{}/{}_expectedLiveQoE_{}s_{}.csv'.format(pathToOutput, videoId, window, layout), dic[videoId], distToQoEReader, layout, window)
-            #print ("Compute CDF for global")
-            #WriteExpectedLiveQoE('{}/global_expectedLiveQoE_{}s_{}.csv'.format(pathToOutput, window, layout), globalDic, distToQoEReader, layout, window)
+    drDict = {}
+    for (dirpath, dirnames, filenames) in os.walk(pathToDatasets):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            print ('Start processing of dataset: {}'.format(filepath))
+            videoId = dirpath.split('/')[-1] + filename[:3]
+            print('Video id = {}'.format(videoId))
 
-def WriteExpectedLiveQoE(path, dic, distToQoEReader, layout, window):
-    with open(path, 'w') as o:
-        o.write('timestamp dist qoe\n')
-        for timestamp in sorted(dic[window].keys()):
-            dist = dic[window][timestamp]
-            qoe = distToQoEReader.GetQoE(dist, layout)
-            o.write('{} {} {}\n'.format(timestamp, dist, qoe))
+            drDict[videoId] = DatasetReader.DatasetReader(filepath)
+            drDict[videoId].ReadDataset()
+    for window in windowRange:
+        print ('Start processing of  window = {}'.format(window))
+        with open('{}/qoeForWindow{}s.csv'.format(pathToOutput, window), 'w') as o:
+            o.write('nbQec qoe\n')
+            for nbQec in range(2,33):
+                if nbQec == 13:
+                    continue
+                dic = {}
+                for videoId in drDict:
+                    dr = drDict[videoId]
+                    if videoId not in dic:
+                        dic[videoId] = {}
+                    if window not in dic[videoId]:
+                        dic[videoId][window] = []
+                    # r = dr.ComputeStatistic(window)
+                    r = dr.ComputeAllPositionsWithTimestamp(window, qecReader, nbQec)
+                    dic[videoId][window] = r
+                    #globalDic[window] = r
+
+
+
+
+                #compute the QoE
+                qoeList = []
+                layout = 'qualityCubeMapLower'
+                for videoId in dic:
+                    qoeList += ComputeExpectedLiveQoE(dic[videoId], distToQoEReader, layout, window)
+                o.write('{} {}\n'.format(nbQec, sum(qoeList)/len(qoeList)))
+
+
+def ComputeExpectedLiveQoE(dic, distToQoEReader, layout, window):
+    qoeList = []
+    for timestamp in sorted(dic[window].keys()):
+        dist = dic[window][timestamp]
+        qoe = distToQoEReader.GetQoE(dist, layout)
+        qoeList.append(qoe)
+    return qoeList
