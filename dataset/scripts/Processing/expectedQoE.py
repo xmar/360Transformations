@@ -47,7 +47,7 @@ def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE, pathToQec)
                 layout = 'qualityCubeMapLower'
 
                 for videoId in dic:
-                    r = ComputeExpectedLiveQoE(dic[videoId], distToQoEReader, layout, window)
+                    r = ComputeExpectedLiveQoE('{}/{}nbQec{}window{}.csv'.format(pathToOutput, videoId, nbQec, window), dic[videoId], distToQoEReader, layout, window)
                     qoeList += r #[sum(r)/len(r)]
                     if nbQec == 1:
                         qMin[videoId] = sum(qoeList)/len(qoeList)
@@ -64,10 +64,13 @@ def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE, pathToQec)
         print (best, qBest)
 
 
-def ComputeExpectedLiveQoE(dic, distToQoEReader, layout, window):
+def ComputeExpectedLiveQoE(path, dic, distToQoEReader, layout, window):
     qoeList = []
-    for timestamp in sorted(dic[window].keys()):
-        dist = dic[window][timestamp]
-        qoe = distToQoEReader.GetQoE(dist, layout)
-        qoeList.append(qoe)
+    with open(path, 'w') as o:
+        o.write('timestamp dist\n')
+        for timestamp in sorted(dic[window].keys()):
+            dist = dic[window][timestamp]
+            qoe = distToQoEReader.GetQoE(dist, layout)
+            o.write('{} {}\n'.format(timestamp, dist))
+            qoeList.append(qoe)
     return qoeList

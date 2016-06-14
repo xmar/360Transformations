@@ -49,10 +49,44 @@ column sep=15pt,
         ]
 
 
-			\foreach \window in {0.5, 1, 2, 5}{
-            \addplot+ table [x =timestamp, y =dist, smooth, each nth point=5]{results/bmxp01_00_expectedLiveQoE_\window s_qualityCubeMapLower.csv};
+			\foreach \qec in {1, 2, 7, 10, 20}{
+            \addplot+ table [x =timestamp, y =dist, smooth, each nth point=5]{results/waterfallp11nbQec\qec window1.csv};
         }
-        	\legend{0.5\,s, 1\,s, 2\,s, 5\,s}
+        	\legend{1, 2, 7, 10, 20}
+
+    \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+    \begin{axis}[
+            ylabel={QoE},
+            xlabel={time (s)},
+            width=1.05\linewidth,
+            height=0.5\linewidth,
+            %x=2cm,
+%    	    xtick={-10,-5,0,5,...,50},
+            %ytick={0,0.1,0.2,...,1},
+            %x tick label as interval,
+            %xticklabels={%
+            %    {500~ms},%
+            %    {1000~ms},%
+            %    {1500~ms},%
+            %    {2000~ms},%
+            %},
+            cycle list name={My color list},
+            legend cell align=left,
+            xmin = 0,
+            %ymin = 0,
+            xmax = 10,
+            %ymax = 1,
+            ymajorgrids,
+            %y filter/.code={\pgfmathparse{#1/100}\pgfmathresult},
+        ]
+
+
+			\foreach \qec in {1, 2, 7, 10, 20}{
+            \addplot+ table [x =timestamp, y =dist, smooth, each nth point=5]{results/waterfallp11nbQec\qec window5.csv};
+        }
+        	\legend{1, 2, 7, 10, 20}
 
     \end{axis}
 \end{tikzpicture}
