@@ -51,8 +51,81 @@ The preparation of the 360-degree video in our viewport-adaptive streaming syste
 requires several settings. We distinguish some global settings (the number of \acp{QEC} ($n$), 
 the number of representations ($k$), the segment length ($x$) and the geometric layout) 
 and settings \emph{per representation}
-(the target bit-rate, the number of qualities settings, the quality arrangement onto the different
-faces).
+(the target bit-rate, the number of different qualities in the representation, the quality 
+arrangement onto the different
+faces). Our tool enables testing the numerous configurations regarding the latter. We do not aim
+at being exhaustive in this paper. The study of the best configurations and the development
+of better video encoding tools is left for future works within the signal processing 
+community. We restrict here our study on the impact of the geometric layout.
+
+A \textit{quality-differentiated layout} is the combination of a geometric layout and video quality 
+arrangement onto the geometric faces. The performance of the layout can be studied with
+regards to two scales: \emph{the best viewport quality}, which is the quality of the extracted viewport 
+when the FoV center and the QEC perfectly matches, and the \emph{sensitivity to head movements}, 
+which is the degradation of the viewport quality when the distance between the FoV center 
+and the QEC increases. 
+To evaluate both scales, we chose one origin point \ac{QEC} in the spherical video. And then we iterated
+over the orthodromic distance $d$, which increases from 0 to $\pi$ (the furthest point). For each
+value $d$, we randomly picked ten \ac{FoV} centers at the distance $d$ from the origin \ac{QEC}
+and we extracted the viewport, which we compared to the same viewport extracted from the 
+full-quality original video to get an objective video quality measure.
+
+% ====
+%the \ac{QoE} degradation
+%depending on the distance between a \ac{FoV} center and a
+%\ac{QEC}. We consider the video is projected on the unit sphere. The
+%distance is measured using the orthodromic distance on this sphere. We
+%used a distance step of 0.25 units. For each distance $d$, for each
+%layout, and for each \ac{QEC} we randomly select $10$ \ac{FoV} center
+%located at the distance $d$ from the \ac{QEC} and we extract the
+%associated \acp{FoV}. Then we use the \ac{FoV} at the same position
+%extracted from the original video to compute the \ac{MS-SSIM} and the
+%\ac{PSNR} of each \ac{FoV}.
+%
+%The Figure~\ref{fig:dist_quality} displays the average \ac{MS-SSIM} of
+%the \acp{FoV} depending on their distance from the different \acp{QEC}
+%and Figure~\ref{fig:dist_quality_psnr} represents the average
+%\ac{PSNR} gap from the equirectagular layout encoded with the same
+%bitrate budget. Both Figures are from the same simulation results. We
+%observe that the cube map layout generates the best results. The
+%\ac{QoE} from the pyramid layout decreases quickly: After a distance of
+%$1$ the quality is under the default equirectangular layout quality.
+%The quality of the cube map layout is never under the
+%quality of the default equirectangular layout. This was not expected. It may
+%be because we used tiles inside the equirectangular layout, this avoid
+%the encoder to efficiently compress the video. \noteXC{There is still
+%some simulation running to see if we can show better results}
+
+\begin{figure}
+    \input{plots/distance_quality_psnr.tex}
+    \caption{Average \acs{PSNR} gap compared to the \emph{uniEqui} layout, depending on the distance from the \acs{QEC}. Global bitrate budget \SI{6}{\mega bps}}
+    \label{fig:dist_quality_psnr}
+\end{figure}
+
+We represent in Figure~\ref{fig:dist_quality_psnr} the difference of \ac{PSNR} between
+the extracted viewport from our quality-differentiated layouts and the same viewport extracted from
+the reference \textit{uniEqui} layout. For each geometric layout (equirectangular 
+panorama with $8\times 8$ tiles, cube map, pyramid, and dodecahedron), we have tested 
+numerous quality arrangements with respect to the overall bit-rate budget. We selected
+here the ``best" arrangement for each layout.
+
+The projection on a cube map appears to be the best choice for the content provider. The quality of
+the viewport when QEC and FoV center matches ($d=0$) is 3dB better than the viewport extracted
+from the reference uniformly encoded 360-degree video at the same bit-rate. The gain in quality 
+decreases when the distance $d$ increases but the quality of the cube map layout is always greater 
+than the other layouts. Note that the pyramid projection is more sensitive to head movements than
+the other layouts, due to the projection under-sampling, with a video quality that is worse than
+the standard \emph{uniEqui} for distance greater than $1.2$. The choice of Facebook to 
+use the pyramid
+layout~\cite{facebook} would thus require cutting the video into shorter segments 
+(duration \SI{1}{\second}) to maintain a better \ac{QoE} than the standard layout.
+
+%\begin{figure}
+%    \input{plots/distance_quality.tex}
+%    \caption{Average \acs{MS-SSIM} depending on the distance from the
+%    \acs{QEC}. Bit-rate budget: \SI{6}{\mega bps}}
+%    \label{fig:dist_quality}
+%\end{figure}
 
 \subsection{Dynamic Viewport Quality}
 \label{sec:qoe}

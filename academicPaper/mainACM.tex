@@ -171,39 +171,39 @@
 
 \input{dataset.tex}
 
-\input{geometricTestbed.tex}
-
-
-\rowcolors{2}{gray!25}{white}
-\begin{table}[t]
-\scriptsize
-\centering
-\begin{tabular}{r@{\hspace{2pt}}|c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c}
-% \rowcolor{gray!50}
- \multicolumn{2}{c|}{~} & \multicolumn{2}{c|}{high quality} & \multicolumn{2}{c|}{mid quality} & \multicolumn{2}{c}{low quality} \\
-%\rowcolor{gray!50}
- & \# tiles & \# tiles & res. & \# tiles & res. & \# tiles & res. \\ \hline \hline
- \textbf{equi.} & 64 & 9 & 1 & 40 & 0.5 & 15 & 0.25 \\
- \textbf{cube} & 6 & 1 & 1 & 4 & [0.4,0.7] & 1 & 0.25\\
- \textbf{pyramid} & 5 & 1 & 1 & 4 & --- & 0 & ---\\
- \textbf{dodeca.} & 12 & 2 & 1 & 8 & [0.4--0.7] & 2 & 0.25
-\end{tabular}
-\caption{tile quality arrangement}\label{tab:quality}
-\end{table}
-
-
-\section{Discussion and Conclusion}
-
-We can use \AD{focal}{} statistics and saliency maps to select better
-\acp{QEC}.
-% eye attention
-
-We have to extend the tests for a large set of videos and for many
-other parameter settings: adjusting quality by spatially or CRF ? how
-many versions (QECs)? toward a rate-distortion figure?
-
-We have to see what are the options if we have a lot of bandwidth
-(case of terahertz antennas).
+%\input{geometricTestbed.tex}
+\input{evaluation.tex}
+%
+%\rowcolors{2}{gray!25}{white}
+%\begin{table}[t]
+%\scriptsize
+%\centering
+%\begin{tabular}{r@{\hspace{2pt}}|c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c}
+%% \rowcolor{gray!50}
+% \multicolumn{2}{c|}{~} & \multicolumn{2}{c|}{high quality} & \multicolumn{2}{c|}{mid quality} & \multicolumn{2}{c}{low quality} \\
+%%\rowcolor{gray!50}
+% & \# tiles & \# tiles & res. & \# tiles & res. & \# tiles & res. \\ \hline \hline
+% \textbf{equi.} & 64 & 9 & 1 & 40 & 0.5 & 15 & 0.25 \\
+% \textbf{cube} & 6 & 1 & 1 & 4 & [0.4,0.7] & 1 & 0.25\\
+% \textbf{pyramid} & 5 & 1 & 1 & 4 & --- & 0 & ---\\
+% \textbf{dodeca.} & 12 & 2 & 1 & 8 & [0.4--0.7] & 2 & 0.25
+%\end{tabular}
+%\caption{tile quality arrangement}\label{tab:quality}
+%\end{table}
+%
+%
+%\section{Discussion and Conclusion}
+%
+%We can use \AD{focal}{} statistics and saliency maps to select better
+%\acp{QEC}.
+%% eye attention
+%
+%We have to extend the tests for a large set of videos and for many
+%other parameter settings: adjusting quality by spatially or CRF ? how
+%many versions (QECs)? toward a rate-distortion figure?
+%
+%We have to see what are the options if we have a lot of bandwidth
+%(case of terahertz antennas).
 
 
 

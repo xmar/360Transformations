@@ -7,41 +7,42 @@
 
 \pgfplotsset{every axis legend/.append style={
         at={(0,0.97)},
-anchor=south west,
-draw=none,
-fill=none,
-legend columns=2,
-column sep=15pt,
-/tikz/every odd column/.append style={column sep=0cm},
-%font=\tiny
+        anchor=south west,
+        draw=none,
+        fill=none,
+        legend columns=4,
+        column sep=5pt,
+        /tikz/every odd column/.append style={column sep=0cm},
+        font=\scriptsize
 }}
-\pgfplotsset{grid style={dashed,gray}}
-\pgfplotsset{minor grid style={dotted,red!20!gray}}
-\pgfplotsset{major grid style={dotted,green!50!black}}
+%\pgfplotsset{grid style={dashed,gray}}
+\pgfplotsset{minor grid style={gray!20}}
+\pgfplotsset{major grid style={dotted}}
 
 
 \begin{tikzpicture}
     \begin{axis}[
-            ylabel={PSNR gap with Equi},
-            xlabel={Orthodromic distance},
+            ylabel={PSNR gap (in dB)},
+            xlabel={Orthodromic distance (in distance units)},
             width=1.05\linewidth,
             height=0.5\linewidth,
- %           unit vector ratio=1 2 1,
- %           x=0.4cm,
             cycle list name={My color list},
-            %ytick={0,2,4,...,10},
-            %xtick pos=left,
-            %x tick label style={at={(current axis.right of origin)},rotate=45,anchor=north east},
-            %minor y tick num={1},
+			 extra y ticks={0},
+            extra y tick labels={\textit{\vphantom{lj}uniEqui}},
+            extra y tick style={grid=major, 
+               tick pos=left, 
+               ticklabel pos=left, tick
+               align=inside,
+               grid=minor,
+               tick label style={rounded corners,
+                  fill=gray!20,
+                  font=\tiny, 
+                  inner sep=2pt,
+                  anchor=west}},
             legend cell align=left,
             xmin = 0,
             xmax = 3.14,
-            %ymin = 0.7,
-            %ymax = 1,
-            ymajorgrids,
-            yminorgrids,
-%            axis on top,
-            %y filter/.code={\pgfmathparse{#1/1000000}\pgfmathresult},
+%            ymajorgrids,
         ]
 
         \addplot+ table [x=distance,
@@ -52,7 +53,7 @@ column sep=15pt,
         y=qualityPyramidLower]{results/distanceQuality_psnr.csv};
         \addplot+ table [x=distance,
         y=qualityRhombicDodeca]{results/distanceQuality_psnr.csv};
-        \legend{EqTiled,CubeMap,Pyramid,RhombicDodeca}
+        \legend{Equirec,CubeMap,Pyramid,Dodeca}
 
     \end{axis}
 \end{tikzpicture}
