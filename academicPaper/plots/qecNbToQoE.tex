@@ -56,7 +56,6 @@ column sep=15pt,
             ymajorgrids,
             %y filter/.code={\pgfmathparse{#1/100}\pgfmathresult},
         ]
-
         \foreach  \window in {1, 2, 3, 5}{
          \addplot+ table [x =nbQec, y =medQoe]{results/qoeForWindow\window s.csv};
         }
