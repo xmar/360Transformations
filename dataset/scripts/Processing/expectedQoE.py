@@ -21,7 +21,7 @@ def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE, pathToQec)
     for window in windowRange:
         print ('Start processing of  window = {}'.format(window))
         with open('{}/qoeForWindow{}s.csv'.format(pathToOutput, window), 'w') as o:
-            o.write('nbQec qoe\n')
+            o.write('nbQec avgQoe minQoe maxQoe medQoe\n')
             qMin = {}
             qMax = {}
             for nbQec in range(1,33):
@@ -53,7 +53,7 @@ def ComputeExpectedQoE(pathToDatasets, pathToOutput, pathToDistToQoE, pathToQec)
                         qMin[videoId] = sum(qoeList)/len(qoeList)
                     if nbQec == 7:
                         qMax[videoId] = sum(qoeList)/len(qoeList)
-                o.write('{} {}\n'.format(nbQec, sum(qoeList)/len(qoeList)))
+                o.write('{} {} {} {} {}\n'.format(nbQec, sum(qoeList)/len(qoeList), min(qoeList), max(qoeList), np.percentile(qoeList, 50)))
         best = None
         qBest = None
         for videoId in qMin:

@@ -24,7 +24,7 @@ column sep=15pt,
 
 \begin{tikzpicture}
     \begin{axis}[
-            ylabel={Avg PSNR gap (in dB)},
+            ylabel style={align=center}, ylabel={Median PSNR gap\\(in dB)},
             %ylabel={PSNR},
             xlabel={Number of QECs},
             width=1.05\linewidth,
@@ -58,7 +58,7 @@ column sep=15pt,
         ]
 
         \foreach  \window in {1, 2, 3, 5}{
-         \addplot+ table [x =nbQec, y =qoe]{results/qoeForWindow\window s.csv};
+         \addplot+ table [x =nbQec, y =medQoe]{results/qoeForWindow\window s.csv};
         }
         \legend{1\,s, 2\,s, 3\,s, 5\,s}
         %\legend{CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}

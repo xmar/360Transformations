@@ -213,7 +213,7 @@ match between the \ac{QEC} and the \ac{FoV} center. However,
 increasing the number of \acp{QEC} also means increased storage and
 management requirements at the server (and a longer \ac{MPD} file).
 
-We represent in Figure~\ref{fig:QEC} the average \ac{PSNR} difference
+We represent in Figure~\ref{fig:QEC} the median \ac{PSNR} difference
 between the viewport extracted from the best cube map layout and the
 same viewport extracted from the \emph{uniEqui} layout with the same
 overall bit-rate budget. To modify the number of \acp{QEC}, we set a
@@ -237,7 +237,7 @@ accordingly.
 \begin{figure}[htbp]
 \centering
 \input{plots/qecNbToQoE.tex}
-\caption{Average \acs{PSNR} gap between the viewports of the cube map layout and the \textit{uniEqui} depending
+\caption{Median \acs{PSNR} gap between the viewports of the cube map layout and the \textit{uniEqui} depending
 on the number of QECs.
 Bit-rate: \SI{\testbitrateBudget}{\mega bps}}
 \label{fig:QEC}
