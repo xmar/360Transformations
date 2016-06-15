@@ -28,7 +28,7 @@ class FlatFixedLayout(Layout):
         if not cls.wasRandomInit:
             cls.wasRandomInit = True
             random.seed(1)
-        return Rotation.RotationFromSpherical(random.uniform(-180,180), random.uniform(-90,90))
+        return Rotation.RotationFromSpherical(random.uniform(-180,180), random.uniform(0,180))
 
     @classmethod
     def SetRandomSeed(cls, seed):
