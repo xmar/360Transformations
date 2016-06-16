@@ -40,7 +40,7 @@ good immersion, the pixel resolution of the displayed viewport should
 be high, typically 4K ($3840\times2160$). This means that the
 resolution of the full 360-degree video should be at least 12K
 ($11520\times6480$). In addition, the immersion requires a video frame
-rate on the order of the HMD refresh rate, so typically around
+rate on the order of the \ac{HMD} refresh rate, so typically around
 \SI[mode=text]{100}{\acp{fps}}. Overall, high-quality 360-degree
 videos combine both a very large resolution (up to 12K) and a very
 high frame rate (up to \SI[mode=text]{100}{\acp{fps}}). To compare,
@@ -90,9 +90,13 @@ of the already received video representation, the quality of the
 extracted video is lower but this degradation is transient until the
 device selects another video representation with a closer \ac{QEC}.
 
-The remainder of the paper is organized as follows. First, we present
-the overall processes that have to be implemented at both the client
-and server sides, and we show how our proposal can be integrated into
+The remainder of the paper is organized as follows. First, \GS{we
+present the viewport-adaptive streaming
+system,}{} and
+%present
+%the overall processes that have to be implemented at both the client
+%and server sides, and
+we show how it can be integrated into
 the \ac{MPEG} \ac{DASH} standard. Our proposal is thus a contribution
 to the \ac{VR} group that was launched by \ac{MPEG} in May
 $2016$~\cite{mpeg-vr}. Second, we address the choice of the geometric
@@ -105,16 +109,21 @@ viewport-adaptive streaming. Based on a dataset of real users
 navigating 360-degree videos, we show that head movements occur over
 short time periods, hence the streaming video segments have to be
 short enough to enable frequent \ac{QEC} switches. \XC{Fourth, we
-examine the impact of the number of \acp{QEC} on the overall quality
-and we show that the quality improvement plateaus out after \num{7}
-\acp{QEC}.}{} Finally, we introduce a tool (released as open source on
-a public
-repository\footnote{\url{https://github.com/xmar/360Transformations}}),
-which creates video representations for viewport-adaptive streaming of
-360-degree videos. The tool is highly configurable: from a given
-360-degree video, it allows for any arrangement of video quality for a
-given geometric layout, and it extracts the \ac{FoV} video from any
-point in the sphere. This tool thus provides the main software module
+examine the impact of the number of \acp{QEC} on the \GS{viewport}{} quality
+and we show that \GS{a small number of (spatially-distributed over the sphere)
+\acp{QEC} suffices to get high viewport quality}.}{}
+%quality improvement plateaus out after \GS{a small number of}{}
+%\acp{QEC}.}{}
+Finally, we introduce a tool (released as open source)%
+%on
+%a public
+%repository\footnote{\url{https://github.com/xmar/360Transformations}})
+, which creates video representations for our viewport-adaptive streaming \GS{proposal}.
+% of 360-degree videos.
+The tool is highly configurable: from a given
+360-degree video, it allows any arrangement of video quality for a
+given geometric layout, and it extracts the \GS{viewport}{} from any \GS{\ac{FoV} center}{}.
+This tool thus provides the main software module
 for the implementation of viewport-adaptive streaming of navigable
 360-degree videos.
 
