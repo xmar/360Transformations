@@ -1,27 +1,27 @@
 \begin{abstract}
 The delivery and display of ultra high resolution 360-degree videos on
-Head-Mounted Displays (HMDs) presents a number of technical
+\acp{HMD} presents a number of technical
 challenges. 360-degree videos are high resolution spherical videos
 that contain an omnidirectional view of the scene, however only a
-portion of this scene is displayed at any time on the user's HMD. The
+portion of this scene is displayed at any time on the user's \ac{HMD}. The
 delivery of such videos wastes network resources since most of the
-pixel data are never used. With high refresh rates, HMDs need to
+pixel data are never used. With high refresh rates, \acp{HMD} need to
 respond in less than 10 ms to head movements. The required ultra
 low-latency response prevents dynamic adjustments of video quality at
 the server based on client feedback. Instead, an entire 360-degree
 video scene needs to be delivered to the client to extract the
 appropriate fraction of this scene on the client's end. To reduce the
-required immense video bitrate, while still providing an immersive
+required immense video bit-rate, while still providing an immersive
 experience to the user, a viewpoint-adaptive 360-degree video
 streaming system is proposed. In this system, the server prepares
-multiple video representations that differ not only by their bitrate,
+multiple video representations that differ not only by their bit-rate,
 but also by the qualities of different scene regions they support. The
 client chooses a representation for the next segment such that its
-bitrate fits the available throughput and a full quality region
+bit-rate fits the available throughput and a full quality region
 matches its viewing direction. We investigate the impact of various
 spherical-to-plane projections and quality arrangements on the video
 quality displayed to the user, showing that the cube map layout offers
-the best quality for the given bitrate budget. An evaluation with a
+the best quality for the given bit-rate budget. An evaluation with a
 dataset of users navigating 360-degree videos demonstrates that
 segments need to be short enough to enable frequent view switches.
 \end{abstract}
