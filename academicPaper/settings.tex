@@ -47,7 +47,7 @@ during the length of a segment.
 
 \parag{Software}We have developed our own tool to manipulate the main
 concepts of viewport-adaptive streaming. Since the code is publicly
-available, \footnote{\url{https://github.com/xmar/360Transformations}}
+available,\footnote{\url{https://github.com/xmar/360Transformations}}
 the software can be used and enhanced to make further studies and to
 develop real systems. The main features include: $(i)$
 \emph{Projection from a spherical video onto any of the four geometric
@@ -76,16 +76,16 @@ arrangements. We compare against two reference videos.
 \begin{itemize}[leftmargin=7pt, itemindent=0pt, topsep=2pt, itemsep=0pt]
 
    \item \emph{The original video at full quality}. \XC{It is from
-   this video we extract reference viewport. The reference viewport
+   this video we extract the reference viewports, which
    are used to compute the objective quality metrics. We used the
    ``\emph{Bridge
    jumping}''\footnote{\url{https://youtu.be/yarcdW91djQ}} video. We
-   can extract viewports at 1080p resolution from this 4k
+   can extract viewports at $1080$p resolution from this 4K
    equirectangular video. For the objective video quality assessment
    tools we used: \ac{MS-SSIM}~\cite{wang2003multiscale} and
    \ac{PSNR}. \ac{MS-SSIM} compares image by image the structural
    similarity between a video and a reference video. It computes a
-   value between \numrange{0}{1}, \num{1} being two identical videos.
+   value between \num{0} and \num{1}, \num{1} being two identical videos.
    The \ac{PSNR} measures the average error of pixel intensities
    between a video and a reference video. It computes a value in
    decibel (\si[mode=text]{\decibel}), $+\infty$ being two identical videos.}{}. Since we
@@ -95,7 +95,7 @@ arrangements. We compare against two reference videos.
    \item \emph{The same video re-encoded at a target bit-rate}. \XC{This
    video represents the basic delivered stream in a regular delivery
    system given a bit-rate target (here \SI{\testbitrateBudget}{\mega
-   bps} being \testbitrateBudgetPercentage of the original video bit-rate).}{} We re-encoded the original full-quality video with \ac{HEVC}
+   bps} being \testbitrateBudgetPercentage{} of the original video bit-rate).}{} We re-encoded the original full-quality video with \ac{HEVC}
    by specifying this bit-rate target. We call it \emph{uniEqui} to
    state that, in this video, the quality is uniform.
 %ith this bit-rate
