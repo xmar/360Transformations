@@ -239,21 +239,21 @@ match between the \ac{QEC} and the \ac{FoV} center. However,
 increasing the number of \acp{QEC} also means increased storage and
 management requirements at the server (and a longer \ac{MPD} file).
 
-\XC{The choice of the position of $n$ \ac{QEC} on a sphere is not
-trivial. We want them to uniformly distributed over the spherical
-video. This definition is hazy: the results highly depends on what we
-consider to be the neighborhood of each \ac{QEC} and on our notion of distance. This problem
-is a classic in particle physic: minimizing the energy of $n$ charged
-particles on a sphere~\cite{rakhmanov1994electrons} also known as the
-Thomson problem. We chose to use a
-solver~\footnote{http://particules.sectionpc.info/bin/Particules.zip}
-for the Thomson problem to determine the position of each \ac{QEC}.}{}
+% \XC{The choice of the position of $n$ \ac{QEC} on a sphere is not
+% trivial. We want them to uniformly distributed over the spherical
+% video. This definition is hazy: the results highly depends on what we
+% consider to be the neighborhood of each \ac{QEC} and on our notion of distance. This problem
+% is a classic in particle physic: minimizing the energy of $n$ charged
+% particles on a sphere~\cite{rakhmanov1994electrons} also known as the
+% Thomson problem. We chose to use a
+% solver~\footnote{http://particules.sectionpc.info/bin/Particules.zip}
+% for the Thomson problem to determine the position of each \ac{QEC}.}{}
 
 We represent in Figure~\ref{fig:QEC} the median \ac{PSNR} difference
 between the viewport extracted from the best cube map layout and the
 same viewport extracted from the \emph{uniEqui} layout with the same
 overall bit-rate budget. To modify the number of \acp{QEC}, we set a
-number $n$, then we determined the position of the $n$ \acp{QEC}.
+number $n$, then we determined the position of the $n$ \acp{QEC} using the Thomson description of the positioning problem\footnote{http://particules.sectionpc.info/bin/Particules.zip}~\cite{rakhmanov1994electrons}.
 %, and we generated $n$ quality-differentiated video representations from these $n$ \acp{QEC}.
 For each head position in the dataset, we computed the distance
 between the \ac{FoV} center and the \ac{QEC} that was chosen at the
