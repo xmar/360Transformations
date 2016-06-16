@@ -21,15 +21,15 @@
 \renewcommand\citet[1]{\citeauthor{#1}~\cite{#1}} % redefine the \citet command to add a ~ space between authors and []
 \usepackage{color}
 \usepackage[dvipsnames,table]{xcolor}
-\usepackage{stfloats}
+% \usepackage{stfloats}
 %\usepackage{pst-gantt}
 % \usepackage{algorithm}
 % \usepackage{algorithmic}
 \usepackage[linesnumbered,ruled,vlined,boxed,commentsnumbered]{algorithm2e}
 \usepackage[noend]{algorithmic}
-\usepackage{float}
+% \usepackage{float}
 \algsetup{linenosize=\tiny}
-%\usepackage{caption}
+\usepackage[skip=5pt,font=bf,labelfont=bf]{caption}
 %\usepackage{subcaption}
 \usepackage[caption=false]{subfig}
 \usepackage{pgfplots}
@@ -48,6 +48,7 @@
 \usepackage{enumitem}
 \usepackage{url}
 \usepackage{etoolbox}
+
 
 \lstset{%
   backgroundcolor=\color{gray!25},
@@ -110,9 +111,9 @@
 \hyphenpenalty=10000
 \hbadness=10000
 
-\floatstyle{ruled}
-\newfloat{ilp}{ht}{aux}
-\floatname{ilp}{Integer Linear Program}
+% \floatstyle{ruled}
+% \newfloat{ilp}{ht}{aux}
+% \floatname{ilp}{Integer Linear Program}
 
 
 \newbool{doubleBlinded}
