@@ -54,7 +54,14 @@ other layouts. Finally we compared the quality of all those extracted
 \ac{FoV} with the \ac{FoV} extracted from the original equirectangular
 video.}
 
-\input{plots/testbed.tex}
+\begin{figure}
+   \centering
+   \input{plots/testbed.tex}
+   \caption{Our testbed: the spherical video is projected into four geometric layouts with variable qualities and
+   one layout at full-quality for reference. The best version is selected, and the \ac{FoV} is extracted. The quality
+   of the extracted \acp{FoV} are compared with respect to the reference video.}
+   \label{fig:testbed}
+\end{figure}
 
 To generate the different videos, we made some choices, which are
 mostly in conformance to the literature and to real implementation of

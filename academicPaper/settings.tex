@@ -124,12 +124,6 @@ viewport, which we compared to the same viewport extracted from the
 full-quality original video, to get an objective video quality
 measure.
 
-\begin{figure}
-    \input{plots/distance_quality.tex}
-%    \caption{Average \acs{PSNR} gap compared to the \emph{uniEqui} layout, depending on the distance from the \acs{QEC}. Global bit-rate budget \SI{\testbitrateBudget}{\mega bps}}
-       \caption{Average \acs{MS-SSIM} depending on the distance to the \acs{QEC} for the four geometric layouts. Global bit-rate budget \SI{\testbitrateBudget}{\mega bps}}
-    \label{fig:dist_quality}
-\end{figure}
 
 %We represent in Figure~\ref{fig:dist_quality_psnr} the difference of \ac{PSNR} between
 %the extracted viewport from our quality-differentiated layouts and the same viewport extracted from
@@ -157,6 +151,13 @@ located at the center of a tile. $3\!\times\! 3$ tiles arround the
 dodecahedron, the \ac{QEC} is located on a node. The $3$ faces that
 contain this node are set at full quality and the other at low
 quality.}{}
+
+\begin{figure}
+    \input{plots/distance_quality.tex}
+%    \caption{Average \acs{PSNR} gap compared to the \emph{uniEqui} layout, depending on the distance from the \acs{QEC}. Global bit-rate budget \SI{\testbitrateBudget}{\mega bps}}
+       \caption{Average \acs{MS-SSIM} depending on the distance to the \acs{QEC} for the four geometric layouts. Global bit-rate budget \SI{\testbitrateBudget}{\mega bps}}
+    \label{fig:dist_quality}
+\end{figure}
 
 The projection on a cube map appears to be the best choice for the
 content provider. The quality of the viewport when the \ac{QEC} and
@@ -201,7 +202,7 @@ means that, on average, users spend \SI{60}{\percent} of their time
 with a \ac{FoV} center at less than \num{1.5}~distance units from the
 \ac{FoV} center on the beginning of the segment.
 
-\begin{figure}[htbp]
+\begin{figure}
 \centering
 \input{plots/cdf-dataset.tex}
 \caption{CDF of the time spent at distance $d$ from the head position on the beginning of the
@@ -268,7 +269,7 @@ accordingly.
 %\XC{We used the best projection, \textit{i.e.} the cube map projection.}{}
 
 
-\begin{figure}[htbp]
+\begin{figure}
 \centering
 \input{plots/qecNbToQoE.tex}
 \caption{Median \acs{PSNR} gap between the viewports of the cube map layout and the \textit{uniEqui} depending

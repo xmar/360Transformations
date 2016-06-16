@@ -13,13 +13,19 @@ navigable 360-degree video delivery framework.
 equirectangular format and transforms each frame into a desired
 geometrical layout. From there, it creates $n$ different video
 versions, each with a different QEC and encoded in $k$ different
-bitrates, as illustrated in Figure~\ref{fig:newdelivery}.
-\input{plots/newDelivery.tex} The server splits all such encoded video
-versions into segments, which are classified in $n*k$ representations
-(based on their respective bitrate and QEC value), enabling the client
-to regularly switch from one representation to another. The quality of
-each segment around the QEC is the highest, while the remaining part
-is encoded at lower quality.
+bitrates, as illustrated in Figure~\ref{fig:newdelivery}. The server
+splits all such encoded video versions into segments, which are
+classified in $n*k$ representations (based on their respective bitrate
+and QEC value), enabling the client to regularly switch from one
+representation to another. The quality of each segment around the QEC
+is the highest, while the remaining part is encoded at lower quality.
+
+\begin{figure}
+   \centering
+   \input{plots/newDelivery.tex}
+   \caption{Viewort-adaptive streaming system: the server offers $n\times k$ representations ($n$ \acp{QEC} at $k$ bit-rates). The streaming session lasts for three segments from $s_1$ to $s_3$. The client moves her head from left to right, while her available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the network throughput.}
+   \label{fig:newdelivery}
+\end{figure}
 
 \parag{Client} The client moves his/her head over time, while the
 available bandwidth changes. The possible head movements are forward
@@ -108,7 +114,7 @@ changes are added as new attributes of the \texttt{Representation} and
 conformance with the standard, ensuring interworking with legacy DASH
 clients that can simply ignore these newly introduced attributes.
 
-\begin{lstlisting}[language=xml, frame=single, backgroundcolor=\color{white}, caption=Extensions of MPD file, label=mpdChanges][hptb]
+\begin {lstlisting} [language=xml, frame=single, backgroundcolor=\color{white}, caption=Extensions of MPD file, label=mpdChanges]
 <?xml version="1.0"?>
    <MPD>
     ...

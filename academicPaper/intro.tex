@@ -65,7 +65,16 @@ viewport-adaptive system, a client selects the video representation
 such that its bit-rate fits the client's transmission receive
 bandwidth and its \ac{QEC} is closest to the client's \ac{FoV} center.
 
-\input{plots/deliveryChain.tex}
+\begin{figure}[h]
+
+   \centering
+   \input{plots/deliveryChain.tex}
+   \caption{Viewport-adaptive 360-degree video delivery system: The server
+   offers video representations for three \acp{QEC}. The dark grey is the part of the video encoded at high quality and the light
+   gray the low quality. The viewport is the dotted red rectangle, the \ac{FoV} center is the
+   cross}
+   \label{fig:deliverychain}
+\end{figure}
 
 This viewport-adaptive 360-degree streaming system has three
 advantages: $(i)$ the bit-rate of the delivered video is lower than
