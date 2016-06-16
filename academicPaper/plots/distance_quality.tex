@@ -46,8 +46,8 @@ font = \scriptsize,
         ]
          \pgfplotsextra{\begin{scope}[on layer=axis background]
                 \draw[draw=gray!50] (axis cs:0,0.951642) -- (axis cs:3.14,0.951642);
-                \node[rounded corners, fill=gray!50, 
-                			font=\tiny, inner sep=2pt, 
+                \node[rounded corners, fill=gray!50,
+                			font=\tiny, inner sep=2pt,
                 			anchor=west] at (axis cs:0,0.951642) {\textit{\vphantom{lj}uniEqui}};
             \end{scope}
         }
@@ -55,7 +55,7 @@ font = \scriptsize,
         \addplot+ table [x=distance, y=qualityEquirectangularTiledLower]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityCubeMapLower]{results/distanceQuality.csv};
         \addplot+ table [x=distance, y=qualityPyramidLower]{results/distanceQuality.csv};
-        \addplot+ table [x=distance, y=qualityRhombicDodeca]{results/distanceQuality.csv};
+        \addplot+ table [x=distance, y=qualityRhombicDodecaLower]{results/distanceQuality.csv};
 %        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
         \legend{Equirec,CubeMap,Pyramid,Dodeca}
 
