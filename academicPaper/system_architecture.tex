@@ -107,6 +107,19 @@ Section~\ref{subsec:segmentLength} based on a dataset.
 
 %The specifics of 360-degree video delivery are that only a portion of the delivered 360-degree video is displayed on the user's HMD (i.e., where the user looks at). Therefore, only this part of the video (around the \ac{QEC}) should be given in full quality, while the quality of the remaining video can be adjusted to the user's head movements and the viewing probability. A video that is mapped to a given geometric layout is split into viewing faces, each of which corresponds to specific viewing direction and can be assigned a different quality.
 
+\begin{lstlisting} [float, language=xml, frame=single, backgroundcolor=\color{white},lineskip={-1pt}, caption=Extensions of MPD file, label=mpdChanges]
+<?xml version="1.0"?>
+<MPD>
+ <AdaptationSet geometricLayout="cubeMap" qualityArrangement="1/0/4">
+  <Representation id="1" qec="90,60" bandwidth="9876" width="1920" height="1080" frameRate="30">
+   <SegmentList timescale="1000" duration="2000">
+   ...
+  </Representation>
+ </AdaptationSet>
+</MPD>
+</xml>
+\end{lstlisting}
+
 \parag{Extending the \ac{MPD} file} To implement the proposed
 \ac{FoV}-adaptive video streaming, we extended a \ac{DASH} \ac{MPD}
 file with new information, as illustrated in Listing~\ref{mpdChanges}.
@@ -125,19 +138,3 @@ attributes of the \texttt{Representation} and \texttt{AdaptationSet}
 tags. With such extensions, we maintain conformance with the standard,
 ensuring interworking with legacy \ac{DASH} clients that can simply
 ignore these newly introduced attributes.
-
-\begin{minipage}{\linewidth}
-\begin {lstlisting} [language=xml, frame=single, backgroundcolor=\color{white},lineskip={-1pt}, caption=Extensions of MPD file, label=mpdChanges]
-<?xml version="1.0"?>
-   <MPD>
-    ...
-        <AdaptationSet geometricLayout="cubeMap" qualityArrangement="1/0/4">
-            <Representation id="1" qec="90,60" bandwidth="9876" width="1920" height="1080" frameRate="30">
-                <SegmentList timescale="1000" duration="2000">
-                ...
-            </Representation>
-        </AdaptationSet>
-    </MPD>
-</xml>
-\end{lstlisting}
-\end{minipage}
