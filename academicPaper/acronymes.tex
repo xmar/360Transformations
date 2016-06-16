@@ -1,20 +1,20 @@
 %%\usepackage[nolist]{acronym}
-\usepackage[acronym]{glossaries}                                           
-\newcommand\acro[2]{\newacronym{#1}{#1}{#2}}                               
+\usepackage[acronym]{glossaries}
+\newcommand\acro[2]{\newacronym{#1}{#1}{#2}}
 \newcommand\acroAlwaysShort[1]{\newglossaryentry{#1}{type=\acronymtype, name={#1}, description={#1}, text={#1}, first={#1}, plural={#1s}, firstplural={#1s}}}
 \newcommand\acroShortSurname[2]{\newglossaryentry{#1}{type=\acronymtype, name={#2}, description={#2}, text={#2}, first={#2}, plural={#2s}, firstplural={#2s}}}
-\newcommand\ac[1]{\gls{#1}}                                                
-\newcommand\acp[1]{\glspl{#1}}                                             
-\newcommand\acs[1]{\glsname{#1}}                                           
+\newcommand\ac[1]{\gls{#1}}
+\newcommand\acp[1]{\glspl{#1}}
+\newcommand\acs[1]{\glsname{#1}}
 \newcommand\acl[1]{\glsentrylong{#1}}
 
 \acro{FoV}{Field of View}
 \acro{ABR}{adaptive bit-rate}
-\acro{DASH}{Dynamic Adaptive Streaming over HTTP}  
-\acro{CDN}{content delivery network}  
+\acro{DASH}{Dynamic Adaptive Streaming over HTTP}
+\acro{CDN}{content delivery network}
 \acro{CDF}{cumulative density function}
 \acro{HMD}{Head-Mounted Display}
-\acro{PDF}{probability density function}  
+\acro{PDF}{probability density function}
 \acro{RTP}{real-time protocol}
 \acro{VR}{Virtual Reality}
 \acro{QoE}{Quality of Experience}
@@ -43,6 +43,7 @@
 text={second}, first={second (s)}, plural={s}, firstplural={~seconds (s)}}
 \acroAlwaysShort{TCP}
 \acroAlwaysShort{HTTP}
+\acroAlwaysShort{MPEG}
 \acro{RTT}{Round-Trip Time}
 \acro{AVC}{Advanced Video Coding}
 \acro{HEVC}{High Efficiency Video Coding}
