@@ -135,10 +135,10 @@ simple server-side management operation.
 
 \subsection{Tiling for Adaptive Video Streaming}
 \GS{To deal with the cases of end-users consuming only a fraction of the
-video, the delivery solution that has been recently studied leverages the concept
-of \emph{tiling}, notably for navigable panorama
+video (navigable panorama
 video~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}
-and large-resolution video~\cite{jean16mmsys}}.
+and large-resolution video~\cite{jean16mmsys}), the delivery solution that has been recently studied leverages the concept
+of \emph{tiling}}.
 %A delivery solution when the end-users consumes only a fraction of the
 %video is based on the concept of \emph{tiling}. This proposal has been
 %implemented for navigable panorama
@@ -197,24 +197,35 @@ the viewport extraction.
 
 A  provider of 360-degree videos (Facebook) has recently
 released details about the implementation of its delivery
-platform~\cite{facebook}. Their system is based on the same idea as
-our concept of \ac{QEC}. Up to 30 representations of the same video
-are available depending on the specific \ac{QEC}. This implementation
+platform~\cite{facebook}.
+% Their system is based on the same idea as
+%our concept of \ac{QEC}. 
+\GS{The spherical video is projected into a pyramid layout from multiple 
+(up to 30) central points to generate a set of video representations.
+Since the 
+front face of pyramid projection has a better image quality than the other faces, the 
+system is in essence similar as our concept of \ac{QEC}. The end-users
+periodically select one of the representations 
+based on their \ac{FoV} center}. This implementation
 corroborates that, from an industrial perspective, the extra-cost of
 generating and storing multiple \ac{QEC}-based representations of the
-same video is compensated by the achieved bandwidth savings and
-enhanced system usability. This system uses projections of the
-spherical videos into two layouts: a pyramid and a cube map. However, it
-uses the same video quality on each face of the geometric layouts.
-\XC{Moreover, they do not show the impact of the encoding on the
-performance of their projections.}{}
+same video is compensated by bandwidth savings and
+enhanced system usability.
+%This system uses projections of the
+%spherical videos into two layouts: a pyramid and a cube map. 
+\GS{However, as we will see in Section~\ref{sec:settings}, the pyramid projection is not
+the best regarding the viewport quality. Moreover, the system
+uses the same video quality on each face, which is less
+efficient than our proposal. Finally, the impact of the video encoding on the solution 
+is not given}.
 
 \parag{Our contributions}Our proposal is based on the same
 idea of offering multiple \ac{QEC}-based video representations.
 However, we provide a complete study of our system with the additional
-distinction of having varying quality across the geometrical layout
-associated with a given representation, based on the specific
-\ac{QEC}. Moreover, our study includes an evaluation of several
+distinction of having varying quality across the geometrical layout. Moreover, 
+our study includes an evaluation of several
 geometric layouts, an analysis of the best segment duration, \XC{an
 analysis of the best number of \acp{QEC},}{} 
 and a step towards integration into MPEG \ac{DASH}.
+%associated with a given representation, based on the specific
+%\ac{QEC}
