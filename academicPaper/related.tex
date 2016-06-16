@@ -89,7 +89,7 @@ structure of the layouts to implement a video encoding based on
 \ac{QEC}. Each geometric layout is characterized by a number of
 \emph{faces} (\textit{e.g.}, 6 for the cube map, 12 for the
 dodecahedron) and a given \emph{central point} (which corresponds to a
-position and an angle in the sphere).
+position on the sphere).
 %(\textit{e.g.} the earth
 % maps are usually centered so that the equator is in the middle of the
 % map, but the longitude of the central $x$ point is not the same
@@ -115,7 +115,7 @@ immediately displayed. Since the device has no knowledge about other
 parts of the spherical video, it has to notify the server about the
 viewer head's movement and wait for receipt of the newly adjusted FoV
 video. As seen in other interactive multimedia
-systems~\cite{ChoyWSR14}, this solution cannot meet the 10-ms latency
+systems~\cite{ChoyWSR14}, this solution cannot meet the \SI{10}{ms} latency
 requirement in the standard Internet, even with the assistance of
 \ac{CDN}. In addition, this solution requires the server to extract a
 part of the video (thus to spend computing resources) for each client
@@ -123,7 +123,7 @@ connection.
 
 \parag{Our contributions} In our proposal, the server always delivers
 the full video, but it has different versions of this video depending
-on the quality emphasis (characterized by the QEC). The client device
+on the quality emphasized region (characterized by the QEC). The client device
 selects the right representation and extracts the viewport. The
 storage requirements at the server side increase but all the
 processing is done at the client side (representation selection and
@@ -174,7 +174,11 @@ pre-processed set of tile representations. The main advantages include
 an easier management for the server (fewer files hence a smaller
 \ac{MPD} file), a simpler selection process for the client (by a
 distance computation), and no need of re-constructing the video before
-the viewport extraction.
+the viewport extraction \noteXC{that's not true since last week
+modification in our system. Now that we have an independent track per
+video it is needed to re-construct the $2$D layout, but having
+everything in the same video container is much easier for the download
+and the time synchronization.}.
 
 \subsection{QEC-Based Streaming}
 
@@ -190,6 +194,8 @@ enhanced system usability. This system uses projections of the
 spherical videos into two layouts: a pyramid (where the base is the
 front view and the peak is in the back) and a cube map. However, it
 uses the same video quality on each face of the geometric layouts.
+\XC{Moreover, they do not show the impact of the encoding on the
+performance of their projections.}{}
 
 \parag{Our contributions} The solution we propose is based on the same
 idea of offering multiple video representations for various \acp{QEC}.
@@ -197,5 +203,6 @@ However, we provide a complete study of our system with the additional
 distinction of having varying quality across the geometrical layout
 associated with a given representation, based on the specific
 \ac{QEC}. Moreover, our study includes an evaluation of several
-geometric layouts, an analysis of the best segment duration, and a
-first step towards integration into MPEG \ac{DASH}.
+geometric layouts, an analysis of the best segment duration, \XC{an
+analysis of the best number of \ac{QEC} representations to
+use,}{} and a first step towards integration into MPEG \ac{DASH}.
