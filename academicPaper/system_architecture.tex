@@ -1,11 +1,11 @@
 \section{System architecture}
 
-\begin{figure}
-   \centering
-   \input{plots/newDelivery.tex}
-   \caption{Viewort-adaptive streaming system: the server offers $n\times k$ representations ($n$ \acp{QEC} at $k$ bit-rates). The streaming session lasts for three segments from $s_1$ to $s_3$. The client moves her head from left to right, while her available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the network throughput.}
-   \label{fig:newdelivery}
-\end{figure}
+% \begin{figure}
+%    \centering
+%    \input{plots/newDelivery.tex}
+%    \caption{Viewort-adaptive streaming system: the server offers $n\times k$ representations ($n$ \acp{QEC} at $k$ bit-rates). The streaming session lasts for three segments from $s_1$ to $s_3$. The client moves her head from left to right, while her available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the network throughput.}
+%    \label{fig:newdelivery}
+% \end{figure}
 
 This section describes the system architecture of the proposed
 navigable 360-degree video delivery framework.
@@ -65,14 +65,14 @@ shown in Figure~\ref{fig:newdelivery}.
 %\parag{Adaptive video streaming}
 Rate-adaptive streaming systems are based on the assumption that
 the selected representation will match the network
-\XC{conditions}{} for the next $x$ seconds. \GS{Rate adaptation algorithms 
+\XC{conditions}{} for the next $x$ seconds. \GS{Rate adaptation algorithms
 are
-developed~\cite{tian,probe_li_2014,miller,zou,liu} to reduce the mismatch between the 
-requested bit-rate and the throughput}. In our proposal, \GS{the adaptation algorithm should also ensure 
+developed~\cite{tian,probe_li_2014,miller,zou,liu} to reduce the mismatch between the
+requested bit-rate and the throughput}. In our proposal, \GS{the adaptation algorithm should also ensure
 that the \ac{FoV} centers will be as close as possible to the chosen \ac{QEC} during
-the $x$ next seconds}. 
+the $x$ next seconds}.
 %we additionally assume that the chosen \ac{QEC} will be close to the
-%\ac{FoV} center for the next $x$ seconds. 
+%\ac{FoV} center for the next $x$ seconds.
 In this paper, we implement
 a simple algorithm for \ac{QEC} selection: we select the \ac{QEC} that
 has the smallest orthodromic distance\footnote{The shortest distance
