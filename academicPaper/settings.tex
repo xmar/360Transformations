@@ -53,19 +53,19 @@ the software can be used and enhanced to make further studies and to
 develop real systems. The main features include: $(i)$
 \emph{Projection from a spherical video onto any of the four geometric
 layouts and vice versa}. The spherical video is the pivot format from
-which it is possible to project to any layout. 
+which it is possible to project to any layout.
 %Note that the majority
 %of 360-degree videos that are currently available are encoded and
 %stored after an equirectangular projection, but our tools enables
-%re-projecting these videos to another layout. 
-\XC{Our tool rotate the
+%re-projecting these videos to another layout.
+\XC{Our tool rotates the
 video so that the \ac{QEC} center is always at the same position on
-the $2$D layouts.}{} $(ii)$ \emph{Adjusting the video quality for each
+the $2$D layout.}{} $(ii)$ \emph{Adjusting the video quality for each
 geometric face of any layout}. \GS{For each face}, we set the resolution in
-number of pixels and the target encoding bit-rate. 
+number of pixels and the target encoding bit-rate.
 %Each face is
 %encoded into its own video track to allow for different bit-rate
-%targets per face. 
+%targets per face.
 $(iii)$ \emph{Viewport extraction for any
 \ac{FoV} center on the sphere}. \XC{It includes the decoding, rescaling
 and ``projection'' of each face of the input video to extract the
@@ -81,25 +81,25 @@ arrangements. We used two reference videos.
 \begin{itemize}[leftmargin=7pt, itemindent=0pt, topsep=2pt, itemsep=-3pt]
 
    \item \emph{The original video at full quality}%
-   :\footnote{\url{https://youtu.be/yarcdW91djQ}} 
-	We extract viewports at 1080p resolution from this 4k
-   equirectangular video. These are the reference (original)
+   :\footnote{\url{https://youtu.be/yarcdW91djQ}}
+	We extract viewports at 1080p resolution from this 4K
+   equirectangular video, which represents the reference (original)
    video we used for the objective video quality assessment:
    \ac{MS-SSIM}~\cite{wang2003multiscale} and
-   \ac{PSNR}. 
+   \ac{PSNR}.
 %   \ac{MS-SSIM} compares image by image the structural
 %   similarity between a video and a reference video. It computes a
 %   value between \num{0} and \num{1}, \num{1} being two identical videos.
 %   The \ac{PSNR} measures the average error of pixel intensities
 %   between a video and a reference video. It computes a value in
-%   decibel (\si[mode=text]{\decibel}), $+\infty$ being two identical videos.}{}. 
+%   decibel (\si[mode=text]{\decibel}), $+\infty$ being two identical videos.}{}.
    Since we
    compare several encoded versions of the \emph{same} video against the
    original, these well-known tools provide a fair performance evaluation of video distortion.
 
-   \item \emph{The same video re-encoded at a target bit-rate}. 
+   \item \emph{The same video re-encoded at a target bit-rate}.
    \XC{It is what a regular delivery system would deliver for the same bit-rate budget (here \SI{\testbitrateBudget}{\mega
-   bps} being \testbitrateBudgetPercentage{} of the original video bit-rate).}{} 
+   bps} being \testbitrateBudgetPercentage{} of the original video bit-rate).}{}
    We re-encoded the original full-quality video with \ac{HEVC}
    by specifying this bit-rate target. We call it \emph{uniEqui} to
    state that, in this video, the quality is uniform.
@@ -146,12 +146,12 @@ viewport extracted from the \textit{uniEqui} layout (it does
 not depend on the distance since the quality is uniform). For each
 geometric layout, we have tested numerous quality arrangements with
 respect to the overall bit-rate budget. We selected here the ``best"
-arrangement for each layout. \XC{For the cube map, 
+arrangement for each layout. \XC{For the cube map,
 the
 \ac{QEC} is located at the center of a face. This face is set at full
 quality (same bit-rate target as the same portion of the original
 video), and the other faces at \SI{25}{\percent} of the
-full quality target}. 
+full quality target}.
 %For equirectangular with tiles, the \ac{QEC} is
 %located at the center of a tile. $3\!\times\! 3$ tiles arround the
 %\ac{QEC} are set at full quality and the other at low quality. For the
@@ -178,13 +178,13 @@ by Facebook~\cite{facebook}) is especially sensitive to head movements.
 %that for the standard \emph{uniEqui} for distance greater than
 %\num{1}.
 \GS{The viewport extracted from a cube map projection has a better quality
-than that extracted from the \emph{uniEqui} for \ac{FoV} center at up to 
+than that extracted from the \emph{uniEqui} for \ac{FoV} center at up to
 \num{2} units from the \ac{QEC} while the other layouts are not
 worthy for \ac{FoV} centers at only \num{1} unit of the \ac{QEC}.
 %\XC{Here the cube map projection has better results
 %probably because this layout have bigger faces. The bigger the face
 %is, the more redundancies in the face are available and so the better
-%the video codec exploits the same bit-rate budget.}{} 
+%the video codec exploits the same bit-rate budget.}{}
 We study next the interplay between this distance, the segment length and the number of \acp{QEC}}.
 
 \subsection{Segment Length}
@@ -205,7 +205,7 @@ users select a \ac{QEC}. Then, we measure the orthodromic distance
 between this initial head position and every \ac{FoV} center during
 the next $x$ seconds, where $x$ is the segment length. In
 Figure~\ref{cdf-dataset}, we show the \ac{CDF} of the time spent at a
-distance $d$ from the initial head position. 
+distance $d$ from the initial head position.
 A point at $(1.5,0.6)$
 means that, on average, users spend \SI{60}{\percent} of their time
 with a \ac{FoV} center at less than \num{1.5}~distance units from the
@@ -262,7 +262,7 @@ We represent in Figure~\ref{fig:QEC} the median \ac{PSNR} difference
 between the viewport extracted from the cube map layout and the
 same viewport extracted from the \emph{uniEqui} layout with the same
 overall bit-rate budget. To modify the number of \acp{QEC}, we set a
-number $n$, then we determined the position of the $n$ \acp{QEC} 
+number $n$, then we determined the position of the $n$ \acp{QEC}
 using the Thomson positioning problem~\cite{rakhmanov1994electrons}.
 %\footnote{http://particules.sectionpc.info/bin/Particules.zip}
 %, and we generated $n$ quality-differentiated video representations from these $n$ \acp{QEC}.

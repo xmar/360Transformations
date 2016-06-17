@@ -21,7 +21,7 @@ enabling multimedia systems react to head movements as fast as the
 \ac{HMD} refresh rate.\footnote{
 \url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}}
 Since the refresh rate of state-of-the-art \acp{HMD} is
-\SI{120}{\hertz},\footnote{\url{http://www.vrnerds.de/vr-brillen-vergleich/}} 
+\SI{120}{\hertz},\footnote{\url{http://www.vrnerds.de/vr-brillen-vergleich/}}
 the whole
 system should react in less than \SI{10}{ms}. This delay constraint
 prevents the implementation of traditional delivery architectures
@@ -90,9 +90,9 @@ of the already received video representation, the quality of the
 extracted viewport is lower but this degradation is transient until the
 device selects another video representation with a closer \ac{QEC}.
 
-The remainder of the paper is organized as follows. First, \GS{we 
-present the viewport-adaptive streaming
-system,}{} and 
+The remainder of the paper is organized as follows. First, \GS{we
+present our viewport-adaptive streaming
+system,}{} and
 %present
 %the overall processes that have to be implemented at both the client
 %and server sides, and
@@ -110,22 +110,22 @@ navigating 360-degree videos, we show that head movements occur over
 short time periods, hence the streaming video segments have to be
 short enough to enable frequent \ac{QEC} switches. \XC{Fourth, we
 examine the impact of the number of \acp{QEC} on the \GS{viewport}{} quality
-and we show that \GS{a small number of (spatially-distributed over the sphere) 
+and we show that \GS{a small number of (spatially-distributed over the sphere)
 \acp{QEC} suffices to get high viewport quality}.}{}
 %quality improvement plateaus out after \GS{a small number of}{}
-%\acp{QEC}.}{} 
+%\acp{QEC}.}{}
 Finally, we introduce a tool (released as open source)%
 %on
 %a public
 %repository\footnote{\url{https://github.com/xmar/360Transformations}})
-, which creates video representations for our viewport-adaptive streaming \GS{proposal}.
+, which creates video representations for the proposed viewport-adaptive streaming system.
 % of 360-degree videos.
 The tool is highly configurable: from a given
 360-degree video, it allows any arrangement of video quality for a
 given geometric layout, and it extracts the \GS{viewport}{} from any \GS{\ac{FoV} center}{}.
 This tool thus provides the main software module
 for the implementation of viewport-adaptive streaming of navigable
-360-degree videos.	
+360-degree videos.
 
 %%% Local Variables:
 %%% mode: latex
