@@ -1,10 +1,21 @@
+\newbool{doubleBlinded}
+%\booltrue{doubleBlinded}  %comment this line to remove doubleBlinded
+
+\newbool{releaseMode}
+\booltrue{releaseMode}  %comment this line to remove all user comments
+
 \newcommand\algoFontSize{8}
+
+\newbool{NotesActivated}
+\ifbool{releaseMode}{\boolfalse{NotesActivated}}{\booltrue{NotesActivated}}
+
 \newcommand{\noteGS}[1] {\ifbool{NotesActivated}{\color{red}\{\textbf{GS:}\textit{{#1}}\}\color{black}}{}}
 \newcommand{\noteXC}[1] {\ifbool{NotesActivated}{\color{YellowOrange}\{\textbf{XC:}\textit{{#1}}\}\color{black}}{}}
 \newcommand{\noteAD}[1] {\ifbool{NotesActivated}{\color{OliveGreen}\{\textbf{AD:}\textit{{#1}}\}\color{black}}{}}
-\newcommand{\AD}[1] {\color{OliveGreen}#1\color{black}}
-\newcommand{\GS}[1] {\color{red}#1\color{black}}
-\newcommand{\XC}[1] {\color{YellowOrange}#1\color{black}}
+\newcommand{\textWithColor}[2]{\ifbool{releaseMode}{#2}{\color{#1}#2\color{black}}}
+\newcommand{\AD}[1] {\textWithColor{OliveGreen}{#1}}
+\newcommand{\GS}[1] {\textWithColor{red}{#1}}
+\newcommand{\XC}[1] {\textWithColor{YellowOrange}{#1}}
 
 
 \newcommand\newpara[1]{\vspace{3pt}\noindent\textbf{#1}.\hspace{0.15cm}}
