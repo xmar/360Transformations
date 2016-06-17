@@ -50,8 +50,9 @@ during the length of a segment.
 concepts of viewport-adaptive streaming. Since the code is publicly
 available,\footnote{\url{https://github.com/xmar/360Transformations}}
 the software can be used and enhanced to make further studies and to
-develop real systems. The main features include: $(i)$
-\emph{Projection from a spherical video onto any of the four geometric
+develop real systems. The main features include:
+\begin{itemize}
+  \item \emph{Projection from a spherical video onto any of the four geometric
 layouts and vice versa}. The spherical video is the pivot format from
 which it is possible to project to any layout.
 %Note that the majority
@@ -60,17 +61,21 @@ which it is possible to project to any layout.
 %re-projecting these videos to another layout.
 \XC{Our tool rotates the
 video so that the \ac{QEC} center is always at the same position on
-the $2$D layout.}{} $(ii)$ \emph{Adjusting the video quality for each
+the $2$D layout.}{}
+
+  \item \emph{Adjusting the video quality for each
 geometric face of any layout}. \GS{For each face}, we set the resolution in
 number of pixels and the target encoding bit-rate.
 %Each face is
 %encoded into its own video track to allow for different bit-rate
 %targets per face.
-$(iii)$ \emph{Viewport extraction for any
+
+  \item \emph{Viewport extraction for any
 \ac{FoV} center on the sphere}. \XC{It includes the decoding, rescaling
 and ``projection'' of each face of the input video to extract the
 viewport. This tool support extraction of \ac{FoV} that overlap on
 multiple faces with different resolution and bit-rate target.}{}
+\end{itemize}
 
 \subsection{Geometric Layout}
 
@@ -78,7 +83,7 @@ We report now the experiment of measuring the video quality of
 viewports, extracted from 360-degree videos
 projected onto various geometric layouts and with various face quality
 arrangements. We used two reference videos.
-\begin{itemize}[leftmargin=7pt, itemindent=0pt, topsep=2pt, itemsep=-3pt]
+\begin{itemize}%[leftmargin=7pt, itemindent=0pt, topsep=2pt, itemsep=-3pt]
 
    \item \emph{The original video at full quality}%
    :\footnote{\url{https://youtu.be/yarcdW91djQ}}
