@@ -10,7 +10,7 @@ Python3 = python3.$(word 2,${python_version_full})
 all: mainACM.pdf
 
 mainACM.pdf: $(MainSource) $(Sections) $(Plots) $(Bib) $(Data)
-	$(Python3) latexrun $<
+	$(Python3) latexrun --latex-args="-shell-escape" $<
 	#./latexrun --latex-args="-shell-escape" $<
 
 .PHONY: oldMake
