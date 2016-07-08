@@ -67,3 +67,26 @@ The equirectangular projection is not the only possible projection, as illustrat
   :name: Figure 4
 
   **Figure 4**: Projections into four geometric layouts
+
+To evaluate our proposition, we implemented an `open-source C++ software <https://github.com/xmar/360Transformations/tree/master/transformation>`_ that take a 360-Degree video and project it onto any 2D layout, with or without a QEC.
+From this tool we extracts the results from `Figure 5`_.
+This Figure show that the *cube map* projection ove-perform other projections.
+Moreover it show that as long as the user stay closer than 1.5 distance unit from the QEC, our proposal improve the quality of the extracted viewport compared to the state-of-the-art streaming solution (named uniEqui on the Figure).
+
+.. figure:: images/distance_quality.png
+  :align: center
+  :name: Figure 5
+
+  **Figure 5**: Average MS-SSIM depending on the distance to the QEC for the four geometric layouts. Global bit-rate budget 6 Mbps
+
+.. figure:: images/cdf_head_position_dataset.png
+  :align: center
+  :name: Figure 6
+
+  **Figure 6**: CDF of the time spent at distance d from the head position on the beginning of the segment, for various segment lengths
+
+.. figure:: images/qec_nb_to_qoe.png
+  :align: center
+  :name: Figure 7
+
+  **Figure 7**: Median PSNR gap between the viewports of the cube map layout and the uniEqui depending on the number of QECs. Bit-rate: 6 Mbps
