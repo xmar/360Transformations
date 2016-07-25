@@ -1,7 +1,7 @@
 Viewport-Adaptive Navigable 360-Degree Video Delivery
 =====================================================
 
-360-Degree videos are becoming more and more popular with the advent of omnidirectionnal capture devices and interactive display systems such as Head-Mounted Display (HMD) devices.
+360-Degree videos are becoming popular with the advent of omnidirectionnal capture devices and interactive display systems such as Head-Mounted Display (HMD) devices.
 A 360-Degree video is an omnidirectionnal video: Images are captured from every direction and are combined into a spherical video.
 What is display to the user, which is indifferently
 called *Field of View (FoV)* or *viewport*, is only a portion of the full spherical video and depends on in which direction he is watching. `Figure 1`_ illustrates this principle.
@@ -9,7 +9,7 @@ To prevent `simulator sickness <http://hfs.sagepub.com/content/53/3/308.short>`_
 Since `the refresh rate of state-of-the-art HMDs is 120 Hz <http://www.vrnerds.de/vr-brillen-vergleich/>`_, the whole system should react in less than 10 ms.
 Those characteristics make it challenging for service providers to deliver 360-Degree videos.
 To guarantee the 10 ms delay, content providers cannot stream directly the user viewport.
-To maintain interactivity, the state-of-the-art solution streams the full spherical video and to let the HMD extracts the viewport in real time, according to the user head position.
+To maintain interactivity, the state-of-the-art solution streams the full spherical video and let the HMD extracts the viewport in real time, according to the user head position.
 Therefore the majority of the bandwidth is waste transmitting portion of the video that will never be displayed.
 
 .. figure:: images/360videos.gif
@@ -36,7 +36,7 @@ The architecture of our proposed system, illustrated in `Figure 3`_, is very sim
 
 **client**
   Over time the orientation of the user head changes along with the available bandwidth.
-  The client can estimate the available bandwidth and can measure the current head orientation using `Euler angles <https://en.wikipedia.org/wiki/Euler_angles>`_.
+  The client can estimate the available bandwidth and can measure the current head orientation using the `Euler angles <https://en.wikipedia.org/wiki/Euler_angles>`_.
   Periodically, the client run an *adaptation algorithm* to choose the new segment representation to download, based on its estimation of the future available bandwidth and on the future position of the user head.
   Then, each time the HMD requires a new frame, the client extract the viewport from the current segment representation.
 
@@ -77,10 +77,11 @@ The goal of our first study is to answer to the three following question:
 
 
 
-To evaluate our proposition, we implemented an `open-source C++ software <https://github.com/xmar/360Transformations/tree/master/transformation>`_ that take a 360-Degree video and project it onto any 2D layout, with or without a QEC.
+To evaluate our proposition, we implemented an `open-source C++ software <https://github.com/xmar/360Transformations/tree/master/transformation>`_ that takes a 360-Degree video and projects it onto any 2D layout, with or without a QEC.
+To measure to efficiency of each projection, we measure the geodecic distance (named orthodromic distance on a sphere) between the QEC and the center of the FoV, and we measure the quality of the FoV using the MS-SSIM objective quality metric.
 From this tool we generated the results from `Figure 5`_.
-This Figure show that the *cube map* projection over-performs other projections.
-Moreover it show that as long as the user stay closer than 1.5 distance unit from the QEC, our proposal improve the quality of the extracted viewport compared to the state-of-the-art streaming solution (named uniEqui on the Figure).
+This Figure shows that the *cube map* projection over-performs other projections.
+Moreover it shows that as long as the user stay closer than 1.5 distance units from the QEC, our proposal improves the quality of the extracted viewport compared to the state-of-the-art streaming solution (named uniEqui on this Figure).
 
 .. figure:: images/distance_quality.png
   :align: center
@@ -88,8 +89,8 @@ Moreover it show that as long as the user stay closer than 1.5 distance unit fr
 
   **Figure 5**: Average MS-SSIM depending on the distance to the QEC for the four geometric layouts. Global bit-rate budget 6 Mbps
 
-We used a dataset that contains the head-position of 11 different users watching ten 10 s 360-Degree videos to measure how often a user stay at a specific distance from his original position. We did the measurement for multiple segment lengths and the results are depicted in `Figure 6`_. Those results show that for a 2 s long segment, users stay 80 % of the time at a distance smaller than 1.5 distance units.
-This means that with a 2 s long, cube map segement, a user will get 80 % of the time a viewport with a better quality compared to what he would get with the state-of-the-art streaming solution.
+We used a dataset that contains the head-position of 11 different users watching ten 10 s 360-Degree videos to measure how often a user stays at a specific distance from his original position. We did the measurement for multiple segment lengths and the results are depicted in `Figure 6`_. Those results show that for a 2 s long segment, users stay 80 % of the time at a distance smaller than 1.5 distance units.
+This means that with a 2 s long cube map segment, a user will get 80 % of the time a viewport with a better quality compared to what he would get with the state-of-the-art streaming solution.
 
 .. figure:: images/cdf_head_position_dataset.png
   :align: center
@@ -97,9 +98,9 @@ This means that with a 2 s long, cube map segement, a user will get 80 % of th
 
   **Figure 6**: CDF of the time spent at distance d from the head position on the beginning of the segment, for various segment lengths
 
-The goal of our last experiment is to estimate the number of QECs needed to deliver the best video quality to the user without wasting too many storage at the server.
+The goal of our last experiment is to estimate the number of QECs needed to deliver the best video quality to the user without wasting too much storage at the server.
 To answer this question we computed the average QoE all users from our dataset would have observed with different number of "equi-spread" QECs on the sphere.
-The results depicted in `Figure 7`_ show that the average QoE increase with the number of QEC but the gain obtained with more than seven QECs do not justify the extra-cost needed to store them. The best number of QEC is then between five and seven QECs.
+The results depicted in `Figure 7`_ show that the average QoE increases with the number of QEC but the gain obtained with more than seven QECs does not justify the extra-cost needed to store them. The best number of QEC is then between five and seven QECs.
 
 .. figure:: images/qec_nb_to_qoe.png
   :align: center
