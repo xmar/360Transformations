@@ -1,10 +1,11 @@
 Viewport-Adaptive Navigable 360-Degree Video Delivery
 =====================================================
 
-360-Degree videos are becoming popular with the advent of omnidirectionnal capture devices and interactive display systems such as Head-Mounted Display (HMD) devices.
+360-Degree video is seen by many as `the next big thing <https://techcrunch.com/2016/06/13/why-vr-is-the-next-big-thing-for-brands/>`_, with the democratization of `omnidirectionnal cameras <https://whichos.com/add-makes-iphone-360-degree-vr-camera/>`_ and Head-Mounted Display (HMD) devices.
 A 360-Degree video is an omnidirectionnal video: Images are captured from every direction and are combined into a spherical video.
 What is display to the user, which is indifferently
 called *Field of View (FoV)* or *viewport*, is only a portion of the full spherical video and depends on in which direction he is watching. `Figure 1`_ illustrates this principle.
+
 To prevent `simulator sickness <http://hfs.sagepub.com/content/53/3/308.short>`_ and to provide good Quality of Experience (QoE), the vendors of HMDs recommend that `the enabling multimedia systems react to head movements as fast as the HMD refresh rate <https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/>`_.
 Since `the refresh rate of state-of-the-art HMDs is 120 Hz <http://www.vrnerds.de/vr-brillen-vergleich/>`_, the whole system should react in less than 10 ms.
 Those characteristics make it challenging for service providers to deliver 360-Degree videos.
