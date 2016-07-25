@@ -105,3 +105,5 @@ The results depicted in `Figure 7`_ show that the average QoE increases with the
   :name: Figure 7
 
   **Figure 7**: Median PSNR gap between the viewports of the cube map layout and the uniEqui depending on the number of QECs. Bit-rate: 6 Mbps
+  
+Overall, our proposal of *viewport-adaptive navigable 360-Degree* looks quite interesting. Join the project on github and contribute to the development of a full system based on this tool!
