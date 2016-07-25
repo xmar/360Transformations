@@ -8,10 +8,10 @@ called *Field of View (FoV)* or *viewport*, is only a portion of the full spheri
 
 To prevent `simulator sickness <http://hfs.sagepub.com/content/53/3/308.short>`_ and to provide good Quality of Experience (QoE), the vendors of HMDs recommend that `the enabling multimedia systems react to head movements as fast as the HMD refresh rate <https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/>`_.
 Since `the refresh rate of state-of-the-art HMDs is 120 Hz <http://www.vrnerds.de/vr-brillen-vergleich/>`_, the whole system should react in less than 10 ms.
-Those characteristics make it challenging for service providers to deliver 360-Degree videos.
-To guarantee the 10 ms delay, content providers cannot stream directly the user viewport.
-To maintain interactivity, the state-of-the-art solution streams the full spherical video and let the HMD extracts the viewport in real time, according to the user head position.
-Therefore the majority of the bandwidth is waste transmitting portion of the video that will never be displayed.
+Those characteristics make it challenging for service providers to deliver online cloud-based 360-Degree videos since such reaction time is one order of magnitude smaller than what `the most interactive cloud multimedia systems implements <http://peerdal.blogspot.fr/2012/12/brewing-storm-on-cloud-gaming-are-cdns.html>`_.
+
+To maintain interactivity, the state-of-the-art solution is to stream the full spherical video and to let the HMD extract the viewport in real time, according to the user head position.
+Therefore the majority of the bandwidth is waste transmitting a portion of the video that will never be displayed (two third of the video for current HMD with 120-Degree FoV).
 
 .. figure:: images/360videos.gif
   :align: center
@@ -19,8 +19,8 @@ Therefore the majority of the bandwidth is waste transmitting portion of the vid
 
   **Figure 1**: 360-Degree delivery
 
-To reduce the bandwidth consumption without impacting the interactivity, we propose a *viewport-adaptive streaming system* that follow the same principles as in rate-adaptive streaming technologies.
-The server offers multiple *representations* of the same 360-degree video but instead of offering representations that only differ by their bit-rate, like for rate-adaptive streaming, the server offers representations that differ by having better quality in a given region of the video. Each video representation is characterized by a *Quality Emphasis Center (QEC)*, which is a given position in the spherical video around which the quality of the video is maximum. The quality of the video is lower for video parts that are far from the QEC. Then depending on the user head movement the client select the right representation to download.
+To reduce the bandwidth consumption without impacting the interactivity, we propose a *viewport-adaptive streaming system* that follows the same principles as in rate-adaptive streaming technologies like DASH.
+The server offers multiple *representations* of the same 360-degree video but instead of offering representations that only differ by their bit-rate, like for rate-adaptive streaming, the server offers representations that differ by having better quality in a given region of the video. Each video representation is characterized by what we call a *Quality Emphasis Center (QEC)*, which is a given position in the spherical video around which the quality of the video is maximum. The quality of the video is lower for video parts that are far from the QEC. Depending on the user head movement, the client selects the right representation to download.
 The whole video is available at the client so it can generate any viewport at any time but the farther from the QEC the user is watching, the lower the viewport quality is. This system is despited in `Figure 2`_.
 
 .. figure:: images/delivery_chain.png
