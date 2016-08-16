@@ -4,14 +4,14 @@ Viewport-Adaptive Navigable 360-Degree Video Delivery
 360-Degree video is seen by many as `the next big thing <https://techcrunch.com/2016/06/13/why-vr-is-the-next-big-thing-for-brands/>`_, with the democratization of `omnidirectionnal cameras <https://whichos.com/add-makes-iphone-360-degree-vr-camera/>`_ and Head-Mounted Display (HMD) devices.
 A 360-Degree video is an omnidirectionnal video: Images are captured from every direction and are combined into a spherical video.
 What is display to the user, which is indifferently
-called *Field of View (FoV)* or *viewport*, is only a portion of the full spherical video and depends on in which direction he is watching. `Figure 1`_ illustrates this principle.
+called *Field of View (FoV)* or *viewport*, is only a portion of the full spherical video and depends on the "watching direction" of the user. `Figure 1`_ illustrates this principle.
 
-To prevent `simulator sickness <http://hfs.sagepub.com/content/53/3/308.short>`_ and to provide good Quality of Experience (QoE), the vendors of HMDs recommend that `the enabling multimedia systems react to head movements as fast as the HMD refresh rate <https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/>`_.
+To prevent `simulator sickness <http://hfs.sagepub.com/content/53/3/308.short>`_ and to provide good Quality of Experience (QoE), the recommendations of HMD vendors is to make `the multimedia systems react to head movements as fast as the HMD refresh rate <https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/>`_.
 Since `the refresh rate of state-of-the-art HMDs is 120 Hz <http://www.vrnerds.de/vr-brillen-vergleich/>`_, the whole system should react in less than 10 ms.
 Those characteristics make it challenging for service providers to deliver online cloud-based 360-Degree videos since such reaction time is one order of magnitude smaller than what `the most interactive cloud multimedia systems implement <http://peerdal.blogspot.fr/2012/12/brewing-storm-on-cloud-gaming-are-cdns.html>`_.
 
 To maintain interactivity, the state-of-the-art solution is to stream the full spherical video and to let the HMD extract the viewport in real time, according to the user head position.
-Therefore the majority of the bandwidth is waste transmitting a portion of the video that is never displayed (two third of the video are dropped in current HMDs with 120-Degree FoV).
+Therefore the majority of the bandwidth is waste transmitting a portion of the video that is never displayed (two thirds of the video are dropped in current HMDs with 120-Degree FoV).
 
 .. figure:: images/360videos.gif
   :align: center
@@ -21,7 +21,7 @@ Therefore the majority of the bandwidth is waste transmitting a portion of the v
 
 To reduce the bandwidth consumption without impacting the interactivity, we propose a *viewport-adaptive streaming system* that follows the same principles as in rate-adaptive streaming technologies like DASH.
 The server offers multiple *representations* of the same 360-degree video but instead of offering representations that only differ by their bit-rate, like for rate-adaptive streaming, the server offers representations that differ by having better quality in a given region of the video. Each video representation is characterized by what we call a *Quality Emphasis Center (QEC)*, which is a given position in the spherical video around which the quality of the video is maximum. The quality of the video is lower for video parts that are far from the QEC. Depending on the user head movement, the client selects the right representation to download.
-The whole video is available at the client so it can generate any viewport at any time but the closer from the QEC is the user watching, the higher is the viewport quality. This system is despited in `Figure 2`_.
+The whole video is available at the client so it can generate any viewport at any time but the closer from the QEC is the user watching, the higher is the viewport quality. This system is depicted in `Figure 2`_.
 
 .. figure:: images/delivery_chain.png
   :align: center
