@@ -53,7 +53,7 @@ column sep=15pt,
 %        \foreach \window in {0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s,
 %            3s, 3.5s, 4s, 4.5s, 5s} {
 			\foreach \window in {1s, 2s, 3s, 5s}{
-            \addplot+ table [x =\window, y = cdf]{global.csv};
+            \addplot+ table [x =\window, y = cdf]{results/global.csv};
         }
         	\legend{1\,s, 2\,s, 3\,s, 5\,s}
 %        \legend{0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s, 3s, 3.5s, 4s,
