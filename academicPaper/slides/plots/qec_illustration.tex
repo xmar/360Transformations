@@ -1,0 +1,25 @@
+\tikzsetnextfilename{qec_illustration}
+\begin{tikzpicture}
+   \newlength{\imageLength}
+   \setlength{\imageLength}{10cm}
+
+   \pgfdeclareimage[width=\imageLength]{equi_full}{videos/360EquiFull.png}
+   \pgfdeclareimage[width=\imageLength]{equi_QEC}{videos/360EquiQec.png}
+
+
+   \node at (5,0) (equi)
+      {%
+         \only<.>{\pgfuseimage{equi_full}}%
+         \only<.(1)->{\pgfuseimage{equi_QEC}}%
+      };
+      %cross
+      \only<.(1)->{
+         \draw[red, thick] (0.5\imageLength-0.2cm,-0.2cm) -- (0.5\imageLength+0.2cm,0.2cm);
+         \draw[red, thick] (0.5\imageLength+0.2cm,-0.2cm) -- (0.5\imageLength-0.2cm,0.2cm);
+      }
+      \only<.(2)->{
+         \draw[green, thick] (0.5\imageLength,0) -- node[above] {good} (0.75\imageLength,0);
+         \draw[red, thick, ->] (0.75\imageLength,0) -- node[above] {degradation} (\imageLength,0);
+         \draw[red] (0.25\imageLength,0.1375\imageLength) rectangle (0.75\imageLength,-0.1375\imageLength);
+      }
+\end{tikzpicture}

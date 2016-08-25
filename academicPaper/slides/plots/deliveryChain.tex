@@ -1,0 +1,200 @@
+\tikzsetnextfilename{deliveryChain}
+\begin{tikzpicture}
+
+% this is for the guy looking at the right
+\tikzset{
+	rightVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.05*#1,0.2*#1)
+			(0.25*#1,0.2*#1)
+			(0.3*#1,0)};
+		\draw (0,0) -- (0.3*#1,0);
+		% then the head
+		\draw[fill=white] (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		% then the VR headset
+		\draw[rounded corners=0.3*#1, fill=black] (0.33*#1, 0.55*#1) rectangle
+			(0.2*#1, 0.35*#1);
+		\begin{scope}
+			\clip (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+			\draw[fill=black] (0.2*#1, 0.5*#1) rectangle (0, 0.46*#1);
+			\draw plot [smooth] coordinates {(0.22*#1,0.3*#1)
+			 (0.27*#1,0.27*#1)
+			 (0.32*#1,0.3*#1)};
+		\end{scope}
+	}
+}
+
+% this is for the guy looking at the front
+\tikzset{
+	frontVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.08*#1,0.2*#1)
+			(0.42*#1,0.2*#1)
+			(0.5*#1,0)};
+		\draw (0,0) -- (0.5*#1,0);
+		% then the head
+		\draw[fill=white] (0.25*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		\draw plot [smooth] coordinates {(0.18*#1,0.3*#1)
+			 (0.25*#1,0.27*#1)
+			 (0.32*#1,0.3*#1)};
+		% then the VR headset
+		\draw[rounded corners=0.5*#1, fill=black] (0.07*#1, 0.55*#1) rectangle
+			(0.43*#1, 0.35*#1);
+	}
+}
+
+\tikzset{
+     element/.style={
+     	rounded corners,
+     	rectangle,
+  	 	thick,
+  	 	draw=black,
+  	 	minimum height=2cm,minimum width=2.5cm
+     }
+}
+
+\tikzset{
+	elementtitle/.style={
+		rectangle,
+		rounded corners,
+		fill=gray!80,
+		font=\footnotesize,
+		text=white,
+		anchor=north
+	}
+}
+
+\tikzset{
+	pics/equirec/.style n args={3}{
+		code={
+			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			%\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
+			\draw[draw,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			%\draw[color=black,fill=black] (0.0088194*#2*#1, 0.0066147*#3*#1) circle (1pt);
+		}
+	}
+}
+
+\def\convCmPt{0.0352778}
+\def\convCmPtRec{0.019844}
+\def\convCmPtRecThird{0.0066147}
+\def\convCmPtFourth{0.0088194}
+
+\tikzset{cross/.style={cross out, draw,
+         minimum size=2*(#1-\pgflinewidth),
+         inner sep=0pt, outer sep=0pt}}
+
+\tikzset{
+	fov/.pic ={
+		\draw[densely dotted, thick, red!70!black] (-0.07,0.10) rectangle (0.37,-0.20);
+%		\draw[fill=red] (0.2,-0.05) circle (2pt);
+		\draw (0.15,-0.05) node[cross=2pt,red!70!black] {};
+	}
+}
+
+
+\tikzset{
+	vr/.pic = {
+		\draw[rounded corners] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+		\draw[rounded corners, thick] (-0.032*#1, -0.019844*#1) rectangle (0.032*#1, 0.016*#1);
+%		\draw(-0.019*#1,0) pic {fov};
+%		\draw(0.019*#1,0) pic {fov};
+		\node[font=\scriptsize,rectangle,red, draw=red, thick,
+					densely dotted, anchor=east, inner sep=2pt,
+					yshift=-1pt, xshift=-1pt] at (0,0) {L};
+		\node[font=\scriptsize,rectangle,red, draw=red, thick,
+					densely dotted, anchor=west, inner sep=2pt,
+					yshift=-1pt,xshift=0.5pt] at (0,0) {R};
+	}
+}
+
+\def\ecartElement{16pt}
+\def\sizeSphere{11}
+\def\ecartObjet{2}
+\def\ecartYVersions{16pt}
+
+
+% capturing system
+\node[element] (0,0) (capturing) {};
+\node[elementtitle, above=-5pt of capturing] {capturing};
+\draw ([xshift=-\sizeSphere - \ecartObjet pt]capturing.east) pic {spherical=\sizeSphere};
+\pgfdeclareimage[width=18 pt]{camera}{plots/pictures/video-camera-icon-hi.png}
+\node at ([xshift=21 pt]capturing.west) (camera1)
+    {\pgfbox[right,center]{\pgfuseimage{camera}}};
+
+% the arrow in the capture
+\draw[-latex] (camera1.east) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]capturing.east);
+
+\onslide<.(1)-> {
+% ===== server
+\node[element,right=\ecartElement of capturing] (server) {};
+\node[elementtitle, above=-5pt of server] {\vphantom{pt}server};
+\draw ([xshift=\sizeSphere + \ecartObjet pt]server.west) pic {spherical=\sizeSphere};
+\draw ([xshift=-\sizeSphere - \ecartObjet pt]server.east) pic {equirec={\sizeSphere}{2}{1}};
+%\draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=\ecartYVersions]server.east) pic {equirec={\sizeSphere}{-2}{-1}};
+%\draw ([xshift=-\sizeSphere - \ecartObjet pt, yshift=-\ecartYVersions]server.east) pic {equirec={\sizeSphere}{0}{0}};
+
+% the three arrows in the server
+\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt]server.east);
+%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=\ecartYVersions]server.east);
+%\draw[-latex] ([xshift=2*\sizeSphere + 2*\ecartObjet pt]server.west) to ([xshift=-2*\sizeSphere - 2*\ecartObjet pt, yshift=-\ecartYVersions]server.east);
+
+
+
+% between capture and server
+\draw[-latex] ([xshift=2pt]capturing.east) to ([xshift=-2pt]server.west);
+}
+
+\onslide<.(2)-> {
+% ===== client
+\node[element,right=\ecartElement of server] (client) {};
+\node[elementtitle, above=-5pt of client] {\vphantom{pt}client};
+% the equirecntagular
+\draw([xshift=\sizeSphere + \ecartObjet pt]client.west) pic {equirec={\sizeSphere}{0}{0}};
+% the old vr
+%\draw ([xshift=-\sizeSphere - \ecartObjet pt]client.east) pic {vr=\sizeSphere};
+% the fov
+\onslide<.(2)>{
+   \pic[local bounding box=thisfov] at ([xshift=\sizeSphere + \ecartObjet pt]client.west) {fov};
+   \pic[local bounding box=headset] at ([xshift=-28 pt, yshift=-15pt]client.east) {rightVR=1.5};
+}
+\onslide<.(3)>{
+   \pic[local bounding box=thisfov2] at ([xshift=\sizeSphere - \ecartObjet pt]client.west) {fov};
+   \pic[local bounding box=headset] at ([xshift=-28 pt, yshift=-15pt]client.east) {frontVR=1.5};
+}
+%\node[anchor=west, font=\tiny,red, text width=23pt,align=center]
+%		at ([yshift=10pt]client.west) (fovleg) {\ac{FoV} and \ac{FoV} center};
+%
+%\draw[red] (fovleg) -- (thisfov);
+
+% vr headset
+
+
+
+% old vr
+%
+
+% the arrow in the client
+\onslide<.(2)>{
+\draw[-latex]
+%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to
+	(thisfov.east) |- (headset);
+		%([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
+      }
+\onslide<.(3)>{
+\draw[-latex]
+%	([xshift=2*\sizeSphere + 2*\ecartObjet pt, yshift=-\ecartYVersions]client.west) to
+	(thisfov2.east) |- (headset);
+		%([xshift=-2*\sizeSphere - 2*\ecartObjet pt]client.east);
+      }
+
+
+% between server and client yshift=-\ecartYVersions
+\draw[-latex] ([xshift=2pt]server.east) to ([xshift=-2pt]client.west);
+}
+
+\end{tikzpicture}

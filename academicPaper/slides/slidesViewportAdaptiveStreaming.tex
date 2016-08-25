@@ -1,0 +1,128 @@
+% Author : Pierre-Henri Horrein
+% Copyright : Telecom Bretagne, 2013
+
+% Définition du document
+\documentclass[t,12pt,pdftex, aspectratio=1610]{beamer}
+\makeatletter
+\newcommand*{\overlaynumber}{\number\beamer@slideinframe}
+\makeatother
+\usetheme{tb}
+\usepackage{appendixnumberbeamer}
+\usepackage{listings}
+\usepackage{ucs}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+%\setbeamertemplate{navigation symbols}[horizontal]
+%\usepackage{multicol}
+\usepackage{todonotes}
+\usepackage{multimedia}
+\usepackage[numbers,sort]{natbib}
+\usepackage{bibentry}
+\nobibliography*
+
+
+%\usepackage{mathptmx}
+%\usepackage[T1]{fontenc}
+%\usepackage{gfsartemisia-euler}
+%\usepackage[T1]{fontenc}
+%\usepackage[lf]{Baskervaldx} % lining figures
+%\usepackage[bigdelims,vvarbb]{newtxmath} % math italic letters from Nimbus Roman
+%\usepackage[cal=boondoxo]{mathalfa} % mathcal from STIX, unslanted a bit
+%\renewcommand*\oldstylenums[1]{\textosf{#1}}
+\usepackage{cmbright}
+\usepackage[T1]{fontenc}
+
+\usepackage{etoolbox}
+
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,positioning}
+\usetikzlibrary{decorations,decorations.pathmorphing}
+\usetikzlibrary{calc}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepgfplotslibrary{statistics}
+\pgfplotsset{compat=1.8}
+\usetikzlibrary{pgfplots.groupplots}
+
+%\usetikzlibrary{external}
+\usepgfplotslibrary{external}
+\tikzexternalize[prefix=latex.out/\overlaynumber-] % activate!
+
+\usepackage{tabularx}
+
+\usepackage{siunitx}
+\sisetup{detect-all}
+%math tools
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+
+
+%\setbeamertemplate{itemize/enumerate body begin}{\Large}
+%\setbeamertemplate{itemize/enumerate subbody begin}{\Large}
+%\setbeamerfont{normal text}{size=\Large}
+
+\input{acronyms.tex}
+
+%\graphicspath{{figs/}}
+
+
+\title[Viewport-Adaptive Navigable 360-Degree Video Delivery]{\Large
+Viewport-Adaptive Navigable 360-Degree Video Delivery\newline}
+
+% autors
+\author[Xavier Corbillon et al.]{\hspace{-2.5pt}Xavier
+Corbillon$^{\star}$ \hfill ~~~~~~~~~~~~~~~~~~Alisa Devlic$^{\star}$
+\newline Gwendal Simon$^{\star}$ \hfill ~~~~~~~~~~~~~~~~~~Jacob Chakareski$^{\dagger}$}
+
+% Presentation date
+\date{}
+
+
+\begin{document}
+	\input{slidesSpecificMacros.tex}
+	\input{tikzset.tex}
+
+%---------- Title -----------
+
+% Create the title frame
+\inserttitlepage
+
+
+\newcommand\insertTableOfContents{
+%---- Table of contents ----
+
+% Insert the table of contents slide
+\begin{frame}[c,noframenumbering]
+	\frametitle{Table of contents}
+	\tableofcontents[hideallsubsections]
+	%\tableofcontents
+\end{frame}
+}
+
+\newcommand\defineContentTable{
+    %---- we display the content table at the beginning of each section except the first one
+    %\AtBeginSubsection[] {
+    \AtBeginSection[] {
+     \begin{frame}[c,noframenumbering]
+     \frametitle{Table of contents}
+       \small \tableofcontents[hideallsubsections,sectionstyle=show/shaded,subsectionstyle=hide/hide/hide ]
+     \end{frame}
+    }
+}
+
+%---- First section ----
+\input{introduction.tex}
+\input{results.tex}
+\input{conclusion.tex}
+\input{appendix.tex}
+
+%\bibliographystyle{abbrvnat}
+%\bibliographystyle{abbrv}
+%\bibliography{biblio}
+
+\end{document}

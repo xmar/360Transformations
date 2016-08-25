@@ -1,0 +1,19 @@
+\newlength{\mylen}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{intersections}
+
+\newcounter{oldBeamerPauses}
+
+\newcounter{tmpCounter}
+
+\newenvironment{independentCounter}[0]{
+   \setcounter{oldBeamerPauses}{\value{beamerpauses}}
+}{
+   \setcounter{beamerpauses}{\value{oldBeamerPauses}}
+}
+\newcommand{\valueBP}{\value{beamerpauses}}
+\newcommand{\setBP}[1]{\setcounter{beamerpauses}{#1}}
+\newcommand{\incBP}[1]{\setBP{\valueBP+#1}}
+\newcommand{\decBP}[1]{\setBP{\valueBP-#1}}
+\newcommand{\getBPValue}[2]{\setcounter{#1}{\valueBP+#1}}

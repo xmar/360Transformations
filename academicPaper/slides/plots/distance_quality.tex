@@ -1,0 +1,62 @@
+\tikzsetnextfilename{distance_quality}
+\begin{tikzpicture}
+   \pgfplotscreateplotcyclelist{My color list}{%
+       {gray,solid, very thick},%
+       {black!25, dashed, very thick},%
+       {black!75, densely dashed, very thick},%
+       {black, densely dotted, very thick},%
+   }
+
+   \pgfplotsset{every axis legend/.append style={
+           at={(-0.03,0.97)},
+   anchor=south west,
+   draw=none,
+   fill=none,
+   legend columns=4,
+   column sep=6pt,
+   %font = \scriptsize,
+   /tikz/every odd column/.append style={column sep=0cm},
+   %font=\tiny
+   }}
+   \pgfplotsset{grid style={dashed,gray}}
+   \pgfplotsset{minor grid style={dotted,red!20!gray}}
+   \pgfplotsset{major grid style={dotted,green!50!black}}
+    \begin{axis}[
+            ylabel={MS-SSIM},
+            xlabel={Orthodromic distance},
+            width=0.95\linewidth,
+            height=0.5\linewidth,
+ %           unit vector ratio=1 2 1,
+ %           x=0.4cm,
+            cycle list name={My color list},
+            %ytick={0,2,4,...,10},
+            %xtick pos=left,
+            %x tick label style={at={(current axis.right of origin)},rotate=45,anchor=north east},
+            %minor y tick num={1},
+            legend cell align=left,
+            xmin = 0,
+            xmax = 3.14,
+            %ymin = 0.7,
+            ymax = 1,
+            ymajorgrids,
+            yminorgrids,
+%            axis on top,
+            %y filter/.code={\pgfmathparse{#1/1000000}\pgfmathresult},
+        ]
+         \pgfplotsextra{\begin{scope}[on layer=axis background]
+                \draw[draw=gray!50] (axis cs:0,0.955777) -- (axis cs:3.14,0.955777);
+                \node[rounded corners, fill=gray!50,
+                			font=\tiny, inner sep=2pt,
+                			anchor=west] at (axis cs:0,0.955777) {\textit{\vphantom{lj}uniEqui}};
+            \end{scope}
+        }
+
+        \addplot+ table [x=distance, y=qualityEquirectangularTiledLower]{results/distanceQuality.csv};
+        \addplot+ table [x=distance, y=qualityCubeMapLower]{results/distanceQuality.csv};
+        \addplot+ table [x=distance, y=qualityPyramidLower]{results/distanceQuality.csv};
+        \addplot+ table [x=distance, y=qualityRhombicDodecaLower]{results/distanceQuality.csv};
+%        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
+        \legend{Equirec,CubeMap,Pyramid,Dodeca}
+
+    \end{axis}
+\end{tikzpicture}

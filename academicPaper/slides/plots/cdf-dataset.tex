@@ -1,0 +1,63 @@
+\pgfplotscreateplotcyclelist{My color list}{%
+    {black!25,solid, very thick},%
+    {black!50,densely dashed, very thick},%
+    {black!75,densely dotted, very thick},%
+    {black!100,dash pattern=on 4pt off 1pt on 4pt off 4pt, very thick}%
+}
+
+\pgfplotsset{every axis legend/.append style={
+        at={(0.05,0.97)},
+anchor=south west,
+draw=none,
+fill=none,
+legend columns=4,
+column sep=15pt,
+/tikz/every odd column/.append style={column sep=0cm},
+%font=\tiny
+}}
+
+\pgfplotsset{grid style={dashed,gray}}
+\pgfplotsset{minor grid style={dotted,red!20!gray}}
+\pgfplotsset{major grid style={dotted,gray!50!black}}
+
+\tikzsetnextfilename{cdf_head_position_dataset}
+\begin{tikzpicture}
+    \begin{axis}[
+            ylabel={CDF},
+            xlabel={Orthodromic Distance to the Initial Head Position},
+            width=0.95\linewidth,
+            height=0.5\linewidth,
+            %x=2cm,
+    	    xtick={0,1, 2, 3},
+            ytick={0,0.2,0.4,...,1},
+            %x tick label as interval,
+            %xticklabels={%
+            %    {500~ms},%
+            %    {1000~ms},%
+            %    {1500~ms},%
+            %    {2000~ms},%
+            %},
+            enlarge x limits=0.02,
+            cycle list name={My color list},
+            legend cell align=left,
+            %xmin = 0,
+            ymin = 0,
+            %xmax = 3,
+            ymax = 1,
+            ymajorgrids,
+            xmajorgrids,
+            y filter/.code={\pgfmathparse{#1/100}\pgfmathresult},
+        ]
+
+
+%        \foreach \window in {0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s,
+%            3s, 3.5s, 4s, 4.5s, 5s} {
+			\foreach \window in {1s, 2s, 3s, 5s}{
+            \addplot+ table [x =\window, y = cdf]{results/global.csv};
+        }
+        	\legend{1\,s, 2\,s, 3\,s, 5\,s}
+%        \legend{0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s, 3s, 3.5s, 4s,
+%        4.5s, 5s}
+
+    \end{axis}
+\end{tikzpicture}

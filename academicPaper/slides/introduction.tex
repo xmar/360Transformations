@@ -1,0 +1,205 @@
+\section*{ Introduction}
+
+%%% Slide  %%%
+\newcounter{tmpCounter1}
+\newcounter{tmpCounter2}
+\newcommand{\boldWhenNeeded}[1]{\only<.-\arabic{tmpCounter1}>{#1} \only<\arabic{tmpCounter2}->{\textbf{#1}}}
+\begin{frame}[c]
+   \frametitle{Context: 360-Degree Videos}
+
+   \vfill
+
+      \setcounter{tmpCounter2}{\valueBP+6}
+      \setcounter{tmpCounter1}{\value{tmpCounter2}-1}
+      \begin{columns}[T]
+        \begin{column}{0.65\linewidth}
+           \begin{itemize}
+              \item<+-> \textbf{Applications}:
+               \begin{itemize}[<+->]
+                  \item Gaming
+                  \item \boldWhenNeeded{Documentaries}
+                  \item \boldWhenNeeded{Recorded sports and concerts}
+                  \item \boldWhenNeeded{Adult content}
+                  \item \boldWhenNeeded{Live event broadcast}
+                  \item Education and Training
+               \end{itemize}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.35\linewidth}
+            %\begin{itemize}[<+->]
+            \includegraphics[scale=0.125]{plots/pictures/playstation-vr.jpg}\\
+            \vspace{-0.25cm}
+            {\tiny Source: playstation.com}
+            %\end{itemize}
+        \end{column}
+      \end{columns}
+
+   %\end{itemize}
+   \incBP{1}
+   \vfill
+   %\vspace{-0.5cm}
+   %\href{run:videos/car_equirectangular_4k.mp4}{\includegraphics[scale=0.3]{videos/test.jpg}}
+   \begin{minipage}[t][7cm][t]{\textwidth}
+      \only<+-.(5)>{
+         \begin{itemize}[<+->]
+            \item Omnidirectional video:
+         \end{itemize}
+         \begin{columns}[T]
+            \begin{column}{0.5\linewidth}
+               %\onslide<.-.(3)>{
+               \begin{independentCounter}
+                  %\decBP{1}
+                  \input{plots/deliveryChain.tex}
+               \end{independentCounter}
+               %}
+            \end{column}
+            \begin{column}{0.5\linewidth}
+               \only<.>{
+                  \includegraphics[scale=0.15]{videos/360camera1.png}
+                  \includegraphics[scale=0.02]{videos/360camera2.jpg}
+                  \setcounter{tmpCounter}{\value{beamerpauses}}
+               }
+               \only<.(1)>{\hspace{2cm}\includegraphics[scale=0.04]{videos/test.png}}
+               \only<.(2)>{\hspace{2cm}\includegraphics[scale=0.065]{videos/fov1.png}}
+               \only<.(3)>{\hspace{2cm}\includegraphics[scale=0.065]{videos/fov2.png}}
+            \end{column}
+         \end{columns}
+         \onslide<.>{
+         \vspace{-0.75cm}
+         {
+            \tiny
+            \url{http://360cameraonline.com/wp-content/uploads/2015/01/gopro_360camera.png}
+         }\\
+
+         {\vspace{-0.75cm}
+            \tiny \url{https://mms.businesswire.com/media/20151221005321/en/501689/5/PANONO_BACK_PRESS_RGB.jpg}
+         }
+         }
+      }
+      \incBP{3}
+      \only<+->{
+         \begin{itemize}[<+->]
+            \item \textbf{Problem}: 4K stereo videos displayed at 100\,Hz require more than 100\,Mbps
+         \end{itemize}
+      }
+    \end{minipage}
+    \vfill
+\end{frame}
+
+\begin{frame}[c]
+   \frametitle{How to deliver videos today?}
+
+   \begin{itemize}
+     \item \textbf{Main technology}: \acl{HAS}
+     \begin{itemize}
+        \setbeamercovered{transparent}
+        \item MPEG-DASH\uncover<+>{, Apple HLS, Adobe HDS, MSS}
+        \setbeamercovered{invisible}
+     \end{itemize}
+   \end{itemize}
+   \begin{minipage}[t][7cm][t]{\textwidth}
+   \only<+>{
+   \raggedright
+   \textbf{Concept}:\\
+   \centering
+   \input{plots/dash.tex}
+   }
+   \only<+->{
+
+   \begin{itemize}
+     \item \textbf{Advantages}:
+     \begin{itemize}[<+->]
+        \item Video bitrate is close to the client available bandwidth\\ $\Rightarrow$ give the feeling of personalized delivery
+        \item Server prepares once only ``a few'' representations\\ $\Rightarrow$ give the feeling of a broadcasted delivery.
+     \end{itemize}
+     \vfill
+     \onslide<+->{
+     \item \textbf{Weakness}:
+     \begin{itemize}
+        \item The choice of the right representation requires network condition predictions
+     \end{itemize}
+     }
+     \vfill
+   \end{itemize}
+   }
+   \end{minipage}
+\end{frame}
+
+
+\begin{frame}[c]
+   \frametitle{Proposition: Viewport-Adaptive Streaming}
+
+   \only<.-.(3)> {
+   \begin{itemize}[<+->]
+      \item \textbf{Observation}:
+      \begin{itemize}[<.->]
+         \item Only $1/5$ of the 360-degree video is displayed at a specific time
+      \end{itemize}
+      \item \textbf{Today's solution}:
+      \begin{itemize}[<.->]
+         \item Stream only the user Field Of View\\ \onslide<+->{$\Rightarrow$ specific processing for each user and huge delay constraints}
+      \end{itemize}
+   \end{itemize}
+   }
+   \setBP{4}
+   \begin{itemize}[<+->]
+      \item \textbf{Proposition}:
+      \begin{itemize}[<.->]
+         \item introduce the notion of \emph{Quality Emphasis Center} (QEC)
+         \item<.(4)-> update DASH to perform viewport-adaptive streaming
+      \end{itemize}
+   \end{itemize}
+
+   \begin{minipage}[t][7cm][t]{\textwidth}
+      \only<+-.(3)> {
+      \begin{independentCounter}
+         \input{plots/qec_illustration.tex}
+      \end{independentCounter}
+      }
+      \incBP{2}
+      \only<+-.(6)> {
+         \begin{independentCounter}
+            \input{plots/newDelivery.tex}
+         \end{independentCounter}
+      }
+   \end{minipage}
+
+\end{frame}
+
+\begin{frame}[c]
+   \frametitle{Spherical video projections}
+
+   \vfill
+
+   \begin{itemize}
+      \item<+-> Multiple possible projections:
+      \begin{itemize}
+         \setbeamercovered{transparent}
+         \item \uncover<.->{Equirectangular}\uncover<+->{, cube map}\uncover<+->{, pyramidal}\uncover<+->{, dodecahedron}
+      \end{itemize}
+   \end{itemize}
+
+   \vfill
+
+   \begin{independentCounter}
+      \setBP{1}
+      \input{plots/projections.tex}
+   \end{independentCounter}
+
+   \setbeamercovered{invisible}
+\end{frame}
+
+\begin{frame}[c]
+   \frametitle{Goals of our study}
+
+   \vfill
+   \begin{itemize}[<+->]
+      \item Which projection layout is the more adapted to viewport-adaptive streaming?
+      \vfill
+      \item What segment size can be used?
+      \vfill
+      \item How many QEC representation should be used?
+   \end{itemize}
+   \vfill
+
+\end{frame}

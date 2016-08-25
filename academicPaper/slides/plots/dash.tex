@@ -1,0 +1,342 @@
+\only<2>{}
+\tikzsetnextfilename{dash}
+\begin{tikzpicture}
+
+\tikzset{
+     element/.style={
+     	rounded corners,
+     	rectangle,
+  	 	thick,
+  	 	draw=black,
+  	 	minimum height=2cm,minimum width=2.5cm
+     }
+}
+
+\tikzset{
+	elementtitle/.style={
+		rectangle,
+		rounded corners,
+		fill=gray!80,
+		font=\footnotesize,
+		text=white,
+		anchor=north
+	}
+}
+
+% this is the equirectangular with QEC and qualities
+\tikzset{
+	pics/equirec/.style n args={3}{
+	% the first parameter is the size
+	% the second parameter is the x coordinate of the QEC
+	% the third parameter is the y coordinate of the QEC
+		code={
+			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			%\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
+			\draw[draw,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			%\draw[color=black,fill=black] (0.0088194*#2*#1, 0.0066147*#3*#1) circle (1pt);
+		}
+	}
+}
+
+\tikzset{
+	emptyEquirec/.pic={
+		\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+	}
+}
+
+\def\convCmPt{0.0352778}
+\def\convCmPtRec{0.019844}
+\def\convCmPtRecThird{0.0066147}
+\def\convCmPtFourth{0.0088194}
+
+\tikzset{cross/.style={cross out, draw,
+         minimum size=2*(#1-\pgflinewidth),
+         inner sep=0pt, outer sep=0pt}}
+
+% here is for the FoV
+\tikzset{
+	pics/fov/.style n args={2}{
+		% the first parameter is the size of the screen
+		% the second parameter is the x coordinate of the FoV center (0, 1 or 2)
+		code = {
+			\draw (-0.5*#1, -0.28*#1) rectangle (0.5*#1, 0.28*#1);
+			\draw[densely dotted, thick, red!70!black] (-0.45*#1 + #2*#1*0.24, 0.15*#1)
+				 rectangle
+			 	(-0.4*#1 + #2*#1*0.24 + 0.4*#1, -0.15*#1);
+			\draw (-0.4*#1 + #2*#1*0.24 + 0.2*#1, 0.05*#1) node[cross=2pt,red!70!black] {};
+	   }
+	}
+}
+
+
+\tikzset{
+	vr/.pic = {
+		\draw[rounded corners] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+		\draw[rounded corners, thick] (-0.032*#1, -0.019844*#1) rectangle (0.032*#1, 0.016*#1);
+		\node[font=\scriptsize,rectangle,red, draw=red, thick,
+					densely dotted, anchor=east, inner sep=2pt,
+					yshift=-1pt, xshift=-1pt] at (0,0) {L};
+		\node[font=\scriptsize,rectangle,red, draw=red, thick,
+					densely dotted, anchor=west, inner sep=2pt,
+					yshift=-1pt,xshift=0.5pt] at (0,0) {R};
+	}
+}
+
+% this is for three representations at different sizes for a given QEC
+\tikzset{
+	pics/threerep/.style n args={5}{
+	% first parameter is a bool if bw must be written
+	% second parameter is the QEC number (0 if not displayed)
+	% third parameter is the segment number (0 if not displayed)
+	% fourth parameter is the x pos of QEC
+	% fifth paramerer is the y pos of QEC
+		code={
+			\pic[local bounding box=bigA] at (0,0) {equirec={\sizeBig}{#4}{#5}};
+			\ifnum#1>0
+		    	\node[font=\scriptsize, anchor=east, inner sep=0pt]
+		    		at (bigA.west) (legbwhi) {high};
+		    \fi
+		    \ifnum#3>0
+				\node[font=\scriptsize,anchor=south] at (bigA.north) {$s_{#3}$};
+			\fi
+			\pic[local bounding box=medA] at ([yshift=\ecartMed]bigA.south) {equirec={\sizeMed}{#4}{#5}};
+			\ifnum#1>0
+				\node[font=\scriptsize,anchor=west, inner sep=0pt]
+					at (legbwhi.west |- medA) (legbwme) {\vphantom{g}med};
+			\fi
+			\pic[local bounding box=lowA] at ([yshift=\ecartLow]medA.south)
+				{equirec={\sizeLow}{#4}{#5}};
+			%\pic[local bounding box=lowA] at ([yshift=\ecartLow]bigA.south)
+			%	{equirec={\sizeLow}{#4}{#5}};
+			\ifnum#1>0
+				\node[font=\scriptsize, inner sep=0pt, anchor=west]
+					at (legbwme.west |- lowA) {\vphantom{g}low};
+			\fi
+			\ifnum#2>0
+				\node[font=\footnotesize,anchor=east] at (legbwhi.south west) {QEC$_#2$};
+			\fi
+		}
+	}
+}
+
+% this is for the guy looking at the left
+\tikzset{
+	leftVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.05*#1,0.2*#1)
+			(0.25*#1,0.2*#1)
+			(0.3*#1,0)};
+		\draw (0,0) -- (0.3*#1,0);
+		% then the head
+		\draw[fill=white] (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		% then the VR headset
+		\draw[rounded corners=0.3*#1, fill=black] (-0.03*#1, 0.55*#1) rectangle
+			(0.1*#1, 0.35*#1);
+		\begin{scope}
+			\clip (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+			\draw[fill=black] (0.1*#1, 0.5*#1) rectangle (0.3*#1, 0.46*#1);
+			\draw plot [smooth] coordinates {(-0.01*#1,0.3*#1)
+			 (0.04*#1,0.27*#1)
+			 (0.09*#1,0.3*#1)};
+		\end{scope}
+	}
+}
+
+% this is for the guy looking at the right
+\tikzset{
+	rightVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.05*#1,0.2*#1)
+			(0.25*#1,0.2*#1)
+			(0.3*#1,0)};
+		\draw (0,0) -- (0.3*#1,0);
+		% then the head
+		\draw[fill=white] (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		% then the VR headset
+		\draw[rounded corners=0.3*#1, fill=black] (0.33*#1, 0.55*#1) rectangle
+			(0.2*#1, 0.35*#1);
+		\begin{scope}
+			\clip (0.15*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+			\draw[fill=black] (0.2*#1, 0.5*#1) rectangle (0, 0.46*#1);
+			\draw plot [smooth] coordinates {(0.22*#1,0.3*#1)
+			 (0.27*#1,0.27*#1)
+			 (0.32*#1,0.3*#1)};
+		\end{scope}
+	}
+}
+
+% this is for the guy looking at the front
+\tikzset{
+	frontVR/.pic = {
+	% the only parameter is the size
+		% first the body
+		\draw plot [smooth] coordinates {(0,0)
+			(0.08*#1,0.2*#1)
+			(0.42*#1,0.2*#1)
+			(0.5*#1,0)};
+		\draw (0,0) -- (0.5*#1,0);
+		% then the head
+		\draw[fill=white] (0.25*#1, 0.4*#1) ellipse (0.15*#1 cm and 0.2*#1 cm);
+		\draw plot [smooth] coordinates {(0.18*#1,0.3*#1)
+			 (0.25*#1,0.27*#1)
+			 (0.32*#1,0.3*#1)};
+		% then the VR headset
+		\draw[rounded corners=0.5*#1, fill=black] (0.07*#1, 0.55*#1) rectangle
+			(0.43*#1, 0.35*#1);
+	}
+}
+
+
+\def\sizeBig{11}
+\def\sizeMed{9}
+\def\ecartMed{-12 pt}
+\def\sizeLow{7}
+\def\ecartLow{-12 pt}
+\def\ecartInterThree{-0.52}
+
+
+\pic[local bounding box=leftup] at (0,0) {threerep={1}{0}{1}{2}{1}};
+% \pic[anchor=east, local bounding box=leftmid] at ($(-0.4,\ecartInterThree)+(leftup.east |- leftup.south)$)
+% 	  {threerep={1}{2}{0}{-2}{-1}};
+% \pic[anchor=east, local bounding box=leftdown] at ($(-0.4,\ecartInterThree)+(leftmid.east |- leftmid.south)$)
+% 	  {threerep={1}{3}{0}{0}{0}};
+
+\pic[local bounding box=centerup] at (1,0) {threerep={0}{0}{2}{2}{1}};
+% \pic[anchor=east, local bounding box=centermid] at ($(-0.4,\ecartInterThree)+(centerup.east |- centerup.south)$)
+% 	  {threerep={0}{0}{0}{-2}{-1}};
+% \pic[anchor=east, local bounding box=centerdown] at ($(-0.4,\ecartInterThree)+(centermid.east |- centermid.south)$)
+% 	  {threerep={0}{0}{0}{0}{0}};
+
+\pic[local bounding box=rightup] at (2,0) {threerep={0}{0}{3}{2}{1}};
+% \pic[anchor=east, local bounding box=rightmid] at ($(-0.4,\ecartInterThree)+(rightup.east |- rightup.south)$)
+% 	  {threerep={0}{0}{0}{-2}{-1}};
+% \pic[anchor=east, local bounding box=rightdown] at ($(-0.4,\ecartInterThree)+(rightmid.east |- rightmid.south)$)
+% 	  {threerep={0}{0}{0}{0}{0}};
+
+%\begin{scope}[on background layer]
+%	\draw[fill=gray!10,draw=none] ([yshift=4.5pt]leftmid.north west) rectangle
+%				([xshift=3pt, yshift=-4.5pt]rightmid.south east);
+%\end{scope}
+
+
+% axis time
+\node[inner sep=1pt] (timeleg) at ([xshift=8pt, yshift=-8pt]rightup.south) {t};
+\draw [thick, ->] ([yshift=-8pt] leftup.south) to (timeleg);
+
+\draw[dotted] ([xshift = 4pt]leftup.east |- timeleg.south) to
+	([xshift = 4pt]leftup.east |- leftup.north);
+
+\draw[dotted] ([xshift = 4 pt]centerup.east |- timeleg.south) to
+	([xshift = 4pt]centerup.east |- centerup.north);
+
+\draw[element] ([yshift=3pt,xshift=-3pt]leftup.north west) rectangle
+				 %([yshift=-3pt,xshift=3pt]rightup.east |- timeleg.south);
+             ([yshift=-40pt,xshift=3pt]rightup.east |- timeleg.south);
+\node[elementtitle,anchor=east,above=-1pt of leftup] (serverLeg) {\vphantom{pt}server};
+
+% ===== client
+
+% draw the guys
+\def\ecartGuys{0.25}
+
+\pic[local bounding box=leftguy, anchor=south, opacity=0] at (4.5, -2.59) {leftVR=1.5};
+\pic[local bounding box=frontguy, right=\ecartGuys cm of leftguy.south east, opacity=0]  {frontVR=1.5};
+\pic[local bounding box=rightguy, right=\ecartGuys cm of frontguy.south east, opacity=0]  {rightVR=1.5};
+
+% draw the associated FoVs
+\pic[local bounding box=leftfov, below=10 pt of leftguy.south, opacity=0] {fov={0.8}{0}};
+\pic[local bounding box=frontfov, below=10 pt of frontguy.south, opacity=0] {fov={0.8}{1}};
+\pic[local bounding box=rightfov, below=10 pt of rightguy.south, opacity=0] {fov={0.8}{2}};
+
+% ==== draw the bandwidth
+
+% axis
+\node[font=\footnotesize, inner sep=1pt] (highpoint) at ([yshift=-3pt]leftfov.west |- leftup.north) {bw};
+\draw[thick,->] ([yshift=10pt]leftfov.west |- leftguy.north) to (highpoint);
+\node[font=\footnotesize, inner sep=1pt] (rightpoint) at ([yshift=10pt]rightfov.east |- rightguy.north) {t};
+\draw[thick,->] ([yshift=10pt]leftfov.west |- leftguy.north) to (rightpoint);
+
+% curve
+\draw[ultra thick] plot [smooth] coordinates {([yshift=35pt]leftfov.west |- leftguy.north)
+		([yshift=50pt]frontfov.west |- leftguy.north)
+		([yshift=25pt]rightfov.west |- leftguy.north)
+		([yshift=40pt]rightfov.east |- leftguy.north)};
+
+% separating lines
+\draw[dotted] ([xshift =0.04cm]leftguy.south east) to
+	([xshift =0.04cm]leftguy.east |- highpoint);
+
+\draw[dotted] ([xshift =0.04cm]frontguy.south east) to
+	([xshift =0.04cm]frontguy.east |- highpoint);
+
+
+\pic[local bounding box=leftBW] at ([yshift=18pt] leftguy.north){emptyEquirec={\sizeMed}};
+\node[font=\scriptsize] at (leftBW) {\vphantom{h}med};
+\pic[local bounding box=frontBW] at ([yshift=18pt] frontguy.north){emptyEquirec={\sizeBig}};
+\node[font=\scriptsize] at (frontBW) {\vphantom{h}high};
+\pic[local bounding box=rightBW] at ([yshift=18pt] rightguy.north){emptyEquirec={\sizeLow}};
+\node[font=\scriptsize] at (rightBW) {\vphantom{h}low};
+
+% draw the enclosing element
+\draw[element] ([yshift=3pt]highpoint.west |- leftup.north) rectangle
+				 ([yshift=-3pt,xshift=3pt]rightfov.south east);
+\node[elementtitle, anchor=east] at (rightguy |- serverLeg) {\vphantom{pt}client};
+
+% =============
+
+\coordinate (client) at (highpoint.west);
+\coordinate (server) at ([xshift=3pt]rightup.east);
+
+\tikzset{
+	proto/.style={
+     	-latex, thick
+     }
+}
+
+\tikzset{
+	protoleg/.style={
+		sloped,
+		inner sep=1pt,
+		font=\tiny,
+		above
+     }
+}
+
+\tikzset{
+	pics/reqresp/.style n args={2}{
+	% first parameter is the req message
+	% second parameter is the resp message
+		code={
+			\draw[proto] (0,0) to
+				node[protoleg, midway] {#1} ([yshift=-10 pt]server |- 0,0);
+			\draw[proto] ([yshift=-11 pt] server |- 0,0) to
+				node[draw=none,midway,matrix] {#2} ([yshift=-21pt] 0,0);
+			}
+	}
+}
+
+\pic[local bounding box=mpd] at (client) {reqresp={connect}
+	{\node[font=\tiny,inner sep=1pt,thin,draw=gray,fill=white] at (0,0) {mpd};\\}
+	};
+\pic[local bounding box=oneseg] at ([yshift=-3pt]client|-mpd.south) {reqresp=
+	{s$_1$:med}
+	{\pic at (0,0) {equirec={\sizeMed}{-2}{-1}};\\}
+	};
+\pic[local bounding box=twoseg] at ([yshift=-3pt]client|-oneseg.south)
+	{reqresp={s$_2$:high}
+	{\pic at (0,0) {equirec={\sizeBig}{0}{0}};\\}
+	};
+\pic[local bounding box=thirdseg] at ([yshift=-3pt]client|-twoseg.south)
+	{reqresp={s$_3$:low}
+	{\pic at (0,0) {equirec={\sizeLow}{2}{1}};\\}
+	};
+
+%\draw[proto] (client) to node[protoleg] {\pgfmathset\baisse-\traitement} ([yshift=-\baisse pt] server |-client);
+%\draw[proto] ([yshift=-\baisse-\traitement pt] server |- client) to
+%	node[protoleg]{mpd} ([\yshift=-\baisse - \baisse-\traitement pt] client);
+
+\end{tikzpicture}
