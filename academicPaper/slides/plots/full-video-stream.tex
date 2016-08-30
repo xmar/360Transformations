@@ -1,0 +1,28 @@
+\tikzsetnextfilename{full-video-stream}
+\begin{tikzpicture}
+   \newlength{\imageLengt}
+   \setlength{\imageLengt}{5cm}
+   \newlength{\gapLengt}
+   \setlength{\gapLengt}{2cm}
+   \only<.(4)>{\setlength{\imageLengt}{2.5cm} \setlength{\gapLengt}{1cm}}
+
+   \pgfdeclareimage[width=\imageLengt]{equi_f}{videos/360EquiFull.png}
+
+   %server
+   \node at (0,0) (server) {\pgfuseimage{equi_f}};
+   \node[yshift=0.1cm] at (server.north) {Server};
+
+   %client
+   \node at (\imageLengt+\gapLengt,0) (client) {\pgfuseimage{equi_f}};
+   \node[yshift=0.1cm] at (client.north) {Client};
+
+   \fill[fill=black!2, even odd rule, opacity=0.75] (0.5\imageLengt+\gapLengt, 0.273*\imageLengt) rectangle (1.5*\imageLengt+\gapLengt, -0.273*\imageLengt)
+      (0.88*\imageLengt+\gapLengt, 0.075*\imageLengt) rectangle (1.12*\imageLengt+\gapLengt, -0.075*\imageLengt)
+   ;
+
+   \draw[<-] (1.12*\imageLengt+\gapLengt, -0.075*\imageLengt) -- (client.south east) node[below] {\scriptsize extracted viewport};
+
+   %streaming
+   \draw[->] (server) -- (client);
+
+\end{tikzpicture}

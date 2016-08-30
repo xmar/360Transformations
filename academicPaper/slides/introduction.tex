@@ -1,6 +1,22 @@
 \section*{ Introduction}
 
 %%% Slide  %%%
+\begin{frame}[c]
+   \frametitle{Who am I?}
+
+   \textbf{Xavier Corbillon}
+
+   First year PhD student at Telecom Bretagne, France
+
+   \includegraphics[scale=0.25]{plots/pictures/Xavier/ritelogo.jpg}
+
+   \includegraphics[scale=0.125]{plots/pictures/Xavier/neo-telecoms.jpg}
+   \hspace{2cm}
+   \includegraphics[scale=0.5]{plots/pictures/Xavier/ABB.jpg}
+
+\end{frame}
+
+%%% Slide  %%%
 \newcounter{tmpCounter1}
 \newcounter{tmpCounter2}
 \newcommand{\boldWhenNeeded}[1]{\only<.-\arabic{tmpCounter1}>{#1} \only<\arabic{tmpCounter2}->{\textbf{#1}}}
@@ -35,13 +51,13 @@
       \end{columns}
 
    %\end{itemize}
-   \incBP{1}
+   %\incBP{1}
    \vfill
    %\vspace{-0.5cm}
    %\href{run:videos/car_equirectangular_4k.mp4}{\includegraphics[scale=0.3]{videos/test.jpg}}
    \begin{minipage}[t][7cm][t]{\textwidth}
       \only<+-.(5)>{
-         \begin{itemize}[<+->]
+         \begin{itemize}[<.->]
             \item Omnidirectional video:
          \end{itemize}
          \begin{columns}[T]
@@ -125,25 +141,122 @@
    \end{minipage}
 \end{frame}
 
-
 \begin{frame}[c]
    \frametitle{Proposition: Viewport-Adaptive Streaming}
 
-   \only<.-.(3)> {
-   \begin{itemize}[<+->]
-      \item \textbf{Observation}:
-      \begin{itemize}[<.->]
-         \item Only $1/5$ of the 360-degree video is displayed at a specific time
-      \end{itemize}
+   \only<1-12> {
+   \begin{itemize}
       \item \textbf{Today's solution}:
-      \begin{itemize}[<.->]
-         \item Stream only the user Field Of View\\ \onslide<+->{$\Rightarrow$ specific processing for each user and huge delay constraints}
+      \begin{itemize}
+         \item<only@2-5> Stream the whole 360-degree video
+         \item<only@6-9> Stream only the user viewport
+         \item<only@10-13> Split the 360-degree video into independent tiles selected by the client
       \end{itemize}
    \end{itemize}
    }
-   \setBP{4}
+   \only<2-5>{
+      %\vspace{-1.5cm}
+      \begin{independentCounter}
+         \setBP{2}
+         \input{plots/full-video-stream.tex}
+      \end{independentCounter}
+      \vspace{-0.5cm}
+      \begin{columns}[T]
+         \begin{column}{0.5\linewidth}
+            \only<3->{
+               \begin{itemize}
+                  \item \textbf{Advantages}:
+                  \begin{itemize}
+                     \item Interactive
+                     \item Simple for the server
+                     \item DASH compliant today
+                  \end{itemize}
+               \end{itemize}
+            }
+         \end{column}
+         \begin{column}{0.5\linewidth}
+            \only<4->{
+            \begin{itemize}
+               \item \textbf{Weaknesses}:
+               \begin{itemize}
+                  \item Bandwidth consumption
+               \end{itemize}
+            \end{itemize}
+            }
+         \end{column}
+      \end{columns}
+   }
+   \incBP{4}
+   \only<6-9>{
+      %\vspace{-1cm}
+      \begin{independentCounter}
+         \setBP{6}
+         \input{plots/viewport-stream.tex}
+      \end{independentCounter}
+      \only<7-8>{\vspace{-1cm}}
+      \only<9>{\vspace{-0.5cm}}
+      \incBP{1}
+      \begin{columns}[T]
+         \begin{column}{0.5\linewidth}
+            \only<7->{
+               \begin{itemize}
+                  \item \textbf{Advantages}:
+                  \begin{itemize}
+                     \item Deliver only the viewport
+                     \item Bandwidth optimization
+                  \end{itemize}
+               \end{itemize}
+            }
+         \end{column}
+         \begin{column}{0.5\linewidth}
+            \only<8->{
+            \begin{itemize}
+               \item \textbf{Weaknesses}:
+               \begin{itemize}
+                  \item Computation at the server
+                  \item Motion-to-photon issues: 5-20\,ms to prevent motion sickness
+               \end{itemize}
+            \end{itemize}
+            }
+         \end{column}
+      \end{columns}
+   }
+   \only<10-12>{
+      %\vspace{-1.5cm}
+      \begin{independentCounter}
+         \setBP{10}
+         \input{plots/tiles-stream.tex}
+      \end{independentCounter}
+      \vspace{-0.5cm}
+      \begin{columns}[T]
+         \begin{column}{0.5\linewidth}
+            \only<11->{
+               \begin{itemize}
+                  \item \textbf{Advantages}:
+                  \begin{itemize}
+                     \item Good interactivity
+                     \item Flexibility
+                     \item Compliant with DASH Spatial Relationship Description
+                  \end{itemize}
+               \end{itemize}
+            }
+         \end{column}
+         \begin{column}{0.5\linewidth}
+            \only<12->{
+            \begin{itemize}
+               \item \textbf{Weaknesses}:
+               \begin{itemize}
+                  \item More processing at the client side
+                  \item Storage and description (64 videos per bitrate)
+               \end{itemize}
+            \end{itemize}
+            }
+         \end{column}
+      \end{columns}
+   }
+   \setBP{12}
    \begin{itemize}[<+->]
-      \item \textbf{Proposition}:
+      \item \textbf{Our proposition}:
       \begin{itemize}[<.->]
          \item introduce the notion of \emph{Quality Emphasis Center} (QEC)
          \item<.(4)-> update DASH to perform viewport-adaptive streaming
@@ -164,29 +277,6 @@
       }
    \end{minipage}
 
-\end{frame}
-
-\begin{frame}[c]
-   \frametitle{Spherical video projections}
-
-   \vfill
-
-   \begin{itemize}
-      \item<+-> Multiple possible projections:
-      \begin{itemize}
-         \setbeamercovered{transparent}
-         \item \uncover<.->{Equirectangular}\uncover<+->{, cube map}\uncover<+->{, pyramidal}\uncover<+->{, dodecahedron}
-      \end{itemize}
-   \end{itemize}
-
-   \vfill
-
-   \begin{independentCounter}
-      \setBP{1}
-      \input{plots/projections.tex}
-   \end{independentCounter}
-
-   \setbeamercovered{invisible}
 \end{frame}
 
 \begin{frame}[c]
