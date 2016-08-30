@@ -4,10 +4,18 @@
 \begin{frame}[c]
    \frametitle{Who am I?}
 
-   \textbf{Xavier Corbillon}
+   \begin{columns}[T]
+     \begin{column}{0.65\linewidth}
+         \textbf{Xavier Corbillon}
 
-   First year PhD student at Telecom Bretagne, France
+         First year PhD student at Telecom Bretagne
+      \end{column}
+      \begin{column}{0.35\linewidth}
+         \includegraphics[scale=0.25]{plots/pictures/Xavier/idCard.eps}
+      \end{column}
+   \end{columns}
 
+   \vspace{-1cm}
    \includegraphics[scale=0.25]{plots/pictures/Xavier/ritelogo.jpg}
 
    \includegraphics[scale=0.125]{plots/pictures/Xavier/neo-telecoms.jpg}
@@ -56,7 +64,7 @@
    %\vspace{-0.5cm}
    %\href{run:videos/car_equirectangular_4k.mp4}{\includegraphics[scale=0.3]{videos/test.jpg}}
    \begin{minipage}[t][7cm][t]{\textwidth}
-      \only<+-.(5)>{
+      \only<+-.(4)>{
          \begin{itemize}[<.->]
             \item Omnidirectional video:
          \end{itemize}
@@ -92,7 +100,7 @@
          }
          }
       }
-      \incBP{3}
+      \incBP{2}
       \only<+->{
          \begin{itemize}[<+->]
             \item \textbf{Problem}: 4K stereo videos displayed at 100\,Hz require more than 100\,Mbps
@@ -125,7 +133,7 @@
    \begin{itemize}
      \item \textbf{Advantages}:
      \begin{itemize}[<+->]
-        \item Video bitrate is close to the client available bandwidth\\ $\Rightarrow$ give the feeling of personalized delivery
+        \item<.-> Video bitrate is close to the client available bandwidth\\ $\Rightarrow$ give the feeling of personalized delivery
         \item Server prepares once only ``a few'' representations\\ $\Rightarrow$ give the feeling of a broadcasted delivery.
      \end{itemize}
      \vfill
@@ -158,7 +166,27 @@
       %\vspace{-1.5cm}
       \begin{independentCounter}
          \setBP{2}
-         \input{plots/full-video-stream.tex}
+         \only<2-4>{
+            \input{plots/full-video-stream.tex}
+         }
+         \only<5>{
+            \begin{columns}[T]
+               \begin{column}{0.5\linewidth}
+                  \input{plots/full-video-stream.tex}
+               \end{column}
+               \begin{column}{0.5\linewidth}
+                  \begin{tabular}{|c|c|c|}
+                     \hline
+                     \textbf{viewport} & \textbf{360$\ensuremath{^\circ}$  video} & \textbf{bandwidth}\\
+                     \hline
+                     HD       &       6K         &   50\,Mbps\\
+                     UHD       &       8K         &   100\,Mbps\\
+                     4K       &       12K         &   $>100$\,Mbps\\
+                     \hline
+                  \end{tabular}
+               \end{column}
+            \end{columns}
+         }
       \end{independentCounter}
       \vspace{-0.5cm}
       \begin{columns}[T]
@@ -191,10 +219,32 @@
       %\vspace{-1cm}
       \begin{independentCounter}
          \setBP{6}
-         \input{plots/viewport-stream.tex}
+         \only<6-8>{
+            \input{plots/viewport-stream.tex}
+         }
+         \only<9>{
+            \begin{columns}[T]
+               \begin{column}{0.5\linewidth}
+                  \input{plots/viewport-stream.tex}
+               \end{column}
+               \begin{column}{0.5\linewidth}
+                  \begin{tabular}{|r|c|}
+                     \hline
+                     \multicolumn{1}{|c|}{\textbf{Action}} & \textbf{Latency}\\
+                     \hline
+                     Request to the server       &       ~RTT/2\\
+                     Viewport extraction       &       0-9\,ms\\
+                     Re-encoding       &       ~10\,ms\\
+                     Transmission       &       ~RTT/2\\
+                     Decoding       &       ~7\,ms\\
+                     \hline
+                  \end{tabular}
+               \end{column}
+            \end{columns}
+         }
       \end{independentCounter}
       \only<7-8>{\vspace{-1cm}}
-      \only<9>{\vspace{-0.5cm}}
+      %\only<9>{\vspace{-0.5cm}}
       \incBP{1}
       \begin{columns}[T]
          \begin{column}{0.5\linewidth}
@@ -255,11 +305,11 @@
       \end{columns}
    }
    \setBP{12}
-   \begin{itemize}[<+->]
-      \item \textbf{Our proposition}:
+   \begin{itemize}
+      \item<+(1)-> \textbf{Our proposition}:
       \begin{itemize}[<.->]
-         \item introduce the notion of \emph{Quality Emphasis Center} (QEC)
-         \item<.(4)-> update DASH to perform viewport-adaptive streaming
+         \item Introduce the notion of \emph{Quality Emphasis Center} (QEC)
+         \item<.(4)-> Update DASH to perform viewport-adaptive streaming
       \end{itemize}
    \end{itemize}
 

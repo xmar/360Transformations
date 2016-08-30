@@ -17,6 +17,58 @@
 
 %%%% Frame %%%%
 \begin{frame}[c]
+   \frametitle{Spherical video projections}
+
+   \vfill
+
+   \begin{itemize}
+      \item<+-> Multiple possible projections:
+      \begin{itemize}
+         \setbeamercovered{transparent}
+         \item \uncover<.->{Equirectangular}\uncover<+->{, cube map}\uncover<+->{, pyramidal}\uncover<+->{, dodecahedron}
+      \end{itemize}
+   \end{itemize}
+
+   \vfill
+
+   \begin{independentCounter}
+      \setBP{1}
+      \input{plots/projections.tex}
+   \end{independentCounter}
+
+   \setbeamercovered{invisible}
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Experimental setup}
+
+   \begin{columns}[T]
+     \begin{column}{0.65\linewidth}
+        \begin{itemize}
+            \item Software + Scripts available on github
+            \begin{itemize}
+               \item Projection
+               \item QEC generation
+            \end{itemize}
+            \item 1080p viewports from a 4K 360-degree video
+            \item Head movement dataset from Jaunt, Inc
+            \begin{itemize}
+               \item 11 360-degree videos
+               \item 10\,s long
+               \item 11 peoples watch with an Occulus Rift DK2
+            \end{itemize}
+         \end{itemize}
+      \end{column}
+      \begin{column}{0.35\linewidth}
+         \includegraphics[scale=0.25]{plots/pictures/Xavier/githubQRC.eps}
+      \end{column}
+   \end{columns}
+
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
    \frametitle{Best projection?}
 
    \begin{independentCounter}
