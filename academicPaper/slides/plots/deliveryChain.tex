@@ -61,7 +61,7 @@
 	elementtitle/.style={
 		rectangle,
 		rounded corners,
-		fill=gray!80,
+		fill=titles,
 		font=\footnotesize,
 		text=white,
 		anchor=north
@@ -71,7 +71,7 @@
 \tikzset{
 	pics/equirec/.style n args={3}{
 		code={
-			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			\draw[fill=midquality] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
 			%\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
 			\draw[draw,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
 			%\draw[color=black,fill=black] (0.0088194*#2*#1, 0.0066147*#3*#1) circle (1pt);

@@ -13,11 +13,63 @@
       \end{column}
    \end{columns}
 
-   \vspace{-1cm}
-   \includegraphics[scale=0.25]{plots/pictures/Xavier/ritelogo.jpg}
+   \vspace{-0.5cm}
+   % \includegraphics[scale=0.25]{plots/pictures/Xavier/ritelogo.jpg}
+   %
+   % \includegraphics[scale=0.125]{plots/pictures/Xavier/neo-telecoms.jpg}
+   % \hspace{2cm}
+   % \includegraphics[scale=0.5]{plots/pictures/Xavier/ABB.jpg}
 
-   \includegraphics[scale=0.125]{plots/pictures/Xavier/neo-telecoms.jpg}
-   \hspace{2cm}
-   \includegraphics[scale=0.5]{plots/pictures/Xavier/ABB.jpg}
+   \only<1-5>{
+   \tikzsetnextfilename{timeline}
+   \begin{tikzpicture}
+      \newlength{\timeLength}
+      \setlength{\timeLength}{10cm}
 
+      \pgfdeclareimage[width=0.2\timeLength]{rite}{plots/pictures/Xavier/ritelogo.jpg}
+      \pgfdeclareimage[width=0.2\timeLength]{neo}{plots/pictures/Xavier/neo-telecoms.jpg}
+      \pgfdeclareimage[width=0.2\timeLength]{abb}{plots/pictures/Xavier/ABB.jpg}
+
+      %timeline
+      \draw[->] (0,0) -- ++(\timeLength+1cm, 0) node[below] {t};
+
+      \coordinate (2010) at (0.1\timeLength,0);
+      \coordinate (2011) at (0.1\timeLength+0.15\timeLength,0);
+      \coordinate (2012) at (0.1\timeLength+0.30\timeLength,0);
+      \coordinate (2013) at (0.1\timeLength+0.45\timeLength,0);
+      \coordinate (2014) at (0.1\timeLength+0.60\timeLength,0);
+      \coordinate (2015) at (0.1\timeLength+0.75\timeLength,0);
+      \coordinate (2016) at (0.1\timeLength+0.90\timeLength,0);
+
+      \incBP{1}
+      \onslide<+->{
+         \node at (0.1\timeLength+0.1\timeLength,1cm) (tb) {\includegraphics[width=0.12\timeLength, keepaspectratio]{Modele/bretagne_quadri_et_baseline}};
+         \draw[beamer@tbgreen, thick] (2010) -- (2012);
+         \draw[beamer@tbgreen, thick] (2013) -- (2014);
+      }
+
+      \definecolor{whiteblue}{HTML}{729FCF}
+      \onslide<+->{
+         \node at (0.1\timeLength+0.35\timeLength,1.2cm) (Neo) {\pgfuseimage{neo}};
+         \draw[whiteblue, thick] (2012) -- (2013);
+      }
+
+      \onslide<+->{
+         \node at (0.1\timeLength+0.65\timeLength,1cm) (abb) {\pgfuseimage{abb}};
+         \draw[red, thick] (2014) -- (2015);
+      }
+
+      \onslide<+->{
+         \node at (0.1\timeLength+0.85\timeLength,1cm) (rite) {\pgfuseimage{rite}};
+         \draw[beamer@tbgreen, thick] (2015) -- (\timeLength+0.99cm,0);
+         \draw[whiteblue, thick, dashed] (2015) -- (2016);
+      }
+
+      \foreach \t in {2010, 2011, 2012, 2013, 2014, 2015, 2016}{
+         \draw (\t) ++(0, -0.05cm) -- ++(0,0.1cm);
+         \node[below] at (\t) {\scriptsize \t};
+      }
+
+   \end{tikzpicture}
+   }
 \end{frame}

@@ -16,7 +16,7 @@
 	elementtitle/.style={
 		rectangle,
 		rounded corners,
-		fill=gray!80,
+		fill=titles,
 		font=\footnotesize,
 		text=white,
 		anchor=north
@@ -30,7 +30,7 @@
 	% the second parameter is the x coordinate of the QEC
 	% the third parameter is the y coordinate of the QEC
 		code={
-			\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+			\draw[fill=midquality] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
 			%\draw[draw=none,fill=gray!70] (0.0088194*#2*#1-2*0.0088194*#1, 0.0066147*#3*#1 - 2*0.0066147*#1) rectangle (0.0088194*#2*#1 + 2*0.0088194*#1, 0.0066147*#3*#1 + 2*0.0066147*#1);
 			\draw[draw,fill=none] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
 			%\draw[color=black,fill=black] (0.0088194*#2*#1, 0.0066147*#3*#1) circle (1pt);
@@ -40,7 +40,7 @@
 
 \tikzset{
 	emptyEquirec/.pic={
-		\draw[fill=gray!30] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+		\draw[fill=midquality] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
 	}
 }
 

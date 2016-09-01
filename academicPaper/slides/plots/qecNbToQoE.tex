@@ -1,9 +1,9 @@
 \pgfplotscreateplotcyclelist{My color list}{%
-    {black!25,solid, very thick},%
-    {black!50,densely dashed, very thick},%
-    {black!75,densely dotted, very thick},%
-    {black!100,dash pattern=on 4pt off 1pt on 4pt off 4pt, very thick},%
-    {black!25,dotted, very thick},%
+    {color1,solid, very thick},%
+    {color2,densely dashed, very thick},%
+    {color3,densely dotted, very thick},%
+    {color4,dash pattern=on 4pt off 1pt on 4pt off 4pt, very thick},%
+    {color5,dotted, very thick},%
 }
 
 \pgfplotsset{every axis legend/.append style={
@@ -57,7 +57,9 @@ column sep=15pt,
             %y filter/.code={\pgfmathparse{#1/100}\pgfmathresult},
         ]
         \foreach  \window in {1, 2, 3, 5}{
-         \addplot+ table [x =nbQec, y =medQoe]{results/qoeForWindow\window s.csv};
+         \only<+->{
+            \addplot+ table [x =nbQec, y =medQoe]{results/qoeForWindow\window s.csv};
+         }
         }
         \legend{1\,s, 2\,s, 3\,s, 5\,s}
         %\legend{CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}
