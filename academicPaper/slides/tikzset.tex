@@ -1,3 +1,6 @@
+\usetikzlibrary{calc}
+\usetikzlibrary{intersections}
+
 %\definecolor{color1}{HTML}{73d216}
 \definecolor{color1}{rgb}{0.66,0.76,0.23}
 \definecolor{color2}{HTML}{c17d11}
@@ -6,10 +9,12 @@
 \definecolor{color5}{HTML}{ad7fa8}
 
 \definecolor{tangoRed}{HTML}{cc0000}
-\definecolor{titles}{HTML}{ad7fa8}
+\colorlet{titles}{color1}
 
-\definecolor{midquality}{HTML}{e9b96e}
-\definecolor{fullquality}{HTML}{8f5902}
+\definecolor{midqualityOri}{HTML}{e9b96e}
+%\definecolor{fullquality}{HTML}{8f5902}
+\colorlet{midquality}{beamer@tbbrown!40!midqualityOri}
+\colorlet{fullquality}{beamer@tbbrown}
 
 \tikzset{
 	spherical/.pic={

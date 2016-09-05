@@ -1,0 +1,125 @@
+\tikzsetnextfilename{quality_metric}
+\begin{tikzpicture}
+
+   \definecolor{qecColor}{HTML}{cc0000}
+
+   \def\sizeSphere{55}
+   \only<+->{
+      \def\angleRot{-20}   \def\distanceH{0.6}   \def\distanceV{0.5}   \def\offsetFoVH{0}   \def\offsetFoVV{0}
+   }
+   \only<+>{
+      \def\angleRot{-160}                                               \def\offsetFoVH{-1}   \def\offsetFoVV{0}
+   }
+   \only<+>{
+      \def\angleRot{160}                                               \def\offsetFoVH{-1}   \def\offsetFoVV{1}
+   }
+   \only<+>{
+      \def\angleRot{20}                                               \def\offsetFoVH{0}   \def\offsetFoVV{1}
+   }
+   %%%%%%%%%%%%%%%
+   \only<+->{
+      \def\angleRot{-20}   \def\distanceH{0.9}   \def\distanceV{0.75}   \def\offsetFoVH{1}   \def\offsetFoVV{-1}
+   }
+   \only<+>{
+      \def\angleRot{-160}                                               \def\offsetFoVH{-2}   \def\offsetFoVV{-1}
+   }
+   \only<+>{
+      \def\angleRot{160}                                               \def\offsetFoVH{-2}   \def\offsetFoVV{2}
+   }
+   \only<+>{
+      \def\angleRot{20}                                               \def\offsetFoVH{1}   \def\offsetFoVV{2}
+   }
+   %%%%%%%%%%%%%%%%
+   \only<+->{
+      \def\angleRot{-20}   \def\distanceH{1.2}   \def\distanceV{1.0}   \def\offsetFoVH{2}   \def\offsetFoVV{-2}
+   }
+   \only<+>{
+      \def\angleRot{-160}                                              \def\offsetFoVH{-3}   \def\offsetFoVV{-2}
+   }
+   \only<+>{
+      \def\angleRot{160}                                               \def\offsetFoVH{-3}   \def\offsetFoVV{3}
+   }
+   \only<+>{
+      \def\angleRot{20}                                               \def\offsetFoVH{2}   \def\offsetFoVV{3}
+   }
+
+   \tikzset{
+   	cross/.pic={
+         \draw[qecColor] (0,0) ++(-0.5#1,-0.5#1) -- ++(#1,#1);
+         \draw[qecColor] (0,0) ++(-0.5#1,0.5#1) -- ++(#1,-#1);
+       }
+   }
+   \tikzset{
+   	equirecNoTile/.pic={
+         \draw[fill=fullquality] (-0.0352778*#1, -0.019844*#1) rectangle (0.0352778*#1, 0.019844*#1);
+       }
+   }
+   \tikzset{
+   	sphericalMetric/.pic={
+   		\pic at (0,0) {spherical={#1}};
+         \coordinate (qec) at (0,0.5#1);
+         \newlength{\crossLength}
+         \setlength{\crossLength}{0.15cm}
+         \pic[local bounding box=crossQEC] at (qec) {cross={\crossLength}};
+         \node[above] at (crossQEC) {\tiny QEC};
+         \draw[qecColor] (qec) ellipse (\distanceH#1 and \distanceV#1);
+         \coordinate (FoV) at ($(qec)+(\angleRot:\distanceH#1 and \distanceV#1)$);
+         \pic at (FoV) {cross={\crossLength}};
+         \draw[qecColor,<->] (qec) -- (FoV) node[midway, below] {\tiny d};
+         \node[anchor=west] at (FoV) {\tiny FoV};
+       }
+   }
+   \tikzset{
+   	pics/FoV/.style n args={3}{
+         code={
+            \def\coef{0.28}
+            \draw[dashed, thick, qecColor] ([shift={(0.00881945*#2*#1,0.004961*#3*#1)}]-0.0352778*\coef*#1, -0.019844*\coef*#1) rectangle ([shift={(0.00881945*#2*#1,0.004961*#3*#1)}]0.0352778*\coef*#1, 0.019844*\coef*#1);
+          }%code
+       }%pic
+   }
+
+   \tikzset{
+   	fovFull/.pic={
+         \def\coef{0.28}
+         \draw[dashed, thick, qecColor, fill=fullquality] (-0.0352778*\coef*#1, -0.019844*\coef*#1) rectangle (0.0352778*\coef*#1, 0.019844*\coef*#1);
+       }
+   }
+
+   \tikzset{
+   	pics/fovTiled/.style n args={3}{
+         code={
+            \def\coef{0.28}
+            \begin{pgfinterruptboundingbox}
+               \begin{scope}
+                  \clip (-0.0352778*\coef*#1, -0.019844*\coef*#1) rectangle (0.0352778*\coef*#1, 0.019844*\coef*#1);
+                  \pic at (-0.00881945*#2*#1,-0.004961*#3*#1) {equirectangular={#1}{-1}{0}};
+               \end{scope}
+            \end{pgfinterruptboundingbox}
+            \draw[dashed, thick, qecColor] (-0.0352778*\coef*#1, -0.019844*\coef*#1) rectangle (0.0352778*\coef*#1, 0.019844*\coef*#1);
+          }%code
+       }%pic
+   }
+
+   \pic [local bounding box=spher]  at (0,0) {sphericalMetric={\sizeSphere}};
+
+   \pic [local bounding box=equiTiled]  at (3.0\sizeSphere,-3.0\sizeSphere) {equirectangular={\sizeSphere}{-1}{0}};
+
+   \pic [local bounding box=equi]  at (-3.0\sizeSphere,-3.0\sizeSphere) {equirecNoTile={\sizeSphere}};
+
+   \pic [local bounding box=FoV1]  at (-3.0\sizeSphere,-3.0\sizeSphere) {FoV={\sizeSphere}{\offsetFoVH}{\offsetFoVV}};
+   \pic [local bounding box=FoV2]  at (3.0\sizeSphere,-3.0\sizeSphere) {FoV={\sizeSphere}{\offsetFoVH}{\offsetFoVV}};
+
+   \draw[->] (spher) -| (equi);
+   \draw[->] (spher) -| (equiTiled);
+
+   \coordinate (msssim) at (0, -5.0\sizeSphere);
+
+   \node (MSSSIM) at (msssim) {MS-SSIM};
+
+   \draw[thick, <-] (MSSSIM) -| (FoV1) node[midway] (midOne) {};
+   \draw[thick, <-] (MSSSIM) -| (FoV2) node[midway] (midTwo) {};
+
+   \pic [local bounding box=FoV11]  at (midOne) {fovFull={\sizeSphere}};
+   \pic [local bounding box=FoV11]  at (midTwo) {fovTiled={\sizeSphere}{\offsetFoVH}{\offsetFoVV}};
+
+\end{tikzpicture}
