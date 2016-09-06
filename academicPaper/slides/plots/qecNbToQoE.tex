@@ -52,17 +52,19 @@ column sep=15pt,
             xmin = 1,
             ymin = 0,
             xmax = 32,
-            %ymax = 1,
+            ymax = 2.5,
             ymajorgrids,
             %y filter/.code={\pgfmathparse{#1/100}\pgfmathresult},
         ]
+        \only<.(1)->{\legend{1\,s, 2\,s, 3\,s, 5\,s}}
         \foreach  \window in {1, 2, 3, 5}{
          \only<+->{
             \addplot+ table [x =nbQec, y =medQoe]{results/qoeForWindow\window s.csv};
          }
         }
-        \legend{1\,s, 2\,s, 3\,s, 5\,s}
         %\legend{CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}
 
+        \coordinate (top) at (rel axis cs:0,1);
     \end{axis}
+    \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
 \end{tikzpicture}

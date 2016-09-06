@@ -10,7 +10,9 @@
    Orthodromic distance is the length of the great-circle
 
    \begin{independentCounter}
-      \input{plots/orthodromicDist.tex}
+      \begin{center}
+         \input{plots/orthodromicDist.tex}
+      \end{center}
    \end{independentCounter}
 
 \end{frame}
@@ -33,7 +35,9 @@
 
    \begin{independentCounter}
       \setBP{1}
-      \input{plots/projections.tex}
+      \begin{center}
+         \input{plots/projections.tex}
+      \end{center}
    \end{independentCounter}
 
    \setbeamercovered{invisible}
@@ -43,12 +47,25 @@
 \begin{frame}[c]
    \frametitle{Quality metric used}
 
-   \begin{independentCounter}
-      \setBP{1}
-      \only<1-12>{
-         \input{plots/qualityMetric.tex}
-      }
-   \end{independentCounter}
+   \begin{columns}[T]
+
+     \begin{column}{0.6\linewidth}
+        \begin{independentCounter}
+           \setBP{1}
+           \only<1-12>{
+              \input{plots/qualityMetric.tex}
+           }
+        \end{independentCounter}
+     \end{column}
+     \begin{column}{0.4\linewidth}
+        \begin{itemize}
+           \item<1-> Generate the viewports\\ Compute the MS-SSIM
+           \item<2-> Average multiple measures at the same distance
+           \item<5-> Multiple distances
+        \end{itemize}
+     \end{column}
+  \end{columns}
+
 \end{frame}
 
 %%%% Frame %%%%
@@ -57,15 +74,15 @@
 
    \begin{columns}[T]
      \begin{column}{0.65\linewidth}
-        \begin{itemize}
+        \begin{itemize}[<+->]
             \item Software + Scripts available on github
-            \begin{itemize}
+            \begin{itemize}[<.->]
                \item Projection
                \item QEC generation
             \end{itemize}
             \item 1080p viewports from a 4K 360-degree video
             \item Head movement dataset from Jaunt, Inc
-            \begin{itemize}
+            \begin{itemize}[<.->]
                \item 11 360-degree videos
                \item 10\,s long
                \item 11 peoples watch with an Occulus Rift DK2

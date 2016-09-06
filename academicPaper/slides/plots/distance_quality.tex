@@ -21,27 +21,20 @@
    \pgfplotsset{grid style={dashed,gray}}
    \pgfplotsset{minor grid style={dotted,red!20!gray}}
    \pgfplotsset{major grid style={dotted,green!50!black}}
+
     \begin{axis}[
             ylabel={MS-SSIM},
             xlabel={Orthodromic distance},
             width=0.95\linewidth,
             height=0.5\linewidth,
- %           unit vector ratio=1 2 1,
- %           x=0.4cm,
             cycle list name={My color list},
-            %ytick={0,2,4,...,10},
-            %xtick pos=left,
-            %x tick label style={at={(current axis.right of origin)},rotate=45,anchor=north east},
-            %minor y tick num={1},
             legend cell align=left,
             xmin = 0,
             xmax = 3.14,
-            %ymin = 0,
+            ymin = 0.88,
             ymax = 1,
             ymajorgrids,
             yminorgrids,
-%            axis on top,
-            %y filter/.code={\pgfmathparse{#1/1000000}\pgfmathresult},
         ]
          \pgfplotsextra{\begin{scope}[on layer=axis background]
                 \draw[draw=color5] (axis cs:0,0.955777) -- (axis cs:3.14,0.955777);
@@ -51,12 +44,15 @@
             \end{scope}
         }
 
+        \only<.(1)->{\legend{Equirec,CubeMap,Pyramid,Dodeca}}
         \only<+->{\addplot+ table [x=distance, y=qualityEquirectangularTiledLower]{results/distanceQuality.csv};}
         \only<+->{\addplot+ table [x=distance, y=qualityCubeMapLower]{results/distanceQuality.csv};}
         \only<+->{\addplot+ table [x=distance, y=qualityPyramidLower]{results/distanceQuality.csv};}
         \only<+->{\addplot+ table [x=distance, y=qualityRhombicDodecaLower]{results/distanceQuality.csv};}
 %        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
-        \legend{Equirec,CubeMap,Pyramid,Dodeca}
 
+
+        \coordinate(top)at(rel axis cs:0,1);
     \end{axis}
+    \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
 \end{tikzpicture}
