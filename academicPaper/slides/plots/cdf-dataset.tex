@@ -59,10 +59,20 @@ column sep=15pt,
             }
         }
 
+
 %        \legend{0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s, 3s, 3.5s, 4s,
 %        4.5s, 5s}
 
       \coordinate (top) at (rel axis cs:0,1);
-   \end{axis}
-   \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
+      \coordinate (xMid) at (axis cs:1.57,0);
+      \coordinate (text) at (axis cs:1.57,0.25);
+      \coordinate (inter) at (axis cs:1.57,0.86);
+      \coordinate (yMid) at (axis cs:-1,0.86);
+      \only<+->{
+         \draw[dashed] (xMid) -- (inter) -- (yMid);
+         \node[right, shape = rectangle, draw, xshift=2pt] at (text) {\tiny In 2\,s, 86\,\% of the users move less than 90$^{\circ}$};
+      }
+  \end{axis}
+  \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
+
 \end{tikzpicture}

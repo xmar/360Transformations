@@ -4,43 +4,45 @@
    \definecolor{qecColor}{HTML}{cc0000}
 
    \def\sizeSphere{55}
+   \def\posViewportLabel{west}
    \only<+->{
-      \def\angleRot{-20}   \def\distanceH{0.6}   \def\distanceV{0.5}   \def\offsetFoVH{0}   \def\offsetFoVV{0}
+      \def\angleRot{-20}   \def\distanceH{0.6}   \def\distanceV{0.5}   \def\offsetFoVH{0.2}   \def\offsetFoVV{-0.2}
    }
    \only<+>{
-      \def\angleRot{-160}                                               \def\offsetFoVH{-1}   \def\offsetFoVV{0}
+      \def\angleRot{-160}                                               \def\offsetFoVH{-1.2}   \def\offsetFoVV{-0.2}
+      \def\posViewportLabel{east}
    }
    \only<+>{
-      \def\angleRot{160}                                               \def\offsetFoVH{-1}   \def\offsetFoVV{1}
+      \def\angleRot{160}                                               \def\offsetFoVH{-1.2}   \def\offsetFoVV{1.2} \def\posViewportLabel{east}
    }
    \only<+>{
-      \def\angleRot{20}                                               \def\offsetFoVH{0}   \def\offsetFoVV{1}
+      \def\angleRot{20}                                               \def\offsetFoVH{0.2}   \def\offsetFoVV{1.2}
    }
    %%%%%%%%%%%%%%%
    \only<+->{
       \def\angleRot{-20}   \def\distanceH{0.9}   \def\distanceV{0.75}   \def\offsetFoVH{1}   \def\offsetFoVV{-1}
    }
    \only<+>{
-      \def\angleRot{-160}                                               \def\offsetFoVH{-2}   \def\offsetFoVV{-1}
+      \def\angleRot{-160}                                               \def\offsetFoVH{-2}   \def\offsetFoVV{-1} \def\posViewportLabel{east}
    }
    \only<+>{
-      \def\angleRot{160}                                               \def\offsetFoVH{-2}   \def\offsetFoVV{2}
+      \def\angleRot{160}                                               \def\offsetFoVH{-2}   \def\offsetFoVV{2} \def\posViewportLabel{east}
    }
    \only<+>{
       \def\angleRot{20}                                               \def\offsetFoVH{1}   \def\offsetFoVV{2}
    }
    %%%%%%%%%%%%%%%%
    \only<+->{
-      \def\angleRot{-20}   \def\distanceH{1.2}   \def\distanceV{1.0}   \def\offsetFoVH{2}   \def\offsetFoVV{-2}
+      \def\angleRot{-20}   \def\distanceH{1.2}   \def\distanceV{1.0}   \def\offsetFoVH{2.3}   \def\offsetFoVV{-2.3}
    }
    \only<+>{
-      \def\angleRot{-160}                                              \def\offsetFoVH{-2.8}   \def\offsetFoVV{-2}
+      \def\angleRot{-160}                                              \def\offsetFoVH{-2.8}   \def\offsetFoVV{-2.3} \def\posViewportLabel{east}
    }
    \only<+>{
-      \def\angleRot{160}                                               \def\offsetFoVH{-2.8}   \def\offsetFoVV{2.8}
+      \def\angleRot{160}                                               \def\offsetFoVH{-2.8}   \def\offsetFoVV{2.8} \def\posViewportLabel{east}
    }
    \only<+>{
-      \def\angleRot{20}                                               \def\offsetFoVH{2}   \def\offsetFoVV{2.8}
+      \def\angleRot{20}                                               \def\offsetFoVH{2.3}   \def\offsetFoVV{2.8}
    }
 
    \tikzset{
@@ -66,7 +68,7 @@
          \coordinate (FoV) at ($(qec)+(\angleRot:\distanceH#1 and \distanceV#1)$);
          \pic at (FoV) {cross={\crossLength}};
          \draw[qecColor,<->] (qec) -- (FoV) node[midway, below] {\tiny d};
-         \node[anchor=west] at (FoV) {\tiny FoV};
+         \node[anchor=\posViewportLabel] at (FoV) {\tiny viewport};
        }
    }
    \tikzset{

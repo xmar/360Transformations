@@ -42,6 +42,10 @@
                 			font=\tiny, inner sep=2pt,
                 			anchor=west, text=white] at (axis cs:0,0.955777) {\textit{\vphantom{lj}uniEqui}};
             \end{scope}
+            \begin{scope}[on layer=axis background]
+                   \draw[draw=black, dashed] (axis cs:1.57,0) -- (axis cs:1.57,1);
+                   \node[shape=rectangle, draw, right, align=center] at (axis cs:1.8, 0.98) {\tiny Withing a 2\,s segment,\\[0.1em] \tiny 86\,\% of the users never explore this zone};
+               \end{scope}
         }
 
         \only<.(1)->{\legend{Equirec,CubeMap,Pyramid,Dodeca}}

@@ -43,7 +43,7 @@
    \vfill
    %\vspace{-0.5cm}
    %\href{run:videos/car_equirectangular_4k.mp4}{\includegraphics[scale=0.3]{videos/test.jpg}}
-   \begin{minipage}[t][7cm][t]{\textwidth}
+   \begin{minipage}[t][4cm][t]{\textwidth}
       \only<+-.(4)>{
          \begin{itemize}[<.->]
             \item Omnidirectional video:
@@ -82,9 +82,11 @@
       }
       \incBP{2}
       \only<+->{
+         \vfill
          \begin{itemize}[<+->]
-            \item \textbf{Problem}: 4K stereo videos displayed at 100\,Hz require more than 100\,Mbps
+            \item \textbf{Problem}: 4K stereo videos + 100\,fps $\Rightarrow$ $>$  100\,Mbps
          \end{itemize}
+         \vspace{2cm}
       }
     \end{minipage}
     \vfill
@@ -113,14 +115,14 @@
    \begin{itemize}
      \item \textbf{Advantages}:
      \begin{itemize}[<+->]
-        \item<.-> Video bitrate is close to the client available bandwidth\\ $\Rightarrow$ give the feeling of personalized delivery
-        \item Server prepares once only ``a few'' representations\\ $\Rightarrow$ give the feeling of a broadcasted delivery.
+        \item<.-> Video bitrate $\approx$ client available bandwidth\\ $\Rightarrow$ give the feeling of personalized delivery
+        \item Server: only ``a few'' representations\\ $\Rightarrow$ give the feeling of a broadcasted delivery.
      \end{itemize}
      \vfill
      \onslide<+->{
      \item \textbf{Weakness}:
      \begin{itemize}
-        \item The choice of the right representation requires network condition predictions
+        \item Representation's choice $\Rightarrow$ network condition predictions
      \end{itemize}
      }
      \vfill
@@ -244,7 +246,7 @@
                \item \textbf{Weaknesses}:
                \begin{itemize}
                   \item Computation at the server
-                  \item Motion-to-photon issues: 5-20\,ms to prevent motion sickness
+                  \item $>$ 5-20\,ms $\Rightarrow$ motion sickness
                \end{itemize}
             \end{itemize}
             }
@@ -268,7 +270,7 @@
                   \begin{itemize}
                      \item Good interactivity
                      \item Flexibility
-                     \item Compliant with DASH Spatial Relationship Description
+                     \item Compliant with DASH SRD% Spatial Relationship Description
                   \end{itemize}
                \end{itemize}
             }
@@ -278,8 +280,9 @@
             \begin{itemize}
                \item \textbf{Weaknesses}:
                \begin{itemize}
-                  \item More processing at the client side
-                  \item Storage and description (64 videos per bitrate)
+                  \item More client side processing
+                  \item Storage and description %(64 videos per bitrate)
+                  \item Compression efficiency
                \end{itemize}
             \end{itemize}
             }
@@ -320,7 +323,7 @@
 
    \vfill
    \begin{itemize}[<+->]
-      \item Which projection layout is the more adapted to viewport-adaptive streaming?
+      \item Which projection is the more adapted to viewport-adaptive streaming?
       \vfill
       \item What segment size can be used?
       \vfill

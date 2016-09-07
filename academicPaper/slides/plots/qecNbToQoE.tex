@@ -65,6 +65,9 @@ column sep=15pt,
         %\legend{CubeMapLower, EquirectangularTiledLower, PyramidLower, RhombicDodeca}
 
         \coordinate (top) at (rel axis cs:0,1);
+        \coordinate (xTop) at (axis cs:7,2.5);
+        \coordinate (xDown) at (axis cs:7,0);
+        \only<+->{\draw[dashed] (xTop) -- (xDown);}
     \end{axis}
     \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
 \end{tikzpicture}

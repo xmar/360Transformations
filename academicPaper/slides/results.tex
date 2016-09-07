@@ -45,6 +45,21 @@
 
 %%%% Frame %%%%
 \begin{frame}[c]
+   \frametitle{Video segment size?}
+   Head movement dataset
+   %from Jaunt, Inc
+   : 11, 10\,s long videos; 11 peoples %with an Occulus Rift DK2
+   \vspace{-0.4cm}
+   \begin{independentCounter}
+      \setBP{2}
+      \only<1-6>{
+         \input{plots/cdf-dataset.tex}
+      }
+   \end{independentCounter}
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
    \frametitle{Quality metric used}
 
    \begin{columns}[T]
@@ -75,18 +90,14 @@
    \begin{columns}[T]
      \begin{column}{0.65\linewidth}
         \begin{itemize}[<+->]
+           \vfill
             \item Software + Scripts available on github
             \begin{itemize}[<.->]
                \item Projection
                \item QEC generation
             \end{itemize}
+            \vfill
             \item 1080p viewports from a 4K 360-degree video
-            \item Head movement dataset from Jaunt, Inc
-            \begin{itemize}[<.->]
-               \item 11 360-degree videos
-               \item 10\,s long
-               \item 11 peoples watch with an Occulus Rift DK2
-            \end{itemize}
          \end{itemize}
       \end{column}
       \begin{column}{0.35\linewidth}
@@ -110,23 +121,23 @@
 
 %%%% Frame %%%%
 \begin{frame}[c]
-   \frametitle{Video segment size?}
-
-   \begin{independentCounter}
-      \setBP{2}
-      \only<1-5>{
-         \input{plots/cdf-dataset.tex}
-      }
-   \end{independentCounter}
-\end{frame}
-
-%%%% Frame %%%%
-\begin{frame}[c]
    \frametitle{Number QEC?}
 
    \begin{independentCounter}
-      \setBP{2}
-      \only<1-5>{
+      \only<1-3>{
+         \begin{itemize}
+            \item In this part the number of QEC is varied
+            \item Maximize the smallest distance between each QEC
+         \end{itemize}
+         \begin{center}
+            \input{plots/illustrateNbQecVariation.tex}
+         \end{center}
+      }
+   \end{independentCounter}
+
+   \begin{independentCounter}
+      \setBP{5}
+      \only<4-9>{
          \input{plots/qecNbToQoE.tex}
       }
    \end{independentCounter}
