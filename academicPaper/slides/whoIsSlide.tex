@@ -1,5 +1,6 @@
+\ifthenelse{\boolean{isXavier}}{%if is Xavier
 %%% Slide for Xavier %%%
-\begin{frame}[c]
+\begin{frame}[c,noframenumbering]
    \frametitle{Who am I?}
 
    \begin{columns}[T]
@@ -73,3 +74,17 @@
    \end{tikzpicture}
    }
 \end{frame}
+}{%then is not Xavier
+   \ifthenelse{\boolean{isGwendal}}{ % if Gwendal
+   %%% Slide for Gwendal  %%%
+   \begin{frame}[c,noframenumbering]
+      \frametitle{Who am I?}
+
+      \textbf{Gwendal Simon}
+
+   \end{frame}
+   }
+   { % is not gwendal
+
+   }
+}

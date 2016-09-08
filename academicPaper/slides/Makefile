@@ -7,11 +7,14 @@ Sections = $(filter-out $MainSource, $(wildcard *.tex))
 Plots = $(wildcard ../plots/*.tex)
 PlotsPdf = $(patsubst %.tex,%.pdf,$(Plots))
 
-.PHONY: xavier
-xavier: $(OutputPDFXavier)
+.PHONY: none
+none: $(OutputPDF)
 
 .PHONY: all
-all: $(OutputPDFGwendal) $(OutputPDFXavier) $(OutputPDFGwendal5G) $(OutputPDFXavier)
+all: $(OutputPDFXavier) $(OutputPDFGwendal) $(OutputPDFGwendal5G) $(OutputPDF)
+
+.PHONY: xavier
+xavier: $(OutputPDFXavier)
 
 .PHONY: gwendal
 gwendal: $(OutputPDFGwendal)
@@ -22,29 +25,25 @@ gwendal5G: $(OutputPDFGwendal5G)
 .PHONY: FORCE
 $(OutputPDF): $(MainSource) $(Sections) $(Plots) FORCE
 	make cleanLn
-	ln -s whoIsXavier.tex whoIsSlide.tex
-	ln -s /dev/null extra5G.tex
+	./generateVariables.py
 	../latexrun --latex-args="-shell-escape" $<
 
 $(OutputPDFXavier): $(MainSource) $(Sections) $(Plots) FORCE
 	make cleanLn
-	ln -s whoIsXavier.tex whoIsSlide.tex
-	ln -s /dev/null extra5G.tex
+	./generateVariables.py --xavier
 	../latexrun --latex-args="-shell-escape" $<
 	cp $(OutputPDF) $(OutputPDFXavier)
 
 $(OutputPDFGwendal): $(MainSource) $(Sections) $(Plots) FORCE
 	make cleanLn
-	ln -s whoIsGwendal.tex whoIsSlide.tex
-	ln -s /dev/null extra5G.tex
+	./generateVariables.py --gwendal
 	#../latexrun --latex-args="-shell-escape" -O latex.out_gwendal $<
 	../latexrun --latex-args="-shell-escape" $<
 	cp $(OutputPDF) $(OutputPDFGwendal)
 
 $(OutputPDFGwendal5G): $(MainSource) $(Sections) $(Plots) cleanLn FORCE
 	make cleanLn
-	ln -s whoIsGwendal.tex whoIsSlide.tex
-	ln -s extra5GSlide.tex extra5G.tex
+	./generateVariables.py --gwendal --fiveG
 	#../latexrun --latex-args="-shell-escape" -O latex.out_gwendal_5G $<
 	../latexrun --latex-args="-shell-escape" $<
 	cp $(OutputPDF) $(OutputPDFGwendal5G)
@@ -57,5 +56,4 @@ clean: cleanLn
 
 .PHONY: cleanLn
 cleanLn:
-	-rm whoIsSlide.tex
-	-rm extra5G.tex
+	-rm variables.tex

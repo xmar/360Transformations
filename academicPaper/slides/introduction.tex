@@ -2,7 +2,9 @@
 
 \input{whoIsSlide.tex}
 
-\input{extra5G.tex}
+\ifthenelse{\boolean{is5G}}{
+   \input{extra5GSlide.tex}
+}{}
 
 %%% Slide  %%%
 \newcounter{tmpCounter1}
