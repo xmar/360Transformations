@@ -1,19 +1,19 @@
 \section{Background and Related Work}
 \label{sec:related}
 
-We introduce the necessary geometric concepts for \GS{spherical}{}
+We introduce the necessary geometric concepts for spherical
 videos, and discuss prospective architecture
-proposals for navigable 360-degree video delivery.
+proposals for navigable $360$-degree video delivery.
 
 \subsection{Geometric Layouts for 360-degree Videos}
 
-A 360-degree video is captured in every direction from a unique point,
-so it is essentially a \emph{spherical} video. Since video encoders
+A $360$-degree video is captured in every direction from a unique point,
+so it is essentially a \emph{spherical} video. Since current video encoders
 operate on a two-dimensional rectangular image, a key step of the
 encoding chain is to project the spherical video onto a planar
 surface. The projection of a sphere onto a plane (known as mapping)
 has been studied for centuries. In this paper, we consider the four
-projections that are the most discussed for 360-degree video
+projections that are the most discussed for $360$-degree video
 encoding~\cite{yu_framework_2015}. These layouts are depicted in
 Figure~\ref{fig:mapping}.
 %The advantages and shortcomings of every projection have been
@@ -33,7 +33,7 @@ layout causes under-sampling: some pairs of pixels on the sphere
 are merged into a
 single pixel in the projected image by interpolating their color
 values. This under-sampling cause distortion and information loss in
-the extracted FoV. Previous work regarding projection of spherical
+some extracted \FoV{}s. Previous work regarding projection of spherical
 videos into different geometric layouts focuses on enabling efficient
 implementation of signal processing
 functions~\cite{kazhdan_metric-aware_2010} and improving the video
@@ -88,7 +88,7 @@ encoding~\cite{tosic_low_2009}.
 
 \parag{Our contributions}We propose to leverage the geometric
 structure of the layouts to implement a video encoding based on
-\ac{QEC}. Each geometric layout is characterized by a number of
+\ac{QER}. Each geometric layout is characterized by a number of
 \emph{faces} (\textit{e.g.}, 6 for the cube map, 12 for the
 dodecahedron) and a given \emph{central point} (which corresponds to a
 position on the sphere).
@@ -103,19 +103,19 @@ reduced.
 %probability (e.g., the back face can be assigned low quality).
 To our knowledge, such idea has not been studied yet.
 Another originality of our work is that we measure \ac{QoE} by
-measuring the quality of several extracted \GS{viewports}{} instead of
-the full video.
+measuring the quality of several extracted viewports instead of
+the full projected video.
 
-\subsection{Personalized FoV-Only Streaming}
+\subsection{Personalized Viewport-Only Streaming}
 
 An intuitive idea to address the problem of resource waste due to the
-delivery of non-\GS{displayed video data}{} is to stream only the part of the video that
-corresponds to the \GS{viewport}. This solution however does not enable
-fast navigation within the 360-degree video: when the client moves the
-head, the FoV center changes, requiring a new viewport to be
+delivery of non-displayed video data is to stream only the part of the video that
+corresponds to the viewport. This solution however does not enable
+fast navigation within the $360$-degree video: When the client moves the
+head, the \FoV{} center changes, requiring a new viewport to be
 immediately displayed. Since the device has no knowledge about other
 parts of the spherical video, it has to notify the server about the
-head movement and wait for the reception of the newly adjusted \GS{viewport}.
+head movement and wait for the reception of the newly adjusted viewport.
 As seen in other interactive multimedia
 systems~\cite{ChoyWSR14}, this solution cannot meet the \SI{10}{ms} latency
 requirement in the standard Internet, even with the assistance of
@@ -125,22 +125,22 @@ connection.
 
 \parag{Our contributions}In our system, the server always delivers
 the full video, but it has different versions of this video depending
-on the quality emphasized region (characterized by the QEC). The client device
+on the \ac{QER} (characterized by the \ac{QEC}). The client device
 selects the right representation and extracts the viewport. The
 storage requirements at the server side increase but all the
 processing is done at the client side (representation selection and
 viewport extraction). This idea matches the adaptive delivery
-solutions that content providers have \GS{recently}{} adopted % in recent years
+solutions that content providers have recently adopted % in recent years
 (\textit{e.g.}~\ac{DASH}), trading client-personalized delivery for
 simple server-side management operation.
 
 \subsection{Tiling for Adaptive Video Streaming}
-\GS{To deal with the cases of end-users consuming only a fraction of the
+To deal with the cases of end-users consuming only a fraction of the
 video (navigable
 panorama~\cite{sanchez_compressed_2015,wang_mixing_2014,gaddam_tiling_2015}
 and large-resolution video~\cite{jean16mmsys}), the most studied delivery solution
 leverages the concept
-of \emph{tiling}}.
+of \emph{tiling}.
 %A delivery solution when the end-users consumes only a fraction of the
 %video is based on the concept of \emph{tiling}. This proposal has been
 %implemented for navigable panorama
@@ -153,15 +153,15 @@ selects a representation for each tile and it has to reconstruct the
 full video from these tiles before the viewport extraction.
 % is carried out.
 In a short paper,~\citet{ochi_live_2015} have sketched a
-tile-based streaming system for 360-degree videos. In their proposal,
+tile-based streaming system for $360$-degree videos. In their proposal,
 the spherical video is mapped onto an \emph{equirectangular} video,
 which is cut into $8\!\times\! 8$ \emph{tiles}.
 
 A tile-based adaptive streaming system provides the same features as
 our proposed system regarding navigability (the clients get the full
 video), bandwidth waste reduction (the video at low quality for
-non-\ac{FoV} part) and \ac{QoE} maintenance (the downloaded video is
-at full quality near the \ac{FoV} center). It has however several
+non-\FoV{} part) and \ac{QoE} maintenance (the downloaded video is
+at full quality near the \FoV{} center). It has however several
 critical weaknesses. First, the client has to first reconstruct the
 video from independent tiles before the viewport extraction can take
 place, which requires energy and time spent for each video frame.
@@ -170,16 +170,16 @@ encoding is due to the tile
 independence~\cite{sanchez_compressed_2015}. Third, the management at
 the server is heavier because the number of files is larger. For
 example, a typical $8\times8$ tiling offered at six quality levels
-contributes to having 384~independent files for each video segment,
-and this results in larger \ac{MPD} files (\GS{or}{} manifest
+contributes to having $384$~independent files for each video segment,
+and this results in larger \ac{MPD} files (or manifest
 files). Finally, the management at the client side is heavier, as
 well. For each tile, the client should run a representation selection
 process and manage a specific network connection with the server.
 
 \parag{Our contributions}In our system, the server
-\GS{prepares $n$ QEC-based videos, each of them being a
-pre-processed set of tile representations. Each QEC-based video is then
-encoded at $k$ \emph{global} quality levels}.
+prepares $n$ \ac{QER}-based videos, each of them being a
+pre-processed set of tile representations. Each \ac{QER}-based video is then
+encoded at $k$ \emph{global} quality levels.
 %prepares
 %(once and for all) \emph{one} video version per \ac{QEC}, each version
 %being then encoded at several global quality levels. Each version is a
@@ -195,39 +195,39 @@ the viewport extraction.
 %everything in the same video container is much easier for the download
 %and the time synchronization.}.
 
-\subsection{QEC-Based Streaming}
+\subsection{\acs{QER}-Based Streaming}
 
-A  provider of 360-degree videos (Facebook) has recently
+A  provider of $360$-degree videos (Facebook) has recently
 released details about the implementation of its delivery
 platform~\cite{facebook}.
 % Their system is based on the same idea as
 %our concept of \ac{QEC}.
-\GS{The spherical video is projected onto a pyramid layout from multiple
-(up to 30) central points to generate a set of video representations.
+The spherical video is projected onto a pyramid layout from multiple
+(up to $30$) central points to generate a set of video representations.
 Since the
 front face of pyramid projection has a better image quality than the other faces, the
-system is in essence similar as our concept of \ac{QEC}. The end-users
+system is in essence similar as our concept of \ac{QER}. The end-users
 periodically select one of the representations
-based on their \ac{FoV} center}. This implementation
+based on their \FoV{} center. This implementation
 corroborates that, from an industrial perspective, the extra-cost of
-generating and storing multiple \ac{QEC}-based representations of the
+generating and storing multiple \ac{QER}-based representations of the
 same video is compensated by bandwidth savings and
 enhanced system usability.
 %This system uses projections of the
 %spherical videos into two layouts: a pyramid and a cube map.
-\GS{However, as we will see in Section~\ref{sec:settings}, the pyramid projection is not
+However, as we will see in Section~\ref{sec:settings}, the pyramid projection is not
 the best regarding the viewport quality. Moreover, the system
 uses the same video quality on each face, which is less
 efficient than our proposal. Finally, the impact of the video encoding on the solution
-is not given}.
+is not given.
 
 \parag{Our contributions}Our approach is based on the same
-idea of offering multiple \ac{QEC}-based video representations.
+idea of offering multiple \ac{QER}-based video representations.
 However, we provide a complete study of our system with the additional
 distinction of having varying quality across the geometrical layout. Moreover,
 our study includes an evaluation of several
-geometric layouts, an analysis of the best segment duration, \XC{an
-analysis of the best number of \acp{QEC},}{}
-and a step towards integration into MPEG \ac{DASH}.
+geometric layouts, an analysis of the best segment duration, an
+analysis of the best number of \acp{QER},
+and a step towards integration into \ac{MPEG} \ac{DASH}.
 %associated with a given representation, based on the specific
 %\ac{QEC}

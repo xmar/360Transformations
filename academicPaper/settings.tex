@@ -3,31 +3,30 @@
 \section{System Settings}
 \label{sec:settings}
 
-The preparation of 360-degree videos for viewport-adaptive streaming
+The preparation of $360$-degree videos for viewport-adaptive streaming
 relies on multiple parameters. We distinguish between global
-parameters (the number of \acp{QEC}, the number of
+parameters (the number of \acp{QER}, the number of
 representations, the segment length and the geometric layout)
 and local (\emph{per representation}) parameters (the target bit-rate,
-the number of different qualities in a representation, the quality
-arrangement onto the different faces of a geometric layout). We \GS{will not
-be}{} comprehensive regarding the selection of all these
+the evolution of the quality in the unique \ac{QER} of each representation). We will not
+be comprehensive regarding the selection of all these
 parameters here. Some of them require a deeper study related to signal
 processing, while others depend on business
 considerations and infrastructure investment. In this paper, we
 restrict our attention to three key questions: What is the best
-geometric layout to support quality-differentiated 360-degree video?
+geometric layout to support quality-differentiated $360$-degree video?
 What is the best segment length to support head movements, while
 maintaining low management overhead? What is the best number of
-\acp{QEC} $n$ to reduce the induced storage requirements, while
-\GS{offering}{} a good \ac{QoE}? To answer these three questions, we have
-developed a software tool and we have used a dataset \GS{from a real \ac{VR} system}.
+\acp{QER} $n$ to reduce the induced storage requirements, while
+offering a good \ac{QoE}? To answer these three questions, we have
+developed a software tool and we have used a dataset from a real \ac{VR} system.
 %real users
 %watching 360-degree videos.
 
 %\subsection{Software and Dataset}
 
 \parag{Dataset}We graciously received from Jaunt, Inc a dataset
-recording the head movements of real users watching 360-degree videos.
+recording the head movements of real users watching $360$-degree videos.
 The dataset is the same as the one used by~\citet{yu_framework_2015}. It comprises
 eleven omnidirectional videos that are ten seconds long. These videos
 are typical of \ac{VR} systems. The dataset contains
@@ -42,7 +41,7 @@ is the most challenging case for our viewport-adaptive
 system. \citet{yu_framework_2015} studied the most frequent head
 positions of users. We are interested here in head movements
 during the length of a segment.
-%They show that the FoV center is around the equator of the spherical
+%They show that the \FoV{} center is around the equator of the spherical
 %video during the majority of time but that lateral movements are
 %frequent.
 
@@ -59,52 +58,41 @@ which it is possible to project to any layout.
 %of 360-degree videos that are currently available are encoded and
 %stored after an equirectangular projection, but our tools enables
 %re-projecting these videos to another layout.
-\XC{Our tool rotates the
-video so that the \ac{QEC} center is always at the same position on
-the $2$D layout.}{}
+Our tool rotates the
+video so that the \ac{QEC} is always at the same position on
+the $2$D layout.
 
   \item \emph{Adjusting the video quality for each
-geometric face of any layout}. \GS{For each face}, we set the resolution in
+geometric face of any layout}. For each face, we set the resolution in
 number of pixels and the target encoding bit-rate.
 %Each face is
 %encoded into its own video track to allow for different bit-rate
 %targets per face.
 
   \item \emph{Viewport extraction for any
-\ac{FoV} center on the sphere}. \XC{It includes the decoding, rescaling
+\FoV{} center on the sphere}. It includes the decoding, rescaling
 and ``projection'' of each face of the input video to extract the
-viewport. This tool support extraction of \ac{FoV} that overlap on
-multiple faces with different resolution and bit-rate target.}{}
+viewport. This tool support extraction of \FoV{} that overlap on
+multiple faces with different resolution and bit-rate target.
 \end{itemize}
 
 \subsection{Geometric Layout}
 
 We report now the experiment of measuring the video quality of
-viewports, extracted from 360-degree videos
+viewports, extracted from $360$-degree videos
 projected onto various geometric layouts and with various face quality
 arrangements. We used two reference videos.
 \begin{itemize}%[leftmargin=7pt, itemindent=0pt, topsep=2pt, itemsep=-3pt]
 
-   \item \emph{The original video at full quality}%
+   \item \emph{The original equirectangular video at full quality}%
    :\footnote{\url{https://youtu.be/yarcdW91djQ}}
-	We extract viewports at 1080p resolution from this 4K
+	We extract viewports at $1080$p resolution from this $4$K
    equirectangular video, which represents the reference (original)
-   video we used for the objective video quality assessment:
-   \ac{MS-SSIM}~\cite{wang2003multiscale} and
-   \ac{PSNR}.
-  \ac{MS-SSIM} compares image by image the structural
-   similarity between a video and a reference video. %It computes a
-%   value between \num{0} and \num{1}, \num{1} being two identical videos.
-   The \ac{PSNR} measures the average error of pixel intensities
-   between a video and a reference video. %It computes a value in
-%   decibel (\si[mode=text]{\decibel}), $+\infty$ being two identical videos.}{}.
-   Since we
-   compare several encoded versions of the \emph{same} video against the
-   original, these well-known tools provide a fair performance evaluation of video distortion.
+   video we used for the objective video quality assessment.
 
-   \item \emph{The same video re-encoded at a target bit-rate}.
-   \XC{It is what a regular delivery system would deliver for the same bit-rate budget (here \SI{\testbitrateBudget}{\mega
-   bps} being \testbitrateBudgetPercentage{} of the original video bit-rate).}{}
+   \item \emph{The same equirectangular video re-encoded at a target bit-rate}.
+   It is what a regular delivery system would deliver for the same bit-rate budget (here \SI{\testbitrateBudget}{\mega
+   bps} being \testbitrateBudgetPercentage{} of the original video bit-rate).
    We re-encoded the original full-quality video with \ac{HEVC}
    by specifying this bit-rate target. We call it \emph{uniEqui} to
    state that, in this video, the quality is uniform.
@@ -114,23 +102,38 @@ arrangements. We used two reference videos.
 %video, the quality is uniform.
 \end{itemize}
 
+To assess the perceived quality, we extract a ten second viewport, at specific distance from the \ac{QEC}, at the same static position on the original equirectangular video and on the tested video. We used two objective video quality metrics to measure the quality of the extracted viewport compared to the original full quality viewport:
+\ac{MS-SSIM}~\cite{wang2003multiscale} and
+\ac{PSNR}.
+\ac{MS-SSIM} compares image by image the structural
+similarity between a video and a reference video. %It computes a
+%   value between \num{0} and \num{1}, \num{1} being two identical videos.
+The \ac{PSNR} measures the average error of pixel intensities
+between a video and a reference video. %It computes a value in
+%   decibel (\si[mode=text]{\decibel}), $+\infty$ being two identical videos.}{}.
+Since we
+compare several encoded versions of the \emph{same} viewport against the
+original, these well-known tools provide a fair performance evaluation of viewport distortion.
+We perform multiple quality assessment (typically forty) at the same distance and average the result.
+
 %Recall that our ultimate motivation
 %is to reduce the bit-rate of the delivered video, while maintaining a high video quality.
 
-\XC{We define a \textit{quality-differentiated layout} as}{} the
-combination of a geometric layout and video quality arrangement onto
-the geometric faces. The performance of the layout can be studied with
+%We define a \textit{quality-differentiated layout} as the
+%combination of a geometric layout and video quality arrangement onto
+%the geometric faces.
+The performance of the layout can be studied with
 regards to two aspects: $(i)$ \emph{the best viewport quality}, which
-is the quality of the extracted viewport when the \ac{FoV} center and
+is the quality of the extracted viewport when the \FoV{} center and
 the \ac{QEC} perfectly matches, $(ii)$ and the \emph{sensitivity to
 head movements}, which is the degradation of the viewport quality when
-the distance between the FoV center and the \ac{QEC} increases. To
+the distance between the \FoV{} center and the \ac{QEC} increases. To
 examine both aspects, we chose one origin point \ac{QEC} in the
-spherical video. \XC{Next,}{} we iterated over the \emph{orthodromic
+spherical video. Next, we iterated over the \emph{orthodromic
 distance} $d$, which increases from \numrange{0}{\pi} (the furthest
-point). For each value $d$, we randomly picked forty \ac{FoV} centers
+point). For each value $d$, we randomly picked forty \FoV{} centers
 at distance $d$ from the origin \ac{QEC} and we extracted the
-viewport, which we compared to the same viewport extracted from the
+viewports, which we compared to the same viewports extracted from the
 full-quality original video, to get an objective video quality
 measure.
 
@@ -147,16 +150,16 @@ We represent in Figure~\ref{fig:dist_quality} the video quality
 quality-differentiated layouts (equirectangular panorama with
 $8\!\times\! 8$ tiles, cube map, pyramid, and dodecahedron). We also
 represent by a thin horizontal line the video quality of the same
-viewport extracted from the \textit{uniEqui} layout (it does
+viewports extracted from the \textit{uniEqui} layout (it does
 not depend on the distance since the quality is uniform). For each
 geometric layout, we have tested numerous quality arrangements with
 respect to the overall bit-rate budget. We selected here the ``best"
-arrangement for each layout. \XC{For the cube map,
+arrangement for each layout. For the cube map,
 the
 \ac{QEC} is located at the center of a face. This face is set at full
 quality (same bit-rate target as the same portion of the original
 video), and the other faces at \SI{25}{\percent} of the
-full quality target}.
+full quality target.
 %For equirectangular with tiles, the \ac{QEC} is
 %located at the center of a tile. $3\!\times\! 3$ tiles arround the
 %\ac{QEC} are set at full quality and the other at low quality. For the
@@ -173,7 +176,7 @@ full quality target}.
 
 The projection on a cube map appears to be the best choice for the
 \ac{VR} provider. The quality of the viewport when the \ac{QEC} and
-the \ac{FoV} center matches ($d=0$) is above \num{0.98}, which
+the \FoV{} center matches ($d=0$) is above \num{0.98}, which
 corresponds to imperceptible distortion relative to the full quality
 video. For all layouts, the quality decreases when the distance $d$
 increases but the quality for the cube map layout is always the
@@ -182,15 +185,15 @@ by Facebook~\cite{facebook}) is especially sensitive to head movements.
 %The video quality for all layouts save for the cube map is lower than
 %that for the standard \emph{uniEqui} for distance greater than
 %\num{1}.
-\GS{The viewport extracted from a cube map projection has a better quality
-than that extracted from the \emph{uniEqui} for \ac{FoV} center at up to
+The viewport extracted from a cube map projection has a better quality
+than that extracted from the \emph{uniEqui} for \FoV{} center at up to
 \num{2} units from the \ac{QEC} while the other layouts are not
-worthy for \ac{FoV} centers at only \num{1} unit of the \ac{QEC}.
-%\XC{Here the cube map projection has better results
+worthy for \FoV{} centers at only \num{1} unit of the \ac{QEC}.
+%Here the cube map projection has better results
 %probably because this layout have bigger faces. The bigger the face
 %is, the more redundancies in the face are available and so the better
-%the video codec exploits the same bit-rate budget.}{}
-We study next the interplay between this distance, the segment length and the number of \acp{QEC}}.
+%the video codec exploits the same bit-rate budget.
+We study next the interplay between this distance, the segment length and the number of \acp{QER}.
 
 \subsection{Segment Length}
 \label{subsec:segmentLength}
@@ -199,22 +202,22 @@ The segment length is a key aspect of viewport-adaptive streaming.
 Long segments are easier to manage and better for video encoding, but
 short segments enable fast re-synchronisation to head movement. With
 respect to Figure~\ref{fig:dist_quality}, the segment length
-should be chosen so that the distance between the \ac{FoV} center and
+should be chosen so that the distance between the \FoV{} center and
 the \ac{QEC} are rarely higher than \num{1.5}~distance units.
 
 Given the dataset, we show the distribution of head movements for
 various segment lengths in Figure~\ref{cdf-dataset}. For each video
 and person watching it, we set timestamps that correspond to the
 starting time of a video segment, \textit{i.e.,} the time at which the
-users select a \ac{QEC}. Then, we measure the orthodromic distance
-between this initial head position and every \ac{FoV} center during
+users select a \ac{QER}. Then, we measure the orthodromic distance
+between this initial head position and every \FoV{} center during
 the next $x$ seconds, where $x$ is the segment length. In
 Figure~\ref{cdf-dataset}, we show the \ac{CDF} of the time spent at a
 distance $d$ from the initial head position.
 A point at $(1.5,0.6)$
 means that, on average, users spend \SI{60}{\percent} of their time
-with a \ac{FoV} center at less than \num{1.5}~distance units from the
-\ac{FoV} center on the beginning of the segment.
+with a \FoV{} center at less than \num{1.5}~distance units from the
+\FoV{} center on the beginning of the segment.
 
 \begin{figure}
 \centering
@@ -244,16 +247,16 @@ sitting users and longer videos.
 %the client (the frequency of representation selection and the number
 %of requests to send). Furthermore, for a \SI{2}{\second}-long segment,
 
-\subsection{Number of \acp{QEC}}
+\subsection{Number of \acp{QER}}
 
-The number of \acp{QEC} $n$ represents another key trade-off. The more
-\acp{QEC} there are, the better the coverage of the spherical video
+The number of \acp{QER} $n$ represents another key trade-off. The more
+\acp{QER} there are, the better the coverage of the spherical video
 is, and thus the better the viewport quality will be due to a better
-match between the \ac{QEC} and the \ac{FoV} center. However,
-increasing the number of \acp{QEC} also means increased storage and
+match between the \ac{QER} and the \FoV{} center. However,
+increasing the number of \acp{QER} also means increased storage and
 management requirements at the server (and a longer \ac{MPD} file).
 
-% \XC{The choice of the position of $n$ \ac{QEC} on a sphere is not
+% The choice of the position of $n$ \ac{QEC} on a sphere is not
 % trivial. We want them to uniformly distributed over the spherical
 % video. This definition is hazy: the results highly depends on what we
 % consider to be the neighborhood of each \ac{QEC} and on our notion of distance. This problem
@@ -261,18 +264,18 @@ management requirements at the server (and a longer \ac{MPD} file).
 % particles on a sphere~\cite{rakhmanov1994electrons} also known as the
 % Thomson problem. We chose to use a
 % solver~\footnote{http://particules.sectionpc.info/bin/Particules.zip}
-% for the Thomson problem to determine the position of each \ac{QEC}.}{}
+% for the Thomson problem to determine the position of each \ac{QEC}.
 
 We represent in Figure~\ref{fig:QEC} the median \ac{PSNR} difference
 between the viewport extracted from the cube map layout and the
 same viewport extracted from the \emph{uniEqui} layout with the same
-overall bit-rate budget. To modify the number of \acp{QEC}, we set a
-number $n$, then we determined the position of the $n$ \acp{QEC}
+overall bit-rate budget. To modify the number of \acp{QER}, we set a
+number $n$, then we determined the position of the $n$ \acp{QER}
 using the Thomson positioning problem~\cite{rakhmanov1994electrons}.
 %\footnote{http://particules.sectionpc.info/bin/Particules.zip}
 %, and we generated $n$ quality-differentiated video representations from these $n$ \acp{QEC}.
 For each head position in the dataset, we computed the distance
-between the \ac{FoV} center and the \ac{QEC} that was chosen at the
+between the \FoV{} center and the \ac{QER} that was chosen at the
 beginning of the segment and we computed the viewport quality
 accordingly.
 %For each video and for
@@ -282,30 +285,30 @@ accordingly.
 %would the users of our datasets see them if the 360-degree video had been prepared
 %with a given number of QECs $n$.
 %%We used the best configuration, \textit{i.e.}, a cube map projection and \SI{2}{\second} segment.
-%\XC{We used the best projection, \textit{i.e.} the cube map projection.}{}
+%We used the best projection, \textit{i.e.} the cube map projection.
 
 
 \begin{figure}
 \centering
 \input{plots/qecNbToQoE.tex}
 \caption{Median \acs{PSNR} gap between the viewports of the cube map layout and the \textit{uniEqui} depending
-on the number of QECs.
+on the number of \acp{QER}.
 Bit-rate: \SI{\testbitrateBudget}{\mega bps}}
 \label{fig:QEC}
 \end{figure}
 
-The best number of \acp{QEC} in this configuration is between
+The best number of \acp{QER} in this configuration is between
 \numlist{5;7}. The gains that are obtained for higher number of
-\acp{QEC} are not significant enough to justify the induced storage
-requirements (in particular not $30$~\acp{QEC} as in the Facebook
-system~\cite{facebook}). Having multiple  \acp{QEC} provides higher
+\acp{QER} are not significant enough to justify the induced storage
+requirements (in particular not $30$~\acp{QER} as in the Facebook
+system~\cite{facebook}). Having multiple  \acp{QER} provides higher
 quality gains for short segments, due to the better re-synchronization
-between the \acp{QEC} and the \ac{FoV} centers. Note also that a
+between the \acp{QER} and the \FoV{} centers. Note also that a
 significant part of these gains stems from the cube map layout
 projection.
 %
 %is between $6$ and $7$.
-%\XC{More \acp{QEC} improve slightly the quality for a linear growth in the
+%More \acp{QEC} improve slightly the quality for a linear growth in the
 %storage needs. Moreover the longer the segment duration is, the lesser
 %the number of \acp{QEC} influences the quality. For a \SI{2}{\second}
-%segment the number of \ac{QEC} is still significant.}
+%segment the number of \ac{QEC} is still significant.
