@@ -3,17 +3,12 @@
 
 The popularity of navigable 360-degree video systems has grown with
 the advent of omnidirectional capturing systems
-%(including multi-camera with stitching systems)
 and interactive displaying systems, like \acp{HMD}. However, to
 deliver 360-degree video content on the Internet, the content
 providers have to deal with a problem of bandwidth waste: What is
 displayed on the device, which is indifferently called
 \textit{\ac{FoV}} or \textit{viewport}, is only a fraction of what is
 downloaded, which is an omnidirectional view of the scene.
-% New delivery solutions have to be designed to provide high-quality
-% \ac{FoV} video despite As epitomized by the launch of a dedicated
-% activity at the June 2016 MPEG \ac{DASH} meeting, new solutions have
-% to be designed to secure high-quality delivery of 360-degree video.
 This bandwidth waste is the price to pay for interactivity. To prevent
 \emph{simulator sickness}~\cite{moss2011characteristics} and to
 provide good \ac{QoE}, the vendors of \acp{HMD} recommend that the
@@ -34,8 +29,7 @@ delivered video stream data are not used.
 
 Let us provide some numbers to illustrate this problem. The viewport
 is defined by a device-specific viewing angle (typically
-$120$ degrees), which delimits horizontally the scene %or vertically
-from the head direction center, called \FoV{} center. To ensure a
+$120$ degrees), which delimits horizontally the scene from the head direction center, called \FoV{} center. To ensure a
 good immersion, the pixel resolution of the displayed viewport is high,
 typically $4$K ($3840\times2160$). So the
 resolution of the full $360$-degree video is at least $12$K
@@ -66,10 +60,7 @@ viewport-adaptive system, clients select the representation
 such that the bit-rate fits their receiving
 bandwidth and the \ac{QEC} is closest to their \FoV{} center.
 
-%\setlength{\textfloatsep}{12pt}
-%\setlength{\intextsep}{9pt}
-\begin{figure}%[h]
-
+\begin{figure}
    \centering
    \input{plots/deliveryChain.tex}
    \caption{Viewport-adaptive 360-degree video delivery system: The server
@@ -93,9 +84,6 @@ device selects another video representation with a closer \ac{QEC}.
 The remainder of the paper is organized as follows. First, we
 present our viewport-adaptive streaming
 system, and
-%present
-%the overall processes that have to be implemented at both the client
-%and server sides, and
 we show how it can be integrated into
 the \ac{MPEG} \ac{DASH}-VR standard. Our proposal is thus a contribution
 to the \ac{VR} group that \ac{MPEG} launched in May
@@ -111,14 +99,7 @@ short enough to enable frequent \ac{QER} switches. Fourth, we
 examine the impact of the number of \acp{QER} on the viewport quality
 and we show that a small number of (spatially-distributed over the sphere)
 \acp{QEC} suffices to get high viewport quality.
-%quality improvement plateaus out after a small number of
-%\acp{QEC}.}{}
-Finally, we introduce a tool (released as open source)%
-%on
-%a public
-%repository\footnote{\url{https://github.com/xmar/360Transformations}})
-, which creates video representations for the proposed viewport-adaptive streaming system.
-% of 360-degree videos.
+Finally, we introduce a tool (released as open source), which creates video representations for the proposed viewport-adaptive streaming system.
 The tool is highly configurable: from a given
 $360$-degree video, it allows any arrangement of video quality for a
 given geometric layout, and it extracts the viewport from any \FoV{} center.

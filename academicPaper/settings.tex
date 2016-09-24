@@ -20,10 +20,7 @@ maintaining low management overhead? What is the best number of
 \acp{QER} $n$ to reduce the induced storage requirements, while
 offering a good \ac{QoE}? To answer these three questions, we have
 developed a software tool and we have used a dataset from a real \ac{VR} system.
-%real users
-%watching 360-degree videos.
 
-%\subsection{Software and Dataset}
 
 \parag{Dataset}We graciously received from Jaunt, Inc a dataset
 recording the head movements of real users watching $360$-degree videos.
@@ -41,9 +38,6 @@ is the most challenging case for our viewport-adaptive
 system. \citet{yu_framework_2015} studied the most frequent head
 positions of users. We are interested here in head movements
 during the length of a segment.
-%They show that the \FoV{} center is around the equator of the spherical
-%video during the majority of time but that lateral movements are
-%frequent.
 
 \parag{Software}We have developed our own tool to manipulate the main
 concepts of viewport-adaptive streaming. Since the code is publicly
@@ -54,10 +48,6 @@ develop real systems. The main features include:
   \item \emph{Projection from a spherical video onto any of the four geometric
 layouts and vice versa}. The spherical video is the pivot format from
 which it is possible to project to any layout.
-%Note that the majority
-%of 360-degree videos that are currently available are encoded and
-%stored after an equirectangular projection, but our tools enables
-%re-projecting these videos to another layout.
 Our tool rotates the
 video so that the \ac{QEC} is always at the same position on
 the $2$D layout.
@@ -65,9 +55,6 @@ the $2$D layout.
   \item \emph{Adjusting the video quality for each
 geometric face of any layout}. For each face, we set the resolution in
 number of pixels and the target encoding bit-rate.
-%Each face is
-%encoded into its own video track to allow for different bit-rate
-%targets per face.
 
   \item \emph{Viewport extraction for any
 \FoV{} center on the sphere}. It includes the decoding, rescaling
@@ -82,10 +69,8 @@ We report now the experiment of measuring the video quality of
 viewports, extracted from $360$-degree videos
 projected onto various geometric layouts and with various face quality
 arrangements. We used two reference videos.
-\begin{itemize}%[leftmargin=7pt, itemindent=0pt, topsep=2pt, itemsep=-3pt]
-
-   \item \emph{The original equirectangular video at full quality}%
-   :\footnote{\url{https://youtu.be/yarcdW91djQ}}
+\begin{itemize}
+   \item \emph{The original equirectangular video at full quality}   :\footnote{\url{https://youtu.be/yarcdW91djQ}}
 	We extract viewports at $1080$p resolution from this $4$K
    equirectangular video, which represents the reference (original)
    video we used for the objective video quality assessment.
@@ -96,32 +81,19 @@ arrangements. We used two reference videos.
    We re-encoded the original full-quality video with \ac{HEVC}
    by specifying this bit-rate target. We call it \emph{uniEqui} to
    state that, in this video, the quality is uniform.
-%ith this bit-rate
-%\emph{budget}, our competitor is the original equirectangular video re-encoded with
-%\ac{HEVC} by specifying this bit-rate target. We call it \emph{uniEqui} to state that, in this
-%video, the quality is uniform.
 \end{itemize}
 
 To assess the perceived quality, we extract a ten second viewport, at specific distance from the \ac{QEC}, at the same static position on the original equirectangular video and on the tested video. We used two objective video quality metrics to measure the quality of the extracted viewport compared to the original full quality viewport:
 \ac{MS-SSIM}~\cite{wang2003multiscale} and
 \ac{PSNR}.
 \ac{MS-SSIM} compares image by image the structural
-similarity between a video and a reference video. %It computes a
-%   value between \num{0} and \num{1}, \num{1} being two identical videos.
-The \ac{PSNR} measures the average error of pixel intensities
-between a video and a reference video. %It computes a value in
-%   decibel (\si[mode=text]{\decibel}), $+\infty$ being two identical videos.}{}.
-Since we
+similarity between a video and a reference video. The \ac{PSNR} measures the average error of pixel intensities
+between a video and a reference video. Since we
 compare several encoded versions of the \emph{same} viewport against the
 original, these well-known tools provide a fair performance evaluation of viewport distortion.
 We perform multiple quality assessment (typically forty) at the same distance and average the result.
 
-%Recall that our ultimate motivation
-%is to reduce the bit-rate of the delivered video, while maintaining a high video quality.
 
-%We define a \textit{quality-differentiated layout} as the
-%combination of a geometric layout and video quality arrangement onto
-%the geometric faces.
 The performance of the layout can be studied with
 regards to two aspects: $(i)$ \emph{the best viewport quality}, which
 is the quality of the extracted viewport when the \FoV{} center and
@@ -138,12 +110,6 @@ full-quality original video, to get an objective video quality
 measure.
 
 
-%We represent in Figure~\ref{fig:dist_quality_psnr} the difference of \ac{PSNR} between
-%the extracted viewport from our quality-differentiated layouts and the same viewport extracted from
-%the reference \textit{uniEqui} layout. For each geometric layout (equirectangular
-%panorama with $8\!\times\! 8$ tiles, cube map, pyramid, and dodecahedron), we have tested
-%numerous quality arrangements with respect to the overall bit-rate budget. We selected
-%here the ``best" arrangement for each layout.
 
 We represent in Figure~\ref{fig:dist_quality} the video quality
 (measured by \acs{MS-SSIM}) of the viewport that is extracted from our
@@ -160,16 +126,9 @@ the
 quality (same bit-rate target as the same portion of the original
 video), and the other faces at \SI{25}{\percent} of the
 full quality target.
-%For equirectangular with tiles, the \ac{QEC} is
-%located at the center of a tile. $3\!\times\! 3$ tiles arround the
-%\ac{QEC} are set at full quality and the other at low quality. For the
-%dodecahedron, the \ac{QEC} is located on a node. The $3$ faces that
-%contain this node are set at full quality and the other at low
-%quality.}{}
 
 \begin{figure}
     \input{plots/distance_quality.tex}
-%    \caption{Average \acs{PSNR} gap compared to the \emph{uniEqui} layout, depending on the distance from the \acs{QEC}. Global bit-rate budget \SI{\testbitrateBudget}{\mega bps}}
        \caption{Average \acs{MS-SSIM} depending on the distance to the \acs{QEC} for the four geometric layouts. Global bit-rate budget \SI{\testbitrateBudget}{\mega bps}}
     \label{fig:dist_quality}
 \end{figure}
@@ -182,17 +141,10 @@ video. For all layouts, the quality decreases when the distance $d$
 increases but the quality for the cube map layout is always the
 highest. Note that the pyramid projection (the layout chosen
 by Facebook~\cite{facebook}) is especially sensitive to head movements.
-%The video quality for all layouts save for the cube map is lower than
-%that for the standard \emph{uniEqui} for distance greater than
-%\num{1}.
 The viewport extracted from a cube map projection has a better quality
 than that extracted from the \emph{uniEqui} for \FoV{} center at up to
 \num{2} units from the \ac{QEC} while the other layouts are not
 worthy for \FoV{} centers at only \num{1} unit of the \ac{QEC}.
-%Here the cube map projection has better results
-%probably because this layout have bigger faces. The bigger the face
-%is, the more redundancies in the face are available and so the better
-%the video codec exploits the same bit-rate budget.
 We study next the interplay between this distance, the segment length and the number of \acp{QER}.
 
 \subsection{Segment Length}
@@ -241,11 +193,6 @@ captures a challenging experiment for our system. We can expect
 narrower head movements, and thus longer possible segment lengths, for
 sitting users and longer videos.
 
-%such
-%a length is acceptable regarding the management at the server (the
-%number of segments to deal with and the size of the \ac{MPD}) and at
-%the client (the frequency of representation selection and the number
-%of requests to send). Furthermore, for a \SI{2}{\second}-long segment,
 
 \subsection{Number of \acp{QER}}
 
@@ -256,15 +203,6 @@ match between the \ac{QER} and the \FoV{} center. However,
 increasing the number of \acp{QER} also means increased storage and
 management requirements at the server (and a longer \ac{MPD} file).
 
-% The choice of the position of $n$ \ac{QEC} on a sphere is not
-% trivial. We want them to uniformly distributed over the spherical
-% video. This definition is hazy: the results highly depends on what we
-% consider to be the neighborhood of each \ac{QEC} and on our notion of distance. This problem
-% is a classic in particle physic: minimizing the energy of $n$ charged
-% particles on a sphere~\cite{rakhmanov1994electrons} also known as the
-% Thomson problem. We chose to use a
-% solver~\footnote{http://particules.sectionpc.info/bin/Particules.zip}
-% for the Thomson problem to determine the position of each \ac{QEC}.
 
 We represent in Figure~\ref{fig:QEC} the median \ac{PSNR} difference
 between the viewport extracted from the cube map layout and the
@@ -272,20 +210,11 @@ same viewport extracted from the \emph{uniEqui} layout with the same
 overall bit-rate budget. To modify the number of \acp{QER}, we set a
 number $n$, then we determined the position of the $n$ \acp{QER}
 using the Thomson positioning problem~\cite{rakhmanov1994electrons}.
-%\footnote{http://particules.sectionpc.info/bin/Particules.zip}
-%, and we generated $n$ quality-differentiated video representations from these $n$ \acp{QEC}.
 For each head position in the dataset, we computed the distance
 between the \FoV{} center and the \ac{QER} that was chosen at the
 beginning of the segment and we computed the viewport quality
 accordingly.
-%For each video and for
-%
-%
-%We show in Figure~\ref{fig:QEC} the average \acs{MS-SSIM} quality of the viewports as
-%would the users of our datasets see them if the 360-degree video had been prepared
-%with a given number of QECs $n$.
 %%We used the best configuration, \textit{i.e.}, a cube map projection and \SI{2}{\second} segment.
-%We used the best projection, \textit{i.e.} the cube map projection.
 
 
 \begin{figure}
@@ -306,9 +235,3 @@ quality gains for short segments, due to the better re-synchronization
 between the \acp{QER} and the \FoV{} centers. Note also that a
 significant part of these gains stems from the cube map layout
 projection.
-%
-%is between $6$ and $7$.
-%More \acp{QEC} improve slightly the quality for a linear growth in the
-%storage needs. Moreover the longer the segment duration is, the lesser
-%the number of \acp{QEC} influences the quality. For a \SI{2}{\second}
-%segment the number of \ac{QEC} is still significant.

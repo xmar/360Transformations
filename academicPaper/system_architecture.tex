@@ -1,20 +1,8 @@
 \section{System architecture}
 
-% \begin{figure}
-%    \centering
-%    \input{plots/newDelivery.tex}
-%    \caption{Viewort-adaptive streaming system: the server offers $n\times k$ representations ($n$ \acp{QEC} at $k$ bit-rates). The streaming session lasts for three segments from $s_1$ to $s_3$. The client moves her head from left to right, while her available bandwidth varies. For each segment, the client requests a representation that matches both the \FoV{} and the network throughput.}
-%    \label{fig:newdelivery}
-% \end{figure}
 
 This section describes the system architecture of the proposed
 navigable $360$-degree video delivery framework.
-% The principles of the navigable video delivery are similar as in
-% adaptive bit-rate video systems such as \ac{DASH}\cite{Stockhammer11}.
-% The server offers multiple versions of the same video
-% and the client selects the most appropriate version according to some criteria. %These versions
-% are cut into second-long segments such that the client can regularly switch from one
-% version to another.
 
 \parag{Server}The server takes as an input a $360$-degree video in
 equirectangular format and transforms each frame into a desired
@@ -58,11 +46,7 @@ $x$ being the segment length). The server replies
 with the requested video representation, from which the
 client extracts the viewport, displaying it on the \ac{HMD}, as
 shown in Figure~\ref{fig:newdelivery}.
-%The center of the \FoV{} is a point on the
-%sphere, while the size of the \FoV{} depends on the device (typically
-%around 100$^\circ$ in state-of-the-art devices).
 
-%\parag{Adaptive video streaming}
 Rate-adaptive streaming systems are based on the assumption that
 the selected representation will match the network
 conditions for the next $x$ seconds. Rate adaptation algorithms
@@ -71,8 +55,6 @@ developed~\cite{tian,probe_li_2014,miller,zou,liu} to reduce the mismatch betwee
 requested bit-rate and the throughput. In our proposal, the adaptation algorithm should also ensure
 that the \FoV{} centers will be as close as possible to the chosen \ac{QEC} during
 the $x$ next seconds.
-%we additionally assume that the chosen \ac{QEC} will be close to the
-%\FoV{} center for the next $x$ seconds.
 In this paper, we implement
 a simple algorithm for \ac{QER} selection: we select the \ac{QEC} that
 has the smallest orthodromic distance\footnote{The shortest distance
@@ -85,9 +67,6 @@ expect new viewport-adaptive algorithms to be developed in
 the future to better predict the head movement and select the
 \ac{QER} accordingly.
 
-% and adjust the video segment length and
-%qualities in 360-degree video accordingly.
-%This head movement prediction will be based on the user's previous head movements and the video content type. If the content is static, the user will not move his/her head so much compared to when watching an action move.
 
 
 \parag{Video segment length}A video segment length determines how
@@ -98,15 +77,12 @@ the overall number of segments and results in larger manifest files.
 Shorter segments also increase the network overhead due to
 frequent requests, as well as the network delay because of the round
 trip time for establishing a TCP connection.
-%\footnote{In case of non-persistent HTTP connection TCP connection is established with the server after each request.} and request a segment (which can both take significant time in case of short segment sizes).
 Longer segments improve the encoding efficiency and quality relative to
 shorter ones, however they reduce the flexibility to adapt the video
 stream to changes. We discuss segment length and head movement in
 Section~\ref{subsec:segmentLength} based on a dataset.
 
-% However, if the user's head moves during this time, the consequences for the user will be even worse than with the adaptive streaming, including the degraded video quality. A new \FoV{} video will be extrapolated from the existing video version stored on the client. The longer the time between the requests, the longer the potential distance from the old to the new \FoV{} center (i.e., \FoV{} center distance), and the larger the quality degradation of the extracted \FoV{} video. In order to improve quality of the displayed video in future, we plan to predict which \ac{QEC} will be close to \FoV{} center for the entire segment duration, showing this area in full quality.
 
-%The specifics of 360-degree video delivery are that only a portion of the delivered 360-degree video is displayed on the user's HMD (i.e., where the user looks at). Therefore, only this part of the video (around the \ac{QEC}) should be given in full quality, while the quality of the remaining video can be adjusted to the user's head movements and the viewing probability. A video that is mapped to a given geometric layout is split into viewing faces, each of which corresponds to specific viewing direction and can be assigned a different quality.
 
 \begin{lstlisting} [float, language=xml, frame=single, backgroundcolor=\color{white},lineskip={-1pt}, caption=Extensions of MPD file,captionpos=b, label=mpdChanges]
 <?xml version="1.0"?>
@@ -133,23 +109,3 @@ It is also possible to define some \acp{RoI} to describe the geometry of the \ac
 The \acp{RoI} are not mandatory in our architecture because the \ac{QEC} is often sufficient to decide which segment to select.
 If a \ac{RoI} is defined, we recommend using a \ac{RoI} defined on the sphere and not inside the projected video.
 
-% Each representation contains the \texttt{\ac{QEC}}
-% \texttt{coordinates} in degrees, besides the parameters that are
-% already defined in the standard~\cite{iso_iec}.
-% Similarly, an
-% adaptation set is extended with \texttt{geometrical} \texttt{layout}
-% and \texttt{quality} \texttt{arrangement} attributes, to notify
-% the video decoder about the encoding.
-%for video
-%encoder to know how to encode the video.
-% The geometrical layout is one
-% of the projection types (equirectangular, cube map, pyramid or
-% dodecahadron), while the quality arrangement takes a string value
-% specifying the qualities of the different faces. In this example, we
-% propose to represent the number of layout faces encoded in the
-% high/medium/low qualities. The proposed changes are added as new
-% attributes of the \texttt{Representation} and \texttt{AdaptationSet}
-% tags. With such extensions, we maintain conformance with the standard,
-% ensuring interworking with legacy \ac{DASH} clients.
-% that can simply
-%ignore these newly introduced attributes.
