@@ -80,7 +80,7 @@ encoding~\cite{tosic_low_2009}.
 
 \parag{Our contributions}We propose to leverage the geometric
 structure of the layouts to implement a video encoding based on
-\ac{QER}. Each geometric layout is characterized by a number of
+\ac{QEC}. Each geometric layout is characterized by a number of
 \emph{faces} (\textit{e.g.}, 6 for the cube map, 12 for the
 dodecahedron) and a given \emph{central point} (which corresponds to a
 position on the sphere).
@@ -111,7 +111,7 @@ connection.
 
 \parag{Our contributions}In our system, the server always delivers
 the full video, but it has different versions of this video depending
-on the \ac{QER} (characterized by the \ac{QEC}). The client device
+on the \ac{QEC} (characterized by the \ac{QEC}). The client device
 selects the right representation and extracts the viewport. The
 storage requirements at the server side increase but all the
 processing is done at the client side (representation selection and
@@ -156,8 +156,8 @@ well. For each tile, the client should run a representation selection
 process and manage a specific network connection with the server.
 
 \parag{Our contributions}In our system, the server
-prepares $n$ \ac{QER}-based videos, each of them being a
-pre-processed set of tile representations. Each \ac{QER}-based video is then
+prepares $n$ \ac{QEC}-based videos, each of them being a
+pre-processed set of tile representations. Each \ac{QEC}-based video is then
 encoded at $k$ \emph{global} quality levels.
 The main advantages include
 an easier management for the server (fewer files hence a smaller
@@ -165,7 +165,7 @@ an easier management for the server (fewer files hence a smaller
 distance computation), and no need for re-constructing the video before
 the viewport extraction.
 
-\subsection{\acs{QER}-Based Streaming}
+\subsection{QEC-Based Streaming}
 
 A  provider of $360$-degree videos (Facebook) has recently
 released details about the implementation of its delivery
@@ -174,11 +174,11 @@ The spherical video is projected onto a pyramid layout from multiple
 (up to $30$) central points to generate a set of video representations.
 Since the
 front face of pyramid projection has a better image quality than the other faces, the
-system is in essence similar as our concept of \ac{QER}. The end-users
+system is in essence similar as our concept of \ac{QEC}. The end-users
 periodically select one of the representations
 based on their \FoV{} center. This implementation
 corroborates that, from an industrial perspective, the extra-cost of
-generating and storing multiple \ac{QER}-based representations of the
+generating and storing multiple \ac{QEC}-based representations of the
 same video is compensated by bandwidth savings and
 enhanced system usability.
 However, as we will see in Section~\ref{sec:settings}, the pyramid projection is not
@@ -188,10 +188,10 @@ efficient than our proposal. Finally, the impact of the video encoding on the so
 is not given.
 
 \parag{Our contributions}Our approach is based on the same
-idea of offering multiple \ac{QER}-based video representations.
+idea of offering multiple \ac{QEC}-based video representations.
 However, we provide a complete study of our system with the additional
 distinction of having varying quality across the geometrical layout. Moreover,
 our study includes an evaluation of several
 geometric layouts, an analysis of the best segment duration, an
-analysis of the best number of \acp{QER},
-and a step towards integration into \ac{MPEG} \ac{DASH}.
+analysis of the best number of \acp{QEC},
+and a step towards integration into MPEG \ac{DASH}.

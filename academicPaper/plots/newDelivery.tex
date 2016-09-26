@@ -112,7 +112,7 @@
 					at (legbwhi.west |- lowA) {\vphantom{g}low};
 			\fi
 			\ifnum#2>0
-				\node[font=\footnotesize,anchor=east] at (legbwhi.south west) {QER$_#2$};
+				\node[font=\footnotesize,anchor=east] at (legbwhi.south west) {QEC$_#2$};
 			\fi
 		}
 	}
@@ -320,15 +320,15 @@
 	{\node[font=\tiny,inner sep=1pt,thin,draw=gray,fill=white] at (0,0) {mpd};\\}
 	};
 \pic[local bounding box=oneseg] at ([yshift=-3pt]client|-mpd.south) {reqresp=
-	{s$_1$:QER$_2$\,lo}
+	{s$_1$:QEC$_2$\,lo}
 	{\pic at (0,0) {equirec={\sizeLow}{-2}{-1}};\\}
 	};
 \pic[local bounding box=twoseg] at ([yshift=-3pt]client|-oneseg.south)
-	{reqresp={s$_2$:QER$_3$\,hi}
+	{reqresp={s$_2$:QEC$_3$\,hi}
 	{\pic at (0,0) {equirec={\sizeBig}{0}{0}};\\}
 	};
 \pic[local bounding box=thirdseg] at ([yshift=-3pt]client|-twoseg.south)
-	{reqresp={s$_3$:QER$_1$\,lo}
+	{reqresp={s$_3$:QEC$_1$\,lo}
 	{\pic at (0,0) {equirec={\sizeLow}{2}{1}};\\}
 	};
 

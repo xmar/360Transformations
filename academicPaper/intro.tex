@@ -45,13 +45,12 @@ We propose in this paper a solution where, following the same
 principles as in rate-adaptive streaming technologies, the server
 offers multiple \emph{representations} of the same $360$-degree video.
 But instead of offering representations that only differ by their
-bit-rate, the server offers here representations that differ by having a \emph{\ac{QER}},
-a better quality in a given region of the video.
-We denote by \emph{\ac{QEC}} the unique barycenter of the quality of the \ac{QER}.
-Our proposal is a
+bit-rate, the server offers here representations that differ by having
+a better quality in a given region of the video. Our proposal is a
 \emph{viewport-adaptive streaming system} and is depicted in
 Figure~\ref{fig:deliverychain}. Each video representation is characterized
-by a \ac{QER} and its \ac{QEC}. Around the \ac{QEC}, the quality of the video is
+by a \emph{\ac{QEC}}, which is a given viewing position in the
+spherical video. Around the \ac{QEC}, the quality of the video is
 maximum, while it is lower for video parts that are far from the
 \ac{QEC}. Similarly as in \ac{DASH}, the video is cut into segments
 and the client periodically runs an \emph{adaptive algorithm} to
@@ -64,8 +63,8 @@ bandwidth and the \ac{QEC} is closest to their \FoV{} center.
    \centering
    \input{plots/deliveryChain.tex}
    \caption{Viewport-adaptive 360-degree video delivery system: The server
-   offers video representations for three \acp{QER}. The dark grey is the \ac{QER} and the light
-   gray the part of the video at low quality. The viewport is the dotted red rectangle, the \FoV{} center is the cross}
+   offers video representations for three \acp{QEC}. The dark grey is the part of the video at high quality and the light
+   gray at low quality. The viewport is the dotted red rectangle, the \FoV{} center is the cross}
    \label{fig:deliverychain}
 \end{figure}
 
@@ -73,7 +72,7 @@ This viewport-adaptive $360$-degree streaming system has three
 advantages: $(i)$ the bit-rate of the delivered video is lower than
 the original full-quality video because video parts distant from the
 \ac{QEC} are encoded at low quality. $(ii)$ When the end-user does not
-move, the viewport is extracted from \ac{QER} of the
+move, the viewport is extracted from the highest quality region of the
 spherical video. And $(iii)$ when the head of the end-user moves, the
 device can always extract a viewport because it has the full
 spherical video. If the new \FoV{} center is far from the \ac{QEC}
@@ -95,8 +94,8 @@ Third, we study the required video segment length for
 viewport-adaptive streaming. Based on a dataset of real users
 navigating $360$-degree videos, we show that head movements occur over
 short time periods, hence the streaming video segments have to be
-short enough to enable frequent \ac{QER} switches. Fourth, we
-examine the impact of the number of \acp{QER} on the viewport quality
+short enough to enable frequent \ac{QEC} switches. Fourth, we
+examine the impact of the number of \acp{QEC} on the viewport quality
 and we show that a small number of (spatially-distributed over the sphere)
 \acp{QEC} suffices to get high viewport quality.
 Finally, we introduce a tool (released as open source), which creates video representations for the proposed viewport-adaptive streaming system.
