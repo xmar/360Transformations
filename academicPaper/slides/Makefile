@@ -6,6 +6,7 @@ OutputPDFGwendal5G = $(MainSource:.tex=_gwendal_5G.pdf)
 Sections = $(filter-out $MainSource, $(wildcard *.tex))
 Plots = $(wildcard ../plots/*.tex)
 PlotsPdf = $(patsubst %.tex,%.pdf,$(Plots))
+Python = python3
 
 .PHONY: none
 none: $(OutputPDF)
@@ -25,25 +26,25 @@ gwendal5G: $(OutputPDFGwendal5G)
 .PHONY: FORCE
 $(OutputPDF): $(MainSource) $(Sections) $(Plots) FORCE
 	make cleanLn
-	./generateVariables.py
+	$(Python) generateVariables.py
 	../latexrun --latex-args="-shell-escape" $<
 
 $(OutputPDFXavier): $(MainSource) $(Sections) $(Plots) FORCE
 	make cleanLn
-	./generateVariables.py --xavier
+	$(Python) generateVariables.py --xavier
 	../latexrun --latex-args="-shell-escape" $<
 	cp $(OutputPDF) $(OutputPDFXavier)
 
 $(OutputPDFGwendal): $(MainSource) $(Sections) $(Plots) FORCE
 	make cleanLn
-	./generateVariables.py --gwendal
+	$(Python) generateVariables.py --gwendal
 	#../latexrun --latex-args="-shell-escape" -O latex.out_gwendal $<
 	../latexrun --latex-args="-shell-escape" $<
 	cp $(OutputPDF) $(OutputPDFGwendal)
 
 $(OutputPDFGwendal5G): $(MainSource) $(Sections) $(Plots) cleanLn FORCE
 	make cleanLn
-	./generateVariables.py --gwendal --fiveG
+	$(Python) generateVariables.py --gwendal --fiveG
 	#../latexrun --latex-args="-shell-escape" -O latex.out_gwendal_5G $<
 	../latexrun --latex-args="-shell-escape" $<
 	cp $(OutputPDF) $(OutputPDFGwendal5G)
