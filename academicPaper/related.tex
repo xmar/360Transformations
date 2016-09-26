@@ -36,45 +36,10 @@ implementation of signal processing
 functions~\cite{kazhdan_metric-aware_2010} and improving the video
 encoding~\cite{tosic_low_2009}.
 
-\tikzsetnextfilename{2d_layout_projections}
+
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}
-\def\sizeSphere{20}\def\ecartY{-1.2}\def\ecartX{6}
-
-%% da sphere
-\pic [local bounding box=spher]  at (0,0) {spherical=15};
-
-%% recantagular
-\pic [local bounding box=equi] at (-3,\ecartY) {equirectangular={\sizeSphere}{-1}{0}};
-
-%% cupe map
-\pic [local bounding box=cubemap] at (-1,\ecartY) {cubemap=\sizeSphere};
-
-%% pyramid
-\pic [local bounding box=pyra] at (1,\ecartY) {pyramid=\sizeSphere};
-
-%% rhombic
-%%\pgfdeclareimage[width=36 pt]{dodecahedron}{RhombicDodecahedron.png}
-%%\node at (3,\ecartY) (dodec)
-%%    {\pgfbox[center,center]{\pgfuseimage{dodecahedron}}};
-
-\def\unitused{0.22}
-
-\pic [local bounding box=dodeca] at (3,0.88*\ecartY) {dodecahedron=\unitused};
-
-%% links
-\draw[-latex] (spher.180) -| (equi);
-\draw[-latex] (spher.200) -| (cubemap);
-\draw[-latex] (spher.340) -| (pyra);
-\draw[-latex] (spher) -| (dodeca);
-
-\node[font=\scriptsize,anchor=north] at (equi.south) {equirectangular};
-\node[font=\scriptsize,anchor=north] at (cubemap.south) {cube map};
-\node[font=\scriptsize,anchor=north] at (pyra.south) {pyramid};
-\node[font=\scriptsize,anchor=north] at (dodeca.south) {\vphantom{y}dodecahedron};
-
-\end{tikzpicture}
+\input{plots/2dProjections.tex}
 \caption{Projections into four geometric layouts}\label{fig:mapping}
 \end{figure}
 
