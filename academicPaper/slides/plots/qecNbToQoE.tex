@@ -24,7 +24,7 @@ column sep=15pt,
 \tikzsetnextfilename{qec_nb_to_qoe}
 \begin{tikzpicture}
     \begin{axis}[
-            ylabel style={align=center}, ylabel={Median PSNR gap\\(in dB)},
+            ylabel style={align=center}, ylabel={Median PSNR improvement\\(in dB)},
             %ylabel={PSNR},
             xlabel={Number of QECs},
             width=0.95\linewidth,
@@ -67,7 +67,11 @@ column sep=15pt,
         \coordinate (top) at (rel axis cs:0,1);
         \coordinate (xTop) at (axis cs:7,2.5);
         \coordinate (xDown) at (axis cs:7,0);
-        \only<+->{\draw[dashed] (xTop) -- (xDown);}
+        \only<+->{
+            \draw[dashed] (xTop) -- (xDown);
+            \node[anchor=west,xshift=2pt,legendinfigure] at (axis cs:7,0.5) {\footnotesize{More than 7 QECs does not improve viewport quality}};
+        
+        }
     \end{axis}
     \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
 \end{tikzpicture}

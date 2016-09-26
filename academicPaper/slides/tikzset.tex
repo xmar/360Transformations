@@ -17,6 +17,18 @@
 \colorlet{fullquality}{beamer@tbbrown}
 
 \tikzset{
+    legendinfigure/.style={
+%        shape = rectangle, 
+        draw, 
+        rounded corners,
+        text width = 5cm,
+        align=center,
+        fill=white
+%        font=\small    
+    }
+}
+
+\tikzset{
 	spherical/.pic={
 		\shade[ball color=midquality,opacity=0.40] (0,0) circle (#1 pt);
 		\draw (-0.0352778*#1,0) arc (180:360:#1 pt and 0.5*#1 pt);

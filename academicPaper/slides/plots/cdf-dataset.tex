@@ -50,17 +50,58 @@ column sep=15pt,
         ]
 
 
-         \only<.(1)->{\legend{1\,s, 2\,s, 3\,s, 5\,s}}
+%         \only<.(1)->{\legend{1\,s, 2\,s, 3\,s, 5\,s}}
 %        \foreach \window in {0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s,
 %            3s, 3.5s, 4s, 4.5s, 5s} {
-			\foreach \window in {1s, 2s, 3s, 5s}{
+%			\foreach \window/\leg in {1s/one, 2s/two, 3s/three, 5s/five}{
             \only<+->{
-               \addplot+ table [x =\window, y = cdf]{results/global.csv};
+               \addplot+ table [x =2s, y = cdf]{results/global.csv} node[
+                   inner sep=3pt,
+                   font=\footnotesize,
+                   draw,
+                   fill=white,
+                   thin, 
+                   pos=0.25
+                   %pin={[pin distance=0cm]120:{$blabla$}}
+                   ]{2\,s};
             }
-        }
+            \only<+->{
+               \addplot+ table [x =1s, y = cdf]{results/global.csv} node[
+                   inner sep=3pt,
+                   font=\footnotesize,
+                   draw,
+                   fill=white,
+                   thin, 
+                   pos=0.25
+                   %pin={[pin distance=0cm]120:{$blabla$}}
+                   ]{1\,s};
+            }
+            \only<+->{
+               \addplot+ table [x =3s, y = cdf]{results/global.csv} node[
+                   inner sep=3pt,
+                   font=\footnotesize,
+                   draw,  
+                   fill=white,
+                   thin, 
+                   pos=0.25
+                   %pin={[pin distance=0cm]120:{$blabla$}}
+                   ]{3\,s};
+            }
+            \only<+->{
+               \addplot+ table [x =5s, y = cdf]{results/global.csv} node[
+                   inner sep=3pt,
+                   font=\footnotesize,
+                   draw,
+                   fill=white,
+                   thin, 
+                   pos=0.25
+                   %pin={[pin distance=0cm]120:{$blabla$}}
+                   ]{5\,s};
+            }          
+%        }
 
 
-%        \legend{0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s, 3s, 3.5s, 4s,
+%        \legend{0.1s, 0.25s, 0.5s, 1s, 1.5s, 2s, 2.5s, 3s, 3.5s, 4s, 
 %        4.5s, 5s}
 
       \coordinate (top) at (rel axis cs:0,1);
@@ -68,9 +109,9 @@ column sep=15pt,
       \coordinate (text) at (axis cs:1.57,0.25);
       \coordinate (inter) at (axis cs:1.57,0.86);
       \coordinate (yMid) at (axis cs:-1,0.86);
-      \only<+->{
+      \only<.(-3)->{
          \draw[dashed] (xMid) -- (inter) -- (yMid);
-         \node[right, shape = rectangle, draw, xshift=2pt] at (text) {\tiny In 2\,s, 86\,\% of the users move less than 90$^{\circ}$};
+         \node[anchor=west, xshift=2pt, inner sep=2pt,legendinfigure] at (text) {\footnotesize{In 2\,s, 86\,\% of the users move less than 90$^{\circ}$}};
       }
   \end{axis}
   \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
