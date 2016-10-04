@@ -1,0 +1,207 @@
+
+%\documentclass[10pt,onecolumn,twoside]{IEEEtran} %!PN
+%\documentclass[10pt,twocolumn,twoside]{IEEEtran} %!PN
+% \documentclass[12pt,onecolumn,twoside,draft]{IEEEtran} %!PN
+%\documentclass[conference]{IEEEtran} %!PN
+\documentclass[conference]{IEEEtran}
+
+% Set letter paper size:
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+\usepackage[
+  pass,% keep layout unchanged
+  % showframe,% show the layout
+]{geometry}
+\usepackage{multirow}
+\usepackage{amsfonts}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\input{acronymes.tex} % acronymes + associated packages  are defined in the acronymes.tex file
+\usepackage[english]{babel}
+%\usepackage{cite}
+\usepackage[numbers,sort]{natbib}
+\renewcommand\citet[1]{\citeauthor{#1}~\cite{#1}} % redefine the \citet command to add a ~ space between authors and []
+\usepackage{color}
+\usepackage[dvipsnames,table]{xcolor}
+% \usepackage{stfloats}
+%\usepackage{pst-gantt}
+% \usepackage{algorithm}
+% \usepackage{algorithmic}
+\usepackage[linesnumbered,ruled,vlined,boxed,commentsnumbered]{algorithm2e}
+\usepackage[noend]{algorithmic}
+\usepackage{float}
+\algsetup{linenosize=\tiny}
+\usepackage[skip=5pt,font=bf,labelfont=bf]{caption}
+%\usepackage{subcaption}
+\usepackage[caption=false]{subfig}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+%\usetikzlibrary{plotmarks}
+\usetikzlibrary{shapes,positioning,3d,calc}
+\usetikzlibrary{decorations,decorations.pathmorphing,backgrounds}
+\usepgfplotslibrary{external}
+\newcommand{\externaldirectory}{latex.out/}
+\tikzexternalize[prefix=\externaldirectory]
+\tikzexternalize % activate!
+%\tikzexternaldisable
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{etoolbox}
+
+
+\lstset{%
+  backgroundcolor=\color{gray!25},
+  basicstyle=\sffamily \scriptsize,
+  breaklines=true
+}
+
+%SI Units
+\usepackage{siunitx}
+\sisetup{detect-all}
+
+%math tools
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+%Some math declarations
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\parenthesis}{(}{)}
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\DeclarePairedDelimiter{\norm}{|}{|}
+\DeclarePairedDelimiter{\integerInterval}{\llbracket}{\rrbracket}
+\DeclareMathOperator*{\minimize}{minimize}
+
+% parag
+\newcommand{\parag}[1]{\vspace{4pt}\noindent\textbf{#1}.\hspace{4pt}}
+
+%Some symbols definitions
+\newcommand{\packetset}{\mathcal P}
+\newcommand{\frameset}{\mathcal F}
+\newcommand{\packetsubset}{\mathcal P'}
+\newcommand{\framesubset}{\mathcal F'}
+
+
+% fix the issue of white character in acronym package
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\@acf{\hskip\z@}{}{}{}
+\patchcmd\@acf{\hskip\z@}{}{}{}
+\makeatother
+
+
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.8}
+
+
+%include some macro specific for this paper
+\input{paperSpecificMacro.tex}
+
+\newcommand {\otoprule }{\midrule [\heavyrulewidth]}
+
+\title{Viewport-Adaptive Navigable 360-Degree Video Delivery}
+%{Geometric Layout for Navigable 360-Degree Video Delivery}
+
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+% \floatstyle{ruled}
+% \newfloat{ilp}{ht}{aux}
+% \floatname{ilp}{Integer Linear Program}
+
+
+
+\makeatletter
+
+\author{\IEEEauthorblockN{Xavier Corbillon \hspace{10pt} Gwendal Simon}
+\IEEEauthorblockA{Telecom Bretagne, France\\
+firstname.lastname@telecom-bretagne.eu}
+\and
+\IEEEauthorblockN{Alisa Devlic}
+\IEEEauthorblockA{Huawei, Sweden\\
+alisa.devlic@huawei.com}
+\and
+\IEEEauthorblockN{Jacob Chakareski}
+\IEEEauthorblockA{University Alabama, USA\\
+jacob@ua.edu}}
+
+\makeatother
+
+\input{tikzset.tex}
+
+
+
+
+\begin{document}
+%\ninept
+
+\maketitle
+
+\input{abstract.tex}
+
+\glsresetall
+
+\input{intro.tex}
+\input{related.tex}
+
+% \input{background.tex}
+
+\input{system_architecture.tex}
+
+\input{settings.tex}
+
+\input{conclusion.tex}
+
+%\input{dataset.tex}
+
+%\input{geometricTestbed.tex}
+%\input{evaluation.tex}
+%
+%\rowcolors{2}{gray!25}{white}
+%\begin{table}[t]
+%\scriptsize
+%\centering
+%\begin{tabular}{r@{\hspace{2pt}}|c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c|c@{\hspace{5pt}}c}
+%% \rowcolor{gray!50}
+% \multicolumn{2}{c|}{~} & \multicolumn{2}{c|}{high quality} & \multicolumn{2}{c|}{mid quality} & \multicolumn{2}{c}{low quality} \\
+%%\rowcolor{gray!50}
+% & \# tiles & \# tiles & res. & \# tiles & res. & \# tiles & res. \\ \hline \hline
+% \textbf{equi.} & 64 & 9 & 1 & 40 & 0.5 & 15 & 0.25 \\
+% \textbf{cube} & 6 & 1 & 1 & 4 & [0.4,0.7] & 1 & 0.25\\
+% \textbf{pyramid} & 5 & 1 & 1 & 4 & --- & 0 & ---\\
+% \textbf{dodeca.} & 12 & 2 & 1 & 8 & [0.4--0.7] & 2 & 0.25
+%\end{tabular}
+%\caption{tile quality arrangement}\label{tab:quality}
+%\end{table}
+%
+%
+%\section{Discussion and Conclusion}
+%
+%We can use \AD{focal}{} statistics and saliency maps to select better
+%\acp{QEC}.
+%% eye attention
+%
+%We have to extend the tests for a large set of videos and for many
+%other parameter settings: adjusting quality by spatially or CRF ? how
+%many versions (QECs)? toward a rate-distortion figure?
+%
+%We have to see what are the options if we have a lot of bandwidth
+%(case of terahertz antennas).
+
+
+
+%\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEbib}
+\bibliographystyle{abbrvnat}
+%\bibliographystyle{abbrv}
+\bibliography{biblio}
+
+\end{document}
