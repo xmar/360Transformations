@@ -18,10 +18,12 @@ This bandwidth waste is the price to pay for interactivity. To prevent
 \emph{simulator sickness}~\cite{moss2011characteristics} and to
 provide good \ac{QoE}, the vendors of \acp{HMD} recommend that the
 enabling multimedia systems react to head movements as fast as the
-\ac{HMD} refresh rate.\footnote{
-\url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}}
+\ac{HMD} refresh rate.
+%\footnote{
+%\url{https://developer.oculus.com/documentation/intro-vr/latest/concepts/bp_intro/}}
 Since the refresh rate of state-of-the-art \acp{HMD} is
-\SI{120}{\hertz},\footnote{\url{http://www.vrnerds.de/vr-brillen-vergleich/}}
+\SI{120}{\hertz},
+%\footnote{\url{http://www.vrnerds.de/vr-brillen-vergleich/}}
 the whole
 system should react in less than \SI{10}{ms}. This delay constraint
 prevents the implementation of traditional delivery architectures
@@ -42,10 +44,10 @@ resolution of the full 360-degree video is at least 12K
 ($11520\times6480$). In addition, the immersion requires a video frame
 rate on the order of the HMD refresh rate, so typically around
 \SI[mode=text]{100}{\acp{fps}}. Overall, high-quality 360-degree
-videos combine both a very large resolution (up to 12K) and a very
+videos combine a very large resolution (up to 12K) and a very
 high frame rate (up to \SI[mode=text]{100}{\acp{fps}}). To compare,
 the bit-rate of 8K videos at \SI[mode=text]{60}{\acp{fps}} encoded
-using the \ac{HEVC} codec is around \SI{100}{Mbps}~\cite{7398367}.
+using \ac{HEVC} is around \SI{100}{Mbps}~\cite{7398367}.
 
 We propose in this paper a solution where, following the same
 principles as in rate-adaptive streaming technologies, the server
@@ -78,15 +80,15 @@ bandwidth and the \ac{QEC} is closest to their \ac{FoV} center.
    \label{fig:deliverychain}
 \end{figure}
 
-This viewport-adaptive 360-degree streaming system has three
+Viewport-adaptive 360-degree streaming system has three
 advantages: $(i)$ the bit-rate of the delivered video is lower than
 the original full-quality video because video parts distant from the
 \ac{QEC} are encoded at low quality. $(ii)$ When the end-user does not
-move, the viewport is extracted from the highest quality region of the
+move, the viewport is extracted from the highest quality part of the
 spherical video. And $(iii)$ when the head of the end-user moves, the
-device can always extract a viewport because it has the full
+device can still extract a viewport because it has the full
 spherical video. If the new \ac{FoV} center is far from the \ac{QEC}
-of the already received video representation, the quality of the
+of the received video representation, the quality of the
 extracted viewport is lower but this degradation is transient until the
 device selects another video representation with a closer \ac{QEC}.
 
