@@ -18,12 +18,12 @@ navigable 360-degree video delivery framework.
 
 \parag{Server}The server takes as an input a 360-degree video in
 equirectangular format and transforms each frame into a desired
-geometrical layout. From there, it creates $n$ different video
+geometrical layout. Then, it creates $n$ different video
 versions, each with a different \ac{QEC} and encoded in $k$ different
-bit-rates, as illustrated in Figure~\ref{fig:newdelivery}. The server
+bit-rates (see Figure~\ref{fig:newdelivery}). The server
 splits all such encoded videos into segments, which are classified in
 $n\!\times\!k$ representations (based on their respective bit-rate and
-\ac{QEC}), enabling the client to regularly switch from one
+\ac{QEC}), enabling clients to regularly switch from one
 representation to another. The \GS{video quality}{} around the
 \ac{QEC} is the highest, while the remaining part is encoded at lower
 quality.
@@ -31,7 +31,7 @@ quality.
 \begin{figure}
    \centering
    \input{plots/newDelivery.tex}
-   \caption{Viewort-adaptive streaming system: the server offers \num{6} representations (\num{3} \acp{QEC} at \num{2} bit-rates). The streaming session lasts for three segments. The client head moves from left to right, while the available bandwidth varies. For each segment, the client requests a representation that matches both the \ac{FoV} and the network throughput.}
+   \caption{Viewort-adaptive streaming system: the server offers \num{6} representations (\num{3} \acp{QEC} at \num{2} bit-rates). The streaming session lasts for three segments. The client head moves from left to right, the available bandwidth varies. For each segment, the client requests a representation that matches both  \ac{FoV} and network throughput.}
    \label{fig:newdelivery}
 \end{figure}
 
@@ -78,8 +78,8 @@ a simple algorithm for \ac{QEC} selection: we select the \ac{QEC} that
 has the smallest orthodromic distance\footnote{The shortest distance
 between two points on the surface of a sphere, measured along the
 surface of the sphere. \XC{Its measure is proportional to the radius
-of the sphere; we refer to "distance unit" in the text to denote the
-size of the radius.}{}} to the FoV center at the time the client runs
+of the sphere; we refer to ``distance unit'' to denote the radius size.}{}} 
+to the FoV center at the time the client runs
 the adaptation algorithm. Similarly as for bit-rate adaptation, we
 expect new \GS{viewport-adaptive algorithms}{} to be developed in
 the future to better predict the head movement \GS{and select the
