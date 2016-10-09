@@ -1,0 +1,62 @@
+\tikzsetnextfilename{distance_quality}
+\begin{tikzpicture}
+   \pgfplotscreateplotcyclelist{My color list}{%
+       {color1,solid, very thick},%
+       {color2, dashed, very thick},%
+       {color3, densely dashed, very thick},%
+       {color4, densely dotted, very thick},%
+   }
+
+   \pgfplotsset{every axis legend/.append style={
+           at={(-0.03,0.97)},
+   anchor=south west,
+   draw=none,
+   fill=none,
+   legend columns=4,
+   column sep=6pt,
+   %font = \scriptsize,
+   /tikz/every odd column/.append style={column sep=0cm},
+   %font=\tiny
+   }}
+   \pgfplotsset{grid style={dashed,gray}}
+   \pgfplotsset{minor grid style={dotted,red!20!gray}}
+   \pgfplotsset{major grid style={dotted,green!50!black}}
+
+    \begin{axis}[
+            ylabel={MS-SSIM},
+            xlabel={Orthodromic distance},
+            width=0.95\linewidth,
+            height=0.5\linewidth,
+            cycle list name={My color list},
+            legend cell align=left,
+            xmin = 0,
+            xmax = 3.14,
+            ymin = 0.88,
+            ymax = 1,
+            ymajorgrids,
+            yminorgrids,
+        ] 
+         \pgfplotsextra{\begin{scope}[on layer=axis background]
+                \draw[draw=color5] (axis cs:0,0.955777) -- (axis cs:3.14,0.955777);
+                \node[rounded corners, fill=color5,
+                			font=\tiny, inner sep=2pt,
+                			anchor=west, text=white] at (axis cs:0,0.955777) {\textit{\vphantom{lj}uniEqui}};
+            \end{scope}
+            \begin{scope}[on layer=axis background]
+                   \draw[draw=black, dashed] (axis cs:1.57,0) -- (axis cs:1.57,1);
+                   \node[anchor=north west,xshift=2pt,yshift=-2pt,inner sep=2pt,legendinfigure] at (axis cs:1.57, 1) {\footnotesize{During a 2\,s segment, 86\,\% of the users never explore this zone}};
+               \end{scope}
+        }
+
+        \only<.(1)->{\legend{Equirec,CubeMap,Pyramid,Dodeca}}
+        \only<+->{\addplot+ table [x=distance, y=qualityEquirectangularTiledLower]{results/distanceQuality.csv};}
+        \only<+->{\addplot+ table [x=distance, y=qualityCubeMapLower]{results/distanceQuality.csv};}
+        \only<+->{\addplot+ table [x=distance, y=qualityPyramidLower]{results/distanceQuality.csv};}
+        \only<+->{\addplot+ table [x=distance, y=qualityRhombicDodecaLower]{results/distanceQuality.csv};}
+%        \addplot+ table [x=distance, y=qualityAverageEquiTiled]{results/distanceQuality.csv};
+
+
+        \coordinate(top)at(rel axis cs:0,1);
+    \end{axis}
+    \node[anchor=south] at (top.north) {\phantom{F}};%trick to avoid jumping of the graph
+\end{tikzpicture}

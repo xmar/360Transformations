@@ -1,0 +1,107 @@
+% Author : Pierre-Henri Horrein
+% Copyright : Telecom Bretagne, 2013
+
+\setlength\parskip{\medskipamount}
+\setlength\parindent{0pt}
+
+
+\mode<presentation>
+
+\setbeamercolor*{author in head/foot}{fg=beamer@tbgray}
+\setbeamercolor*{title in head/foot}{fg=beamer@tbgray}
+\setbeamercolor*{date in head/foot}{fg=beamer@tbgray}
+
+\setbeamercolor*{section in head/foot}{fg=beamer@tbgreen}
+\setbeamercolor*{subsection in head/foot}{fg=beamer@tbgreen}
+
+%\setbeamercolor{background sidebar}{bg=}
+
+
+\defbeamertemplate*{navigation symbols} {}
+
+\setbeamertemplate{sidebar canvas left}
+{%
+  \vspace*{0.95cm}\hspace*{0pt}%
+  {\input{Modele/barre_tricolore_cote.tex}}%
+}
+
+
+%Bas de page à customiser
+\defbeamertemplate*{footline}{infolines theme}
+{
+	\begin{textblock*}{10cm}(0cm,-0.1cm)
+		\input{Modele/barre_tricolore_bas.tex}
+	\end{textblock*}
+  \begin{textblock*}{10cm}(13.6cm,-.65cm)
+    \includegraphics[width=.9cm, keepaspectratio=true]{images/A_Square_Logo_4c.eps}
+  \end{textblock*}
+	\begin{textblock*}{10cm}(14.7cm,-.65cm)
+		\includegraphics[width=.9cm, keepaspectratio=true]{Modele/bretagne_quadri}
+	\end{textblock*}
+	\begin{textblock*}{.95cm}(0.05cm,0.0cm)
+		\begin{beamercolorbox}[wd=.95cm,ht=5pt,left]{title in head/foot}%
+			\color{beamer@tbblack}
+			\textbf{\insertframenumber/\inserttotalframenumber}
+		\end{beamercolorbox}
+	\end{textblock*}
+	\begin{textblock*}{1cm}(.95cm,0.0cm)
+		\begin{beamercolorbox}[wd=.1cm,ht=5pt,right]{title in head/foot}%
+			\color{beamer@tbblack}
+			\textbf{\insertdate}
+		\end{beamercolorbox}
+	\end{textblock*}
+	\begin{textblock*}{3.4cm}(2.1cm,0.0cm)
+		\begin{beamercolorbox}[wd=3.4cm,ht=5pt,center]{title in head/foot}%
+			\color{beamer@tbwhite}
+			\usebeamerfont{title in head/foot}\insertshortauthor
+		\end{beamercolorbox}
+	\end{textblock*}
+	\begin{textblock*}{5.4cm}(5.7cm,0.0cm)
+		\begin{beamercolorbox}[wd=5.4cm,ht=5pt,center]{title in head/foot}%
+			\color{beamer@tbblack}
+			\usebeamerfont{title in head/foot}\insertshorttitle
+		\end{beamercolorbox}
+	\end{textblock*}
+
+  % Dirty hack, all margin will have to be recomputed
+  \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,right]{title in head/foot}%
+	  ~
+  \end{beamercolorbox}
+  \vskip2pt%
+}
+
+
+%Haut de page
+
+\defbeamertemplate*{frametitle}{tb theme}
+{
+  \leavevmode%
+  %\vspace{0.60cm}
+  \vspace{0.3cm}
+  \hbox{%
+	  %\hspace{.45cm}
+	  \hspace{1.05cm}
+	  \begin{beamercolorbox}[wd=.86\paperwidth,dp=1ex,left]{frametitle}%
+		  \usebeamerfont{frametitle}%
+		  \color{beamer@tbgreen}%
+		  %\vspace{10mm}%
+		  \strut{\bf \insertframetitle}\strut%
+		  %\vspace{-5mm}%
+		  %\includegraphics[height=2pt, width=300pt]{Modele2009/Barre_horizontale.jpg}%
+	  \end{beamercolorbox}%
+  }%
+%  \vspace{-2mm}
+%  \hbox{%
+%  \hspace{-7mm}
+%  \begin{beamercolorbox}{title in head/foot}%
+%     {\scriptsize\insertnavigation{0.8\paperwidth}}%
+%  \end{beamercolorbox}%
+%  }
+}
+
+
+%\beamerdefaultoverlayspecification{<+->}
+
+%\setbeamersize{text margin left=1.8cm,text margin right=10pt}
+
+\mode<all>

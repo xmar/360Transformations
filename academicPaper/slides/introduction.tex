@@ -1,0 +1,336 @@
+\section*{ Introduction}
+
+\input{whoIsSlide.tex}
+
+\ifthenelse{\boolean{is5G}}{
+   \input{extra5GSlide.tex}
+}{}
+
+%%% Slide  %%%
+\newcounter{tmpCounter1}
+\newcounter{tmpCounter2}
+\newcommand{\boldWhenNeeded}[1]{\only<.-\arabic{tmpCounter1}>{#1} \only<\arabic{tmpCounter2}->{\textbf{#1}}}
+\begin{frame}[c]
+   \frametitle{Context: 360-Degree Videos}
+
+   \vfill
+
+   \setcounter{tmpCounter2}{\valueBP+7}
+   \setcounter{tmpCounter1}{\value{tmpCounter2}-1}
+   \begin{columns}[T]
+     \begin{column}{0.65\linewidth}
+        \begin{itemize}
+           \item<+-> \textbf{Applications}:
+            \begin{itemize}[<+->]
+               \item Gaming
+               \item \boldWhenNeeded{Documentaries}
+               \item \boldWhenNeeded{Recorded sports and concerts}
+               \item \boldWhenNeeded{Adult content}
+               \item \boldWhenNeeded{Live event broadcast}
+               \item Education and Training
+            \end{itemize}
+         \end{itemize}
+     \end{column}
+     \begin{column}{0.35\linewidth}
+         %\begin{itemize}[<+->]
+         \includegraphics[scale=0.125]{plots/pictures/playstation-vr.jpg}\\
+         \vspace{-0.25cm}
+         {}%\tiny Source: playstation.com}
+         %\end{itemize}
+     \end{column}
+   \end{columns}
+
+   %\end{itemize}
+   \incBP{1}
+   \vfill
+   %\vspace{-0.5cm}
+   %\href{run:videos/car_equirectangular_4k.mp4}{\includegraphics[scale=0.3]{videos/test.jpg}}
+   \begin{minipage}[t][4cm][t]{\textwidth}
+      \only<+-.(4)>{
+         \begin{itemize}[<.->]
+            \item Omnidirectional video:
+         \end{itemize}
+         \begin{columns}[T]
+            \begin{column}{0.5\linewidth}
+               %\onslide<.-.(3)>{
+               \begin{independentCounter}
+                  %\decBP{1}
+                  \input{plots/deliveryChain.tex}
+               \end{independentCounter}
+               %}
+            \end{column}
+            \begin{column}{0.5\linewidth}
+               \only<.>{
+                  \includegraphics[scale=0.15]{videos/360camera1.png}
+                  \includegraphics[scale=0.02]{videos/360camera2.jpg}
+                  \setcounter{tmpCounter}{\value{beamerpauses}}
+               }
+               \only<.(1)>{\hspace{2cm}\includegraphics[scale=0.04]{videos/test.png}}
+               \only<.(2)>{\hspace{2cm}\includegraphics[scale=0.065]{videos/fov1.png}}
+               \only<.(3)>{\hspace{2cm}\includegraphics[scale=0.065]{videos/fov2.png}}
+            \end{column}
+         \end{columns}
+         % \onslide<.>{
+         % \vspace{-0.75cm}
+         % {
+         %    \tiny
+         %    %\url{http://360cameraonline.com/wp-content/uploads/2015/01/gopro_360camera.png}
+         % }\\
+         %
+         % {\vspace{-0.75cm}
+         %    %\tiny \url{https://mms.businesswire.com/media/20151221005321/en/501689/5/PANONO_BACK_PRESS_RGB.jpg}
+         % }
+         %}
+      }
+      \incBP{2}
+      \only<+->{
+         \vfill
+         \begin{itemize}[<+->]
+            \item \textbf{Problem}: 4K stereo videos + 100\,fps $\Rightarrow$ $>$  100\,Mbps
+         \end{itemize}
+         \vspace{2cm}
+      }
+    \end{minipage}
+    \vfill
+\end{frame}
+
+\begin{frame}[c]
+   \frametitle{How to deliver videos today?}
+
+   \begin{itemize}
+     \item \textbf{Main technology}: \acl{HAS}
+     \begin{itemize}
+        \setbeamercovered{transparent}
+        \item MPEG-DASH\uncover<+>{, Apple HLS, Adobe HDS, MSS}
+        \setbeamercovered{invisible}
+     \end{itemize}
+   \end{itemize}
+   \begin{minipage}[t][7cm][t]{\textwidth}
+   \only<+>{
+   \raggedright
+   \textbf{Concept}:\\
+   \centering
+   \input{plots/dash.tex}
+   }
+   \only<+->{
+
+   \begin{itemize}
+     \item \textbf{Advantages}:
+     \begin{itemize}[<+->]
+        \item<.-> Video bitrate $\approx$ client available bandwidth\\ $\Rightarrow$ give the feeling of personalized delivery
+        \item Server: only ``a few'' representations\\ $\Rightarrow$ give the feeling of a broadcasted delivery.
+     \end{itemize}
+     \vfill
+     \onslide<+->{
+     \item \textbf{Weakness}:
+     \begin{itemize}
+        \item Representation's choice $\Rightarrow$ network condition predictions
+     \end{itemize}
+     }
+     \vfill
+   \end{itemize}
+   }
+   \end{minipage}
+\end{frame}
+
+\begin{frame}[c]
+   \frametitle{Proposition: Viewport-Adaptive Streaming}
+
+   \only<1-12> {
+   \begin{itemize}
+      \item \textbf{Today's solution}:
+      \begin{itemize}
+         \item<only@2-5> Stream the whole 360-degree video
+         \item<only@6-9> Stream only the user viewport
+         \item<only@10-13> Split the 360-degree video into independent tiles selected by the client
+      \end{itemize}
+   \end{itemize}
+   }
+   \only<2-5>{
+      %\vspace{-1.5cm}
+      \begin{independentCounter}
+         \setBP{2}
+         \only<2-4>{
+            \input{plots/full-video-stream.tex}
+         }
+         \only<5>{
+            \begin{columns}[T]
+               \begin{column}{0.5\linewidth}
+                  \input{plots/full-video-stream.tex}
+               \end{column}
+               \begin{column}{0.5\linewidth}
+                  \begin{tabular}{|c|c|c|}
+                     \hline
+                     \textbf{viewport} & \textbf{360$\ensuremath{^\circ}$  video} & \textbf{bandwidth}\\
+                     \hline
+                     HD       &       6K         &   50\,Mbps\\
+                     UHD       &       8K         &   100\,Mbps\\
+                     4K       &       12K         &   $>100$\,Mbps\\
+                     \hline
+                  \end{tabular}
+               \end{column}
+            \end{columns}
+         }
+      \end{independentCounter}
+      \vspace{-0.5cm}
+      \begin{columns}[T]
+         \begin{column}{0.5\linewidth}
+            \only<3->{
+               \begin{itemize}
+                  \item \textbf{Advantages}:
+                  \begin{itemize}
+                     \item Interactive
+                     \item Simple for the server
+                     \item DASH compliant today
+                  \end{itemize}
+               \end{itemize}
+            }
+         \end{column}
+         \begin{column}{0.5\linewidth}
+            \only<4->{
+            \begin{itemize}
+               \item \textbf{Weaknesses}:
+               \begin{itemize}
+                  \item Bandwidth consumption
+               \end{itemize}
+            \end{itemize}
+            }
+         \end{column}
+      \end{columns}
+   }
+   \incBP{4}
+   \only<6-9>{
+      %\vspace{-1cm}
+      \begin{independentCounter}
+         \setBP{6}
+         \only<6-8>{
+            \input{plots/viewport-stream.tex}
+         }
+         \only<9>{
+            \begin{columns}[T]
+               \begin{column}{0.5\linewidth}
+                  \input{plots/viewport-stream.tex}
+               \end{column}
+               \begin{column}{0.5\linewidth}
+                  \begin{tabular}{|r|c|}
+                     \hline
+                     \multicolumn{1}{|c|}{\textbf{Action}} & \textbf{Latency}\\
+                     \hline
+                     Request to the server       &       ~RTT/2\\
+                     Viewport extraction       &       0-9\,ms\\
+                     Re-encoding       &       ~10\,ms\\
+                     Transmission       &       ~RTT/2\\
+                     Decoding       &       ~7\,ms\\
+                     \hline
+                  \end{tabular}
+               \end{column}
+            \end{columns}
+         }
+      \end{independentCounter}
+      \only<7-8>{\vspace{-1cm}}
+      %\only<9>{\vspace{-0.5cm}}
+      \incBP{1}
+      \begin{columns}[T]
+         \begin{column}{0.5\linewidth}
+            \only<7->{
+               \begin{itemize}
+                  \item \textbf{Advantages}:
+                  \begin{itemize}
+                     \item Deliver only the viewport
+                     \item Bandwidth optimization
+                  \end{itemize}
+               \end{itemize}
+            }
+         \end{column}
+         \begin{column}{0.5\linewidth}
+            \only<8->{
+            \begin{itemize}
+               \item \textbf{Weaknesses}:
+               \begin{itemize}
+                  \item Computation at the server
+                  \item $>$ 5-20\,ms $\Rightarrow$ motion sickness
+               \end{itemize}
+            \end{itemize}
+            }
+         \end{column}
+      \end{columns}
+   }
+   \only<10-12>{
+      %\vspace{-1.5cm}
+      \begin{independentCounter}
+         \setBP{10}
+         \begin{center}
+            \input{plots/tiles-stream.tex}
+         \end{center}
+      \end{independentCounter}
+      \vspace{-0.5cm}
+      \begin{columns}[T]
+         \begin{column}{0.5\linewidth}
+            \only<11->{
+               \begin{itemize}
+                  \item \textbf{Advantages}:
+                  \begin{itemize}
+                     \item Good interactivity
+                     \item Flexibility
+                     \item Compliant with DASH SRD% Spatial Relationship Description
+                  \end{itemize}
+               \end{itemize}
+            }
+         \end{column}
+         \begin{column}{0.5\linewidth}
+            \only<12->{
+            \begin{itemize}
+               \item \textbf{Weaknesses}:
+               \begin{itemize}
+                  \item More client side processing
+                  \item Storage and description %(64 videos per bitrate)
+                  \item Compression efficiency
+               \end{itemize}
+            \end{itemize}
+            }
+         \end{column}
+      \end{columns}
+   }
+   \setBP{12}
+   \begin{itemize}
+      \item<+(1)-> \textbf{Our proposition}:
+      \begin{itemize}[<.->]
+         \item Introduce the notion of \emph{Quality Emphasis Center} (QEC)
+         \item<.(4)-> Update DASH to perform viewport-adaptive streaming
+      \end{itemize}
+   \end{itemize}
+
+   \begin{minipage}[t][7cm][t]{\textwidth}
+      \only<+-.(3)> {
+      \begin{independentCounter}
+         \begin{center}
+            \input{plots/qec_illustration.tex}
+         \end{center}
+      \end{independentCounter}
+      }
+      \incBP{2}
+      \only<+-.(6)> {
+         \begin{independentCounter}
+            \begin{center}
+               \input{plots/newDelivery.tex}
+            \end{center}
+         \end{independentCounter}
+      }
+   \end{minipage}
+
+\end{frame}
+
+\begin{frame}[c]
+   \frametitle{Goals of our study}
+
+   \vfill
+   \begin{itemize}[<+->]
+      \item Which projection is the more adapted to viewport-adaptive streaming?
+      \vfill
+      \item What segment size can be used?
+      \vfill
+      \item How many QEC representation should be used?
+   \end{itemize}
+   \vfill
+
+\end{frame}

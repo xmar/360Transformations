@@ -1,0 +1,71 @@
+% Author : Pierre-Henri Horrein
+% Copyright : Telecom Bretagne, 2013
+
+\DeclareOptionBeamer{shadow}[true]{\def\beamer@themerounded@shadow{#1}}
+\ExecuteOptionsBeamer{shadow=false}
+\ProcessOptionsBeamer
+
+\defbeamertemplate*{title page}{information}[1][]
+{
+	% Logo
+	%\begin{textblock*}{2cm}(-1.0cm,3.5cm)
+	\begin{textblock*}{2cm}(0cm,3.5cm)
+		\begin{beamercolorbox}[sep=2pt, wd=2cm, ht=10pt, left, ignorebg, #1]{titlepage}
+				~~~~~~~~~~~~~~~~~~~~~~$^{\star}$
+		    \includegraphics[width=2cm, keepaspectratio]{Modele/bretagne_quadri_et_baseline}
+		\end{beamercolorbox}
+	\end{textblock*}
+
+	\begin{textblock*}{4cm}(0cm,5.5cm)
+		\begin{beamercolorbox}[sep=2pt, wd=4cm, ht=10pt, left, ignorebg, #1]{titlepage}
+				~~~~~~~~~~~~~~~~~~~~~~$^{\dagger}$
+				\includegraphics[width=3cm, keepaspectratio]{images/UA-StackedNameplate.eps}
+		\end{beamercolorbox}
+	\end{textblock*}
+
+	% Texte
+	\begin{textblock*}{9.3cm}(5.7cm,4.6cm)
+		\begin{flushleft}
+			% Titre
+			\begin{beamercolorbox}[wd=9.3cm, ht=5pt, left, ignorebg, #1]{titlepage}
+%				\usebeamerfont{title}
+				\huge{\textbf{\inserttitle}}
+			\end{beamercolorbox}
+			% Auteur
+			\vspace{.5cm}
+			\hspace{-5pt}
+			\begin{beamercolorbox}[sep=0pt, wd=9.3cm, ht=5pt, left, ignorebg, #1]{titlepage}
+				\usebeamerfont{author}
+				\insertauthor
+			\end{beamercolorbox}
+		\end{flushleft}
+	\end{textblock*}
+	% Barre tricolore
+	\begin{textblock*}{7.8cm}(5.2cm,8cm)
+		\begin{beamercolorbox}[sep=2pt, wd=2cm, ht=10pt, left, ignorebg, #1]{titlepage}
+            \tikzset{every picture/.style={scale=1.25}}
+    			\input{Modele/barre_tricolore_garde.tex}
+            \tikzset{every picture/.style={xscale=1}}
+		\end{beamercolorbox}
+	\end{textblock*}
+}
+
+\mode<presentation>
+
+%Commande de titre
+\newcommand{\inserttitlepage}[0]{
+	\frame[plain]{\titlepage}
+}
+
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{itemize item}[square]
+\setbeamertemplate{itemize subitem}[circle]
+\setbeamertemplate{itemize subsubitem}[default]
+\setbeamertemplate{sections/subsections in toc}[square]
+\setbeamertemplate{title page}[information][]
+\setbeamertemplate{part page}[default][colsep=-4bp,rounded=true,shadow=\beamer@themerounded@shadow]
+
+
+
+
+\mode<all>

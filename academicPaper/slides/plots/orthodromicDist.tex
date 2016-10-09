@@ -1,0 +1,20 @@
+\tikzsetnextfilename{orthodromic_distance}
+\begin{tikzpicture}
+
+
+\tikzset{
+	sphericalOrtho/.pic={
+		\pic at (0,0) {spherical={#1}};
+      \coordinate (A) at (-0.0252778*#1,0);
+      \draw[tangoRed, line width=0.5mm]  (A) arc (210:300:#1 pt and 0.5*#1 pt) coordinate (B) node[midway, below]{d};
+      \node[tangoRed, left] at (A) {A};
+      \node[tangoRed, right] at (B) {B};
+      \draw[tangoRed, dashed] (A) -- (B);
+
+      \draw (0,0) circle (#1 pt);
+    }
+}
+
+\pic [local bounding box=spher]  at (0,0) {sphericalOrtho=55};
+
+\end{tikzpicture}
