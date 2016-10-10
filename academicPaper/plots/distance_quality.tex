@@ -1,8 +1,8 @@
 \pgfplotscreateplotcyclelist{My color list}{%
-    {gray,solid, very thick},%
-    {black!25, dashed, very thick},%
-    {black!75, densely dashed, very thick},%
-    {black, densely dotted, very thick},%
+    {color1,solid, very thick},%
+    {color2,densely dashed, very thick},%
+    {color3,densely dotted, very thick},%
+    {color4,dash pattern=on 4pt off 1pt on 4pt off 4pt, very thick}%
 }
 
 \pgfplotsset{every axis legend/.append style={
@@ -45,8 +45,8 @@ font = \scriptsize,
             %y filter/.code={\pgfmathparse{#1/1000000}\pgfmathresult},
         ]
          \pgfplotsextra{\begin{scope}[on layer=axis background]
-                \draw[draw=gray!50] (axis cs:0,0.955777) -- (axis cs:3.14,0.955777);
-                \node[rounded corners, fill=gray!50,
+                \draw[draw=color5] (axis cs:0,0.955777) -- (axis cs:3.14,0.955777);
+                \node[rounded corners, fill=color5,
                 			font=\tiny, inner sep=2pt,
                 			anchor=west] at (axis cs:0,0.955777) {\textit{\vphantom{lj}uniEqui}};
             \end{scope}
