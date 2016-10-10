@@ -71,7 +71,7 @@ viewports, extracted from $360$-degree videos
 projected onto various geometric layouts and with various face quality
 arrangements. We used two reference videos.
 \begin{itemize}
-   \item \emph{The original equirectangular video at full quality}   :\footnote{\url{https://youtu.be/yarcdW91djQ}}
+   \item \emph{The original equirectangular video at full quality}:\footnote{\url{https://youtu.be/yarcdW91djQ}}
 	We extract viewports at $1080$p resolution from this $4$K
    equirectangular video, which represents the reference (original)
    video we used for the objective video quality assessment.
@@ -84,7 +84,19 @@ arrangements. We used two reference videos.
    state that, in this video, the quality is uniform.
 \end{itemize}
 
-To assess the perceived quality, we extract a ten second viewport, at specific distance from the \ac{QEC}, at the same static position on the original equirectangular video and on the tested video. We used two objective video quality metrics to measure the quality of the extracted viewport compared to the original full quality viewport:
+The performance of the layout can be studied with
+regards to two aspects: $(i)$ \emph{the best viewport quality}, which
+is the quality of the extracted viewport when the \FoV{} center and
+the \ac{QEC} perfectly matches, $(ii)$ and the \emph{sensitivity to
+head movements}, which is the degradation of the viewport quality when
+the distance between the \FoV{} center and the \ac{QEC} increases.
+To examine both aspects, we select one \ac{QEC} on the spherical video.
+We chose one orthodromic distance $d$ that will vary from \numrange{0}{\pi}.
+We extract a ten second viewport, at distance $d$
+from the \ac{QEC}, at the same spherical position on the original
+equirectangular video and on the tested video. We used two objective
+video quality metrics to measure the quality of the extracted viewport
+compared to the original full quality viewport:
 \ac{MS-SSIM}~\cite{wang2003multiscale} and
 \ac{PSNR}.
 \ac{MS-SSIM} compares image by image the structural
@@ -92,23 +104,23 @@ similarity between a video and a reference video. The \ac{PSNR} measures the ave
 between a video and a reference video. Since we
 compare several encoded versions of the \emph{same} viewport against the
 original, these well-known tools provide a fair performance evaluation of viewport distortion.
-We perform multiple quality assessment (typically forty) at the same distance and average the result.
+We perform multiple quality assessment (typically forty) at the same distance $d$ but at different positions and average the result.
 
 
-The performance of the layout can be studied with
-regards to two aspects: $(i)$ \emph{the best viewport quality}, which
-is the quality of the extracted viewport when the \FoV{} center and
-the \ac{QEC} perfectly matches, $(ii)$ and the \emph{sensitivity to
-head movements}, which is the degradation of the viewport quality when
-the distance between the \FoV{} center and the \ac{QEC} increases. To
-examine both aspects, we chose one origin point \ac{QEC} in the
-spherical video. Next, we iterated over the \emph{orthodromic
-distance} $d$, which increases from \numrange{0}{\pi} (the furthest
-point). For each value $d$, we randomly picked forty \FoV{} centers
-at distance $d$ from the origin \ac{QEC} and we extracted the
-viewports, which we compared to the same viewports extracted from the
-full-quality original video, to get an objective video quality
-measure.
+% The performance of the layout can be studied with
+% regards to two aspects: $(i)$ \emph{the best viewport quality}, which
+% is the quality of the extracted viewport when the \FoV{} center and
+% the \ac{QEC} perfectly matches, $(ii)$ and the \emph{sensitivity to
+% head movements}, which is the degradation of the viewport quality when
+% the distance between the \FoV{} center and the \ac{QEC} increases. To
+% examine both aspects, we chose one origin point \ac{QEC} in the
+% spherical video. Next, we iterated over the \emph{orthodromic
+% distance} $d$, which increases from \numrange{0}{\pi} (the furthest
+% point). For each value $d$, we randomly picked forty \FoV{} centers
+% at distance $d$ from the origin \ac{QEC} and we extracted the
+% viewports, which we compared to the same viewports extracted from the
+% full-quality original video, to get an objective video quality
+% measure.
 
 
 
