@@ -34,20 +34,30 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
         }
         if (layoutType == "cubeMap" || layoutType == "cubeMap2")
         {
-            auto bitrateFront = ptree.get<double>(layoutSection+".bitrateFront");
-            auto bitrateBack = ptree.get<double>(layoutSection+".bitrateBack");
-            auto bitrateLeft = ptree.get<double>(layoutSection+".bitrateLeft");
-            auto bitrateRight = ptree.get<double>(layoutSection+".bitrateRight");
-            auto bitrateTop = ptree.get<double>(layoutSection+".bitrateTop");
-            auto bitrateBottom = ptree.get<double>(layoutSection+".bitrateBottom");
-            double sum = bitrateFront+bitrateBack+bitrateLeft+bitrateRight+bitrateTop+bitrateBottom;
-            bitrateVect.push_back(bitrateGoal*bitrateFront/sum);
-            bitrateVect.push_back(bitrateGoal*bitrateBack/sum);
-            bitrateVect.push_back(bitrateGoal*bitrateLeft/sum);
-            bitrateVect.push_back(bitrateGoal*bitrateRight/sum);
-            bitrateVect.push_back(bitrateGoal*bitrateTop/sum);
-            bitrateVect.push_back(bitrateGoal*bitrateBottom/sum);
-            return bitrateVect;
+            auto useTile = ptree.get<bool>(layoutSection+".useTile");
+            if (useTile)
+            {
+              auto bitrateFront = ptree.get<double>(layoutSection+".bitrateFront");
+              auto bitrateBack = ptree.get<double>(layoutSection+".bitrateBack");
+              auto bitrateLeft = ptree.get<double>(layoutSection+".bitrateLeft");
+              auto bitrateRight = ptree.get<double>(layoutSection+".bitrateRight");
+              auto bitrateTop = ptree.get<double>(layoutSection+".bitrateTop");
+              auto bitrateBottom = ptree.get<double>(layoutSection+".bitrateBottom");
+              double sum = bitrateFront+bitrateBack+bitrateLeft+bitrateRight+bitrateTop+bitrateBottom;
+              bitrateVect.push_back(bitrateGoal*bitrateFront/sum);
+              bitrateVect.push_back(bitrateGoal*bitrateBack/sum);
+              bitrateVect.push_back(bitrateGoal*bitrateLeft/sum);
+              bitrateVect.push_back(bitrateGoal*bitrateRight/sum);
+              bitrateVect.push_back(bitrateGoal*bitrateTop/sum);
+              bitrateVect.push_back(bitrateGoal*bitrateBottom/sum);
+              return bitrateVect;
+            }
+            else
+            {
+              auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+              bitrateVect.push_back(bitrateGoal * bitrate);
+              return bitrateVect;
+            }
         }
         if (layoutType == "flatFixed")
         {
@@ -56,6 +66,9 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
         }
         if (layoutType == "pyramid" || layoutType == "pyramid2")
         {
+          auto useTile = ptree.get<bool>(layoutSection+".useTile");
+          if (useTile)
+          {
             double pyramidBaseBitrate = ptree.get<double>(layoutSection+".pyramidBaseBitrate");
             double pyramidTopBitrate = ptree.get<double>(layoutSection+".pyramidTopBitrate");
             double pyramidBottomBitrate = ptree.get<double>(layoutSection+".pyramidBottomBitrate");
@@ -68,9 +81,19 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
             bitrateVect.push_back(bitrateGoal*pyramidLeftBitrate/sum);
             bitrateVect.push_back(bitrateGoal*pyramidRightBitrate/sum);
             return bitrateVect;
+          }
+          else
+          {
+            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+            bitrateVect.push_back(bitrateGoal * bitrate);
+            return bitrateVect;
+          }
         }
         if (layoutType == "rhombicDodeca")
         {
+          auto useTile = ptree.get<bool>(layoutSection+".useTile");
+          if (useTile)
+          {
             std::array<double, 12> faceBitrate;
             for (unsigned int i = 0; i < 12; ++i)
             {
@@ -80,9 +103,19 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
             for (auto b: faceBitrate) {sum += b;}
             for (auto b: faceBitrate) { bitrateVect.push_back(bitrateGoal*b/sum); }
             return bitrateVect;
+          }
+          else
+          {
+            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+            bitrateVect.push_back(bitrateGoal * bitrate);
+            return bitrateVect;
+          }
         }
         if (layoutType == "equirectangularTiled")
         {
+          auto useTile = ptree.get<bool>(layoutSection+".useTile");
+          if (useTile)
+          {
             std::array<std::array<double, 8>, 8> faceBitrate;
             double sum = 0;
             for (unsigned i = 0; i < 8; ++i)
@@ -101,6 +134,13 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
                 }
             }
             return bitrateVect;
+          }
+          else
+          {
+            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+            bitrateVect.push_back(bitrateGoal * bitrate);
+            return bitrateVect;
+          }
         }
     }
     catch (std::exception &e)
@@ -111,10 +151,19 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
     throw std::invalid_argument("Not supported type: "+layoutType);
 }
 
-std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& ptree, bool isInput, unsigned int inputWidth, unsigned int inputHeight)
+enum class LayoutStatus
+{
+  Input, /// indicates that the layout is an input layout and so will have an input video
+  Intermediate, /// indicates that the layout is neither an input layout nor an output layout
+  Output /// indicates that the layout is an output layout and so may have an output video
+};
+
+std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& ptree, LayoutStatus layoutStatus, unsigned int inputWidth, unsigned int inputHeight)
 {
     std::string layoutType;
 
+    bool isInput = layoutStatus == LayoutStatus::Input;
+    bool isOutput = layoutStatus == LayoutStatus::Output;
     try {
         layoutType = ptree.get<std::string>(layoutSection+".type");
         bool infer = isInput ? true : ptree.get<bool>(layoutSection+".relativeResolution");
@@ -171,6 +220,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
                 if (!infer)
@@ -186,11 +236,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "cubeMap2")
@@ -204,6 +254,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
                 if (!infer)
@@ -219,11 +270,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "flatFixed")
@@ -258,6 +309,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
+            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
                 if (!infer)
@@ -273,11 +325,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, pyramidBaseEdgeLength*inputWidth/4);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, useTile, pyramidBaseEdgeLength*inputWidth/4);
             }
             else
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, pyramidBaseEdgeLength);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, useTile, pyramidBaseEdgeLength);
             }
         }
         if (layoutType == "pyramid2")
@@ -291,6 +343,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
+            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
                 if (!infer)
@@ -306,11 +359,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, useTile, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, useTile, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
             }
         }
         if (layoutType == "rhombicDodeca")
@@ -318,6 +371,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             std::array<double, 12> faceResScale;
             std::array<unsigned int, 12> faceRes;
             for (unsigned int i = 0; i < 12; ++i)
@@ -343,7 +397,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 faceRes[i] = (infer ? inputWidth/8.0 : 1)*faceResScale[i];
             }
 
-            return LayoutRhombicdodeca::GenerateLayout(yaw, pitch, roll, faceRes);
+            return LayoutRhombicdodeca::GenerateLayout(yaw, pitch, roll, useTile, faceRes);
         }
         if (layoutType == "equirectangularTiled")
         {
@@ -352,6 +406,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
 
             for (unsigned int i = 0; i < 8; ++i)
             {
@@ -385,7 +440,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 }
             }
 
-            return std::make_shared<LayoutEquirectangularTiles>(tileRes, yaw, pitch, roll);
+            return std::make_shared<LayoutEquirectangularTiles>(tileRes, yaw, pitch, roll, useTile);
         }
     }
     catch (std::exception &e)

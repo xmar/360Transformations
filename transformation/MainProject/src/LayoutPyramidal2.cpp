@@ -263,65 +263,80 @@ std::shared_ptr<Picture> LayoutPyramidal2::ReadNextPictureFromVideoImpl(void)
 {
     bool isInit = false;
     cv::Mat outputMat;
-    for (unsigned i = 0; i < 5; ++i)
+    if (UseTile())
     {
-        Faces f = static_cast<Faces>(i);
-        unsigned startI , startJ;
-        if (f != Faces::Top && f != Faces::Bottom)
-        {
-            startI = IStartOffset(f, 0);
-        }
-        else
-        {
-            startI = IStartOffset(Faces::Base, 0);
-        }
-        if (f != Faces::Left && f != Faces::Right)
-        {
-            startJ = JStartOffset(f, 0);
-        }
-        else
-        {
-            startJ = JStartOffset(Faces::Base, 0);
-        }
-        cv::Rect roi( startI,  startJ, GetRes(f), GetRes(f) );
-        auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
-        //std::cout << "Expected Width: "<< GetRes(f) << "; Height " << GetRes(f) << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
-        if (!isInit)
-        {
-            outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
-            isInit = true;
-        }
-        cv::Mat facePictMat ( outputMat, roi);
-        facePictPtr->copyTo(facePictMat);
+      for (unsigned i = 0; i < 5; ++i)
+      {
+          Faces f = static_cast<Faces>(i);
+          unsigned startI , startJ;
+          if (f != Faces::Top && f != Faces::Bottom)
+          {
+              startI = IStartOffset(f, 0);
+          }
+          else
+          {
+              startI = IStartOffset(Faces::Base, 0);
+          }
+          if (f != Faces::Left && f != Faces::Right)
+          {
+              startJ = JStartOffset(f, 0);
+          }
+          else
+          {
+              startJ = JStartOffset(Faces::Base, 0);
+          }
+          cv::Rect roi( startI,  startJ, GetRes(f), GetRes(f) );
+          auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
+          //std::cout << "Expected Width: "<< GetRes(f) << "; Height " << GetRes(f) << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
+          if (!isInit)
+          {
+              outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
+              isInit = true;
+          }
+          cv::Mat facePictMat ( outputMat, roi);
+          facePictPtr->copyTo(facePictMat);
+      }
+    }
+    else
+    {
+      auto facePictPtr = m_inputVideoPtr->GetNextPicture(0);
+      facePictPtr->copyTo(outputMat);
     }
     return std::make_shared<Picture>(outputMat);
 }
 
 void LayoutPyramidal2::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
 {
-    for (unsigned i = 0; i < 5; ++i)
+    if (UseTile())
     {
-        Faces f = static_cast<Faces>(i);
-        unsigned startI , startJ;
-        if (f != Faces::Top && f != Faces::Bottom)
-        {
-            startI = IStartOffset(f, 0);
-        }
-        else
-        {
-            startI = IStartOffset(Faces::Base, 0);
-        }
-        if (f != Faces::Left && f != Faces::Right)
-        {
-            startJ = JStartOffset(f, 0);
-        }
-        else
-        {
-            startJ = JStartOffset(Faces::Base, 0);
-        }
-        cv::Rect roi( startI,  startJ, GetRes(f), GetRes(f) );
-        cv::Mat facePictMat ( pict->GetMat(), roi);
-        m_outputVideoPtr->Write( facePictMat, i);
+      for (unsigned i = 0; i < 5; ++i)
+      {
+          Faces f = static_cast<Faces>(i);
+          unsigned startI , startJ;
+          if (f != Faces::Top && f != Faces::Bottom)
+          {
+              startI = IStartOffset(f, 0);
+          }
+          else
+          {
+              startI = IStartOffset(Faces::Base, 0);
+          }
+          if (f != Faces::Left && f != Faces::Right)
+          {
+              startJ = JStartOffset(f, 0);
+          }
+          else
+          {
+              startJ = JStartOffset(Faces::Base, 0);
+          }
+          cv::Rect roi( startI,  startJ, GetRes(f), GetRes(f) );
+          cv::Mat facePictMat ( pict->GetMat(), roi);
+          m_outputVideoPtr->Write( facePictMat, i);
+      }
+    }
+    else
+    {
+      m_outputVideoPtr->Write(pict->GetMat(),0);
     }
 }
 
@@ -329,7 +344,7 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutPyramidal2::InitInputVideoImpl(st
 {
     std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
     vrPtr->Init(nbFrame);
-    if (vrPtr->GetNbStream() != 5)
+    if ((UseTile() && vrPtr->GetNbStream() != 5) || (vrPtr->GetNbStream() != 1))
     {
         std::cout << "Unsupported number of stream for Pyramidal input video: "<<vrPtr->GetNbStream() <<" instead of 5" << std::endl;
         return nullptr;
@@ -341,17 +356,30 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutPyramidal2::InitInputVideoImpl(st
 std::shared_ptr<IMT::LibAv::VideoWriter> LayoutPyramidal2::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
 {
     std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
-    std::array<unsigned, 5> br;
-    std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 5, br.begin());
-    std::array<unsigned, 5> widthArr;
-    std::array<unsigned, 5> heightArr;
-    //Cannot use different resolution for pyramid faces anymore
-    for (unsigned i = 0; i < 5; ++i)
+    if (UseTile())
     {
-        Faces f = static_cast<Faces>(i);
-        widthArr[i] = GetRes(f);
-        heightArr[i] = GetRes(f);
+      std::array<unsigned, 5> br;
+      std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 5, br.begin());
+      std::array<unsigned, 5> widthArr;
+      std::array<unsigned, 5> heightArr;
+      //Cannot use different resolution for pyramid faces anymore
+      for (unsigned i = 0; i < 5; ++i)
+      {
+          Faces f = static_cast<Faces>(i);
+          widthArr[i] = GetRes(f);
+          heightArr[i] = GetRes(f);
+      }
+      vwPtr->Init<5>(codecId, widthArr, heightArr, fps, gop_size, br);
     }
-    vwPtr->Init<5>(codecId, widthArr, heightArr, fps, gop_size, br);
+    else
+    {
+      std::array<unsigned, 1> br;
+      std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
+      std::array<unsigned, 1> widthArr;
+      std::array<unsigned, 1> heightArr;
+      widthArr[0] = m_outWidth;
+      heightArr[0] = m_outHeight;
+      vwPtr->Init<1>(codecId, widthArr, heightArr, fps, gop_size, br);
+    }
     return vwPtr;
 }

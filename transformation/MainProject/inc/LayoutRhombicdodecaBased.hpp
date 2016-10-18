@@ -11,6 +11,7 @@ class LayoutRhombicdodecaBased: public Layout
 
         enum class Faces{ Face1, Face2, Face3, Face4, Face5, Face6, Face7, Face8, Face9, Face10, Face11, Face12, Black, Last, First=Face1 };
 
+        const bool& UseTile(void) const {return m_useTile;}
     protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const = 0;
@@ -63,8 +64,8 @@ class LayoutRhombicdodecaBased: public Layout
                 std::array<unsigned int, 12> m_faces;
         };
 
-        LayoutRhombicdodecaBased(double yaw, double pitch, double roll, FaceResolutions fr): Layout(), m_fr(std::move(fr)),
-        m_rotMat(GetRotMatrice(yaw, pitch, roll)), m_faceRotations() {InitFaceRotations();}
+        LayoutRhombicdodecaBased(double yaw, double pitch, double roll, bool useTile, FaceResolutions fr): Layout(), m_fr(std::move(fr)),
+        m_rotMat(GetRotMatrice(yaw, pitch, roll)), m_faceRotations(), m_useTile(useTile) {InitFaceRotations();}
         Plan FaceToPlan(Faces f) const
         {
             switch(f)
@@ -107,6 +108,7 @@ class LayoutRhombicdodecaBased: public Layout
         FaceResolutions m_fr;
         RotMat m_rotMat;
         std::array<RotMat,12> m_faceRotations;
+        bool m_useTile;
 
         void InitFaceRotations(void);
 };

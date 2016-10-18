@@ -134,24 +134,35 @@ std::shared_ptr<Picture> LayoutCubeMap::ReadNextPictureFromVideoImpl(void)
 {
     bool isInit = false;
     cv::Mat outputMat;
-    for (unsigned i = 0; i < 6; ++i)
+    if (UseTile())
     {
-        Faces f = static_cast<Faces>(i);
-        cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
-        auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
-        if (!isInit)
-        {
-            outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
-            isInit = true;
-        }
-        cv::Mat facePictMat ( outputMat, roi);
-        facePictPtr->copyTo(facePictMat);
+      for (unsigned i = 0; i < 6; ++i)
+      {
+          Faces f = static_cast<Faces>(i);
+          cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
+          auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
+          if (!isInit)
+          {
+              outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
+              isInit = true;
+          }
+          cv::Mat facePictMat ( outputMat, roi);
+          facePictPtr->copyTo(facePictMat);
+      }
+    }
+    else
+    {
+      auto facePictPtr = m_inputVideoPtr->GetNextPicture(0);
+      //outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
+      facePictPtr->copyTo(outputMat);
     }
     return std::make_shared<Picture>(outputMat);
 }
 
 void LayoutCubeMap::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
 {
+  if (UseTile())
+  {
     for (unsigned i = 0; i < 6; ++i)
     {
         Faces f = static_cast<Faces>(i);
@@ -159,13 +170,18 @@ void LayoutCubeMap::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
         cv::Mat facePictMat ( pict->GetMat(), roi);
         m_outputVideoPtr->Write( facePictMat, i);
     }
+  }
+  else
+  {
+    m_outputVideoPtr->Write(pict->GetMat(), 0);
+  }
 }
 
 std::shared_ptr<IMT::LibAv::VideoReader> LayoutCubeMap::InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame)
 {
     std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
     vrPtr->Init(nbFrame);
-    if (vrPtr->GetNbStream() != 6)
+    if ((UseTile() && vrPtr->GetNbStream() != 6) || (vrPtr->GetNbStream() != 1))
     {
         std::cout << "Unsupported number of stream for CubeMap input video: "<<vrPtr->GetNbStream() <<" instead of 6" << std::endl;
         return nullptr;
@@ -176,7 +192,9 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutCubeMap::InitInputVideoImpl(std::
 
 std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
 {
-    std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
+  std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
+  if (UseTile())
+  {
     std::array<unsigned, 6> br;
     std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 6, br.begin());
     std::array<unsigned, 6> resArr;
@@ -185,5 +203,16 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std:
         resArr[i] = GetRes(static_cast<Faces>(i));
     }
     vwPtr->Init<6>(codecId, resArr, resArr, fps, gop_size, br);
-    return vwPtr;
+  }
+  else
+  {
+    std::array<unsigned, 1> br;
+    std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
+    std::array<unsigned, 1> resArrV;
+    std::array<unsigned, 1> resArrH;
+    resArrV[0] = m_outHeight;
+    resArrH[0] = m_outWidth;
+    vwPtr->Init<1>(codecId, resArrH, resArrV, fps, gop_size, br);
+  }
+  return vwPtr;
 }

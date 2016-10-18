@@ -11,7 +11,8 @@ def GetFaceRes(front, left, right, top, bottom, back):
     return c
 
 def GetFaceBitrate(front, left, right, top, bottom, back):
-    c='bitrateFront={}\n'.format(front)
+    c='useTile=true\n'
+    c+='bitrateFront={}\n'.format(front)
     c+='bitrateLeft={}\n'.format(left)
     c+='bitrateRight={}\n'.format(right)
     c+='bitrateTop={}\n'.format(top)

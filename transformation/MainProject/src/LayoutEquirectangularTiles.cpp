@@ -94,40 +94,54 @@ std::shared_ptr<Picture> LayoutEquirectangularTiles::ReadNextPictureFromVideoImp
 {
     bool isInit = false;
     cv::Mat outputMat;
-    for (unsigned i = 0; i < 8; ++i)
+    if (m_useTile)
     {
-        for (unsigned j = 0; j < 8; ++j)
-        {
-            TileId ti(i,j);
-            auto offset = TileIdTo2dOffset(ti);
-            cv::Rect roi( offset.x,  offset.y, m_tr.GetResWidth(ti), m_tr.GetResHeight(ti) );
-            auto facePictPtr = m_inputVideoPtr->GetNextPicture(FromTileId(ti));
-            //std::cout << "Expected Width: "<< m_tr.GetResWidth(ti) << "; Height " << m_tr.GetResHeight(ti) << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
-            if (!isInit)
-            {
-                outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
-                isInit = true;
-            }
-            cv::Mat facePictMat ( outputMat, roi);
-            facePictPtr->copyTo(facePictMat);
-        }
+      for (unsigned i = 0; i < 8; ++i)
+      {
+          for (unsigned j = 0; j < 8; ++j)
+          {
+              TileId ti(i,j);
+              auto offset = TileIdTo2dOffset(ti);
+              cv::Rect roi( offset.x,  offset.y, m_tr.GetResWidth(ti), m_tr.GetResHeight(ti) );
+              auto facePictPtr = m_inputVideoPtr->GetNextPicture(FromTileId(ti));
+              //std::cout << "Expected Width: "<< m_tr.GetResWidth(ti) << "; Height " << m_tr.GetResHeight(ti) << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
+              if (!isInit)
+              {
+                  outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
+                  isInit = true;
+              }
+              cv::Mat facePictMat ( outputMat, roi);
+              facePictPtr->copyTo(facePictMat);
+          }
+      }
+    }
+    else
+    {
+      auto facePictPtr = m_inputVideoPtr->GetNextPicture(0);
+      facePictPtr->copyTo(outputMat);
     }
     return std::make_shared<Picture>(outputMat);
 }
 
 void LayoutEquirectangularTiles::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
 {
-
-    for (unsigned i = 0; i < 8; ++i)
+    if (m_useTile)
     {
-        for (unsigned j = 0; j < 8; ++j)
-        {
-            TileId ti(i,j);
-            auto offset = TileIdTo2dOffset(ti);
-            cv::Rect roi( offset.x,  offset.y, m_tr.GetResWidth(ti), m_tr.GetResHeight(ti) );
-            cv::Mat facePictMat ( pict->GetMat(), roi);
-            m_outputVideoPtr->Write( facePictMat, FromTileId(ti));
-        }
+      for (unsigned i = 0; i < 8; ++i)
+      {
+          for (unsigned j = 0; j < 8; ++j)
+          {
+              TileId ti(i,j);
+              auto offset = TileIdTo2dOffset(ti);
+              cv::Rect roi( offset.x,  offset.y, m_tr.GetResWidth(ti), m_tr.GetResHeight(ti) );
+              cv::Mat facePictMat ( pict->GetMat(), roi);
+              m_outputVideoPtr->Write( facePictMat, FromTileId(ti));
+          }
+      }
+    }
+    else
+    {
+      m_outputVideoPtr->Write(pict->GetMat(), 0);
     }
 }
 
@@ -135,7 +149,7 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutEquirectangularTiles::InitInputVi
 {
     std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
     vrPtr->Init(nbFrame);
-    if (vrPtr->GetNbStream() != 64)
+    if ((m_useTile && vrPtr->GetNbStream() != 64) || (vrPtr->GetNbStream() != 1))
     {
         std::cout << "Unsupported number of stream for EquirectangularTiles input video: "<<vrPtr->GetNbStream() <<" instead of 64" << std::endl;
         return nullptr;
@@ -147,21 +161,32 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutEquirectangularTiles::InitInputVi
 std::shared_ptr<IMT::LibAv::VideoWriter> LayoutEquirectangularTiles::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
 {
     std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
-    std::array<unsigned, 64> br;
-    std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 64, br.begin());
-    std::array<unsigned, 64> widthArr;
-    std::array<unsigned, 64> heightArr;
-    for (unsigned i = 0; i < 8; ++i)
+    if (m_useTile)
     {
-        for (unsigned j = 0; j < 8; ++j)
-        {
-            TileId ti(i,j);
-            widthArr[FromTileId(ti)] = m_tr.GetResWidth(ti);
-            heightArr[FromTileId(ti)] = m_tr.GetResHeight(ti);
-        }
+      std::array<unsigned, 64> br;
+      std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 64, br.begin());
+      std::array<unsigned, 64> widthArr;
+      std::array<unsigned, 64> heightArr;
+      for (unsigned i = 0; i < 8; ++i)
+      {
+          for (unsigned j = 0; j < 8; ++j)
+          {
+              TileId ti(i,j);
+              widthArr[FromTileId(ti)] = m_tr.GetResWidth(ti);
+              heightArr[FromTileId(ti)] = m_tr.GetResHeight(ti);
+          }
+      }
+      vwPtr->Init<64>(codecId, widthArr, heightArr, fps, gop_size, br);
     }
-
-
-    vwPtr->Init<64>(codecId, widthArr, heightArr, fps, gop_size, br);
+    else
+    {
+      std::array<unsigned, 1> br;
+      std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
+      std::array<unsigned, 1> widthArr;
+      std::array<unsigned, 1> heightArr;
+      widthArr[0] = m_outWidth;
+      heightArr[0] = m_outHeight;
+      vwPtr->Init<1>(codecId, widthArr, heightArr, fps, gop_size, br);
+    }
     return vwPtr;
 }

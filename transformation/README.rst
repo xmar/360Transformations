@@ -140,6 +140,9 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   cubeEdgeLengthTop=1
   cubeEdgeLengthBottom=1
   cubeEdgeLengthBack=1
+  ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the bitrateFront, bitrateLeft, etc. parameters
+  ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
+  useTile=true
   ;Relative bitrate of each face (if final layout encoded). A ratio r means r*videoOutputBitRate/6
   bitrateFront=1
   bitrateLeft=0.25
@@ -147,6 +150,8 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   bitrateTop=0.25
   bitrateBottom=0.25
   bitrateBack=0.25
+  ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
+  bitrate=1
 
 **pyramid** layout
 
@@ -172,12 +177,17 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   pyramidHeightRight=1
   pyramidHeightTop=1
   pyramidHeightBottom=1
+  ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the pyramidBaseBitrate, pyramidLeftBitrate, etc. parameters
+  ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
+  useTile=true
   ;Relative bitrate of each face (if final layout encoded). A ratio r means r*videoOutputBitRate/5
   pyramidBaseBitrate=1
   pyramidLeftBitrate=0.25
   pyramidRightBitrate=0.25
   pyramidTopBitrate=0.25
   pyramidBottomBitrate=0.25
+  ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
+  bitrate=1
 
 **rhombicDodeca** layout
 
@@ -208,6 +218,9 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   rhombEdgeLengthFace10=1
   rhombEdgeLengthFace11=1
   rhombEdgeLengthFace12=1
+  ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the rhombFace1Bitrate, rhombFace2Bitrate, etc. parameters
+  ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
+  useTile=true
   ;Relative bitrate of each face (if final layout encoded). A ratio r means r*videoOutputBitRate/12
   rhombFace1Bitrate=1
   rhombFace5Bitrate=1
@@ -221,6 +234,8 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   rhombFace11Bitrate=0.5
   rhombFace9Bitrate=0.25
   rhombFace12Bitrate=0.25
+  ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
+  bitrate=1
 
 **equirectangularTiled** layout
 
@@ -237,6 +252,9 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   yaw=45.0
   pitch=-22.5
   roll=0.0
+  ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the equirectangularTileBitrate_0_0, equirectangularTileBitrate_0_1, etc. parameters
+  ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
+  useTile=true
   ;resolution of the tile (i,j)=(0,0)
   equirectangularTile_0_0=1
   ; bitrate of the tile (i,j) = (0,0). Ratio of r means r*videoOutputBitRate/64
@@ -367,3 +385,5 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   equirectangularTileBitrate_7_6=0.25
   equirectangularTile_7_7=1
   equirectangularTileBitrate_7_7=0.25
+  ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
+  bitrate=1

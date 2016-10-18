@@ -10,7 +10,7 @@ class LayoutPyramidalBased : public Layout
         struct FaceResolutions;//Forward declaration
     public:
         enum class Faces: int {Base, Left, Right, Top, Bottom, Black, Last, First = Base};
-        LayoutPyramidalBased(double baseEdge, double yaw, double pitch, double roll, unsigned int width, unsigned int height, FaceResolutions fr):
+        LayoutPyramidalBased(double baseEdge, double yaw, double pitch, double roll, unsigned int width, unsigned int height, double useTile, FaceResolutions fr):
             Layout(width,height), m_yaw(yaw), m_pitch(pitch), m_roll(roll),
              m_baseEdge(baseEdge), m_alpha(baseEdge/2.0),
              m_canonicTopPlan((1-std::pow(m_alpha,2))/(2*m_alpha), 0, 1, -(1+std::pow(m_alpha,2))/(2*m_alpha)),
@@ -19,10 +19,11 @@ class LayoutPyramidalBased : public Layout
              m_pyramidHeight(norm(m_top-Coord3dCart(1,0,0))),
              m_topHeight(norm(m_top-Coord3dCart(1,0,m_alpha))),
              m_intersectionHeight(norm(m_interTop-Coord3dCart(1,0,m_alpha))), m_fr(std::move(fr)),
-             m_rotationMat(GetRotMatrice(yaw,pitch,roll))
+             m_rotationMat(GetRotMatrice(yaw,pitch,roll)),
+             m_useTile(useTile)
              {}
 
-
+    const bool& UseTile(void) const {return m_useTile;}
 
     protected:
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
@@ -103,6 +104,7 @@ class LayoutPyramidalBased : public Layout
       double m_pyramidHeight; //Height of the pyramid (base to top)
       double m_topHeight; //Height of the top face (from (1, 0, m_alpha) to m_top
       double m_intersectionHeight; //Distance between (1, 0, m_alpha) and m_interTop
+      bool m_useTile;
 
       double UsePlanEquation(double x) const; //compute the value of z knowing the value of x (for the top plan in the canonic pyramid)
       FaceResolutions m_fr;
