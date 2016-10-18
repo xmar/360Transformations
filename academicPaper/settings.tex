@@ -9,7 +9,7 @@ parameters (the number of \acp{QEC}, the number of
 representations, the segment length and the geometric layout)
 and local (\emph{per representation}) parameters (the target bit-rate,
 the number of different qualities in a representation, the quality
-arrangement onto the different faces of a geometric layout). We \GS{will not
+arrangement of different faces of a geometric layout). We \GS{will not
 be}{} comprehensive regarding the selection of all these
 parameters here. Some of them require a deeper study related to signal
 processing, while others depend on business
@@ -20,7 +20,7 @@ What is the best segment length to support head movements, while
 maintaining low management overhead? What is the best number of
 \acp{QEC} $n$ to reduce the induced storage requirements, while
 offering a good \ac{QoE}? To answer these three questions, we have
-developed a software tool and we have used a dataset from a real \ac{VR} system.
+developed a software tool and used a dataset from a real \ac{VR} system.
 
 
 \parag{Dataset}We graciously received from Jaunt, Inc a dataset
@@ -92,7 +92,7 @@ head movements}, which is the degradation of the viewport quality when
 the distance between the \FoV{} center and the \ac{QEC} increases.
 To examine both aspects, we select one \ac{QEC} on the spherical video.
 We chose one orthodromic distance $d$ that will vary from \numrange{0}{\pi}.
-We extract a ten second viewport, at distance $d$
+We extract a ten seconds long viewport video, at distance $d$
 from the \ac{QEC}, at the same spherical position on the original
 equirectangular video and on the tested video. We used two objective
 video quality metrics to measure the quality of the extracted viewport
@@ -100,8 +100,8 @@ compared to the original full quality viewport:
 \ac{MS-SSIM}~\cite{wang2003multiscale} and
 \ac{PSNR}.
 \ac{MS-SSIM} compares image by image the structural
-similarity between a video and a reference video. The \ac{PSNR} measures the average error of pixel intensities
-between a video and a reference video. Since we
+similarity between this video and the reference video. The \ac{PSNR} measures the average error of pixel intensities
+between this video and the reference video. Since we
 compare several encoded versions of the \emph{same} viewport against the
 original, these well-known tools provide a fair performance evaluation of viewport distortion.
 We perform multiple quality assessment (typically forty) at the same distance $d$ but at different positions and average the result.
@@ -155,9 +155,8 @@ increases but the quality for the cube map layout is always the
 highest. Note that the pyramid projection (the layout chosen
 by Facebook~\cite{facebook}) is especially sensitive to head movements.
 The viewport extracted from a cube map projection has a better quality
-than that extracted from the \emph{uniEqui} for \FoV{} center at up to
-\num{2} units from the \ac{QEC} while the other layouts are not
-worthy for \FoV{} centers at only \num{1} unit of the \ac{QEC}.
+than that extracted from the \emph{uniEqui} for \FoV{} center for up to
+\num{2} units from the \ac{QEC} while the other layouts viewports increase a video quality for only \num{1} unit of the \ac{QEC}.
 We study next the interplay between this distance, the segment length and the number of \acp{QEC}.
 
 \subsection{Segment Length}
@@ -167,7 +166,7 @@ The segment length is a key aspect of viewport-adaptive streaming.
 Long segments are easier to manage and better for video encoding, but
 short segments enable fast re-synchronisation to head movement. With
 respect to Figure~\ref{fig:dist_quality}, the segment length
-should be chosen so that the distance between the \FoV{} center and
+should be chosen such that the distance between the \FoV{} center and
 the \ac{QEC} are rarely higher than \num{1.5}~distance units.
 
 Given the dataset, we show the distribution of head movements for
@@ -194,7 +193,7 @@ segment, for various segment lengths.}\label{cdf-dataset}
 Our main observation is that viewport-adaptive streaming requires
 short segment lengths, typically smaller than \SI{3}{\second}. Indeed,
 for a segment length of \SI{5}{\second}, users spend on average half of
-their time watching at a position that is at more than
+their time watching at a position that is more than
 \num{1.3}~distance units away from the initial head position, which
 results in a degraded video quality. A segment length of
 \SI{2}{\second} appears to be a good trade-off: \SI{92}{\percent} of
