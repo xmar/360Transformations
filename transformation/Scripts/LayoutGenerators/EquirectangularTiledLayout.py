@@ -15,6 +15,8 @@ class EquirectangularTiledLayout(Layout):
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
         c+='useTile=true\n'
+        c+='nbHTiles=8\n'
+        c+='nbVTiles=8\n'
         c+=super().GetYawPitchRoll()
         if self.qec is not None:
             if a is None:
@@ -48,6 +50,8 @@ class EquirectangularTiledHigherQualityLayout(Layout):
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
         c+='useTile=true\n'
+        c+='nbHTiles=8\n'
+        c+='nbVTiles=8\n'
         c+=super().GetYawPitchRoll()
         for i in range(0,8):
             for j in range (0,8):
@@ -69,6 +73,8 @@ class EquirectangularTiledLowerQualityLayout(Layout):
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
         c+='useTile=true\n'
+        c+='nbHTiles=8\n'
+        c+='nbVTiles=8\n'
         c+=super().GetYawPitchRoll()
         for i in range(0,8):
             for j in range (0,8):
@@ -90,6 +96,8 @@ class EquirectangularTiledMediumQualityLayout(Layout):
         c += super().GetRefResolutionLine()
         c += 'relativeResolution=true\n'
         c+='useTile=true\n'
+        c+='nbHTiles=8\n'
+        c+='nbVTiles=8\n'
         c+=super().GetYawPitchRoll()
         for i in range(0,8):
             for j in range (0,8):

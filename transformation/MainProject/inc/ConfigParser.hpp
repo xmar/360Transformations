@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <boost/property_tree/ptree.hpp>
+#include <boost/preprocessor.hpp>
 
 #include "Layout.hpp"
 #include "LayoutCubeMap.hpp"
@@ -17,6 +18,77 @@
 
 
 namespace IMT {
+
+#define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
+#define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
+
+#define GENERATE_EQUI_TILED_LAYOUT(nbHTiles,nbVTiles) \
+  LayoutEquirectangularTiles<nbHTiles,nbVTiles>::ScaleTilesMap scaleRes;\
+  for (unsigned int i = 0; i < nbHTiles; ++i)\
+  {\
+      for (unsigned int j = 0; j < nbVTiles; ++j)\
+      {\
+          auto scale = ptree.get<double>(layoutSection+".equirectangularTile_"+std::to_string(i)+"_"+std::to_string(j));\
+          scaleRes[i][j] = scale;\
+      }\
+  }\
+  if (isInput)\
+  {\
+      if (!infer)\
+      {\
+          throw std::invalid_argument("Input with static resolution not supported yet");\
+      }\
+      if (refRes == CoordI(0,0))\
+      {\
+          refRes = LayoutEquirectangularTiles<nbHTiles,nbVTiles>::GetReferenceResolution(inputWidth, inputHeight, scaleRes);\
+      }\
+      inputWidth = refRes.x;\
+      inputHeight = refRes.y;\
+  }\
+  LayoutEquirectangularTiles<nbHTiles,nbVTiles>::TilesMap tileRes;\
+  for (unsigned int i = 0; i < nbHTiles; ++i)\
+  {\
+      for (unsigned int j = 0; j < nbVTiles; ++j)\
+      {\
+          tileRes[i][j] = std::make_tuple(unsigned(scaleRes[i][j]*inputWidth/nbHTiles),unsigned(scaleRes[i][j]*inputHeight/nbVTiles));\
+      }\
+  }\
+  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(tileRes, yaw, pitch, roll, useTile);
+///END MACRO GENERATE_EQUI_TILED_LAYOUT
+
+#define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
+  if (nbHTiles == BOOST_PP_SEQ_ELEM(0,p) && nbVTiles == BOOST_PP_SEQ_ELEM(1,p))\
+  {\
+    GENERATE_EQUI_TILED_LAYOUT(BOOST_PP_SEQ_ELEM(0,p),BOOST_PP_SEQ_ELEM(1,p))\
+  }
+///END MACRO TEST_AND_GENERATE_EQUI_TILED_LAYOUT
+
+#define GET_BITRATE_VECT(nbHTiles, nbVTiles) \
+  std::array<std::array<double, nbVTiles>, nbHTiles> faceBitrate;\
+  double sum = 0;\
+  for (unsigned i = 0; i < nbHTiles; ++i)\
+  {\
+      for (unsigned j = 0; j < nbVTiles; ++j)\
+      {\
+          faceBitrate[i][j] = ptree.get<double>(layoutSection+".equirectangularTileBitrate_"+std::to_string(i)+"_"+std::to_string(j));\
+          sum += faceBitrate[i][j];\
+      }\
+  }\
+  for (unsigned i = 0; i < nbHTiles; ++i)\
+  {\
+      for (unsigned j = 0; j < nbVTiles; ++j)\
+      {\
+          bitrateVect.push_back(bitrateGoal*faceBitrate[i][j]/sum);\
+      }\
+  }
+///END MACRO GET_BITRATE_VECT
+
+#define TEST_AND_GET_BITRATE_VECT(r,p)\
+  if (nbHTiles == BOOST_PP_SEQ_ELEM(0,p) && nbVTiles == BOOST_PP_SEQ_ELEM(1,p))\
+  {\
+    GET_BITRATE_VECT(BOOST_PP_SEQ_ELEM(0,p),BOOST_PP_SEQ_ELEM(1,p))\
+  }
+///END MACRO TEST_AND_GET_BITRATE_VECT
 
 namespace pt = boost::property_tree;
 std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, unsigned bitrateGoal)
@@ -116,23 +188,11 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
           auto useTile = ptree.get<bool>(layoutSection+".useTile");
           if (useTile)
           {
-            std::array<std::array<double, 8>, 8> faceBitrate;
-            double sum = 0;
-            for (unsigned i = 0; i < 8; ++i)
-            {
-                for (unsigned j = 0; j < 8; ++j)
-                {
-                    faceBitrate[i][j] = ptree.get<double>(layoutSection+".equirectangularTileBitrate_"+std::to_string(i)+"_"+std::to_string(j));
-                    sum += faceBitrate[i][j];
-                }
-            }
-            for (unsigned i = 0; i < 8; ++i)
-            {
-                for (unsigned j = 0; j < 8; ++j)
-                {
-                    bitrateVect.push_back(bitrateGoal*faceBitrate[i][j]/sum);
-                }
-            }
+            unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
+            unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");
+
+            BOOST_PP_SEQ_FOR_EACH_PRODUCT(TEST_AND_GET_BITRATE_VECT, RANGE_NB_H_TILES RANGE_NB_V_TILES)
+
             return bitrateVect;
           }
           else
@@ -401,46 +461,18 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         }
         if (layoutType == "equirectangularTiled")
         {
-            LayoutEquirectangularTiles::ScaleTilesMap scaleRes;
 
             double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
 
-            for (unsigned int i = 0; i < 8; ++i)
-            {
-                for (unsigned int j = 0; j < 8; ++j)
-                {
-                    auto scale = ptree.get<double>(layoutSection+".equirectangularTile_"+std::to_string(i)+"_"+std::to_string(j));
-                    scaleRes[i][j] = scale;
-                }
-            }
+            unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
+            unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");
 
-            if (isInput)
-            {
-                if (!infer)
-                {
-                    throw std::invalid_argument("Input with static resolution not supported yet");
-                }
-                if (refRes == CoordI(0,0))
-                {
-                    refRes = LayoutEquirectangularTiles::GetReferenceResolution(inputWidth, inputHeight, scaleRes);
-                }
-                inputWidth = refRes.x;
-                inputHeight = refRes.y;
-            }
+            BOOST_PP_SEQ_FOR_EACH_PRODUCT(TEST_AND_GENERATE_EQUI_TILED_LAYOUT, RANGE_NB_H_TILES RANGE_NB_V_TILES)
 
-            LayoutEquirectangularTiles::TilesMap tileRes;
-            for (unsigned int i = 0; i < 8; ++i)
-            {
-                for (unsigned int j = 0; j < 8; ++j)
-                {
-                    tileRes[i][j] = std::make_tuple(unsigned(scaleRes[i][j]*inputWidth/8),unsigned(scaleRes[i][j]*inputHeight/8));
-                }
-            }
-
-            return std::make_shared<LayoutEquirectangularTiles>(tileRes, yaw, pitch, roll, useTile);
+            throw std::invalid_argument("Not supported type: equirectangularTiled with nbHTiles = "+std::to_string(nbHTiles)+" and nbVTiles = "+std::to_string(nbVTiles));
         }
     }
     catch (std::exception &e)

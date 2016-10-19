@@ -232,6 +232,7 @@ int main( int argc, const char* argv[] )
           }
           if (displayFinalPict)
           {
+            std::cout << pictOut->GetMat().cols << " " << pictOut->GetMat().rows << std::endl;
               pictOut->ImgShowWithLimit("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,900));
           }
           if (!qualityWriterVect.empty() && j != 0)

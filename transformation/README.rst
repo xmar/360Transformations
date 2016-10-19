@@ -252,6 +252,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   yaw=45.0
   pitch=-22.5
   roll=0.0
+  ;nbHTiles (resp. nbVTiles) indicate the number of horizontal (resp. vertical) tiles
+  ;You have to compile the software with the RANGE_NB_H_TILES and RANGE_NB_V_TILES macro to be able to use this layout.
+  ;For instance in this example the value 8 should be in the macro RANGE_NB_H_TILES and RANGE_NB_V_TILES otherwise a runtime error will be raised
+  nbHTiles=8
+  nbVTiles=8
   ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the equirectangularTileBitrate_0_0, equirectangularTileBitrate_0_1, etc. parameters
   ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
   useTile=true
