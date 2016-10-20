@@ -274,6 +274,8 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   vTileRation_5=1
   vTileRation_6=1
   vTileRation_7=1
+  ;if upscale is set to true, all the tiles will be upscaled to the original tile resolution
+  upscale=false
   ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the equirectangularTileBitrate_0_0, equirectangularTileBitrate_0_1, etc. parameters
   ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
   useTile=true

@@ -68,6 +68,14 @@ class LayoutEquirectangularTiles : public Layout
             }
             auto offset = TileIdTo2dOffset(ti);
             auto normPixel = pixel-offset;
+            //upscaling: spacial quantification
+            if (m_upscale)
+            {
+               unsigned int i,j;
+               std::tie(i,j) = ti;
+               normPixel.x = unsigned(normPixel.x * m_scaleTile[i][j])/m_scaleTile[i][j];
+               normPixel.y = unsigned(normPixel.y * m_scaleTile[i][j])/m_scaleTile[i][j];
+            }
             return NormalizedFaceInfo(CoordF(double(normPixel.x)/m_tr.GetResWidth(ti), double(normPixel.y)/m_tr.GetResHeight(ti)), FromTileId(ti));
         }
 
@@ -239,7 +247,7 @@ class LayoutEquirectangularTiles : public Layout
         struct TileResolutions
         {
             public:
-                TileResolutions(void) = delete;
+                TileResolutions(void): m_tiles(){};
                 TileResolutions(TilesMap tileResVect):
                     m_tiles(std::move(tileResVect))
                     {}
@@ -275,8 +283,8 @@ class LayoutEquirectangularTiles : public Layout
             {
               for (unsigned int j = 0; j < nbVTiles; ++j)
               {
-                  PRINT_DEBUG("DEBUG: ("<< i <<","<< j <<")"<<GetHTileRatio(i) << "; " << GetVTileRatio(j) << " !! " << m_tr.GetResWidth(std::make_tuple(i,j)) << "; " << m_tr.GetResHeight(std::make_tuple(i,j)) << " -> "<< m_tr.GetResWidth(std::make_tuple(i,j))*GetHTileRatio(i)*nbHTiles <<";" << m_tr.GetResHeight(std::make_tuple(i,j))*GetVTileRatio(j)*nbVTiles << std::endl)
-                  m_tr.GetTileMapRef()[i][j] = std::make_tuple (m_tr.GetResWidth(std::make_tuple(i,j))*GetHTileRatio(i)*nbHTiles, m_tr.GetResHeight(std::make_tuple(i,j))*GetVTileRatio(j)*nbVTiles);
+                  auto scale = m_upscale ? 1.0 : m_scaleTile[i][j];
+                  m_tr.GetTileMapRef()[i][j] = std::make_tuple (GetHTileRatio(i)*std::get<0>(m_originalRes)*scale,GetVTileRatio(j)*std::get<1>(m_originalRes)*scale);
               }
             }
             //Compute columns and rows size in pixels
@@ -390,18 +398,22 @@ class LayoutEquirectangularTiles : public Layout
         const double& GetVTileRatio(unsigned int j) const {return std::get<1>(m_tileRatios)[j];}
 
         TileResolutions m_tr;
+        ScaleTilesMap m_scaleTile;
         TileRatios m_tileRatios;
         std::array<unsigned int, nbVTiles> m_rowsMaxSize;
         std::array<unsigned int, nbHTiles> m_colsMaxSize;
         std::array<std::array<CoordI, nbVTiles>, nbHTiles> m_offsets;
         RotMat m_rotationMatrice;
+        std::tuple<unsigned int, unsigned int> m_originalRes;
         bool m_useTile;
+        bool m_upscale;
 
     public:
 
-        LayoutEquirectangularTiles(TilesMap tr, TileRatios tileRatios, double yaw, double pitch, double roll, bool useTile): Layout(), m_tr(std::move(tr)),
-          m_tileRatios(std::move(tileRatios)), m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
-          m_rotationMatrice(GetRotMatrice(yaw, pitch, roll)), m_useTile(useTile)
+        LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, double yaw, double pitch, double roll, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale):
+          Layout(), m_tr(),
+          m_scaleTile(std::move(scaleTile)), m_tileRatios(std::move(tileRatios)), m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
+          m_rotationMatrice(GetRotMatrice(yaw, pitch, roll)), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
           {};
 
 

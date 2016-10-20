@@ -19,10 +19,10 @@
 
 namespace IMT {
 
- #define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
- #define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
-//#define RANGE_NB_H_TILES ((3))
-//#define RANGE_NB_V_TILES ((3))
+// #define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
+// #define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
+#define RANGE_NB_H_TILES ((3))
+#define RANGE_NB_V_TILES ((3))
 
 #define GENERATE_EQUI_TILED_LAYOUT(nbHTiles,nbVTiles) \
   LayoutEquirectangularTiles<nbHTiles,nbVTiles>::ScaleTilesMap scaleRes;\
@@ -47,14 +47,14 @@ namespace IMT {
       inputWidth = refRes.x;\
       inputHeight = refRes.y;\
   }\
-  LayoutEquirectangularTiles<nbHTiles,nbVTiles>::TilesMap tileRes;\
+  /*LayoutEquirectangularTiles<nbHTiles,nbVTiles>::TilesMap tileRes;\
   for (unsigned int i = 0; i < nbHTiles; ++i)\
   {\
       for (unsigned int j = 0; j < nbVTiles; ++j)\
       {\
           tileRes[i][j] = std::make_tuple(unsigned(scaleRes[i][j]*inputWidth/nbHTiles),unsigned(scaleRes[i][j]*inputHeight/nbVTiles));\
       }\
-  }\
+  }*/\
   std::array<double, nbHTiles> hRatios;\
   std::array<double, nbVTiles> vRatios;\
   double sumH = 0;\
@@ -72,7 +72,8 @@ namespace IMT {
   for(auto& hr: hRatios) {hr /= sumH;}\
   for(auto& vr: vRatios) {vr /= sumV;}\
   auto tilesRatios = std::make_tuple(std::move(hRatios),std::move(vRatios));\
-  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(tileRes, std::move(tilesRatios), yaw, pitch, roll, useTile);
+  auto orignalRes = std::make_tuple(inputWidth, inputHeight);\
+  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), yaw, pitch, roll, orignalRes, useTile, upscale);
 ///END MACRO GENERATE_EQUI_TILED_LAYOUT
 
 #define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
@@ -486,6 +487,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
             double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
+            bool upscale = ptree.get<bool>(layoutSection+".upscale");
 
             unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
             unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");
