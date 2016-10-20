@@ -3,7 +3,8 @@
 
 #define DEBUG_Packet 0
 #if DEBUG_Packet
-#define PRINT_DEBUG_Packet(s) std::cout << s << std::endl;
+#include <iostream>
+#define PRINT_DEBUG_Packet(s) {std::cout << s << std::endl;}
 #else
 #define PRINT_DEBUG_Packet(s) {}
 #endif // DEBUG_VideoWrite
@@ -28,30 +29,64 @@ void Packet::Free(void)
 
 bool Packet::SetAvPacketWithEncoder(AVCodecContext* context, AVFrame* frame)
 {
-    PRINT_DEBUG_Packet("Free pkt")
+    PRINT_DEBUG_Packet("1# Free pkt")
     Free();
-    int got_output;
-    PRINT_DEBUG_Packet("init pkt")
+    PRINT_DEBUG_Packet("1# init pkt")
     av_init_packet(&m_pkt);
     m_pkt.data = nullptr;
     m_pkt.size = 0;
-    PRINT_DEBUG_Packet("run coding")
-    int ret = avcodec_encode_video2(context, &m_pkt, frame, &got_output);
-    PRINT_DEBUG_Packet("done")
+    PRINT_DEBUG_Packet("1# run coding")
+    //int ret = avcodec_encode_video2(context, &m_pkt, frame, &got_output);
+    int ret = avcodec_send_frame(context, frame);
+    PRINT_DEBUG_Packet("1# done")
     if (ret < 0)
     {
         throw std::runtime_error("Error while encoding frame");
     }
-    if (got_output)
+    if (ret == 0)
     {
-        m_isInit = true;
+        PRINT_DEBUG_Packet("1# ask codec for received pkt")
+        ret = avcodec_receive_packet(context, &m_pkt);
+        if (ret != AVERROR(EAGAIN))
+        {
+            PRINT_DEBUG_Packet("1# received pkt")
+            m_isInit = true;
+        }
+        else
+        {
+          PRINT_DEBUG_Packet("1# no received pkt")
+          av_packet_unref(&m_pkt);
+        }
     }
     else
     {
-        PRINT_DEBUG_Packet("free pkt")
-        av_packet_unref(&m_pkt);
+        PRINT_DEBUG_Packet("1# free pkt")
+        //av_packet_unref(&m_pkt);
     }
     return m_isInit;
+}
+
+bool Packet::GetNextPacketAfterSentFrame(AVCodecContext* context)
+{
+  PRINT_DEBUG_Packet("2# free pkt")
+  Free();
+  av_init_packet(&m_pkt);
+  PRINT_DEBUG_Packet("2# init pkt")
+  m_pkt.data = nullptr;
+  m_pkt.size = 0;
+  PRINT_DEBUG_Packet("2# ask codec for received pkt")
+  int ret = avcodec_receive_packet(context, &m_pkt);
+  if (ret != AVERROR(EAGAIN))
+  {
+      PRINT_DEBUG_Packet("2# received pkt")
+      m_isInit = true;
+  }
+  else
+  {
+    PRINT_DEBUG_Packet("2# no received pkt")
+    av_packet_unref(&m_pkt);
+  }
+  return m_isInit;
 }
 
 int Packet::GetNextPacket(AVFormatContext* fmt_ctx)

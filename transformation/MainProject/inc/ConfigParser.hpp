@@ -19,10 +19,10 @@
 
 namespace IMT {
 
-// #define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
-// #define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
-#define RANGE_NB_H_TILES ((3))
-#define RANGE_NB_V_TILES ((3))
+#define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
+#define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
+//#define RANGE_NB_H_TILES ((3))
+//#define RANGE_NB_V_TILES ((3))
 
 #define GENERATE_EQUI_TILED_LAYOUT(nbHTiles,nbVTiles) \
   LayoutEquirectangularTiles<nbHTiles,nbVTiles>::ScaleTilesMap scaleRes;\
