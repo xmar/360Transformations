@@ -257,6 +257,23 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   ;For instance in this example the value 8 should be in the macro RANGE_NB_H_TILES and RANGE_NB_V_TILES otherwise a runtime error will be raised
   nbHTiles=8
   nbVTiles=8
+  ;hTileRation_X and vTileRation_X indicate the relative horizontal and vertical ratio of the tile X. In this example each tile get 1/8 of the equirectangular picture
+  hTileRation_0=1
+  hTileRation_1=1
+  hTileRation_2=1
+  hTileRation_3=1
+  hTileRation_4=1
+  hTileRation_5=1
+  hTileRation_6=1
+  hTileRation_7=1
+  vTileRation_0=1
+  vTileRation_1=1
+  vTileRation_2=1
+  vTileRation_3=1
+  vTileRation_4=1
+  vTileRation_5=1
+  vTileRation_6=1
+  vTileRation_7=1
   ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the equirectangularTileBitrate_0_0, equirectangularTileBitrate_0_1, etc. parameters
   ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
   useTile=true

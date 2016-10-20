@@ -7,6 +7,10 @@
 
 namespace IMT {
 
+//#define PRINT_DEBUG(x) {std::cout << x ;}
+#define PRINT_DEBUG(x) {}
+
+
 template <unsigned int nbHTiles, unsigned int nbVTiles>
 class LayoutEquirectangularTiles : public Layout
 {
@@ -14,6 +18,7 @@ class LayoutEquirectangularTiles : public Layout
         typedef std::tuple<unsigned int, unsigned int> TileId;
         typedef std::array<std::array<std::tuple<unsigned int, unsigned int>, nbVTiles>,nbHTiles> TilesMap;
         typedef std::array<std::array<double, nbVTiles>,nbHTiles> ScaleTilesMap;
+        typedef std::tuple<std::array<double, nbHTiles>, std::array<double, nbVTiles>> TileRatios; //Size of each tiles relative to each other
         virtual ~LayoutEquirectangularTiles() = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -23,11 +28,11 @@ class LayoutEquirectangularTiles : public Layout
             {
                 for (unsigned j = 0; j < nbVTiles; ++j)
                 {
-                    maxI = MAX(maxI, m_tr.GetResWidth(std::make_tuple(i,j)));
-                    maxJ = MAX(maxJ, m_tr.GetResHeight(std::make_tuple(i,j)));
+                    maxI = MAX(maxI, m_tr.GetResWidth(std::make_tuple(i,j))/(GetHTileRatio(i)*nbHTiles));
+                    maxJ = MAX(maxJ, m_tr.GetResHeight(std::make_tuple(i,j))/(GetVTileRatio(j)*nbVTiles));
                 }
             }
-            std::cout << nbHTiles*maxI << " " << nbVTiles*maxJ << std::endl;
+            PRINT_DEBUG( nbHTiles*maxI << " " << nbVTiles*maxJ << std::endl )
             return CoordI(nbHTiles*maxI, nbVTiles*maxJ);
         }
 
@@ -46,9 +51,9 @@ class LayoutEquirectangularTiles : public Layout
                 sumRationCols += maxCols;
                 sumRationRows += maxRows;
             }
-            std::cout << nbHTiles*width/sumRationCols << "; " << nbVTiles*heigth/sumRationRows << std::endl;
-            std::cout << width << "; " << heigth << std::endl;
-            std::cout << sumRationCols << "; " << sumRationRows << std::endl;
+            PRINT_DEBUG( nbHTiles*width/sumRationCols << "; " << nbVTiles*heigth/sumRationRows << std::endl)
+            PRINT_DEBUG( width << "; " << heigth << std::endl)
+            PRINT_DEBUG( sumRationCols << "; " << sumRationRows << std::endl)
             return CoordI(nbHTiles*width/sumRationCols, nbVTiles*heigth/sumRationRows);
         }
 
@@ -75,24 +80,57 @@ class LayoutEquirectangularTiles : public Layout
 
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            //auto i = 8*std::fmod(PI()+sphericalCoord.y, 2.0*PI()/8)/ (2.0*PI());
-            //auto j = 8*std::fmod(sphericalCoord.z, PI()/8) / PI();
             Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationMatrice.t());
             double i = 0.5+rotCoord.y/ (2.0*PI());
             double j = rotCoord.z / PI();
-            auto ni =  unsigned(i*nbHTiles);
-            auto nj =  unsigned(j*nbVTiles);
-            if (ni == nbHTiles) {ni = nbHTiles-1;}
-            if (nj == nbVTiles) {nj = nbVTiles-1;}
-            return NormalizedFaceInfo(CoordF(nbHTiles*std::fmod(i,1.0/nbHTiles), nbVTiles*std::fmod(j,1.0/nbVTiles)), ni*nbVTiles+nj);
+            //Find tile id:
+            unsigned int ni(0), nj(0);
+            double normalizedCoordI(0.0), normalizedCoordJ(0.0);
+            double sum = 0;
+            for (unsigned ii = 0; ii < nbHTiles; ++ii)
+            {
+              sum += GetHTileRatio(ii);
+              if (sum > i)
+              {
+                ni = ii;
+                sum -= GetHTileRatio(ii);
+                normalizedCoordI = (i-sum)/GetHTileRatio(ii);
+                break;
+              }
+            }
+            sum = 0.0;
+            for (unsigned jj = 0; jj < nbVTiles; ++jj)
+            {
+              sum += GetVTileRatio(jj);
+              if (sum >= j)
+              {
+                nj = jj;
+                sum -= GetVTileRatio(jj);
+                normalizedCoordJ = (j-sum)/GetVTileRatio(jj);
+                break;
+              }
+            }
+            return NormalizedFaceInfo(CoordF(normalizedCoordI, normalizedCoordJ), ni*nbVTiles+nj);
         }
 
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override
         {
             if (ni.m_faceId == -1) {return Coord3dCart(0,0,0);}
             auto ti = ToTileId(ni.m_faceId);
-            double theta = 2.0*PI()*((std::get<0>(ti)+ni.m_normalizedFaceCoordinate.x)/nbHTiles-0.5);
-            double phi = (std::get<1>(ti)+ni.m_normalizedFaceCoordinate.y)*PI()/nbVTiles;
+            // double theta = 2.0*PI()*((std::get<0>(ti)+ni.m_normalizedFaceCoordinate.x)/nbHTiles-0.5);
+            // double phi = (std::get<1>(ti)+ni.m_normalizedFaceCoordinate.y)*PI()/nbVTiles;
+            double theta(-PI());
+            for (unsigned int i = 0; i < std::get<0>(ti); ++i)
+            {
+              theta += 2.0*PI() * GetHTileRatio(i);
+            }
+            theta += 2.0*PI()*ni.m_normalizedFaceCoordinate.x*GetHTileRatio(std::get<0>(ti));
+            double phi(0);
+            for (unsigned int j = 0; j < std::get<1>(ti); ++j)
+            {
+              phi += PI() * GetVTileRatio(j);
+            }
+            phi += PI()*ni.m_normalizedFaceCoordinate.y*GetVTileRatio(std::get<1>(ti));
             return Rotation(Coord3dSpherical(1, theta, phi), m_rotationMatrice);
         }
 
@@ -224,6 +262,7 @@ class LayoutEquirectangularTiles : public Layout
                     return std::get<1>(GetRes(t));
                 }
 
+                TilesMap& GetTileMapRef(void) {return m_tiles;}
             private:
                 TilesMap m_tiles;
         };
@@ -231,29 +270,49 @@ class LayoutEquirectangularTiles : public Layout
 
         void InitImpl(void) override
         {
-            unsigned int sumWidth(0), sumHeight(0);
+            //Update tile resolutions
             for(unsigned int i = 0; i < nbHTiles; ++i)
             {
+              for (unsigned int j = 0; j < nbVTiles; ++j)
+              {
+                  PRINT_DEBUG("DEBUG: ("<< i <<","<< j <<")"<<GetHTileRatio(i) << "; " << GetVTileRatio(j) << " !! " << m_tr.GetResWidth(std::make_tuple(i,j)) << "; " << m_tr.GetResHeight(std::make_tuple(i,j)) << " -> "<< m_tr.GetResWidth(std::make_tuple(i,j))*GetHTileRatio(i)*nbHTiles <<";" << m_tr.GetResHeight(std::make_tuple(i,j))*GetVTileRatio(j)*nbVTiles << std::endl)
+                  m_tr.GetTileMapRef()[i][j] = std::make_tuple (m_tr.GetResWidth(std::make_tuple(i,j))*GetHTileRatio(i)*nbHTiles, m_tr.GetResHeight(std::make_tuple(i,j))*GetVTileRatio(j)*nbVTiles);
+              }
+            }
+            //Compute columns and rows size in pixels
+            unsigned int sumWidth(0), sumHeight(0);
+
+
+            for (unsigned int i = 0; i < nbHTiles; ++i)
+            {
                 unsigned int maxCol = 0;
-                for (unsigned int j = 0; j < nbVTiles; ++j)
+                for(unsigned int j = 0; j < nbVTiles; ++j)
                 {
+                    PRINT_DEBUG ("("<<i<<","<<j<<") ->"<< m_tr.GetResWidth(std::make_tuple(i,j))<<" ")
                     maxCol = MAX(maxCol, m_tr.GetResWidth(std::make_tuple(i,j)));
                 }
+                PRINT_DEBUG (" max = " << maxCol << std::endl)
                 sumWidth += maxCol;
                 m_colsMaxSize[i] = maxCol;
             }
-            for(unsigned int j = 0; j < nbVTiles; ++j)
+            PRINT_DEBUG ("---- total = " << sumWidth << std::endl)
+
+            for (unsigned int j = 0; j < nbVTiles; ++j)
             {
                 unsigned int maxRow = 0;
-                for (unsigned int i = 0; i < nbHTiles; ++i)
+                for(unsigned int i = 0; i < nbHTiles; ++i)
                 {
+                    PRINT_DEBUG ("("<<i<<","<<j<<") ->"<< m_tr.GetResHeight(std::make_tuple(i,j))<<" ")
                     maxRow = MAX(maxRow, m_tr.GetResHeight(std::make_tuple(i,j)));
                 }
+                PRINT_DEBUG (" maxRow = " << maxRow << std::endl)
                 sumHeight += maxRow;
                 m_rowsMaxSize[j] = maxRow;
             }
+            PRINT_DEBUG ("---- total = " << sumHeight << std::endl)
             SetWidth(sumWidth);
             SetHeight(sumHeight);
+            //Compute tiles starting offsets
             for (unsigned i = 0; i < nbHTiles; ++i)
             {
                 for (unsigned j = 0; j < nbVTiles; ++j)
@@ -327,7 +386,11 @@ class LayoutEquirectangularTiles : public Layout
             return (start.x <= i && end.x >= i) && (start.y <= j && end.y >= j);
         }
 
+        const double& GetHTileRatio(unsigned int i) const {return std::get<0>(m_tileRatios)[i];}
+        const double& GetVTileRatio(unsigned int j) const {return std::get<1>(m_tileRatios)[j];}
+
         TileResolutions m_tr;
+        TileRatios m_tileRatios;
         std::array<unsigned int, nbVTiles> m_rowsMaxSize;
         std::array<unsigned int, nbHTiles> m_colsMaxSize;
         std::array<std::array<CoordI, nbVTiles>, nbHTiles> m_offsets;
@@ -336,8 +399,8 @@ class LayoutEquirectangularTiles : public Layout
 
     public:
 
-        LayoutEquirectangularTiles(TilesMap tr, double yaw, double pitch, double roll, bool useTile): Layout(), m_tr(std::move(tr)),
-          m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
+        LayoutEquirectangularTiles(TilesMap tr, TileRatios tileRatios, double yaw, double pitch, double roll, bool useTile): Layout(), m_tr(std::move(tr)),
+          m_tileRatios(std::move(tileRatios)), m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
           m_rotationMatrice(GetRotMatrice(yaw, pitch, roll)), m_useTile(useTile)
           {};
 

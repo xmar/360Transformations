@@ -19,8 +19,10 @@
 
 namespace IMT {
 
-#define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
-#define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
+ #define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
+ #define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
+//#define RANGE_NB_H_TILES ((3))
+//#define RANGE_NB_V_TILES ((3))
 
 #define GENERATE_EQUI_TILED_LAYOUT(nbHTiles,nbVTiles) \
   LayoutEquirectangularTiles<nbHTiles,nbVTiles>::ScaleTilesMap scaleRes;\
@@ -53,7 +55,24 @@ namespace IMT {
           tileRes[i][j] = std::make_tuple(unsigned(scaleRes[i][j]*inputWidth/nbHTiles),unsigned(scaleRes[i][j]*inputHeight/nbVTiles));\
       }\
   }\
-  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(tileRes, yaw, pitch, roll, useTile);
+  std::array<double, nbHTiles> hRatios;\
+  std::array<double, nbVTiles> vRatios;\
+  double sumH = 0;\
+  double sumV = 0;\
+  for (unsigned i = 0; i < nbHTiles; ++i)\
+  {\
+    hRatios[i] =  ptree.get<double>(layoutSection+".hTileRation_"+std::to_string(i));\
+    sumH += hRatios[i];\
+  }\
+  for (unsigned j = 0; j < nbVTiles; ++j)\
+  {\
+    vRatios[j] =  ptree.get<double>(layoutSection+".vTileRation_"+std::to_string(j));\
+    sumV += vRatios[j];\
+  }\
+  for(auto& hr: hRatios) {hr /= sumH;}\
+  for(auto& vr: vRatios) {vr /= sumV;}\
+  auto tilesRatios = std::make_tuple(std::move(hRatios),std::move(vRatios));\
+  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(tileRes, std::move(tilesRatios), yaw, pitch, roll, useTile);
 ///END MACRO GENERATE_EQUI_TILED_LAYOUT
 
 #define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
@@ -89,6 +108,7 @@ namespace IMT {
     GET_BITRATE_VECT(BOOST_PP_SEQ_ELEM(0,p),BOOST_PP_SEQ_ELEM(1,p))\
   }
 ///END MACRO TEST_AND_GET_BITRATE_VECT
+
 
 namespace pt = boost::property_tree;
 std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, unsigned bitrateGoal)
