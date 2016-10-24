@@ -68,6 +68,8 @@ The **Global** section contains the global configuration of the test.
   videoOutputBitRate=0
   ;Path to the quality output file. If empty no quality is computed. The flow id and the name of the last layout is used as an id for the generated output file
   qualityOutputName=
+  ;Index of the first frame of the input videos to process. If equal to n then the n first frames of the input videos will be skipped
+  startFrame=0
   ;Number of frame to process in the video
   nbFrames= 5
   ;The layout flow indicate for each flow the input video, its layout and which transformation to perform. It is an array of array. The first string in an array is the path to the input video. The second string is the layout of the input video and the other string are section id of the layout onto which the video should be projected.

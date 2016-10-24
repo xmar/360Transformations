@@ -117,6 +117,7 @@ int main( int argc, const char* argv[] )
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
+      auto startFrame = ptree.get<unsigned int>("Global.startFrame");
       auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate")*1000;
 
       //This vector contains the shared pointer of each layout named in the LayoutFlowSections
@@ -206,61 +207,68 @@ int main( int argc, const char* argv[] )
       cv::Mat img;
       int count = 0;
       double averageDuration = 0;
-      while (count < nbFrames)
+      while (count < nbFrames+startFrame)
       {
         auto startTime = std::chrono::high_resolution_clock::now();
 
-        std::cout << "Read image " << count << std::endl;
+        std::cout << (count >= startFrame ? "Read" : "Skip") << " image " << count << std::endl;
 
         unsigned int j = 0;
         std::shared_ptr<Picture> firstPict(nullptr);
         for(auto& lf: layoutFlowVect)
         {
           std::shared_ptr<Picture> pict = lf[0]->ReadNextPictureFromVideo();
-          auto pictOut = pict;
-          std::cout << "Flow " << j << ": " << layoutFlowSections[j][0];
-          for (unsigned int i = 1; i < lf.size(); ++i)
-          {
-              std::cout << " -> " << layoutFlowSections[j][i];
-              pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
-              lf[i]->NextStep();
+          if (count >= startFrame)
+          {//start processing when count >= startFrame
+
+            auto pictOut = pict;
+            std::cout << "Flow " << j << ": " << layoutFlowSections[j][0];
+            for (unsigned int i = 1; i < lf.size(); ++i)
+            {
+                std::cout << " -> " << layoutFlowSections[j][i];
+                pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
+                lf[i]->NextStep();
+            }
+            std::cout << std::endl;
+            if (firstPict == nullptr)
+            {
+                firstPict = pictOut;
+            }
+            if (displayFinalPict)
+            {
+                pictOut->ImgShowWithLimit("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,900));
+            }
+            if (!qualityWriterVect.empty() && j != 0)
+            {
+                auto msssim = firstPict->GetMSSSIM(*pictOut);
+                auto psnr = firstPict->GetPSNR(*pictOut);
+                std::cout << "Flow " << j << ": MS-SSIM = " << msssim << " PSNR = " << psnr << std::endl;
+                *qualityWriterVect[j-1] << msssim << " " << psnr << std::endl;
+            }
+            if (!pathToOutputVideo.empty())
+            {
+                PRINT_DEBUG("Send picture to encoder "<<j+1)
+                lf.back()->WritePictureToVideo(pictOut);
+            }
+            ++j;
           }
-          std::cout << std::endl;
-          if (firstPict == nullptr)
-          {
-              firstPict = pictOut;
-          }
+        }
+
+        if (count >= startFrame)
+        {
           if (displayFinalPict)
           {
-              pictOut->ImgShowWithLimit("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,900));
+            cv::waitKey(0);
+            cv::destroyAllWindows();
           }
-          if (!qualityWriterVect.empty() && j != 0)
-          {
-              auto msssim = firstPict->GetMSSSIM(*pictOut);
-              auto psnr = firstPict->GetPSNR(*pictOut);
-              std::cout << "Flow " << j << ": MS-SSIM = " << msssim << " PSNR = " << psnr << std::endl;
-              *qualityWriterVect[j-1] << msssim << " " << psnr << std::endl;
-          }
-          if (!pathToOutputVideo.empty())
-          {
-              PRINT_DEBUG("Send picture to encoder "<<j+1)
-              lf.back()->WritePictureToVideo(pictOut);
-          }
-          ++j;
-        }
 
-        if (displayFinalPict)
-        {
-          cv::waitKey(0);
-          cv::destroyAllWindows();
+          auto endTime = std::chrono::high_resolution_clock::now();
+          auto duration = std::chrono::duration_cast<std::chrono::microseconds>( endTime - startTime ).count();
+          averageDuration = (averageDuration*count + duration)/(count+1);
+          std::cout << "Elapsed time for this picture: "<< float(duration)/1000000.f<< "s "
+            "estimated remaining time = " << (nbFrames-count-1)*averageDuration/1000000.f << "s "  << std::endl;
         }
-
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( endTime - startTime ).count();
-        averageDuration = (averageDuration*count + duration)/(count+1);
-        std::cout << "Elapsed time for this picture: "<< float(duration)/1000000.f<< "s "
-          "estimated remaining time = " << (nbFrames-count-1)*averageDuration/1000000.f << "s "  << std::endl;
-        if (++count == nbFrames)
+        if (++count >= nbFrames+startFrame)
         {
             break;
         }
