@@ -122,6 +122,8 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   height=1080
   ;Horizontal angle of the display device (in degree)
   horizontalAngleOfVision=110
+  ;Vertical angle of the display device (in degree)
+  verticalAngleOfVision=90
 
 **cube map** layout
 

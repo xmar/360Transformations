@@ -21,6 +21,7 @@ class FlatFixedLayout(Layout):
         c += 'width={}\n'.format(self.width)
         c += 'height={}\n'.format(self.height)
         c += 'horizontalAngleOfVision={}\n'.format(self.horizontalAngle)
+        c += 'verticalAngleOfVision=90\n'
         return c
 
     wasRandomInit = False

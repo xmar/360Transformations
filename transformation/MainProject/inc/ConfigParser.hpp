@@ -377,17 +377,18 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double width = ptree.get<double>(layoutSection+".width");
             double height = ptree.get<double>(layoutSection+".height");
             double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
+            double verticalAngleOfVision = ptree.get<double>(layoutSection+".verticalAngleOfVision")*PI()/180;
             if (isInput)
             {
                 throw std::invalid_argument("FlatFixed  layout cannot be the input of the transformation flow");
             }
             if (infer)
             {
-                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision);
+                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision, verticalAngleOfVision);
             }
             else
             {
-                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width, height, horizontalAngleVision);
+                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width, height, horizontalAngleVision, verticalAngleOfVision);
             }
         }
         if (layoutType == "pyramid")
