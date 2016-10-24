@@ -119,6 +119,7 @@ int main( int argc, const char* argv[] )
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
       auto startFrame = ptree.get<unsigned int>("Global.startFrame");
       auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate")*1000;
+      double fps = ptree.get<double>("Global.fps");
 
       //This vector contains the shared pointer of each layout named in the LayoutFlowSections
       std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
@@ -169,7 +170,6 @@ int main( int argc, const char* argv[] )
           size_t lastindex = pathToOutputVideo.find_last_of(".");
           std::string pathToOutputVideoExtension = pathToOutputVideo.substr(lastindex, pathToOutputVideo.size());
           pathToOutputVideo = pathToOutputVideo.substr(0, lastindex);
-          double fps = ptree.get<double>("Global.fps");
           unsigned int j = 0;
           for(auto& lfsv: layoutFlowSections)
           {
@@ -227,7 +227,7 @@ int main( int argc, const char* argv[] )
             {
                 std::cout << " -> " << layoutFlowSections[j][i];
                 pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
-                lf[i]->NextStep();
+                lf[i]->NextStep(double(count-startFrame)/fps);
             }
             std::cout << std::endl;
             if (firstPict == nullptr)

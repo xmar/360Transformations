@@ -360,9 +360,20 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         }
         if (layoutType == "flatFixed")
         {
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");
+            double yaw, pitch, roll;
+            std::string pathToPositionTrace;
+            if (!dynamicPositions) {
+              yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
+              pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
+              roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            }
+            else
+            {
+              std::cout << "DEBUG dynamic position set" << std::endl;
+              pathToPositionTrace = ptree.get<std::string>(layoutSection+".positionTrace");
+            }
+            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(yaw, pitch, roll);
             double width = ptree.get<double>(layoutSection+".width");
             double height = ptree.get<double>(layoutSection+".height");
             double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
@@ -372,11 +383,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return std::make_shared<LayoutFlatFixed>(yaw, pitch, roll, width*inputWidth, height*inputHeight, horizontalAngleVision);
+                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision);
             }
             else
             {
-                return std::make_shared<LayoutFlatFixed>(yaw, pitch, roll, width, height, horizontalAngleVision);
+                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width, height, horizontalAngleVision);
             }
         }
         if (layoutType == "pyramid")

@@ -4,7 +4,7 @@
 #include <boost/range/iterator_range.hpp>
 #include <stdexcept>
 #include <functional>
-
+#include <opencv2/opencv.hpp>
 
 namespace IMT {
 
@@ -138,6 +138,24 @@ inline RotMat GetRotMatrice(double yaw, double pitch, double roll)
 #undef sinP
 #undef cosR
 #undef sinR
+
+/** Compute a euler angles solution for a rotation matrice */
+inline std::tuple<double, double, double> GetEulerFromRotMat(const RotMat& r)
+{//We will return only one solution even if there are always at least two solutions
+  if (r(2,0) == -1)
+  {
+    return std::make_tuple(0.0, PI()/2, std::atan2(r(0,1),r(1,2)));
+  }
+  else if (r(2,0) == 1)
+  {
+    return std::make_tuple(0.0, -PI()/2, std::atan2(-r(0,1),-r(1,2)));
+  }
+  else
+  {
+    double pitch = -std::asin(r(2,0));
+    return std::make_tuple(std::atan2(r(1,0)/pitch, r(0,0)/pitch), pitch, std::atan2(r(2,1)/pitch, r(2,2)/pitch));
+  }
+}
 
 inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double pitch, double roll)
 {

@@ -37,8 +37,9 @@ class Layout
         void Init(void) {InitImpl(); m_isInit = true;}
 
         /** \brief If we need a dynamic layout that evolve with the time, this function should be overide to apply the evolution. By default do nothing.
+            relatifTimestamp Time since the beginning of the video
          */
-        virtual void NextStep(void) {}
+        virtual void NextStep(double relatifTimestamp) {}
 
 
         unsigned int GetWidth(void) const {return m_outWidth;}

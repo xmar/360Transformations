@@ -109,7 +109,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   type=flatFixed
   ;relativeResolution cannot be true for flatFixed layout
   relativeResolution=false
-  ;yaw, pitch, roll of the center point of the FoV (in degree)
+  ;indicates if we want to use a static position set by the yaw, pitch and roll parameter or play a traces located at positionTrace
+  dynamicPositions=false
+  ;The path to the position trace file. Used if dynamicPositions is set to true
+  positionTrace=pathToPositionTrace
+  ;yaw, pitch, roll of the center point of the FoV (in degree). Used if dynamicPositions is set to false
   yaw=0.0
   pitch=0.0
   roll=0.0

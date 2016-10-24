@@ -15,6 +15,7 @@ class FlatFixedLayout(Layout):
     def GenerateLayout(self, mediumRatio):
         c = '[{}]\ntype=flatFixed\n'.format(self.GetName())
         c += 'relativeResolution=false\n'
+        c += 'dynamicPositions=false\n'
 
         c+=super().GetYawPitchRoll()
         c += 'width={}\n'.format(self.width)
