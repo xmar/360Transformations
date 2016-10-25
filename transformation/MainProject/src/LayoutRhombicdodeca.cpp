@@ -186,25 +186,35 @@ std::shared_ptr<Picture> LayoutRhombicdodeca::ReadNextPictureFromVideoImpl(void)
 {
     bool isInit = false;
     cv::Mat outputMat;
-    for (unsigned i = 0; i < 12; ++i)
+    if (UseTile())
     {
-        Faces f = static_cast<Faces>(i);
-        cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
-        auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
-        //std::cout << "Expected Width: "<< GetRes(f) << "; Height " << GetRes(f) << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
-        if (!isInit)
-        {
-            outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
-            isInit = true;
-        }
-        cv::Mat facePictMat ( outputMat, roi);
-        facePictPtr->copyTo(facePictMat);
+      for (unsigned i = 0; i < 12; ++i)
+      {
+          Faces f = static_cast<Faces>(i);
+          cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
+          auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
+          //std::cout << "Expected Width: "<< GetRes(f) << "; Height " << GetRes(f) << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
+          if (!isInit)
+          {
+              outputMat = cv::Mat( m_outHeight, m_outWidth, facePictPtr->type());
+              isInit = true;
+          }
+          cv::Mat facePictMat ( outputMat, roi);
+          facePictPtr->copyTo(facePictMat);
+      }
+      return std::make_shared<Picture>(outputMat);
     }
-    return std::make_shared<Picture>(outputMat);
+    else
+    {
+      auto facePictPtr = m_inputVideoPtr->GetNextPicture(0);
+      facePictPtr->copyTo(outputMat);
+    }
 }
 
 void LayoutRhombicdodeca::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
 {
+  if (UseTile())
+  {
     for (unsigned i = 0; i < 12; ++i)
     {
         Faces f = static_cast<Faces>(i);
@@ -212,13 +222,18 @@ void LayoutRhombicdodeca::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
         cv::Mat facePictMat ( pict->GetMat(), roi);
         m_outputVideoPtr->Write( facePictMat, i);
     }
+  }
+  else
+  {
+    m_outputVideoPtr->Write(pict->GetMat(), 0);
+  }
 }
 
 std::shared_ptr<IMT::LibAv::VideoReader> LayoutRhombicdodeca::InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame)
 {
     std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
     vrPtr->Init(nbFrame);
-    if (vrPtr->GetNbStream() != 12)
+    if ((UseTile() && vrPtr->GetNbStream() != 12) || (vrPtr->GetNbStream() != 1))
     {
         std::cout << "Unsupported number of stream for Rhombicdodeca input video: "<<vrPtr->GetNbStream() <<" instead of 12" << std::endl;
         return nullptr;
@@ -230,13 +245,27 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutRhombicdodeca::InitInputVideoImpl
 std::shared_ptr<IMT::LibAv::VideoWriter> LayoutRhombicdodeca::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
 {
     std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
-    std::array<unsigned, 12> br;
-    std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 12, br.begin());
-    std::array<unsigned, 12> resArr;
-    for (unsigned i = 0; i < 12; ++i)
+    if (UseTile())
     {
-        resArr[i] = GetRes(static_cast<Faces>(i));
+      std::array<unsigned, 12> br;
+      std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 12, br.begin());
+      std::array<unsigned, 12> resArr;
+      for (unsigned i = 0; i < 12; ++i)
+      {
+          resArr[i] = GetRes(static_cast<Faces>(i));
+      }
+      vwPtr->Init<12>(codecId, resArr, resArr, fps, gop_size, br);
+      return vwPtr;
     }
-    vwPtr->Init<12>(codecId, resArr, resArr, fps, gop_size, br);
-    return vwPtr;
+    else
+    {
+      std::array<unsigned, 1> br;
+      std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
+      std::array<unsigned, 1> resArrW;
+      std::array<unsigned, 1> resArrH;
+      resArrW[0] = m_outWidth;
+      resArrH[0] = m_outHeight;
+      vwPtr->Init<1>(codecId, resArrW, resArrH, fps, gop_size, br);
+      return vwPtr;
+    }
 }

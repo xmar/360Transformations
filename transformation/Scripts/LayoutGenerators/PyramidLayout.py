@@ -16,6 +16,7 @@ class PyramidLayout(Layout):
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramidHeight{}={}\n'.format(f, Constants.GOOD_QUALITY)
+        c+='useTile=true\n'
         c+='pyramidBaseBitrate={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramid{}Bitrate={}\n'.format(f, mediumRatio)
@@ -36,6 +37,7 @@ class PyramidHigherQualityLayout(Layout):
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramidHeight{}={}\n'.format(f, Constants.GOOD_QUALITY)
+        c+='useTile=true\n'
         c+='pyramidBaseBitrate={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramid{}Bitrate={}\n'.format(f, Constants.GOOD_QUALITY)
@@ -56,6 +58,7 @@ class PyramidLowerQualityLayout(Layout):
         c+='pyramidBaseEdgeLength={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramidHeight{}={}\n'.format(f, Constants.GOOD_QUALITY)
+        c+='useTile=true\n'
         c+='pyramidBaseBitrate={}\n'.format(Constants.GOOD_QUALITY)
         for f in ['Left','Right','Top','Bottom']:
             c+='pyramid{}Bitrate={}\n'.format(f, Constants.BAD_QUALITY)

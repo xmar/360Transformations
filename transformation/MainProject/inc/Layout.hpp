@@ -23,7 +23,7 @@ class Layout
             int m_faceId;
         };
         Layout(void): m_outWidth(0), m_outHeight(0), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
-        Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight), m_isInit(false) {};
+        Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
         virtual ~Layout(void) = default;
 
         /*Return the 3D coordinate cartesian of the point corresponding to the pixel with coordinate pixelCoord on the 2d layout*/
@@ -37,8 +37,9 @@ class Layout
         void Init(void) {InitImpl(); m_isInit = true;}
 
         /** \brief If we need a dynamic layout that evolve with the time, this function should be overide to apply the evolution. By default do nothing.
+            relatifTimestamp Time since the beginning of the video
          */
-        virtual void NextStep(void) {}
+        virtual void NextStep(double relatifTimestamp) {}
 
 
         unsigned int GetWidth(void) const {return m_outWidth;}
@@ -103,7 +104,7 @@ class Layout
         void SetWidth(unsigned int w) {m_outWidth = w;}
         void SetHeight(unsigned int h) {m_outHeight = h;}
 
-                /** \brief return the normalized face information corresponding to the given coordinate of a pixel on the 2d layout
+         /** \brief return the normalized face information corresponding to the given coordinate of a pixel on the 2d layout
          *
          * \param pixel Coordinate of the pixel on the 2d layout
          * \return A NormalizedFaceInfo contening the normalized information about this pixel

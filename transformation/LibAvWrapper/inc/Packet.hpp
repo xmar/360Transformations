@@ -35,6 +35,10 @@ class Packet
          *
          */
         bool SetAvPacketWithEncoder(AVCodecContext* context, AVFrame* frame);
+        /**
+        *  After a successfull SetAvPacketWithEncoder try to get other packet from the encoder
+        */
+        bool GetNextPacketAfterSentFrame(AVCodecContext* context);
         int GetNextPacket(AVFormatContext* fmt_ctx);
         void Free(void);
 };

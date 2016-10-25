@@ -17,6 +17,7 @@ class RhombicDodecaLayout(Layout):
         for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
 
+        c+='useTile=true\n'
         for i in [1,5]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,4,6,7,8,10,11]:
@@ -40,6 +41,7 @@ class RhombicDodecaHigherQualityLayout(Layout):
         for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
 
+        c+='useTile=true\n'
         for i in [1,5, 4]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,6,7,8,9,10,11,12]:
@@ -61,6 +63,7 @@ class RhombicDodecaMediumQualityLayout(Layout):
         for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
 
+        c+='useTile=true\n'
         for i in [1,5,4]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,6,7,10,11]:
@@ -83,6 +86,7 @@ class RhombicDodecaEqualQualityLayout(Layout):
         for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
 
+        c+='useTile=true\n'
         for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.GOOD_QUALITY)
         return c
@@ -102,9 +106,9 @@ class RhombicDodecaLowerQualityLayout(Layout):
         for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
             c+='rhombEdgeLengthFace{}={}\n'.format(i, Constants.GOOD_QUALITY)
 
+        c+='useTile=true\n'
         for i in [1,5]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.GOOD_QUALITY)
         for i in [2,3,4,6,7,8,10,11, 9,12]:
             c+='rhombFace{}Bitrate={}\n'.format(i, Constants.BAD_QUALITY)
         return c
-

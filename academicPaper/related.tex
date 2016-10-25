@@ -49,7 +49,7 @@ structure of the layouts to implement a video encoding based on
 \emph{faces} (\textit{e.g.}, 6 for the cube map, 12 for the
 dodecahedron) and a given \emph{central point} (which corresponds to a
 position on the sphere).
-From a given central point and a given layout, our idea is to encode
+From the given central point and layout, our idea is to encode
 the front face in full quality while the quality of other faces is
 reduced.
 To our knowledge, such idea has not been studied yet.
@@ -139,7 +139,7 @@ The spherical video is projected onto a pyramid layout from up to $30$ central
 points to generate a set of video representations.
 Since the
 front face of pyramid projection has a better image quality than the other faces, the
-system is in essence similar as our concept of \ac{QEC}. The end-users
+system is in essence similar to our concept of \ac{QEC}. The end-users
 periodically select one of the representations
 based on their \FoV{} center. This implementation
 corroborates that, from an industrial perspective, the extra-cost of

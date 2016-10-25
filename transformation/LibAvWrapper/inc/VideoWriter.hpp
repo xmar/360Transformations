@@ -18,17 +18,16 @@ extern "C"
 
 #define DEBUG_VideoWrite 0
 #if DEBUG_VideoWrite
-#define PRINT_DEBUG_VideoWrite(s) std::cout << s << std::endl;
+#define PRINT_DEBUG_VideoWrite(s) std::cout << "ENC -- "<< s << std::endl;
 #else
 #define PRINT_DEBUG_VideoWrite(s) {}
 #endif // DEBUG_VideoWrite
-
-#include "Packet.hpp"
 
 #include <string>
 #include <exception>
 #include <memory>
 #include <array>
+#include <queue>
 #include <opencv2/opencv.hpp>
 
 namespace IMT
@@ -103,6 +102,7 @@ namespace LibAv
                     m_codec_ctx[id]->gop_size = gop_size;
                     m_codec_ctx[id]->pix_fmt = AV_PIX_FMT_YUV420P;
                     m_codec_ctx[id]->max_b_frames = 2;
+                    m_codec_ctx[id]->refcounted_frames = 1;
                     m_vstream[id]->time_base.num = 1;
                     m_vstream[id]->time_base.den = fps;
 
@@ -116,6 +116,7 @@ namespace LibAv
                         throw std::runtime_error("Cannot open "+codecName);
                     }
                     outformat->video_codec = codec->id;
+                    m_lastFramesQueue.push_back(std::queue<AVFrame*>());
                 }
 
                 //Open output file:
@@ -158,6 +159,7 @@ namespace LibAv
             AVFormatContext* m_fmt_ctx;
             std::vector<AVCodecContext*> m_codec_ctx;
             std::vector<AVStream*> m_vstream;
+            std::vector<std::queue<AVFrame*>> m_lastFramesQueue;
             unsigned m_pts;
 
             bool m_isInit;
@@ -165,9 +167,9 @@ namespace LibAv
             VideoWriter(const VideoWriter& vw) = delete;
             VideoWriter& operator=(const VideoWriter& vw) = delete;
 
-            std::shared_ptr<Packet> Encode(const cv::Mat& pict, int streamId);
-            std::shared_ptr<Packet> Encode(AVFrame* frame, int streamId);
-            void PrivateWrite(std::shared_ptr<Packet> sharedPkt, int streamId);
+            void EncodeAndWrite(const cv::Mat& pict, int streamId);
+            void EncodeAndWrite(AVFrame* frame, int streamId);
+            //void PrivateWrite(std::shared_ptr<Packet> sharedPkt, int streamId);
     };
 }
 }

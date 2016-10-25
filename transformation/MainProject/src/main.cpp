@@ -68,43 +68,43 @@ int main( int argc, const char* argv[] )
 
       po::notify(vm);
 
-      std::vector<std::string> pathToInputVideos;// = vm["inputVideo"].as<std::string>();
+      //Get the path to the configuration file
       std::string pathToIni = vm["config"].as<std::string>();
 
       std::cout << "Path to the ini file: " <<pathToIni << std::endl;
 
-//      GlobalArgsStructure sga;
-//
       //read the ini file the feed the GlobalArgsStructure
       pt::ptree ptree;
       pt::ptree ptree_json;
       pt::ini_parser::read_ini(pathToIni, ptree);
 
-      std::vector<std::vector<std::string>> layoutFlowSections;
+      std::vector<std::vector<std::string>> layoutFlowSections; //contains the layoutFlow information
+      std::vector<std::string> pathToInputVideos; //contains the path to the input videos. index i from layoutFlow i
+      //Parse the layoutFlow line from the configuration configuration file
       try {
-      std::stringstream ss(ptree.get<std::string>("Global.layoutFlow"));
-      pt::json_parser::read_json(ss, ptree_json);
-      BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
-      {
-          std::vector<std::string> lfsv;
-          bool first = true;
-          BOOST_FOREACH(boost::property_tree::ptree::value_type & u, v.second)
-          {
-              if (first)
-              {
-                  first = false;
-                  pathToInputVideos.push_back(u.second.data());
-              }
-              else
-              {
-                  lfsv.push_back(u.second.data());
-              }
-          }
-          if (lfsv.size()>0)
-          {
-              layoutFlowSections.push_back(std::move(lfsv));
-          }
-      }
+        std::stringstream ss(ptree.get<std::string>("Global.layoutFlow"));
+        pt::json_parser::read_json(ss, ptree_json);
+        BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
+        {
+            std::vector<std::string> lfsv;
+            bool first = true;
+            BOOST_FOREACH(boost::property_tree::ptree::value_type & u, v.second)
+            {
+                if (first)
+                {
+                    first = false;
+                    pathToInputVideos.push_back(u.second.data());
+                }
+                else
+                {
+                    lfsv.push_back(u.second.data());
+                }
+            }
+            if (lfsv.size()>0)
+            {
+                layoutFlowSections.push_back(std::move(lfsv));
+            }
+        }
       }
       catch (std::exception &e)
       {
@@ -112,101 +112,122 @@ int main( int argc, const char* argv[] )
           exit(1);
       }
 
+      //Parse the rest of the Global Section from the configuration file
       std::string pathToOutputVideo = ptree.get<std::string>("Global.videoOutputName");
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
+      auto startFrame = ptree.get<unsigned int>("Global.startFrame");
       auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate")*1000;
+      double fps = ptree.get<double>("Global.fps");
 
-        std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
+      //This vector contains the shared pointer of each layout named in the LayoutFlowSections
+      std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
 
-        unsigned j = 0;
-        for(auto& lfsv: layoutFlowSections)
-        {
-            bool isFirst = true;
-            layoutFlowVect.push_back(std::vector<std::shared_ptr<Layout>>());
-            CoordI refResolution ( 0, 0 );
-            unsigned k = 0;
-            for(auto& lfs: lfsv)
-            {
-                layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, isFirst, refResolution.x, refResolution.y));
-                layoutFlowVect.back().back()->Init();
-                refResolution = layoutFlowVect.back().back()->GetReferenceResolution();
-                isFirst = false;
-                ++k;
-            }
-            ++j;
-        }
-
-      j = 0;
-      for (auto& inputPath:pathToInputVideos)
+      //Populate the layoutFlowVect. Will read the configuration file to get information about each layout named in the LayoutFlowSections
+      unsigned j = 0;
+      for(auto& lfsv: layoutFlowSections)
       {
-          PRINT_DEBUG("Start init input video for flow "<<j+1)
-          layoutFlowVect[j][0]->InitInputVideo(inputPath, nbFrames);
-          PRINT_DEBUG("Done init input video for flow "<<j+1)
+          LayoutStatus layoutStatus = LayoutStatus::Input;
+          layoutFlowVect.push_back(std::vector<std::shared_ptr<Layout>>());
+          CoordI refResolution ( 0, 0 );
+          unsigned k = 0;
+          for(auto& lfs: lfsv)
+          {
+              if (k == lfsv.size()-1)
+              {
+                layoutStatus = LayoutStatus::Output;
+              }
+              layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, layoutStatus, refResolution.x, refResolution.y));
+              layoutFlowVect.back().back()->Init();
+              refResolution = layoutFlowVect.back().back()->GetReferenceResolution();
+              ++k;
+              if (layoutStatus == LayoutStatus::Input)
+              {
+                layoutStatus = LayoutStatus::Intermediate;
+              }
+              if (k == lfsv.size()-1)
+              {
+                layoutStatus = LayoutStatus::Output;
+              }
+          }
           ++j;
       }
 
-        if (!pathToOutputVideo.empty())
-        {
-            size_t lastindex = pathToOutputVideo.find_last_of(".");
-            std::string pathToOutputVideoExtension = pathToOutputVideo.substr(lastindex, pathToOutputVideo.size());
-            pathToOutputVideo = pathToOutputVideo.substr(0, lastindex);
-            double fps = ptree.get<double>("Global.fps");
-            unsigned int j = 0;
-            for(auto& lfsv: layoutFlowSections)
-            {
-                const auto& l = layoutFlowVect[j].back();
-                std::string path = pathToOutputVideo+std::to_string(j+1)+lfsv.back()+pathToOutputVideoExtension;
-                std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
+      //Initilise input video for each first layout in the layoutFlowVect
+      j = 0;
+      for (auto& inputPath:pathToInputVideos)
+      {
+        PRINT_DEBUG("Start init input video for flow "<<j+1)
+        layoutFlowVect[j][0]->InitInputVideo(inputPath, nbFrames);
+        PRINT_DEBUG("Done init input video for flow "<<j+1)
+        ++j;
+      }
 
-                auto bitrate = GetBitrateVector(lfsv.back(), ptree, videoOutputBitRate);
-                l->InitOutputVideo(path, "libx265", fps, int(fps/2), bitrate);
-                ++j;
-            }
-        }
-        std::vector<std::shared_ptr<std::ofstream>> qualityWriterVect;
-        if (!pathToOutputQuality.empty())
-        {
-            size_t lastindex = pathToOutputQuality.find_last_of(".");
-            std::string pathToOutputQualityExtension = pathToOutputQuality.substr(lastindex, pathToOutputQuality.size());
-            pathToOutputQuality = pathToOutputQuality.substr(0, lastindex);
-            unsigned int j = 0;
-            for(auto& lfsv: layoutFlowSections)
-            {
-                if (j != 0)
-                {
-                    const auto& l = layoutFlowVect[j].back();
-                    std::string path = pathToOutputQuality+std::to_string(j+1)+lfsv.back()+pathToOutputQualityExtension;
-                    std::cout << "Quality path for flow "<< j+1 <<": " << path << std::endl;
-                    qualityWriterVect.push_back(std::make_shared<std::ofstream>(path));
-                }
-                ++j;
-            }
-        }
-//      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), sga.fps, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
+      //Init ouput video for each last video in the layoutFlowVect
+      if (!pathToOutputVideo.empty())
+      {
+          size_t lastindex = pathToOutputVideo.find_last_of(".");
+          std::string pathToOutputVideoExtension = pathToOutputVideo.substr(lastindex, pathToOutputVideo.size());
+          pathToOutputVideo = pathToOutputVideo.substr(0, lastindex);
+          unsigned int j = 0;
+          for(auto& lfsv: layoutFlowSections)
+          {
+              const auto& l = layoutFlowVect[j].back();
+              std::string path = pathToOutputVideo+std::to_string(j+1)+lfsv.back()+pathToOutputVideoExtension;
+              std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
+
+              auto bitrate = GetBitrateVector(lfsv.back(), ptree, videoOutputBitRate);
+              l->InitOutputVideo(path, "libx265", fps, int(fps/2), bitrate);
+              ++j;
+          }
+      }
+      //Init the quality ouput files
+      std::vector<std::shared_ptr<std::ofstream>> qualityWriterVect;
+      if (!pathToOutputQuality.empty())
+      {
+          size_t lastindex = pathToOutputQuality.find_last_of(".");
+          std::string pathToOutputQualityExtension = pathToOutputQuality.substr(lastindex, pathToOutputQuality.size());
+          pathToOutputQuality = pathToOutputQuality.substr(0, lastindex);
+          unsigned int j = 0;
+          for(auto& lfsv: layoutFlowSections)
+          {
+              if (j != 0)
+              {
+                  const auto& l = layoutFlowVect[j].back();
+                  std::string path = pathToOutputQuality+std::to_string(j+1)+lfsv.back()+pathToOutputQualityExtension;
+                  std::cout << "Quality path for flow "<< j+1 <<": " << path << std::endl;
+                  qualityWriterVect.push_back(std::make_shared<std::ofstream>(path));
+              }
+              ++j;
+          }
+      }
+      //      cv::VideoWriter vwriter(pathToOutputVideo, cv::VideoWriter::fourcc('D','A','V','C'), sga.fps, cv::Size(lcm.GetWidth(), lcm.GetHeight()));
 
       cv::Mat img;
       int count = 0;
       double averageDuration = 0;
-      while (count < nbFrames)
+      while (count < nbFrames+startFrame)
       {
-          auto startTime = std::chrono::high_resolution_clock::now();
+        auto startTime = std::chrono::high_resolution_clock::now();
 
-          std::cout << "Read image " << count << std::endl;
+        std::cout << (count >= startFrame ? "Read" : "Skip") << " image " << count << std::endl;
 
         unsigned int j = 0;
         std::shared_ptr<Picture> firstPict(nullptr);
         for(auto& lf: layoutFlowVect)
         {
-            std::shared_ptr<Picture> pict = lf[0]->ReadNextPictureFromVideo();
+          std::shared_ptr<Picture> pict = lf[0]->ReadNextPictureFromVideo();
+          if (count >= startFrame)
+          {//start processing when count >= startFrame
+
             auto pictOut = pict;
             std::cout << "Flow " << j << ": " << layoutFlowSections[j][0];
             for (unsigned int i = 1; i < lf.size(); ++i)
             {
                 std::cout << " -> " << layoutFlowSections[j][i];
                 pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
-                lf[i]->NextStep();
+                lf[i]->NextStep(double(count-startFrame)/fps);
             }
             std::cout << std::endl;
             if (firstPict == nullptr)
@@ -230,23 +251,27 @@ int main( int argc, const char* argv[] )
                 lf.back()->WritePictureToVideo(pictOut);
             }
             ++j;
+          }
         }
 
-        if (displayFinalPict)
+        if (count >= startFrame)
         {
+          if (displayFinalPict)
+          {
             cv::waitKey(0);
             cv::destroyAllWindows();
-        }
+          }
 
           auto endTime = std::chrono::high_resolution_clock::now();
           auto duration = std::chrono::duration_cast<std::chrono::microseconds>( endTime - startTime ).count();
           averageDuration = (averageDuration*count + duration)/(count+1);
           std::cout << "Elapsed time for this picture: "<< float(duration)/1000000.f<< "s "
             "estimated remaining time = " << (nbFrames-count-1)*averageDuration/1000000.f << "s "  << std::endl;
-          if (++count == nbFrames)
-          {
-              break;
-          }
+        }
+        if (++count >= nbFrames+startFrame)
+        {
+            break;
+        }
       }
    }
    catch(const po::error& e)

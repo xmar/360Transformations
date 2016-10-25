@@ -18,6 +18,7 @@ def GenerateConfigString(layouts_a, fps, bitrate, nbFrames, inputVideo, output):
     c += 'videoOutputName= {}\n'.format(output)
     c += 'videoOutputBitRate={}\n'.format(bitrate)
     c += 'qualityOutputName=\n'
+    c += 'startFrame=0\n'
     c += 'nbFrames={}\n'.format(nbFrames)
 
     for (l,a) in layouts_a:

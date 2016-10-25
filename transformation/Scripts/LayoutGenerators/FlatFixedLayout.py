@@ -15,11 +15,13 @@ class FlatFixedLayout(Layout):
     def GenerateLayout(self, mediumRatio):
         c = '[{}]\ntype=flatFixed\n'.format(self.GetName())
         c += 'relativeResolution=false\n'
+        c += 'dynamicPositions=false\n'
 
         c+=super().GetYawPitchRoll()
         c += 'width={}\n'.format(self.width)
         c += 'height={}\n'.format(self.height)
         c += 'horizontalAngleOfVision={}\n'.format(self.horizontalAngle)
+        c += 'verticalAngleOfVision=90\n'
         return c
 
     wasRandomInit = False
