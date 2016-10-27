@@ -81,7 +81,8 @@ selects the right representation and extracts the viewport. The
 storage requirements at the server side increase but all the
 processing is done at the client side (representation selection and
 viewport extraction). This idea matches the adaptive delivery
-solutions that content providers have recently adopted (\textit{e.g.}~\ac{DASH}), trading client-personalized delivery for
+solutions that content providers have recently adopted (\textit{e.g.}~\ac{DASH}), 
+trading client-personalized delivery for
 simple server-side management operation.
 
 \subsection{Tiling for Adaptive Video Streaming}
@@ -100,10 +101,11 @@ In a short paper,~\citet{ochi_live_2015} have sketched a
 tile-based streaming system for $360$-degree videos. In their proposal,
 the spherical video is mapped onto an \emph{equirectangular} video,
 which is cut into $8\!\times\! 8$ \emph{tiles}.
-More recently, ~\citet{vishyArxiv} proposed a \emph{hexaface sphere}-based tiling 
+More recently,~\citet{vishyArxiv} proposed a \emph{hexaface sphere}-based tiling 
 of a $360$-degree video to take into account projection distortion. They also present 
 an approach to describe the tiles with \ac{MPEG} \ac{DASH} \ac{SRD}
-formatting principles.
+formatting principles. \citet{allthings} also propose the delivery of tiles based on
+a prediction of the head movements.
 
 A tile-based adaptive streaming system provides the same features as
 our proposed system regarding navigability (the clients get the full
