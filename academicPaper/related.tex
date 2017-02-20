@@ -105,7 +105,9 @@ More recently,~\citet{vishyArxiv} proposed a \emph{hexaface sphere}-based tiling
 of a $360$-degree video to take into account projection distortion. They also present
 an approach to describe the tiles with \ac{MPEG} \ac{DASH} \ac{SRD}
 formatting principles. \citet{allthings} also propose the delivery of tiles based on
-a prediction of the head movements.
+a prediction of the head movements. \citet{zare2016hevc} evaluate the impact of
+different tiling scheme on the compression efficiency and on the transmission
+bit-rate saving.
 
 A tile-based adaptive streaming system provides the same features as
 our proposed system regarding navigability (the clients get the full
@@ -122,7 +124,7 @@ the server is heavier because the number of files is larger. For
 example, a typical $8\times8$ tiling offered at six quality levels
 contributes to having $384$~independent files for each video segment,
 and this results in larger \ac{MPD} files (or manifest
-files). Finally, the management at the client side is heavier.%, as
+files). Finally, the management at the client side is heavier. %, as
 %well.
 For each tile, the client should run a representation selection
 process and manage a specific network connection with the server.
