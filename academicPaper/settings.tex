@@ -5,7 +5,7 @@
 
 The preparation of $360$-degree videos for viewport-adaptive streaming
 relies on multiple parameters. We distinguish between global
-parameters (the number of \acp{QEC}, the number of
+parameters (the number of \acp{QER}, the number of
 representations, the segment length and the geometric layout)
 and local (\emph{per representation}) parameters (the target bit-rate,
 the number of different qualities in a representation, the quality
@@ -18,7 +18,7 @@ restrict our attention to three key questions: What is the best
 geometric layout to support quality-differentiated $360$-degree video?
 What is the best segment length to support head movements, while
 maintaining low management overhead? What is the best number of
-\acp{QEC} $n$ to reduce the induced storage requirements, while
+\acp{QER} $n$ to reduce the induced storage requirements, while
 offering a good \ac{QoE}? To answer these three questions, we have
 developed a software tool and used a dataset from a real \ac{VR} system.
 
@@ -204,23 +204,23 @@ lesser than \num{0.7}~distance unit). Please recall that our dataset
 captures a challenging experiment for our system. We can expect
 narrower head movements, and thus longer possible segment lengths, for
 sitting users and longer videos. Note also that these results are consistent
-with the head movement prediction from~\citet{allthings}, who showed that 
+with the head movement prediction from~\citet{allthings}, who showed that
 prediction accuracy drops for time periods greater than \SI{2}{\second}.
 
-\subsection{Number of \acp{QEC}}
+\subsection{Number of \acp{QER}}
 
-The number of \acp{QEC} $n$ represents another key trade-off. The more
-\acp{QEC} there are, the better the coverage of the spherical video
+The number of \acp{QER} $n$ represents another key trade-off. The more
+\acp{QER} there are, the better the coverage of the spherical video
 is, and thus the better the viewport quality will be due to a better
 match between the \ac{QEC} and the \FoV{} center. However,
-increasing the number of \acp{QEC} also means increased storage and
+increasing the number of \acp{QER} also means increased storage and
 management requirements at the server (and a longer \ac{MPD} file).
 
 
 We represent in Figure~\ref{fig:QEC} the median \ac{PSNR} difference
 between the viewport extracted from the cube map layout and the
 same viewport extracted from the \emph{uniEqui} layout with the same
-overall bit-rate budget. To modify the number of \acp{QEC}, we set a
+overall bit-rate budget. To modify the number of \acp{QER}, we set a
 number $n$, then we determined the position of the $n$ \acp{QEC}
 using the Thomson positioning problem~\cite{rakhmanov1994electrons}.
 For each head position in the dataset, we computed the distance
@@ -234,17 +234,17 @@ accordingly.
 \centering
 \input{plots/qecNbToQoE.tex}
 \caption{Median \acs{PSNR} gap between the viewports of the cube map layout and the \textit{uniEqui} depending
-on the number of \acp{QEC}.
+on the number of \acp{QER}.
 Bit-rate: \SI{\testbitrateBudget}{\mega bps}}
 \label{fig:QEC}
 \end{figure}
 
-The best number of \acp{QEC} in this configuration is between
+The best number of \acp{QER} in this configuration is between
 \numlist{5;7}. The gains that are obtained for higher number of
-\acp{QEC} are not significant enough to justify the induced storage
-requirements (in particular not $30$~\acp{QEC} as in the Facebook
-system~\cite{facebook}). Having multiple  \acp{QEC} provides higher
+\acp{QER} are not significant enough to justify the induced storage
+requirements (in particular not $30$~\acp{QER} as in the Facebook
+system~\cite{facebook}). Having multiple  \acp{QER} provides higher
 quality gains for short segments, due to the better re-synchronization
-between the \acp{QEC} and the \FoV{} centers. Note also that a
+between the \acp{QER} and the \FoV{} centers. Note also that a
 significant part of these gains stems from the cube map layout
 projection.

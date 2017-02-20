@@ -48,9 +48,12 @@ principles as in rate-adaptive streaming technologies, the server
 offers multiple \emph{representations} of the same $360$-degree video.
 But instead of offering representations that only differ by their
 bit-rate, the server offers here representations that differ by having
-a better quality in a given region of the video. Our proposal is a
+%a better quality in a given region of the video.
+a \ac{QER}: a region of the video with a better quality than the remaining
+of the video.
+Our proposal is a
 \emph{viewport-adaptive streaming system} and is depicted in
-Figure~\ref{fig:deliverychain}. Each video representation is characterized
+Figure~\ref{fig:deliverychain}. The \ac{QER} of each video representation is characterized
 by a \emph{\ac{QEC}}, which represents a given viewing position in the
 spherical video. Around the \ac{QEC}, the quality of the video is
 maximum, while it is lower for video parts that are far from the
@@ -65,7 +68,7 @@ bandwidth and the \ac{QEC} is closest to their \FoV{} center.
    \centering
    \input{plots/deliveryChain.tex}
    \caption{Viewport-adaptive 360-degree video delivery system: The server
-   offers video representations for three \acp{QEC}. The dark \ifbool{withColor}{brown}{gray} is the part of the video encoded at high quality, the light
+   offers video representations for three \acp{QER}. The dark \ifbool{withColor}{brown}{gray} is the part of the video encoded at high quality, the light
    \ifbool{withColor}{brown}{gray} the low quality. The viewport is the dotted red rectangle, the \FoV{} center the
    cross}
    \label{fig:deliverychain}
@@ -97,10 +100,10 @@ Third, we study the required video segment length for
 viewport-adaptive streaming. Based on a dataset of real users
 navigating $360$-degree videos, we show that head movements occur over
 short time periods, hence the streaming video segments have to be
-short enough to enable frequent \ac{QEC} switches. Fourth, we
-examine the impact of the number of \acp{QEC} on the viewport quality
+short enough to enable frequent \ac{QER} switches. Fourth, we
+examine the impact of the number of \acp{QER} on the viewport quality
 and we show that a small number of (spatially-distributed over the sphere)
-\acp{QEC} suffices to get high viewport quality.
+\acp{QER} suffices to get high viewport quality.
 Finally, we introduce a tool (released as open source), which creates video representations for the proposed viewport-adaptive streaming system.
 The tool is highly configurable: from a given
 $360$-degree video, it allows any arrangement of video quality for a

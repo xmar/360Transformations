@@ -7,11 +7,11 @@ navigable $360$-degree video delivery framework.
 \parag{Server}The server takes as an input a $360$-degree video in
 equirectangular format and transforms each frame into a desired
 geometrical layout. Then, it creates $n$ different video
-versions, each with a different \ac{QEC} and encoded in $k$ different
+versions, each with a different \ac{QER} and encoded in $k$ different
 bit-rates (see Figure~\ref{fig:newdelivery}). The server
 splits all such encoded videos into segments, which are classified in
 $n\!\times\!k$ representations (based on their respective bit-rate and
-\ac{QEC}), enabling clients to regularly switch from one
+\ac{QER}), enabling clients to regularly switch from one
 representation to another. The video quality around the
 \ac{QEC} is the highest, while the remaining part is encoded at lower
 quality.
@@ -19,7 +19,7 @@ quality.
 \begin{figure}
    \centering
    \input{plots/newDelivery.tex}
-   \caption{Viewport-adaptive streaming system: the server offers \num{6} representations (\num{3} \acp{QEC} at \num{2} bit-rates). The streaming session lasts for three segments. The client head moves from left to right, the available bandwidth varies. For each segment, the client requests a representation that matches both the \FoV{} and the network throughput.}
+   \caption{Viewport-adaptive streaming system: the server offers \num{6} representations (\num{3} \acp{QER} at \num{2} bit-rates). The streaming session lasts for three segments. The client head moves from left to right, the available bandwidth varies. For each segment, the client requests a representation that matches both the \FoV{} and the network throughput.}
    \label{fig:newdelivery}
 \end{figure}
 
@@ -35,12 +35,12 @@ matches both the new \FoV{} center and the available throughput.
 
 \parag{Adaptation algorithm}Similarly to \ac{DASH}, the client runs
 an adaptation algorithm to select the video representation. It first
-selects the \ac{QEC} of the video based on the \FoV{} center and
-the available \acp{QEC}. This is an important addition to
-the \ac{DASH} bit-rate adaptation logic, since the \ac{QEC} determines
+selects the \ac{QER} of the video based on the \FoV{} center and
+the \acp{QEC} of the available \acp{QER}. This is an important addition to
+the \ac{DASH} bit-rate adaptation logic, since the \ac{QER} determines
 the quality of the video that is delivered and displayed to the user.
-After the \ac{QEC} selection, the client chooses the video
-representation characterized by this \ac{QEC} and whose bit-rate fits
+After the \ac{QER} selection, the client chooses the video
+representation characterized by this \ac{QER} and whose bit-rate fits
 with the expected throughput for the next $x$ seconds (\textit{i.e.},
 $x$ being the segment length). The server replies
 with the requested video representation, from which the
@@ -53,7 +53,7 @@ conditions for the next $x$ seconds. Rate adaptation algorithms
 are
 developed~\cite{tian,probe_li_2014,miller,zou,liu} to reduce the mismatch between the
 requested bit-rate and the throughput. In our proposal, the adaptation algorithm should also ensure
-that the \FoV{} centers will be as close as possible to the chosen \ac{QEC} during
+that the \FoV{} centers will be as close as possible to the \ac{QEC} of the chosen \ac{QER} during
 the $x$ next seconds.
 In this paper, we implement
 a simple algorithm for \ac{QEC} selection: we select the \ac{QEC} that
