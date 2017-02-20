@@ -21,6 +21,13 @@
 \newcommand\newpara[1]{\vspace{3pt}\noindent\textbf{#1}.\hspace{0.15cm}}
 \newcommand\newsubpara[1]{\vspace{0.15cm}\noindent\textit{#1}.\hspace{0.15cm}}
 
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
 %Define names of the Estimation Functions
 \newcommand{\setPositive}{ % STYLE
    \text{\bf{\scriptsize+}}
