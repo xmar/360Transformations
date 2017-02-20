@@ -101,7 +101,10 @@ compared to the original full quality viewport:
 \ac{PSNR}.
 \ac{MS-SSIM} compares image by image the structural
 similarity between this video and the reference video. The \ac{PSNR} measures the average error of pixel intensities
-between this video and the reference video. Since we
+between this video and the reference video.
+The \ac{MS-SSIM} metric is closer to human perception but is less appropriate
+than the \ac{PSNR} to measure difference between two measurements.
+Since we
 compare several encoded versions of the \emph{same} viewport against the
 original, these well-known tools provide a fair performance evaluation of viewport distortion.
 We perform multiple quality assessment (typically forty) at the same distance $d$ but at different positions and average the result.
