@@ -24,7 +24,7 @@ However, some pixels are over-sampled (a pixel on the sphere is
 projected to a pair of pixels in the projected image). This is
 typically the case for the sphere pole when projected on the
 equirectangular panorama. This over-sampling degrades the performance
-of traditional video encoders~\cite{wojciechowski_h.264_2006,
+of traditional video encoders~\cite{
 yu_framework_2015}. On the contrary, the projection into a pyramid
 layout causes under-sampling: some pairs of pixels on the sphere
 are merged into a
@@ -160,6 +160,11 @@ the best regarding the viewport quality. Moreover, the system
 uses the same video quality on each face, which is less
 efficient than our proposal. Finally, the impact of the video encoding on the solution
 is not given.
+
+\citet{lee2011efficient} studied in an other context the coding of a regular
+video with a \ac{QER}. The \ac{QER} is generated near the area that is more likely
+to attract gazes. They do not propose to generate representations with different
+\ac{QER}.
 
 \parag{Our contributions}Our approach is based on the same
 idea of offering multiple \ac{QER}-based video representations.
