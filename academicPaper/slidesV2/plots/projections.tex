@@ -1,0 +1,39 @@
+\tikzsetnextfilename{2d_layout_projections}
+\begin{tikzpicture}
+   \def\sizeSphere{20}%pt
+   \def\ecartY{-1.2}%cm
+   \def\ecartX{6}
+
+   % da sphere
+   \pic [local bounding box=spher]  at (0,0) {spherical=15};
+
+   % recantagular
+   \uncover<+->{
+      \pic [local bounding box=equi] at (-3,\ecartY) {equirectangular={\sizeSphere}{-1}{0}};
+      \draw[-latex] (spher.180) -| (equi);
+      \node[font=\scriptsize,anchor=north] at (equi.south) {equirectangular};
+   }
+
+   % cupe map
+   \uncover<+->{
+      \pic [local bounding box=cubemap] at (-1,\ecartY) {cubemap=\sizeSphere};
+      \draw[-latex] (spher.200) -| (cubemap);
+      \node[font=\scriptsize,anchor=north] at (cubemap.south) {cube map};
+   }
+
+   % pyramid
+   \uncover<+->{
+      \pic [local bounding box=pyra] at (1,\ecartY) {pyramid=\sizeSphere};
+      \draw[-latex] (spher.340) -| (pyra);
+      \node[font=\scriptsize,anchor=north] at (pyra.south) {pyramid};
+   }
+
+   \def\unitused{0.22}
+
+   \uncover<+->{
+      \pic [local bounding box=dodeca] at (3,0.88*\ecartY) {dodecahedron=\unitused};
+      \draw[-latex] (spher) -| (dodeca);
+      \node[font=\scriptsize,anchor=north] at (dodeca.south) {\vphantom{y}dodecahedron};
+   }
+
+\end{tikzpicture}

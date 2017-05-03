@@ -1,0 +1,66 @@
+%%\usepackage[nolist]{acronym}
+\usepackage[acronym]{glossaries}
+\newcommand\acro[2]{\newacronym{#1}{#1}{#2}}
+\newcommand\acroAlwaysShort[1]{\newglossaryentry{#1}{type=\acronymtype, name={#1}, description={#1}, text={#1}, first={#1}, plural={#1s}, firstplural={#1s}}}
+\newcommand\acroShortSurname[2]{\newglossaryentry{#1}{type=\acronymtype, name={#2}, description={#2}, text={#2}, first={#2}, plural={#2s}, firstplural={#2s}}}
+\newcommand\ac[1]{\gls{#1}}
+\newcommand\acp[1]{\glspl{#1}}
+\newcommand\acs[1]{\glsname{#1}}
+\newcommand\acl[1]{\glsentrylong{#1}}
+
+%\begin{acronym}
+\acro{CWND}{Congestion Window}
+\acro{HDM}{Head-Mounted Display}
+\acro{DASH}{dynamic adaptive streaming over HTTP}
+\acro{CDN}{content delivery network}
+\acro{CDF}{cumulative density function}
+\acro{PDF}{probability density function}
+\acro{RTP}{real-time protocol}
+\acro{OS}{Operating System}
+\acro{IETF}{Internet Engineering Task Force}
+\acro{TAPS}{Transport Services}
+\acro{QoE}{quality of experience}
+\acro{VQM}{Video Quality Metric}
+\acro{ILP}{Integer Linear Program}
+\acro{HDTV}{high definition television}
+\acro{UGC}{User-Generated Content}
+\acro{MPD}{Media Presentation Description}
+\acro{GPU}{graphics processing unit}
+\acro{CPU}{central processing unit}
+\acro{API}{Application Programming Interface}
+\acro{VM}{Virtual Machine}
+\acro{SVC}{Scalable Video Coding}
+\acro{E2E}{End-to-end}
+\acro{GOP}{Group of Picture}
+\acro{PMU}{Performance Monitoring Unit}
+\acro{PSNR}{Peak Signal to Noise Ratio}
+\acro{TCP}{Transmission Control Protocol}
+\acro{UDP}{User Datagram Protocol}
+\acro{MTU}{Maximum Transmission Unit}
+\acro{FIFO}{First-In First-Out}
+\acro{RTT}{Round-Trip Time}
+\acro{sRTT}{smoothed Round-Trip Time}
+\acro{NTP}{Network Time Protocol}
+\acro{GPS}{Global Positioning System}
+\acro{VPN}{Virtual Private Network}
+\acro{LAN}{Local Area Network}
+\acro{MPRTP}{Multi-Path Real-time Transport Protocol}
+\acro{MPTCP}{Multi-Path Transmission Control Protocol}
+\acro{SCTP}{Stream Control Transmission Protocol}
+\acro{CMT-SCTP}{Concurrent Multipath Transfer SCTP}
+\acro{OLIA}{Opportunistic Linked-Increases Algorithm}
+\acro{HEVC}{High Efficiency Video Coding}
+\acro{HM-15}{\ac{HEVC} Test Model - 15}
+\acro{RPS}{reference picture set}
+\acro{HTTP}{HyperText Transfer Protocol}
+\acro{VoD}{Video on Demand}
+\acro{POC}{picture order counts}
+\acro{ISOBMFF}{ISO base media file format}
+\acro{HAS}{HTTP Adaptive Streaming}
+\acro{RTCP}{Real-Time Transport Control Protocol}
+\acro{VQMT}{Video Quality Measurement Tool}
+\acro{EPFL}{Ecole Polytechnique F\'{e}d\'{e}rale de Lausanne}
+\acro{MS-SSIM}{Multiscale - Structural Similarity}
+\acro{QUIC}{Quick UDP Internet Connections}
+\acroAlwaysShort{YUV}
+%\end{acronym}

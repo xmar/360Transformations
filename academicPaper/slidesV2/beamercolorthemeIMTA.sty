@@ -1,0 +1,91 @@
+% Author : Pierre-Henri Horrein
+% Copyright : Telecom Bretagne, 2013
+
+\mode<presentation>
+
+%\setbeamercolor*{structure}{bg=gray,fg=black}
+
+\definecolor{beamer@imtlightnlue}{RGB}{0,184,222}
+\definecolor{beamer@imtdark}{RGB}{60, 60, 60}
+\definecolor{beamer@imttruedark}{RGB}{0, 0, 0}
+\definecolor{beamer@imtwhite}{RGB}{255,255,255}
+\definecolor{beamer@imtdarkblue}{RGB}{12,35,64}
+\definecolor{beamer@imtgreen}{RGB}{164,210,51}
+\definecolor{beamer@imtgray}{RGB}{230,230,230}
+
+
+\newcommand\drawLogo[1]{
+% \begin{tikzpicture}[scale=#1,every node/.style={transform shape}]
+\tikzset{external/export next=false}
+\tikzsetnextfilename{IMTALogo}
+\begin{tikzpicture}[transform canvas={scale=#1}]
+% \begin{tikzpicture}[scale=#1,every node/.style={scale=#1}]
+\def\h{0.67}
+\fill[beamer@imtlightnlue] (0,0) -- (2*\h ,0) -- (0,-2*\h);
+\fill[beamer@imtlightnlue] (2*\h,0) -- (2*\h,-2*\h) -- (4*\h,-2*\h) -- (4*\h,0) -- (3*\h,-\h) ;
+\fill[beamer@imtlightnlue] (4*\h,-\h) -- (5*\h,0) -- (7*\h,0) -- (5*\h,-2*\h) -- (5*\h,-\h);
+\def\gauche{-.03*#1}
+\draw (0,-2*\h)++(\gauche,-.2) node (text1) [anchor= north west, font=\sffamily\large,inner sep=0pt,beamer@imttruedark] {\textbf{IMT Atlantique}};
+\draw (0,-2*\h)++(\gauche,-.65) node [anchor=north west, font=\sffamily\normalsize,inner sep=0pt, beamer@imttruedark] {Bretagne-Pays de la Loire};
+\draw (0,-2*\h)++(\gauche,-1) node [anchor=north west, font=\sffamily\normalsize,inner sep=0pt, beamer@imttruedark] {\'Ecole Mines-T\'el\'ecom};
+\end{tikzpicture}
+}
+
+\newcommand\drawTruncatedLogo[1]{
+% \begin{tikzpicture}[scale=#1,every node/.style={transform shape}]
+\tikzset{external/export next=false}
+\tikzsetnextfilename{IMTATruncatedLogo}
+\begin{tikzpicture}[transform canvas={scale=#1}]
+% \begin{tikzpicture}[scale=#1,every node/.style={scale=#1}]
+\def\h{0.67}
+\fill[beamer@imtlightnlue] (0,0) -- (2*\h ,0) -- (0,-2*\h);
+\fill[beamer@imtlightnlue] (2*\h,0) -- (2*\h,-2*\h) -- (4*\h,-2*\h) -- (4*\h,0) -- (3*\h,-\h) ;
+\fill[beamer@imtlightnlue] (4*\h,-\h) -- (5*\h,0) -- (7*\h,0) -- (5*\h,-2*\h) -- (5*\h,-\h);
+\def\gauche{-.03*#1}
+\draw (0,-2*\h)++(\gauche,-.2) node (text1) [anchor= north west, font=\sffamily\large,inner sep=0pt] {\textbf{IMT Atlantique}};
+\end{tikzpicture}
+}
+
+
+\setbeamercolor*{imtagray}{bg=beamer@imtgray}
+
+\setbeamercolor*{palette primary}{use=structure,fg=beamer@imtwhite,bg=structure.fg}
+\setbeamercolor*{palette secondary}{use=structure,fg=beamer@imtwhite,bg=structure.fg!75!black}
+\setbeamercolor*{palette tertiary}{use=structure,fg=beamer@imtwhite,bg=structure.fg!50!black}
+\setbeamercolor*{palette quaternary}{fg=beamer@imtwhite,bg=black}
+
+\setbeamercolor*{sidebar}{use=structure,bg=structure.fg}
+
+\setbeamercolor*{palette sidebar primary}{use=structure,fg=structure.fg!10}
+\setbeamercolor*{palette sidebar secondary}{fg=beamer@imtwhite}
+\setbeamercolor*{palette sidebar tertiary}{use=structure,fg=structure.fg!50}
+\setbeamercolor*{palette sidebar quaternary}{fg=beamer@imtwhite}
+
+\setbeamercolor*{titlelike}{parent=palette primary}
+
+\setbeamercolor*{separation line}{}
+\setbeamercolor*{fine separation line}{}
+
+\setbeamercolor{section in toc}{fg=black, bg=beamer@imtwhite}
+\setbeamercolor{section in toc shaded}{fg=beamer@imtgray, bg=beamer@imtwhite}
+
+\setbeamercolor{caption}{bg=beamer@imtwhite}
+\setbeamercolor{caption name}{bg=beamer@imtwhite}
+
+\setbeamercolor{item}{fg=beamer@imtgreen, bg=beamer@imtwhite}
+\setbeamercolor{subitem}{fg=beamer@imtdarkblue, bg=beamer@imtwhite}
+\setbeamercolor{subsubitem}{fg=beamer@tbblack, bg=beamer@imtwhite}
+
+\setbeamercolor{block body}{fg=beamer@tbblack, bg=beamer@imtgreen!40}
+\setbeamercolor{block body alerted}{bg=beamer@imtdarkblue!40, fg=beamer@tbblack}
+\setbeamercolor{block body example}{bg=beamer@imtgray!40, fg=beamer@tbblack}
+\setbeamercolor{block title}{fg=beamer@imtdarkblue, bg=beamer@imtgreen}
+\setbeamercolor{block title alerted}{bg=beamer@imtdarkblue, fg=beamer@imtgreen}
+\setbeamercolor{block title example}{bg=beamer@imtgray, fg=beamer@tbblack}
+
+\setbeamercolor{title}{fg=beamer@imttruedark bg=beamer@imtwhite}
+\setbeamercolor{titlepage}{fg=beamer@imtwhite, bg=beamer@imtwhite}
+\setbeamercolor{titlepage_author}{fg=beamer@imttruedark, bg=beamer@imtwhite}
+
+\mode
+<all>

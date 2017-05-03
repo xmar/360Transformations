@@ -1,0 +1,143 @@
+\defineContentTable
+\section{Results}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Orthodromic distance?}
+
+   Geodesics on a sphere are the great-circles
+
+   Orthodromic distance is the length of the great-circle
+
+   \begin{independentCounter}
+      \begin{center}
+         \input{plots/orthodromicDist.tex}
+      \end{center}
+   \end{independentCounter}
+
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Video segment size?}
+   Head movement dataset
+   %from Jaunt, Inc
+   : eleven 10\,s-long videos; eleven users%with an Occulus Rift DK2
+   \vspace{-0.4cm}
+   \begin{independentCounter}
+      \setBP{2}
+      \only<1-5>{
+         \input{plots/cdf-dataset.tex}
+      }
+   \end{independentCounter}
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Spherical video projections}
+
+   \vfill
+
+   \begin{itemize}
+      \item<+-> Multiple possible projections:
+      \begin{itemize}
+         \setbeamercovered{transparent}
+         \item \uncover<.->{Equirectangular}\uncover<+->{, cube map}\uncover<+->{, pyramidal}\uncover<+->{, dodecahedron}
+      \end{itemize}
+   \end{itemize}
+
+   \vfill
+
+   \begin{independentCounter}
+      \setBP{1}
+      \begin{center}
+         \input{plots/projections.tex}
+      \end{center}
+   \end{independentCounter}
+
+   \setbeamercovered{invisible}
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Quality metric used}
+
+   \begin{columns}[T]
+
+     \begin{column}{0.6\linewidth}
+        \begin{independentCounter}
+           \setBP{1}
+           \only<1-12>{
+              \input{plots/qualityMetric.tex}
+           }
+        \end{independentCounter}
+     \end{column}
+     \begin{column}{0.4\linewidth}
+        \begin{itemize}
+           \item<1-> Generate the viewports\\ Compute the MS-SSIM
+           \item<2-> Average multiple measures at the same distance
+           \item<5-> Multiple distances
+        \end{itemize}
+     \end{column}
+  \end{columns}
+
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Experimental setup}
+
+   \begin{columns}[T]
+     \begin{column}{0.65\linewidth}
+        \begin{itemize}[<+->]
+           \vfill
+            \item Software + Scripts available on github
+            \begin{itemize}[<.->]
+               \item Projection
+               \item QEC generation
+            \end{itemize}
+            \vfill
+            \item 1080p viewports from a 4K 360-degree video
+         \end{itemize}
+      \end{column}
+      \begin{column}{0.35\linewidth}
+         \includegraphics[scale=0.25]{plots/pictures/Xavier/githubQRC.eps}
+      \end{column}
+   \end{columns}
+
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Best projection?}
+
+   \begin{independentCounter}
+      \setBP{2}
+      \only<1-5>{
+         \input{plots/distance_quality.tex}
+      }
+   \end{independentCounter}
+\end{frame}
+
+%%%% Frame %%%%
+\begin{frame}[c]
+   \frametitle{Number QEC?}
+
+   \begin{independentCounter}
+      \only<1-3>{
+         \begin{itemize}
+            \item Distribute ``evenly'' the QEC on the sphere
+         \end{itemize}
+         \begin{center}
+            \input{plots/illustrateNbQecVariation.tex}
+         \end{center}
+      }
+   \end{independentCounter}
+
+   \begin{independentCounter}
+      \setBP{5}
+      \only<4-9>{
+         \input{plots/qecNbToQoE.tex}
+      }
+   \end{independentCounter}
+\end{frame}

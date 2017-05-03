@@ -1,0 +1,58 @@
+\tikzsetnextfilename{quality_metric}
+\begin{tikzpicture}
+
+   \definecolor{qecColor}{HTML}{cc0000}
+   \def\sizeSphere{55}
+
+   \tikzset{
+   	cross/.pic={
+         \draw[qecColor] (0,0) ++(-0.5#1,-0.5#1) -- ++(#1,#1);
+         \draw[qecColor] (0,0) ++(-0.5#1,0.5#1) -- ++(#1,-#1);
+       }
+   }
+
+   \tikzset{
+   	crossDashed/.pic={
+         \draw[qecColor, dash pattern=on 1pt off 1pt] (0,0) ++(-0.5#1,-0.5#1) -- ++(#1,#1);
+         \draw[qecColor, dash pattern=on 1pt off 1pt] (0,0) ++(-0.5#1,0.5#1) -- ++(#1,-#1);
+       }
+   }
+
+   \tikzset{
+   	sphericalNbQec/.pic={
+   		\pic at (0,0) {spherical={#1}};
+         \coordinate (qec) at (0.7#1,0.7#1);
+         \newlength{\crossLength}
+         \setlength{\crossLength}{0.15cm}
+         \pic[local bounding box=crossQEC] at (qec) {cross={\crossLength}};
+         \only<.(1)>{
+            \node[above] at (crossQEC) {\tiny QEC};
+         }
+         \only<.(2)->{
+            \coordinate (qec2) at (-0.9#1,-0.9#1);
+            \pic[local bounding box=crossQEC] at (qec2) {cross={\crossLength}};
+            \coordinate (qec3) at (-0.3#1,-0.3#1);
+            \pic[local bounding box=crossQEC] at (qec3) {crossDashed={\crossLength}};
+         }
+         \only<.(3)->{
+            \coordinate (qec4) at (-1.2#1,1.0#1);
+            \pic[local bounding box=crossQEC] at (qec4) {cross={\crossLength}};
+            \coordinate (qec5) at (1.2#1,-0.6#1);
+            \pic[local bounding box=crossQEC] at (qec5) {crossDashed={\crossLength}};
+         }
+       }
+   }
+
+   \pic [local bounding box=spher]  at (0,0) {sphericalNbQec={\sizeSphere}};
+
+   \only<.(1)>{
+      \node[below] at (0,-3.0\sizeSphere) {1 QEC};
+   }
+   \only<.(2)>{
+      \node[below] at (0,-3.0\sizeSphere) {3 QEC};
+   }
+   \only<.(3)>{
+      \node[below] at (0,-3.0\sizeSphere) {5 QEC};
+   }
+
+\end{tikzpicture}

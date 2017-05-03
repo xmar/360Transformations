@@ -1,0 +1,57 @@
+\tikzsetnextfilename{full-video-stream}
+\begin{tikzpicture}
+   \newlength{\imageLengt}
+   \setlength{\imageLengt}{5cm}
+   \newlength{\gapLengt}
+   \setlength{\gapLengt}{2cm}
+   \only<.(4)>{\setlength{\imageLengt}{2.5cm} \setlength{\gapLengt}{1cm}}
+   \newlength{\imageHeight}
+   \setlength{\imageHeight}{0.5458\imageLengt}
+
+   \pgfdeclareimage[width=\imageLengt]{equi_f}{videos/360EquiFull.png}
+
+   %server
+   \node at (0,0) (server) {\pgfuseimage{equi_f}};
+   \node[yshift=0.1cm] at (server.north) {Server};
+
+   \newlength{\xone}
+   \newlength{\yone}
+   \setlength{\xone}{\dimexpr0.125\imageLengt\relax}
+   \setlength{\yone}{\dimexpr0.0682\imageLengt\relax}
+   \foreach \i in {0, 1, 2, 3, 4, 5, 6, 7} {
+      \foreach \j in {0, 1, 2, 3, 4, 5, 6, 7} {
+         \setBP{\i+1}
+         \setcounter{tmpCounter}{\j+1}
+         \draw (-0.5\imageLengt+\i\xone,-0.5\imageHeight+\j\yone) rectangle (-0.5\imageLengt+\valueBP\xone,-0.5\imageHeight+\value{tmpCounter}\yone);
+      }
+   }
+
+   %client
+   \node at (\imageLengt+\gapLengt,0) (client) {\pgfuseimage{equi_f}};
+   \node[yshift=0.1cm] at (client.north) {Client};
+
+   \fill[draw=black, dashed, fill=white, even odd rule, opacity=0.97] (0.5\imageLengt+\gapLengt, 0.273*\imageLengt) rectangle (1.5*\imageLengt+\gapLengt, -0.273*\imageLengt)
+      (0.5*\imageLengt+\gapLengt+2\xone, -0.5\imageHeight+2\yone) rectangle (0.5*\imageLengt+\gapLengt+6\xone, -0.5\imageHeight+6\yone)
+   ;
+
+   \foreach \i in {0, 1, 2, 3, 4, 5, 6, 7} {
+      \foreach \j in {0, 1, 2, 3, 4, 5, 6, 7} {
+         \setBP{\i+1}
+         \setcounter{tmpCounter}{\j+1}
+         \draw[dotted] (0.5\imageLengt+\gapLengt+\i\xone,-0.5\imageHeight+\j\yone) rectangle (0.5\imageLengt+\gapLengt+\valueBP\xone,-0.5\imageHeight+\value{tmpCounter}\yone);
+      }
+   }
+   \foreach \i in {2, 3, 4, 5} {
+      \foreach \j in {2, 3, 4, 5} {
+         \setBP{\i+1}
+         \setcounter{tmpCounter}{\j+1}
+         \draw (0.5\imageLengt+\gapLengt+\i\xone,-0.5\imageHeight+\j\yone) rectangle (0.5\imageLengt+\gapLengt+\valueBP\xone,-0.5\imageHeight+\value{tmpCounter}\yone);
+      }
+   }
+   \draw[red, thick] (0.5\imageLengt+\gapLengt+3\xone,-0.5\imageHeight+3\yone) rectangle (0.5\imageLengt+\gapLengt+5\xone,-0.5\imageHeight+5\yone);
+
+   %streaming
+   \draw[->] (server.350) -- (client.190);
+   \draw[->] (client.170) -- (server.10) node[midway, above] {\scriptsize Selection};
+
+\end{tikzpicture}
