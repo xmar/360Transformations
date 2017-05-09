@@ -269,7 +269,7 @@ double Picture::GetMSSSIM(const Picture& pic) const
     }
 
     // overall_mssim = prod(mcs_array(1:level-1).^weight(1:level-1))*mssim_array(level);
-    double msssim = mssim[m_nlevs-1];
+    double msssim = pow(mssim[m_nlevs-1] ,m_mssimWeight[m_nlevs-1]);
     for (int l=0; l<m_nlevs-1; l++)
     {
         msssim *= pow(mcs[l], m_mssimWeight[l]);
