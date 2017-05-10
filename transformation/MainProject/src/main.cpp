@@ -112,6 +112,53 @@ int main( int argc, const char* argv[] )
           exit(1);
       }
 
+      constexpr unsigned int mask_msssim = 1<<0;
+      constexpr unsigned int mask_ssim = 1<<1;
+      constexpr unsigned int mask_psnr = 1<<2;
+      constexpr unsigned int mask_spsnrnn = 1<<3;
+      constexpr unsigned int mask_spsnri = 1<<4;
+      constexpr unsigned int mask_wspsnr = 1<<5;
+
+      unsigned int qualityToMeasure = 0;
+
+      try {
+        std::stringstream ss(ptree.get<std::string>("Global.qualityToComputeList"));
+        pt::json_parser::read_json(ss, ptree_json);
+        BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
+        {
+            if (v.second.data() == "MS-SSIM")
+            {
+              qualityToMeasure |= mask_msssim;
+            }
+            else if (v.second.data() == "SSIM")
+            {
+              qualityToMeasure |= mask_ssim;
+            }
+            else if (v.second.data() == "PSNR")
+            {
+              qualityToMeasure |= mask_psnr;
+            }
+            else if (v.second.data() == "S-PSNR-NN")
+            {
+              qualityToMeasure |= mask_spsnrnn;
+            }
+            else if (v.second.data() == "S-PSNR-I")
+            {
+              qualityToMeasure |= mask_spsnri;
+            }
+            else if (v.second.data() == "WS-PSNR")
+            {
+              qualityToMeasure |= mask_wspsnr;
+            }
+        }
+      }
+      catch (std::exception &e)
+      {
+          std::cout << "Error while parsing the Global.layoutFlow: " << e.what() << std::endl;
+          exit(1);
+      }
+
+
       //Parse the rest of the Global Section from the configuration file
       std::string pathToOutputVideo = ptree.get<std::string>("Global.videoOutputName");
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
@@ -134,10 +181,6 @@ int main( int argc, const char* argv[] )
           unsigned k = 0;
           for(auto& lfs: lfsv)
           {
-              if (k == lfsv.size()-1)
-              {
-                layoutStatus = LayoutStatus::Output;
-              }
               layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, layoutStatus, refResolution.x, refResolution.y));
               layoutFlowVect.back().back()->Init();
               refResolution = layoutFlowVect.back().back()->GetReferenceResolution();
@@ -238,12 +281,173 @@ int main( int argc, const char* argv[] )
             {
                 pictOut->ImgShowWithLimit("Output"+std::to_string(j)+": "+layoutFlowSections[j][lf.size()-1], cv::Size(1200,900));
             }
-            if (!qualityWriterVect.empty() && j != 0)
+            if (!qualityWriterVect.empty() && qualityToMeasure != 0  && j != 0)
             {
-                auto msssim = firstPict->GetMSSSIM(*pictOut);
-                auto psnr = firstPict->GetPSNR(*pictOut);
-                std::cout << "Flow " << j << ": MS-SSIM = " << msssim << " PSNR = " << psnr << std::endl;
-                *qualityWriterVect[j-1] << msssim << " " << psnr << std::endl;
+                std::cout << "Flow " << j << ": ";
+                bool first = true;
+                if (count == 0)
+                {
+                  if (qualityToMeasure & mask_msssim)
+                  {
+                    if (!first)
+                    {
+                      *qualityWriterVect[j-1] << " ";
+                    }
+                    else
+                    {
+                      first = false;
+                    }
+                    *qualityWriterVect[j-1] <<"MS-SSIM";
+                  }
+                  if (qualityToMeasure & mask_ssim)
+                  {
+                    if (!first)
+                    {
+                      *qualityWriterVect[j-1] << " ";
+                    }
+                    else
+                    {
+                      first = false;
+                    }
+                    *qualityWriterVect[j-1] <<"SSIM";
+                  }
+                  if (qualityToMeasure & mask_psnr)
+                  {
+                    if (!first)
+                    {
+                      *qualityWriterVect[j-1] << " ";
+                    }
+                    else
+                    {
+                      first = false;
+                    }
+                    *qualityWriterVect[j-1] <<"PSNR";
+                  }
+                  if (qualityToMeasure & mask_spsnrnn)
+                  {
+                    if (!first)
+                    {
+                      *qualityWriterVect[j-1] << " ";
+                    }
+                    else
+                    {
+                      first = false;
+                    }
+                    *qualityWriterVect[j-1] <<"S-PSNR-NN";
+                  }
+                  if (qualityToMeasure & mask_spsnri)
+                  {
+                    if (!first)
+                    {
+                      *qualityWriterVect[j-1] << " ";
+                    }
+                    else
+                    {
+                      first = false;
+                    }
+                    *qualityWriterVect[j-1] <<"S-PSNR-I";
+                  }
+                  if (qualityToMeasure & mask_wspsnr)
+                  {
+                    if (!first)
+                    {
+                      *qualityWriterVect[j-1] << " ";
+                    }
+                    else
+                    {
+                      first = false;
+                    }
+                    *qualityWriterVect[j-1] <<"WS-PSNR";
+                  }
+                  *qualityWriterVect[j-1] << std::endl;
+                }
+                first = true;
+                if (qualityToMeasure & mask_msssim)
+                {
+                  auto msssim = firstPict->GetMSSSIM(*pictOut);
+                  std::cout << "MS-SSIM = " << msssim <<";";
+                  if (!first)
+                  {
+                    *qualityWriterVect[j-1] << " ";
+                  }
+                  else
+                  {
+                    first = false;
+                  }
+                  *qualityWriterVect[j-1] << msssim;
+                }
+                if (qualityToMeasure & mask_ssim)
+                {
+                  auto ssim = firstPict->GetSSIM(*pictOut);
+                  std::cout << " SSIM = " << ssim <<";";
+                  if (!first)
+                  {
+                    *qualityWriterVect[j-1] << " ";
+                  }
+                  else
+                  {
+                    first = false;
+                  }
+                  *qualityWriterVect[j-1] << ssim;
+                }
+                if (qualityToMeasure & mask_psnr)
+                {
+                  auto psnr = firstPict->GetPSNR(*pictOut);
+                  std::cout << " PSNR = " << psnr <<";";
+                  if (!first)
+                  {
+                    *qualityWriterVect[j-1] << " ";
+                  }
+                  else
+                  {
+                    first = false;
+                  }
+                  *qualityWriterVect[j-1] << psnr;
+                }
+                if (qualityToMeasure & mask_spsnrnn)
+                {
+                  auto spsnrnn = firstPict->GetSPSNR(*pictOut, *layoutFlowVect[0].back(), *lf.back(), Picture::InterpolationTech::NEAREST_NEIGHTBOOR);
+                  std::cout << " S-PSNR-NN = " << spsnrnn <<";";
+                  if (!first)
+                  {
+                    *qualityWriterVect[j-1] << " ";
+                  }
+                  else
+                  {
+                    first = false;
+                  }
+                  *qualityWriterVect[j-1] << spsnrnn;
+                }
+                if (qualityToMeasure & mask_spsnri)
+                {
+                  auto spsnri = firstPict->GetSPSNR(*pictOut, *layoutFlowVect[0].back(), *lf.back(), Picture::InterpolationTech::BICUBIC);
+                  std::cout << " S-PSNR-I = "<< spsnri <<";";
+                  if (!first)
+                  {
+                    *qualityWriterVect[j-1] << " ";
+                  }
+                  else
+                  {
+                    first = false;
+                  }
+                  *qualityWriterVect[j-1] << spsnri;
+                }
+                if (qualityToMeasure & mask_wspsnr)
+                {
+                  auto wspsnr = firstPict->GetWSPSNR(*pictOut, *layoutFlowVect[0].back(), *lf.back());
+                  std::cout << " WS-PSNR = "<< wspsnr <<";";
+                  if (!first)
+                  {
+                    *qualityWriterVect[j-1] << " ";
+                  }
+                  else
+                  {
+                    first = false;
+                  }
+                  *qualityWriterVect[j-1] << wspsnr;
+                }
+                std::cout <<std::endl;
+                *qualityWriterVect[j-1] << std::endl;
             }
             if (!pathToOutputVideo.empty())
             {

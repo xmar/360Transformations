@@ -1,56 +1,181 @@
 #include "Picture.hpp"
+#include "Layout.hpp"
+#include "sphere_655362.hpp"
 
+#include <cmath>
 
 using namespace IMT;
 
 double Picture::m_mssimWeight[m_nlevs] = {0.0448, 0.2856, 0.3001, 0.2363, 0.1333};
 
-#define INTERPOLATION_BILINEAR 1
+static float CubicInterpolate (float p[4], float x) {
+	return p[1] + 0.5 * x*(p[2] - p[0] + x*(2.0*p[0] - 5.0*p[1] + 4.0*p[2] - p[3] + x*(3.0*(p[1] - p[2]) + p[3] - p[0])));
+}
 
-Pixel Picture::GetInterPixel(CoordF pt) const
+static float BicubicInterpolate (float p[4][4], float x, float y) {
+	float arr[4];
+	arr[0] = CubicInterpolate(p[0], y);
+	arr[1] = CubicInterpolate(p[1], y);
+	arr[2] = CubicInterpolate(p[2], y);
+	arr[3] = CubicInterpolate(p[3], y);
+	return CubicInterpolate(arr, x);
+}
+
+static unsigned int  Clamp(float v, unsigned int min = 0, unsigned int max = 255)
+{
+  v = std::round(v);
+  if (v < 0)
+  {
+    return min;
+  }
+  else if (v > max)
+  {
+    return max;
+  }
+  else
+  {
+    return (unsigned int)(v);
+  }
+}
+
+Pixel Picture::GetInterPixel(CoordF pt, Picture::InterpolationTech it) const
 {
     const cv::Mat& img = m_pictMat;
     assert(!img.empty());
     assert(img.channels() == 3);
 
-    int x = (int)pt.x;
-    int y = (int)pt.y;
-
-#if INTERPOLATION_BILINEAR == 1
-    int x0 = cv::borderInterpolate(x,   img.cols, cv::BORDER_REFLECT_101);
-    int x1 = cv::borderInterpolate(x+1, img.cols, cv::BORDER_REFLECT_101);
-    int y0 = cv::borderInterpolate(y,   img.rows, cv::BORDER_REFLECT_101);
-    int y1 = cv::borderInterpolate(y+1, img.rows, cv::BORDER_REFLECT_101);
-
-    float a = pt.x - (float)x;
-    float c = pt.y - (float)y;
-
-    const auto& p00 = img.at<Pixel>(y0, x0);
-    const auto& p01 = img.at<Pixel>(y0, x1);
-    const auto& p10 = img.at<Pixel>(y1, x0);
-    const auto& p11 = img.at<Pixel>(y1, x1);
-
-    uchar b = (uchar)cvRound((p00[0] * (1.f - a) + p01[0] * a) * (1.f - c)
-                           + (p10[0] * (1.f - a) + p11[0] * a) * c);
-    uchar g = (uchar)cvRound((p00[1] * (1.f - a) + p01[1] * a) * (1.f - c)
-                           + (p10[1] * (1.f - a) + p11[1] * a) * c);
-    uchar r = (uchar)cvRound((p00[2] * (1.f - a) + p01[2] * a) * (1.f - c)
-                           + (p10[2] * (1.f - a) + p11[2] * a) * c);
-    return Pixel(b, g, r);
-
-#else
-
-    if (x >= img.cols)
+    if (it == InterpolationTech::BILINEAR)
     {
-        x = img.cols-1;
-    }
-    if (y >= img.rows)
-    {
-        y = img.rows-1;
-    }
-    return img.at<Pixel>(y,x);
+      int x = std::floor(pt.x);
+      int y = std::floor(pt.y);
 
-#endif
+      int x0 = cv::borderInterpolate(x,   img.cols, cv::BORDER_REFLECT_101);
+      int x1 = cv::borderInterpolate(x+1, img.cols, cv::BORDER_REFLECT_101);
+      int y0 = cv::borderInterpolate(y,   img.rows, cv::BORDER_REFLECT_101);
+      int y1 = cv::borderInterpolate(y+1, img.rows, cv::BORDER_REFLECT_101);
+
+      float a = pt.x - float(x);
+      float c = pt.y - float(y);
+
+      const auto& p00 = img.at<Pixel>(y0, x0);
+      const auto& p01 = img.at<Pixel>(y0, x1);
+      const auto& p10 = img.at<Pixel>(y1, x0);
+      const auto& p11 = img.at<Pixel>(y1, x1);
+
+      uchar b = (uchar)cvRound((p00[0] * (1.f - a) + p01[0] * a) * (1.f - c)
+                             + (p10[0] * (1.f - a) + p11[0] * a) * c);
+      uchar g = (uchar)cvRound((p00[1] * (1.f - a) + p01[1] * a) * (1.f - c)
+                             + (p10[1] * (1.f - a) + p11[1] * a) * c);
+      uchar r = (uchar)cvRound((p00[2] * (1.f - a) + p01[2] * a) * (1.f - c)
+                             + (p10[2] * (1.f - a) + p11[2] * a) * c);
+      return Pixel(b, g, r);
+    }
+    else if(it == InterpolationTech::NEAREST_NEIGHTBOOR)
+    {
+      int x = std::round(pt.x);
+      int y = std::round(pt.y);
+
+      if (x >= img.cols)
+      {
+          x = img.cols-1;
+      }
+      if (y >= img.rows)
+      {
+          y = img.rows-1;
+      }
+      return img.at<Pixel>(y,x);
+    }
+    else if (it == InterpolationTech::BICUBIC)
+    {
+      int x = std::round(pt.x);
+      int y = std::round(pt.y);
+
+      int x0 = cv::borderInterpolate(x-1,   img.cols, cv::BORDER_REFLECT_101);
+      int x1 = cv::borderInterpolate(x, img.cols, cv::BORDER_REFLECT_101);
+      int x2 = cv::borderInterpolate(x+1, img.cols, cv::BORDER_REFLECT_101);
+      int x3 = cv::borderInterpolate(x+2, img.cols, cv::BORDER_REFLECT_101);
+      int y0 = cv::borderInterpolate(y-1,   img.rows, cv::BORDER_REFLECT_101);
+      int y1 = cv::borderInterpolate(y, img.rows, cv::BORDER_REFLECT_101);
+      int y2 = cv::borderInterpolate(y+1, img.rows, cv::BORDER_REFLECT_101);
+      int y3 = cv::borderInterpolate(y+2, img.rows, cv::BORDER_REFLECT_101);
+
+      Pixel p[4][4];
+      p[0][0] = img.at<Pixel>(y0, x0);
+      p[0][1] = img.at<Pixel>(y0, x1);
+      p[0][2] = img.at<Pixel>(y0, x2);
+      p[0][3] = img.at<Pixel>(y0, x3);
+      p[1][0] = img.at<Pixel>(y1, x0);
+      p[1][1] = img.at<Pixel>(y1, x1);
+      p[1][2] = img.at<Pixel>(y1, x2);
+      p[1][3] = img.at<Pixel>(y1, x3);
+      p[2][0] = img.at<Pixel>(y2, x0);
+      p[2][1] = img.at<Pixel>(y2, x1);
+      p[2][2] = img.at<Pixel>(y2, x2);
+      p[2][3] = img.at<Pixel>(y2, x3);
+      p[3][0] = img.at<Pixel>(y3, x0);
+      p[3][1] = img.at<Pixel>(y3, x1);
+      p[3][2] = img.at<Pixel>(y3, x2);
+      p[3][3] = img.at<Pixel>(y3, x3);
+
+      float p_b[4][4];
+      float p_g[4][4];
+      float p_r[4][4];
+      for (unsigned int i = 0; i < 4; ++i)
+      {
+        for (unsigned int j = 0; j < 4; ++j)
+        {
+          p_b[i][j] = p[i][j][0];
+          p_g[i][j] = p[i][j][1];
+          p_r[i][j] = p[i][j][2];
+        }
+      }
+
+      // auto GetValueFor = [&p, &pt](unsigned i)
+      // {
+      //   float a00 = p[1][1][i];
+    	// 	float a01 = -.5*p[1][0][i] + .5*p[1][2][i];
+    	// 	float a02 = p[1][0][i] - 2.5*p[1][1][i] + 2*p[1][2][i] - .5*p[1][3][i];
+    	// 	float a03 = -.5*p[1][0][i] + 1.5*p[1][1][i] - 1.5*p[1][2][i] + .5*p[1][3][i];
+    	// 	float a10 = -.5*p[0][1][i] + .5*p[2][1][i];
+    	// 	float a11 = .25*p[0][0][i] - .25*p[0][2][i] - .25*p[2][0][i] + .25*p[2][2][i];
+    	// 	float a12 = -.5*p[0][0][i] + 1.25*p[0][1][i] - p[0][2][i] + .25*p[0][3][i] + .5*p[2][0][i] - 1.25*p[2][1][i] + p[2][2][i] - .25*p[2][3][i];
+    	// 	float a13 = .25*p[0][0][i] - .75*p[0][1][i] + .75*p[0][2][i] - .25*p[0][3][i] - .25*p[2][0][i] + .75*p[2][1][i] - .75*p[2][2][i] + .25*p[2][3][i];
+    	// 	float a20 = p[0][1][i] - 2.5*p[1][1][i] + 2*p[2][1][i] - .5*p[3][1][i];
+    	// 	float a21 = -.5*p[0][0][i] + .5*p[0][2][i] + 1.25*p[1][0][i] - 1.25*p[1][2][i] - p[2][0][i] + p[2][2][i] + .25*p[3][0][i] - .25*p[3][2][i];
+    	// 	float a22 = p[0][0][i] - 2.5*p[0][1][i] + 2*p[0][2][i] - .5*p[0][3][i] - 2.5*p[1][0][i] + 6.25*p[1][1][i] - 5*p[1][2][i] + 1.25*p[1][3][i] + 2*p[2][0][i] - 5*p[2][1][i] + 4*p[2][2][i] - p[2][3][i] - .5*p[3][0][i] + 1.25*p[3][1][i] - p[3][2][i] + .25*p[3][3][i];
+    	// 	float a23 = -.5*p[0][0][i] + 1.5*p[0][1][i] - 1.5*p[0][2][i] + .5*p[0][3][i] + 1.25*p[1][0][i] - 3.75*p[1][1][i] + 3.75*p[1][2][i] - 1.25*p[1][3][i] - p[2][0][i] + 3*p[2][1][i] - 3*p[2][2][i] + p[2][3][i] + .25*p[3][0][i] - .75*p[3][1][i] + .75*p[3][2][i] - .25*p[3][3][i];
+    	// 	float a30 = -.5*p[0][1][i] + 1.5*p[1][1][i] - 1.5*p[2][1][i] + .5*p[3][1][i];
+    	// 	float a31 = .25*p[0][0][i] - .25*p[0][2][i] - .75*p[1][0][i] + .75*p[1][2][i] + .75*p[2][0][i] - .75*p[2][2][i] - .25*p[3][0][i] + .25*p[3][2][i];
+    	// 	float a32 = -.5*p[0][0][i] + 1.25*p[0][1][i] - p[0][2][i] + .25*p[0][3][i] + 1.5*p[1][0][i] - 3.75*p[1][1][i] + 3*p[1][2][i] - .75*p[1][3][i] - 1.5*p[2][0][i] + 3.75*p[2][1][i] - 3*p[2][2][i] + .75*p[2][3][i] + .5*p[3][0][i] - 1.25*p[3][1][i] + p[3][2][i] - .25*p[3][3][i];
+    	// 	float a33 = .25*p[0][0][i] - .75*p[0][1][i] + .75*p[0][2][i] - .25*p[0][3][i] - .75*p[1][0][i] + 2.25*p[1][1][i] - 2.25*p[1][2][i] + .75*p[1][3][i] + .75*p[2][0][i] - 2.25*p[2][1][i] + 2.25*p[2][2][i] - .75*p[2][3][i] - .25*p[3][0][i] + .75*p[3][1][i] - .75*p[3][2][i] + .25*p[3][3][i];
+      //
+      //   float x = pt.x - std::floor(pt.x);
+      //   float y = pt.x - std::floor(pt.y);
+      //
+      //   float x_2 = x * x;
+    	// 	float x_3 = x_2 * x;
+    	// 	float y_2 = y * y;
+    	// 	float y_3 = y_2 * y;
+      //
+      //   std::cout << (a00 + a01 * y + a02 * y_2 + a03 * y_3) +
+    	// 	       (a10 + a11 * y + a12 * y_2 + a13 * y_3) * x +
+    	// 	       (a20 + a21 * y + a22 * y_2 + a23 * y_3) * x_2 +
+    	// 	       (a30 + a31 * y + a32 * y_2 + a33 * y_3) * x_3 << std::endl;
+      //
+    	// 	return (a00 + a01 * y + a02 * y_2 + a03 * y_3) +
+    	// 	       (a10 + a11 * y + a12 * y_2 + a13 * y_3) * x +
+    	// 	       (a20 + a21 * y + a22 * y_2 + a23 * y_3) * x_2 +
+    	// 	       (a30 + a31 * y + a32 * y_2 + a33 * y_3) * x_3;
+      // };
+
+      float x_r = pt.x - std::floor(pt.x);
+      float y_r = pt.y - std::floor(pt.y);
+      return Pixel(Clamp(BicubicInterpolate(p_b, x_r, y_r)), Clamp(BicubicInterpolate(p_g, x_r, y_r)), Clamp(BicubicInterpolate(p_r, x_r, y_r)));
+    }
+    else
+    {
+      throw std::invalid_argument("Unknown interpolation technique");
+    }
 }
 
 void Picture::ImgShowWithLimit(std::string txt, cv::Size s) const
@@ -275,4 +400,74 @@ double Picture::GetMSSSIM(const Picture& pic) const
         msssim *= pow(mcs[l], m_mssimWeight[l]);
     }
     return msssim;
+}
+
+
+double Picture::GetWSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic) const
+{
+  if (pic.GetHeight()!= GetHeight() && pic.GetWidth() != GetWidth())
+  {
+      throw std::invalid_argument("MSE computation require pictures to have the same width and height");
+  }
+  cv::Mat tmp1(cv::Mat::zeros(GetHeight(), GetWidth(), m_pictMat.type()));
+  cv::subtract(m_pictMat, pic.m_pictMat, tmp1);
+  cv::multiply(tmp1, tmp1, tmp1);
+  cv::Mat tmp(cv::Mat::zeros(GetHeight(), GetWidth(), CV_64F));
+  tmp1.convertTo(tmp, CV_64F);
+  double totalSurface = 0;
+  double maxSurface = 0;
+  #pragma omp parallel for collapse(2) shared(tmp, pic, layoutThisPict, layoutArgPic) schedule(dynamic) reduction(+:totalSurface)
+  for (unsigned int i = 0; i < pic.GetHeight(); ++i)
+  {
+    for (unsigned int j = 0; j < pic.GetWidth(); ++j)
+    {
+      auto surface = (layoutThisPict.GetSurfacePixel(CoordI(i,j)) + layoutArgPic.GetSurfacePixel(CoordI(i,j)))/2.0;
+      // std::cout << tmp.at<cv::Vec3d>(i, j) << " ; " << tmp.at<cv::Vec3d>(i, j) * surface << std::endl;
+      tmp.at<cv::Vec3d>(i, j) = tmp.at<cv::Vec3d>(i, j) * surface;
+      // std::cout << tmp.at<cv::Vec3d>(i, j) << std::endl;
+      totalSurface += surface;
+      maxSurface = std::max(maxSurface, surface);
+    }
+  }
+
+  auto mse = cv::mean(tmp).val[0] / maxSurface;
+  return mse != 0 ? 10.0*std::log10(255*255/mse) : 100.0;
+}
+
+double Picture::GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic, InterpolationTech it) const
+{
+  cv::Mat vRef(nbOfUniformPointOneSphere, 1, m_pictMat.type());
+  cv::Mat vArg(nbOfUniformPointOneSphere, 1, m_pictMat.type());
+  #pragma omp parallel for shared(vRef, vArg, pic, layoutThisPict, layoutArgPic) schedule(dynamic)
+  for (unsigned long p = 0; p < nbOfUniformPointOneSphere; ++p)
+  {
+    Coord3dSpherical pointOnTheSphere(1, uniformPointOneSphere[2*p + 1], uniformPointOneSphere[2*p]);
+    CoordI pixelCoordOnRefPic = layoutThisPict.FromSphereTo2d(pointOnTheSphere);
+    CoordI pixelCoordOnArgPic = layoutArgPic.FromSphereTo2d(pointOnTheSphere);
+
+    if (inInterval(pixelCoordOnRefPic.x, 0, this->GetMat().cols) && inInterval(pixelCoordOnRefPic.y, 0,  this->GetMat().rows))
+    {
+      vRef.at<Pixel>(p/2, 0) = GetInterPixel(pixelCoordOnRefPic, it);
+    }
+    else
+    {
+      vRef.at<Pixel>(p/2, 0) = Pixel(0,0,0);
+    }
+
+    if (inInterval(pixelCoordOnArgPic.x, 0, pic.GetMat().cols) && inInterval(pixelCoordOnArgPic.y, 0,  pic.GetMat().rows))
+    {
+      vArg.at<Pixel>(p/2, 0) = GetInterPixel(pixelCoordOnArgPic, it);
+    }
+    else
+    {
+      vArg.at<Pixel>(p/2, 0) = Pixel(0,0,0);
+    }
+  }
+
+  cv::Mat tmp(nbOfUniformPointOneSphere, 1, m_pictMat.type());
+  cv::subtract(vRef, vArg, tmp);
+  cv::multiply(tmp, tmp, tmp);
+
+  auto mse = cv::mean(tmp).val[0];
+  return mse != 0 ? 10.0*std::log10(255*255/mse) : 100.0;
 }

@@ -68,6 +68,9 @@ The **Global** section contains the global configuration of the test.
   videoOutputBitRate=0
   ;Path to the quality output file. If empty no quality is computed. The flow id and the name of the last layout is used as an id for the generated output file
   qualityOutputName=
+  ;Indicate which metric to use. "MS-SSIM", "SSIM", "PSNR" and "WS-PSNR" require the two final picture to have the same resolution.
+  ;The "S-PSNR-NN" and "S-PSNR-I" are computed from a uniform sampling of 655362 points on the sphere. "S-PSNR-NN" uses the Nearest Neightboor interpolation and "S-PSNR-I" uses the Bicubic interpolation.
+  qualityToComputeList = ["MS-SSIM", "SSIM", "PSNR", "S-PSNR-NN", "S-PSNR-I", "WS-PSNR"]
   ;Index of the first frame of the input videos to process. If equal to n then the n first frames of the input videos will be skipped
   startFrame=0
   ;Number of frame to process in the video

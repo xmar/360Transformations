@@ -49,6 +49,9 @@ class Layout
          */
         virtual CoordI GetReferenceResolution(void) = 0;
 
+        /** \brief Return the surface on the sphere of the corresponding pixel. **/
+        double GetSurfacePixel(const CoordI& pixelCoord);
+
         //transform the layoutPic that is a picture in the current layout into a picture with the layout destLayout with the dimention (width, height)
         std::shared_ptr<Picture> ToLayout(const Picture& layoutPic, const Layout& destLayout) const;
         std::shared_ptr<Picture> FromLayout(const Picture& picFromOtherLayout, const Layout& originalLayout) const

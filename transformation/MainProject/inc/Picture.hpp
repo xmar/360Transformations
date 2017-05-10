@@ -5,13 +5,19 @@
 #include "Common.hpp"
 
 namespace IMT {
+class Layout;
 class Picture {
     public:
+        enum class InterpolationTech {
+          NEAREST_NEIGHTBOOR,
+          BILINEAR,
+          BICUBIC
+        };
         Picture(void): m_pictMat(){};
         Picture(cv::Mat pictMat): m_pictMat(std::move(pictMat)){};
         virtual ~Picture(void) {m_pictMat.release();};
 
-        Pixel GetInterPixel(CoordF pt) const;
+        Pixel GetInterPixel(CoordF pt, InterpolationTech it = InterpolationTech::BILINEAR) const;
         Pixel GetPixel(CoordI pt) const {return m_pictMat.at<Pixel>(pt);}
 
         void ImgShow(std::string txt) const{
@@ -48,6 +54,13 @@ class Picture {
 
         double GetSSIM(const Picture& pic) const;
         double GetMSSSIM(const Picture& pic) const;
+
+        /** \brief compute a weighted PSNR for each pixel of the two output weighted with the surface of each pixel on the sphere.
+        *   The two picture should have the same size
+        **/
+        double GetWSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic) const;
+        /** \brief compute the PSNR from a uniform sampling in the spherical domain. The two input pictures do not need to have the same size **/
+        double GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic, InterpolationTech it) const;
 
         const int& GetWidth(void) const {return m_pictMat.cols;}
         const int& GetHeight(void) const {return m_pictMat.rows;}

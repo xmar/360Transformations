@@ -4,6 +4,7 @@
 #include <boost/range/iterator_range.hpp>
 #include <stdexcept>
 #include <functional>
+#include <iostream>
 #include <opencv2/opencv.hpp>
 
 namespace IMT {
@@ -46,6 +47,16 @@ template <int i> constexpr double norm(const SpacePoint<i>& sp) {return cv::norm
 template <> constexpr double norm(const Coord3dSpherical& sp) {return sp.x;}
 
 constexpr double PI() {return std::atan(1)*4.0;}
+
+inline  std::ostream& operator<<(std::ostream& os, const Coord3dCart& dt)
+{
+  return os << "(x="<< dt.x <<", y="<< dt.y <<", z="<< dt.z <<")";
+}
+
+inline  std::ostream& operator<<(std::ostream& os, const Coord3dSpherical& dt)
+{
+  return os << "(r="<< dt.x <<", theta="<< dt.y <<", phi="<< dt.z <<")";
+}
 
 constexpr bool inIntervalStrict(double x, double a, double b)
 {//true if a < x < b

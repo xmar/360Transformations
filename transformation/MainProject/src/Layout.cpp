@@ -44,3 +44,39 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
     }
     return pic;
 }
+
+double Layout::GetSurfacePixel(const CoordI& pixelCoord)
+{
+  NormalizedFaceInfo nfi_0_0 = From2dToNormalizedFaceInfo(pixelCoord);
+  NormalizedFaceInfo nfi_1_0 = From2dToNormalizedFaceInfo(CoordI(pixelCoord.x+1, pixelCoord.y));
+  NormalizedFaceInfo nfi_0_1 = From2dToNormalizedFaceInfo(CoordI(pixelCoord.x, pixelCoord.y+1));
+  NormalizedFaceInfo nfi_1_1 = From2dToNormalizedFaceInfo(CoordI(pixelCoord.x+1, pixelCoord.y+1));
+  bool ok_1_0(true), ok_0_1(true);
+  if (nfi_1_0.m_faceId != nfi_0_0.m_faceId)
+  {
+    ok_1_0 = false;
+    nfi_1_0.m_faceId = nfi_0_0.m_faceId;
+    nfi_1_0.m_normalizedFaceCoordinate.x = 1;
+    nfi_1_0.m_normalizedFaceCoordinate.y = nfi_0_0.m_normalizedFaceCoordinate.y;
+  }
+  if (nfi_0_1.m_faceId != nfi_0_0.m_faceId)
+  {
+    ok_0_1 = false;
+    nfi_0_1.m_faceId = nfi_0_0.m_faceId;
+    nfi_0_1.m_normalizedFaceCoordinate.x = nfi_0_0.m_normalizedFaceCoordinate.x;
+    nfi_0_1.m_normalizedFaceCoordinate.y = 1;
+  }
+  if (nfi_1_1.m_faceId != nfi_0_0.m_faceId)
+  {
+    nfi_1_1.m_faceId = nfi_0_0.m_faceId;
+    nfi_1_1.m_normalizedFaceCoordinate.x = !ok_1_0 ? 1 : nfi_1_1.m_normalizedFaceCoordinate.x;
+    nfi_1_1.m_normalizedFaceCoordinate.y = !ok_0_1 ? 1 : nfi_0_0.m_normalizedFaceCoordinate.y;
+  }
+
+  Coord3dCart v_0_0 = FromNormalizedInfoTo3d(nfi_0_0);
+  Coord3dCart v_1_0 = FromNormalizedInfoTo3d(nfi_1_0);
+  Coord3dCart v_0_1 = FromNormalizedInfoTo3d(nfi_0_1);
+  Coord3dCart v_1_1 = FromNormalizedInfoTo3d(nfi_1_1);
+  //First approximation (if all vector are close)
+  return cv::norm(cv::Point3d(v_1_0-v_0_0).cross(v_1_1-v_0_0))/2.0 + cv::norm(cv::Point3d(v_0_1-v_0_0).cross(v_1_1-v_0_0))/2.0;
+}
