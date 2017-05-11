@@ -39,17 +39,17 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
          * \return LayoutPyramidal2 The LayoutPyramidal2 object generated
          *
          */
-	    static std::shared_ptr<LayoutPyramidal2> GenerateLayout(double baseEdge, double yaw, double pitch, double roll, bool useTile, std::array<unsigned int,5> pixelEdges)
+	    static std::shared_ptr<LayoutPyramidal2> GenerateLayout(double baseEdge, Quaternion rotationQuaternion, bool useTile, std::array<unsigned int,5> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
-            return std::shared_ptr<LayoutPyramidal2>(new LayoutPyramidal2(baseEdge,yaw, pitch, roll, useTile,
+            return std::shared_ptr<LayoutPyramidal2>(new LayoutPyramidal2(baseEdge, rotationQuaternion, useTile,
                 fr.GetRes(Faces::Left)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Right),
                 fr.GetRes(Faces::Top)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Bottom),
                 fr));
 	    }
 
-        LayoutPyramidal2(double baseEdge, double yaw, double pitch, double roll, bool useTile, unsigned int pixelBaseEdge):
-            LayoutPyramidalBased(baseEdge, yaw, pitch, roll, 3*pixelBaseEdge, 3*pixelBaseEdge, useTile, {{pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {};
+        LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, unsigned int pixelBaseEdge):
+            LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, 3*pixelBaseEdge, useTile, {{pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {};
         virtual ~LayoutPyramidal2(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -74,8 +74,8 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
         virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) override;
         virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override;
     private:
-        LayoutPyramidal2(double baseEdge, double yaw, double pitch, double roll, bool useTile, unsigned int width, unsigned int height, const FaceResolutions& fr):
-                LayoutPyramidalBased(baseEdge, yaw, pitch, roll, width, height, useTile, fr) {}
+        LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, unsigned int width, unsigned int height, const FaceResolutions& fr):
+                LayoutPyramidalBased(baseEdge, rotationQuaternion, width, height, useTile, fr) {}
 
         unsigned int IStartOffset(LayoutPyramidalBased::Faces f, unsigned int j) const;
 

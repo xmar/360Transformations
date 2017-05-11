@@ -33,9 +33,11 @@ public:
     double t4 = std::cos( pitch * 0.5);
   	double t5 = std::sin( pitch * 0.5);
 
-    return Quaternion(t0 * t2 * t4 + t1 * t3 * t5, VectorCartesian(t0 * t3 * t4 - t1 * t2 * t5,
-                                                          t0 * t2 * t5 + t1 * t3 * t4,
-                                                          t1 * t2 * t4 - t0 * t3 * t5));
+    auto q = Quaternion(t0 * t2 * t4 + t1 * t3 * t5, VectorCartesian( t0 * t3 * t4 - t1 * t2 * t5,
+                                                                      t0 * t2 * t5 + t1 * t3 * t4,
+                                                                      t1 * t2 * t4 - t0 * t3 * t5));
+    q.Normalize();
+    return q;
   }
 
   constexpr SCALAR DotProduct(const Quaternion& q) const {return m_w*q.m_w + m_v.DotProduct(q.m_v);}

@@ -410,10 +410,10 @@ class LayoutEquirectangularTiles : public Layout
 
     public:
 
-        LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, double yaw, double pitch, double roll, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale):
+        LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, Quaternion rotationQuaternion, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale):
           Layout(), m_tr(),
           m_scaleTile(std::move(scaleTile)), m_tileRatios(std::move(tileRatios)), m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
-          m_rotationQuaternion(Quaternion::FromEuler(yaw, pitch, roll)), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
+          m_rotationQuaternion(rotationQuaternion), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
           {};
 
 

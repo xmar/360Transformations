@@ -91,10 +91,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   refWidth=4096
   ;Width of the reference equirectangular video
   refHeight=2048
-  ;yaw, pitch, roll of the center point of the equirectangular video (in degree)
-  yaw=0
-  pitch=0
-  roll=0
+  ;The rotation used to get the center of the front face: type = "euler" or "quaternion".
+  ; if type is "euler" you have to give the yaw, pitch and roll angle in degree
+  ; if type if "quaternion" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software.
+  rotation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":0.0}
+  ;rotation= {"type":"quaternion", "w":1.0, "x":0.0, "y":0.0, "z":0.0}
   ;if true, the resolution of the layout is compute based on the resolution of the previous layout (or on the resolution of the reference equirectangular video)
   relativeResolution=true
   ;if relativeResolution=true ratio of the output layout width compare to the reference video; otherwise width size of the output video in pixel number
@@ -116,10 +117,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   dynamicPositions=false
   ;The path to the position trace file. Used if dynamicPositions is set to true
   positionTrace=pathToPositionTrace
-  ;yaw, pitch, roll of the center point of the FoV (in degree). Used if dynamicPositions is set to false
-  yaw=0.0
-  pitch=0.0
-  roll=0.0
+  ;The rotation used to get the center of the front face: type = "euler" or "quaternion".
+  ; if type is "euler" you have to give the yaw, pitch and roll angle in degree
+  ; if type if "quaternion" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software.
+  rotation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":0.0}
+  ;rotation= {"type":"quaternion", "w":1.0, "x":0.0, "y":0.0, "z":0.0}
   ;width and height in pixels of the output image
   width=1920
   height=1080
@@ -140,10 +142,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   refHeight=2048
   ;use relative resolution for the face resolutions
   relativeResolution=true
-  ;yaw, pitch and roll of the center of the Front face (in degree)
-  yaw=0.0
-  pitch=0.0
-  roll=0.0
+  ;The rotation used to get the center of the front face: type = "euler" or "quaternion".
+  ; if type is "euler" you have to give the yaw, pitch and roll angle in degree
+  ; if type if "quaternion" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software.
+  rotation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":0.0}
+  ;rotation= {"type":"quaternion", "w":1.0, "x":0.0, "y":0.0, "z":0.0}
   ;the edge of each face. If relativeResolution, ratio compared to the reference input video, otherwise size in pixel.
   cubeEdgeLengthFront=1
   cubeEdgeLengthLeft=1
@@ -178,10 +181,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   relativeResolution=true
   ;Size of the Base face in the 3D space (the circumscribed sphere have a radius of 1). Should be strictly higher than 2.
   pyramidBaseEdge=2.5
-  ;yaw, pitch and roll of the center of the Base face (in degree)
-  yaw=0.0
-  pitch=0.0
-  roll=0.0
+  ;The rotation used to get the center of the front face: type = "euler" or "quaternion".
+  ; if type is "euler" you have to give the yaw, pitch and roll angle in degree
+  ; if type if "quaternion" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software.
+  rotation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":0.0}
+  ;rotation= {"type":"quaternion", "w":1.0, "x":0.0, "y":0.0, "z":0.0}
   ;the edge of each face. If relativeResolution, ratio compared to the reference input video, otherwise size in pixel.
   pyramidBaseEdgeLength=1
   pyramidHeightLeft=1
@@ -212,10 +216,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   refHeight=2048
   ;use relative resolution for the face resolutions
   relativeResolution=true
-  ;yaw, pitch and roll of the center of the Face 1 (in degree)
-  yaw=199.4712
-  pitch=-26.565
-  roll=0.0
+  ;The rotation used to get the center of the front face: type = "euler" or "quaternion".
+  ; if type is "euler" you have to give the yaw, pitch and roll angle in degree
+  ; if type if "quaternion" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software.
+  rotation= {"type":"euler", "yaw":199.4712, "pitch":-26.565, "roll":0.0}
+  ;rotation= {"type":"quaternion", "w":0.16457888628862896, "x":0.2264437924852498, "y":0.03885174449037981, "z":0.9592327876917812}
   ;the length of each face. If relativeResolution, ratio compared to the reference input video, otherwise size in pixel.
   rhombEdgeLengthFace1=1
   rhombEdgeLengthFace2=1
@@ -259,10 +264,11 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   refHeight=2048
   ;use relative resolution for the face resolutions
   relativeResolution=true
-  ;yaw, pitch, roll of the center of face 4x3 (in degree)
-  yaw=45.0
-  pitch=-22.5
-  roll=0.0
+  ;The rotation used to get the center of the front face: type = "euler" or "quaternion".
+  ; if type is "euler" you have to give the yaw, pitch and roll angle in degree
+  ; if type if "quaternion" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software.
+  rotation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":0.0}
+  ;rotation= {"type":"quaternion", "w":1.0, "x":0.0, "y":0.0, "z":0.0}
   ;nbHTiles (resp. nbVTiles) indicate the number of horizontal (resp. vertical) tiles
   ;You have to compile the software with the RANGE_NB_H_TILES and RANGE_NB_V_TILES macro to be able to use this layout.
   ;For instance in this example the value 8 should be in the macro RANGE_NB_H_TILES and RANGE_NB_V_TILES otherwise a runtime error will be raised

@@ -1,10 +1,12 @@
 #pragma once
 #include <string>
+#include <sstream>
 #include <vector>
 #include <memory>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/preprocessor.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "Layout.hpp"
 #include "LayoutCubeMap.hpp"
@@ -73,7 +75,7 @@ namespace IMT {
   for(auto& vr: vRatios) {vr /= sumV;}\
   auto tilesRatios = std::make_tuple(std::move(hRatios),std::move(vRatios));\
   auto orignalRes = std::make_tuple(inputWidth, inputHeight);\
-  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), yaw, pitch, roll, orignalRes, useTile, upscale);
+  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), rotationQuaternion, orignalRes, useTile, upscale);
 ///END MACRO GENERATE_EQUI_TILED_LAYOUT
 
 #define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
@@ -232,6 +234,54 @@ std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptr
     throw std::invalid_argument("Not supported type: "+layoutType);
 }
 
+Quaternion ParseRotationJSON(std::string s)
+{
+  std::stringstream ss(s);
+  pt::ptree ptree_json;
+
+  pt::json_parser::read_json(ss, ptree_json);
+
+  auto& v = ptree_json.get_child("type");
+
+  if (v.data() == "euler")
+  {
+    auto vv = ptree_json.get_child("yaw");
+    auto y = std::stod(vv.data())*PI()/180;
+
+    vv = ptree_json.get_child("pitch");
+    auto p =  std::stod(vv.data())*PI()/180;
+
+    vv = ptree_json.get_child("roll");
+    auto r = std::stod(vv.data())*PI()/180;
+    return Quaternion::FromEuler(y, p, r);
+  }
+  else if (v.data() == "quaternion")
+  {
+    auto vv = ptree_json.get_child("w");
+    auto w = std::stod(vv.data());
+
+    vv = ptree_json.get_child("x");
+    auto x =  std::stod(vv.data());
+
+    vv = ptree_json.get_child("y");
+    auto y = std::stod(vv.data());
+
+    vv = ptree_json.get_child("z");
+    auto z = std::stod(vv.data());
+    auto q = Quaternion(w, VectorCartesian(x, y, z));
+    q.Normalize();
+    return q;
+  }
+
+  // BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child("particles.electron"))
+  // {
+  //     assert(v.first.empty()); // array elements have no names
+  //     std::cout << v.second.data() << std::endl;
+  //     // etc
+  // }
+  return Quaternion(0);
+}
+
 enum class LayoutStatus
 {
   Input, /// indicates that the layout is an input layout and so will have an input video
@@ -266,14 +316,12 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         }
         if (layoutType == "equirectangular")
         {
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             if (isInput)
             {
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
-                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, yaw, pitch, roll));
+                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion));
             }
             else
             {
@@ -281,11 +329,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 double relativeHeight = ptree.get<double>(layoutSection+".height");
                 if (infer)
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, yaw, pitch, roll));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion));
                 }
                 else
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, yaw, pitch, roll));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion));
                 }
             }
 
@@ -298,9 +346,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -317,11 +363,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "cubeMap2")
@@ -332,9 +378,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -351,29 +395,27 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap2::GenerateLayout(yaw, pitch, roll, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "flatFixed")
         {
             bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");
-            double yaw, pitch, roll;
+            Quaternion rotationQuaternion;
             std::string pathToPositionTrace;
             if (!dynamicPositions) {
-              yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-              pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-              roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+              rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             }
             else
             {
               std::cout << "DEBUG dynamic position set" << std::endl;
               pathToPositionTrace = ptree.get<std::string>(layoutSection+".positionTrace");
             }
-            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(yaw, pitch, roll);
+            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);
             double width = ptree.get<double>(layoutSection+".width");
             double height = ptree.get<double>(layoutSection+".height");
             double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
@@ -393,9 +435,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         }
         if (layoutType == "pyramid")
         {
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             double pyramidBaseEdge = ptree.get<double>(layoutSection+".pyramidBaseEdge");
             double pyramidBaseEdgeLength = ptree.get<double>(layoutSection+".pyramidBaseEdgeLength");
             double pyramidHeightTop = ptree.get<double>(layoutSection+".pyramidHeightTop");
@@ -418,18 +458,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, useTile, pyramidBaseEdgeLength*inputWidth/4);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, pyramidBaseEdgeLength*inputWidth/4);
             }
             else
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, yaw, pitch, roll, useTile, pyramidBaseEdgeLength);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, pyramidBaseEdgeLength);
             }
         }
         if (layoutType == "pyramid2")
         {
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             double pyramidBaseEdge = ptree.get<double>(layoutSection+".pyramidBaseEdge");
             double pyramidBaseEdgeLength = ptree.get<double>(layoutSection+".pyramidBaseEdgeLength");
             double pyramidHeightTop = ptree.get<double>(layoutSection+".pyramidHeightTop");
@@ -452,18 +490,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, useTile, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, yaw, pitch, roll, useTile, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
             }
         }
         if (layoutType == "rhombicDodeca")
         {
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             std::array<double, 12> faceResScale;
             std::array<unsigned int, 12> faceRes;
@@ -490,14 +526,12 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 faceRes[i] = (infer ? inputWidth/8.0 : 1)*faceResScale[i];
             }
 
-            return LayoutRhombicdodeca::GenerateLayout(yaw, pitch, roll, useTile, faceRes);
+            return LayoutRhombicdodeca::GenerateLayout(rotationQuaternion, useTile, faceRes);
         }
         if (layoutType == "equirectangularTiled")
         {
 
-            double yaw = ptree.get<double>(layoutSection+".yaw")*PI()/180;
-            double pitch = ptree.get<double>(layoutSection+".pitch")*PI()/180;
-            double roll = ptree.get<double>(layoutSection+".roll")*PI()/180;
+            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             bool upscale = ptree.get<bool>(layoutSection+".upscale");
 

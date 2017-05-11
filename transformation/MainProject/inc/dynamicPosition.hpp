@@ -15,7 +15,7 @@ class DynamicPosition
 {
 public:
   /** Constructor for a static position */
-  DynamicPosition(double yaw, double pitch, double roll): m_isStatic(true), m_firstTimestamp(0.0), m_rotQuaternion(Quaternion::FromEuler(yaw, pitch, roll)), m_inputPositionsTrace(){}
+  DynamicPosition(Quaternion rotationQuaternion): m_isStatic(true), m_firstTimestamp(0.0), m_rotQuaternion(rotationQuaternion), m_inputPositionsTrace(){}
   /** Constructor that take the path to an input positions trace file */
   DynamicPosition(std::string pathToInputPositionsTrace): m_isStatic(false), m_firstTimestamp(-1.0), m_rotQuaternion(), m_inputPositionsTrace(pathToInputPositionsTrace){}
 

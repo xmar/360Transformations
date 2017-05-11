@@ -10,8 +10,8 @@ class LayoutPyramidalBased : public Layout
         struct FaceResolutions;//Forward declaration
     public:
         enum class Faces: int {Base, Left, Right, Top, Bottom, Black, Last, First = Base};
-        LayoutPyramidalBased(double baseEdge, double yaw, double pitch, double roll, unsigned int width, unsigned int height, double useTile, FaceResolutions fr):
-            Layout(width,height), m_yaw(yaw), m_pitch(pitch), m_roll(roll),
+        LayoutPyramidalBased(double baseEdge, Quaternion rotationQuaternion, unsigned int width, unsigned int height, double useTile, FaceResolutions fr):
+            Layout(width,height),
              m_baseEdge(baseEdge), m_alpha(baseEdge/2.0),
              m_canonicTopPlan((1-std::pow(m_alpha,2))/(2*m_alpha), 0, 1, -(1+std::pow(m_alpha,2))/(2*m_alpha)),
              m_top(-m_canonicTopPlan[3]/m_canonicTopPlan[0], 0, 0),
@@ -19,7 +19,7 @@ class LayoutPyramidalBased : public Layout
              m_pyramidHeight((m_top-Coord3dCart(1,0,0)).Norm()),
              m_topHeight((m_top-Coord3dCart(1,0,m_alpha)).Norm()),
              m_intersectionHeight((m_interTop-Coord3dCart(1,0,m_alpha)).Norm()), m_fr(std::move(fr)),
-             m_rotQuaternion(Quaternion::FromEuler(yaw,pitch,roll)),
+             m_rotQuaternion(rotationQuaternion),
              m_useTile(useTile)
              {}
 
@@ -93,9 +93,6 @@ class LayoutPyramidalBased : public Layout
     protected:
 
     private:
-      double m_yaw;
-      double m_pitch;
-      double m_roll;
       double m_baseEdge;
       double m_alpha;
       Plan m_canonicTopPlan;// Ton plan in the canonic pyramid

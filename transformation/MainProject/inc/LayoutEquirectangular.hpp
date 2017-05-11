@@ -6,8 +6,8 @@ namespace IMT {
 class LayoutEquirectangular: public Layout
 {
     public:
-        LayoutEquirectangular(unsigned int width, unsigned int height, double yaw, double pitch, double roll):
-            Layout(width, height),  m_rotationQuaternion(Quaternion::FromEuler(yaw, pitch, roll)) {}
+        LayoutEquirectangular(unsigned int width, unsigned int height, Quaternion rotationQuaternion):
+            Layout(width, height),  m_rotationQuaternion(rotationQuaternion) {}
         virtual ~LayoutEquirectangular(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
