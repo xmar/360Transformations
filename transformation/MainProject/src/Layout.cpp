@@ -28,7 +28,7 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
         for (auto j = 0; j < pic->GetMat().rows; ++j)
         {
             Coord3dSpherical thisPixel3dPolar = destLayout.From2dTo3d(CoordI(i,j)); // coordinate of the pixel (i, j) in the output picture in the 3d space
-            if (norm(thisPixel3dPolar) != 0)
+            if (thisPixel3dPolar.Norm() != 0)
             {//Keep the pixel black (i.e. do nothing) if == 0
                 auto coordPixelOriginalPic = FromSphereTo2d(thisPixel3dPolar); //coordinate of the corresponding pixel in the input picture
                 if (inInterval(coordPixelOriginalPic.x, 0, layoutPic.GetMat().cols) && inInterval(coordPixelOriginalPic.y, 0, layoutPic.GetMat().rows))
@@ -78,5 +78,5 @@ double Layout::GetSurfacePixel(const CoordI& pixelCoord)
   Coord3dCart v_0_1 = FromNormalizedInfoTo3d(nfi_0_1);
   Coord3dCart v_1_1 = FromNormalizedInfoTo3d(nfi_1_1);
   //First approximation (if all vector are close)
-  return cv::norm(cv::Point3d(v_1_0-v_0_0).cross(v_1_1-v_0_0))/2.0 + cv::norm(cv::Point3d(v_0_1-v_0_0).cross(v_1_1-v_0_0))/2.0;
+  return ((v_1_0-v_0_0)^(v_1_1-v_0_0)).Norm()/2.0 + ((v_0_1-v_0_0)^(v_1_1-v_0_0)).Norm()/2.0;
 }

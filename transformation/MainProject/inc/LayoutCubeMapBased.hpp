@@ -13,7 +13,7 @@ class LayoutCubeMapBased : public Layout
         enum class Faces: int {Front, Back, Right, Left, Top, Bottom, Black, Last, First=Front};
         LayoutCubeMapBased(unsigned int outWidth, unsigned int outHeight, double yaw, double pitch, double roll, bool useTile,
                            FaceResolutions fr):
-            Layout(outWidth, outHeight), m_fr(std::move(fr)), m_rotMat(GetRotMatrice(yaw,pitch,roll)),
+            Layout(outWidth, outHeight), m_fr(std::move(fr)), m_rotQuaternion(Quaternion::FromEuler(yaw,pitch,roll)),
             m_faceRotations(), m_useTile(useTile)
             {InitFaceRotations();};
         virtual ~LayoutCubeMapBased(void) = default;
@@ -88,14 +88,14 @@ class LayoutCubeMapBased : public Layout
             }
         }
 
-        const RotMat& FaceToRotMat(Faces f) const;
+        const Quaternion& FaceToRotQuaternion(Faces f) const;
 
         unsigned int GetRes(const Faces& f) const {return m_fr.GetRes(f);}
 
     private:
         FaceResolutions m_fr;
-        RotMat m_rotMat;//GlobalRotation
-        std::array<RotMat,6> m_faceRotations;
+        Quaternion m_rotQuaternion;//GlobalRotation
+        std::array<Quaternion,6> m_faceRotations;
         bool m_useTile;
 
         void InitFaceRotations(void);

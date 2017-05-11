@@ -7,7 +7,7 @@ class LayoutEquirectangular: public Layout
 {
     public:
         LayoutEquirectangular(unsigned int width, unsigned int height, double yaw, double pitch, double roll):
-            Layout(width, height),  m_rotationMatrice(GetRotMatrice(yaw, pitch, roll)) {}
+            Layout(width, height),  m_rotationQuaternion(Quaternion::FromEuler(yaw, pitch, roll)) {}
         virtual ~LayoutEquirectangular(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -26,14 +26,14 @@ class LayoutEquirectangular: public Layout
         }
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            Coord3dSpherical rotCoord = Rotation(sphericalCoord, m_rotationMatrice.t());
-            return NormalizedFaceInfo(CoordF(0.5+rotCoord.y/ (2.0*PI()), rotCoord.z / PI()), 0);
+            Coord3dSpherical rotCoord = Rotation(sphericalCoord, m_rotationQuaternion.Inv());
+            return NormalizedFaceInfo(CoordF(0.5+rotCoord.GetTheta()/ (2.0*PI()), rotCoord.GetPhi() / PI()), 0);
         }
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override
         {
             double theta = (ni.m_normalizedFaceCoordinate.x-0.5)*2.0*PI();
             double phi = (ni.m_normalizedFaceCoordinate.y)*PI();
-            return Rotation(Coord3dSpherical(1, theta, phi), m_rotationMatrice);
+            return Rotation(Coord3dSpherical(1, theta, phi), m_rotationQuaternion);
         }
 
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override
@@ -67,6 +67,6 @@ class LayoutEquirectangular: public Layout
             return vwPtr;
         }
     private:
-        RotMat m_rotationMatrice;
+        Quaternion m_rotationQuaternion;
 };
 }

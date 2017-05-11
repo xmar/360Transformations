@@ -65,7 +65,7 @@ class LayoutRhombicdodecaBased: public Layout
         };
 
         LayoutRhombicdodecaBased(double yaw, double pitch, double roll, bool useTile, FaceResolutions fr): Layout(), m_fr(std::move(fr)),
-        m_rotMat(GetRotMatrice(yaw, pitch, roll)), m_faceRotations(), m_useTile(useTile) {InitFaceRotations();}
+          m_rotQuaternion(Quaternion::FromEuler(yaw, pitch, roll)), m_faceRotations(), m_useTile(useTile) {InitFaceRotations();}
         Plan FaceToPlan(Faces f) const
         {
             switch(f)
@@ -101,13 +101,13 @@ class LayoutRhombicdodecaBased: public Layout
             }
         }
 
-        const RotMat& FaceToRotMat(Faces f) const; //Rot matrix to transform Face1 into f
+        const Quaternion& FaceToRotQuaternion(Faces f) const; //Rot matrix to transform Face1 into f
 
         unsigned int GetRes(Faces f) const {return m_fr.GetRes(f);}
     private:
         FaceResolutions m_fr;
-        RotMat m_rotMat;
-        std::array<RotMat,12> m_faceRotations;
+        Quaternion m_rotQuaternion;
+        std::array<Quaternion,12> m_faceRotations;
         bool m_useTile;
 
         void InitFaceRotations(void);

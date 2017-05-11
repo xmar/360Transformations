@@ -88,9 +88,9 @@ class LayoutEquirectangularTiles : public Layout
 
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationMatrice.t());
-            double i = 0.5+rotCoord.y/ (2.0*PI());
-            double j = rotCoord.z / PI();
+            Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationQuaternion.Inv());
+            double i = 0.5+rotCoord.GetTheta()/ (2.0*PI());
+            double j = rotCoord.GetPhi() / PI();
             //Find tile id:
             unsigned int ni(0), nj(0);
             double normalizedCoordI(0.0), normalizedCoordJ(0.0);
@@ -139,7 +139,7 @@ class LayoutEquirectangularTiles : public Layout
               phi += PI() * GetVTileRatio(j);
             }
             phi += PI()*ni.m_normalizedFaceCoordinate.y*GetVTileRatio(std::get<1>(ti));
-            return Rotation(Coord3dSpherical(1, theta, phi), m_rotationMatrice);
+            return Rotation(Coord3dSpherical(1, theta, phi), m_rotationQuaternion);
         }
 
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override
@@ -403,7 +403,7 @@ class LayoutEquirectangularTiles : public Layout
         std::array<unsigned int, nbVTiles> m_rowsMaxSize;
         std::array<unsigned int, nbHTiles> m_colsMaxSize;
         std::array<std::array<CoordI, nbVTiles>, nbHTiles> m_offsets;
-        RotMat m_rotationMatrice;
+        Quaternion m_rotationQuaternion;
         std::tuple<unsigned int, unsigned int> m_originalRes;
         bool m_useTile;
         bool m_upscale;
@@ -413,7 +413,7 @@ class LayoutEquirectangularTiles : public Layout
         LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, double yaw, double pitch, double roll, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale):
           Layout(), m_tr(),
           m_scaleTile(std::move(scaleTile)), m_tileRatios(std::move(tileRatios)), m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
-          m_rotationMatrice(GetRotMatrice(yaw, pitch, roll)), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
+          m_rotationQuaternion(Quaternion::FromEuler(yaw, pitch, roll)), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
           {};
 
 

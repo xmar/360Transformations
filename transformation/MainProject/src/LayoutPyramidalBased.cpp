@@ -9,7 +9,7 @@ double LayoutPyramidalBased::UsePlanEquation(double x) const //Use the plan equa
 
 Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    Coord3dSpherical p = Rotation(sphericalCoord, m_rotationMat.t());
+    Coord3dSpherical p = Rotation(sphericalCoord, m_rotQuaternion.Inv());
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
     auto rtr = IntersectionCart(lambda, p);
@@ -21,24 +21,24 @@ Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(cons
     switch (f)
     {
         case Faces::Base:
-            normalizedI = inter.y/m_baseEdge+0.5;
-            normalizedJ = -inter.z/m_baseEdge+0.5;
+            normalizedI = inter.GetY()/m_baseEdge+0.5;
+            normalizedJ = -inter.GetZ()/m_baseEdge+0.5;
             break;
         case Faces::Left:
-            normalizedI = (inter.x + m_pyramidHeight)/(m_pyramidHeight+1);
-            normalizedJ = -inter.z/(normalizedI*m_baseEdge)+0.5;
+            normalizedI = (inter.GetX() + m_pyramidHeight)/(m_pyramidHeight+1);
+            normalizedJ = -inter.GetZ()/(normalizedI*m_baseEdge)+0.5;
             break;
         case Faces::Right:
-            normalizedI = (1-inter.x)/(m_pyramidHeight+1);
-            normalizedJ = -inter.z/((1-normalizedI)*m_baseEdge)+0.5;
+            normalizedI = (1-inter.GetX())/(m_pyramidHeight+1);
+            normalizedJ = -inter.GetZ()/((1-normalizedI)*m_baseEdge)+0.5;
             break;
         case Faces::Top:
-            normalizedJ = (inter.x + m_pyramidHeight)/(m_pyramidHeight+1);
-            normalizedI = inter.y/(normalizedJ*m_baseEdge)+0.5;
+            normalizedJ = (inter.GetX() + m_pyramidHeight)/(m_pyramidHeight+1);
+            normalizedI = inter.GetY()/(normalizedJ*m_baseEdge)+0.5;
             break;
         case Faces::Bottom:
-            normalizedJ = (1-inter.x)/(m_pyramidHeight+1);
-            normalizedI = inter.y/((1-normalizedJ)*m_baseEdge)+0.5;
+            normalizedJ = (1-inter.GetX())/(m_pyramidHeight+1);
+            normalizedI = inter.GetY()/((1-normalizedJ)*m_baseEdge)+0.5;
             break;
          case Faces::Black:
          case Faces::Last:
@@ -60,35 +60,35 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
     case Faces::Base:
         {
             Coord3dCart inter(1, (normalizedI-0.5)*m_baseEdge, (0.5 - normalizedJ)*m_baseEdge);
-            return Rotation(inter, m_rotationMat);
+            return Rotation(inter, m_rotQuaternion);
         }
     case Faces::Left:
         {
             double z = -normalizedI*(normalizedJ-0.5) * m_baseEdge;
             double x = (m_pyramidHeight+1.0)*normalizedI-m_pyramidHeight;
             double y = -UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
+            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
         }
     case Faces::Top:
         {
             double y = (normalizedI-0.5)*normalizedJ * m_baseEdge;
             double x =  (m_pyramidHeight+1.0)*normalizedJ-m_pyramidHeight;
             double z = UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
+            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
         }
     case Faces::Right:
         {
             double z = -((normalizedJ-0.5)*(1-normalizedI)) * m_baseEdge;
             double x = -(m_pyramidHeight+1.0)*normalizedI+1;
             double y = UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
+            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
         }
     case Faces::Bottom:
         {
             double y = ((normalizedI-0.5)*(1-normalizedJ)) * m_baseEdge;
             double x = -(m_pyramidHeight+1.0)*normalizedJ+1;
             double z = -UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotationMat);
+            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
         }
     case Faces::Last:
         throw std::invalid_argument("FromNormalizedInfoTo3d: Last is not a valid face");
@@ -96,5 +96,3 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
         return Coord3dCart(0,0,0);
     }
 }
-
-

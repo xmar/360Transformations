@@ -16,18 +16,18 @@ CoordF LayoutFlatFixed::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo&
 }
 Layout::NormalizedFaceInfo LayoutFlatFixed::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    const RotMat& rotationMat = m_dynamicPosition.GetNextPosition();
-    Coord3dSpherical cardPosition = Rotation(sphericalCoord, rotationMat.t());
-    cardPosition.y = 0.5+cardPosition.y/m_horizontalAngleOfVision;
-    cardPosition.z = 0.5+(cardPosition.z - PI()/2)/m_verticalAngleOfVision;
-    return Layout::NormalizedFaceInfo(CoordF(cardPosition.y, cardPosition.z), 0);
+    const Quaternion& rotationMat = m_dynamicPosition.GetNextPosition();
+    Coord3dSpherical cardPosition = Rotation(sphericalCoord, rotationMat.Inv());
+    cardPosition.SetTheta(0.5+cardPosition.GetTheta()/m_horizontalAngleOfVision);
+    cardPosition.SetPhi(0.5+(cardPosition.GetPhi() - PI()/2)/m_verticalAngleOfVision);
+    return Layout::NormalizedFaceInfo(CoordF(cardPosition.GetTheta(), cardPosition.GetPhi()), 0);
 }
 Coord3dCart LayoutFlatFixed::FromNormalizedInfoTo3d(const Layout::NormalizedFaceInfo& ni) const
 {
     const CoordF& coord(ni.m_normalizedFaceCoordinate);
     // Coord3dCart coordBefRot(1.f, (coord.x-0.5)*m_maxHDist, (coord.y-0.5)*m_maxVDist);//coordinate in the plan x=1
     Coord3dSpherical coordBefRot(1.f, (coord.x-0.5)*m_horizontalAngleOfVision, PI()/2+(coord.y-0.5)*m_verticalAngleOfVision);
-    const RotMat& rotationMat = m_dynamicPosition.GetNextPosition();
+    const Quaternion& rotationMat = m_dynamicPosition.GetNextPosition();
     return Rotation(coordBefRot, rotationMat);
 }
 
