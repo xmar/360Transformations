@@ -272,6 +272,25 @@ Quaternion ParseRotationJSON(std::string s)
     q.Normalize();
     return q;
   }
+  else if (v.data() == "angleAxis")
+  {
+    auto vv = ptree_json.get_child("angle");
+    auto theta = std::stod(vv.data())*PI()/180;
+
+    vv = ptree_json.get_child("x");
+    auto x =  std::stod(vv.data());
+
+    vv = ptree_json.get_child("y");
+    auto y = std::stod(vv.data());
+
+    vv = ptree_json.get_child("z");
+    auto z = std::stod(vv.data());
+
+    VectorCartesian v(x, y, z);
+    auto q = Quaternion(std::cos(theta/2.0), std::cos(theta/2.0)*v/v.Norm());
+    q.Normalize();
+    return q;
+  }
 
   // BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child("particles.electron"))
   // {
