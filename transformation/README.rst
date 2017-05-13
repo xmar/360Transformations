@@ -18,10 +18,10 @@ Requirements
 ............
 
 * A **C++11** compiler (for instance gcc version 5 or more recent)
-* **OpenCV** version 3 or more recent
-* **Boost** library version 1.3 or more recent, with the program option package
-* ffmpeg **libav** library
+* **Python** with the **virtualenv** package
 * **CMake** version 3 or more recent
+
+Note that during the first compilation step, * **OpenCV**, **Boost** and ffmpeg **libav** library will be download by **conan** (c.f. next section)
 
 Compilation steps
 .................
@@ -30,6 +30,17 @@ Create the build repository and move into it::
 
     mkdir build
     cd build
+
+Create a python virtualenv (tested with python3), use it and install the conan package inside::
+
+    python -m venv ConanEnv
+    source ConanEnv/bin/activate
+    pip install conan
+
+Still inside the virtualenv, use conan to get the **OpenCV**, **Boost** and **libav** dependency and generate a part of the cmake configuration::
+
+    conan install .. -s compiler=gcc -s compiler.libcxx=libstdc++11 --build=missing
+    deactivate
 
 Generate the Makefile::
 
