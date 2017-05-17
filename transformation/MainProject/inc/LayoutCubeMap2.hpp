@@ -14,12 +14,12 @@ class LayoutCubeMap2: public LayoutCubeMapBased
          * \return LayoutCubeMap2 The LayoutCubeMap2 object generated
          *
          */
-	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::array<unsigned int,6> pixelEdges)
+	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(Quaternion rotationQuaternion, bool useTile, double vectorOffsetRation, std::array<unsigned int,6> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
 	        auto maxOffsetTFB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Top), fr.GetRes(Faces::Bottom)));
 	        auto maxOffsetLFRB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Left), MAX(fr.GetRes(Faces::Right), fr.GetRes(Faces::Back))));
-            return std::shared_ptr<LayoutCubeMap2>( new LayoutCubeMap2(rotationQuaternion, useTile,
+            return std::shared_ptr<LayoutCubeMap2>( new LayoutCubeMap2(rotationQuaternion, useTile, vectorOffsetRation,
                 fr.GetRes(Faces::Left)+maxOffsetTFB+fr.GetRes(Faces::Right)+fr.GetRes(Faces::Back),
                 fr.GetRes(Faces::Top)+maxOffsetLFRB+fr.GetRes(Faces::Bottom),
                 fr, maxOffsetTFB, maxOffsetLFRB));
@@ -30,8 +30,8 @@ class LayoutCubeMap2: public LayoutCubeMapBased
          * \param pixelEdge unsigned int resolution of each squared face
          *
          */
-		LayoutCubeMap2(unsigned int pixelEdge, bool useTile):
-		            LayoutCubeMapBased(4*pixelEdge, 3*pixelEdge, Quaternion(1), useTile,
+		LayoutCubeMap2(unsigned int pixelEdge, bool useTile, double vectorOffsetRation):
+		            LayoutCubeMapBased(4*pixelEdge, 3*pixelEdge, Quaternion(1), useTile, vectorOffsetRation,
                                  {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}})
                     , m_maxOffsetTFB(pixelEdge), m_maxOffsetLFRB(pixelEdge) {}
 
@@ -62,8 +62,8 @@ class LayoutCubeMap2: public LayoutCubeMapBased
         unsigned int m_maxOffsetTFB;
         unsigned int m_maxOffsetLFRB;
 
-        LayoutCubeMap2(Quaternion rotationQuaternion, double useTile, unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
-            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
+        LayoutCubeMap2(Quaternion rotationQuaternion, double useTile, double vectorOffsetRation, unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
+            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorOffsetRation, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
 
         unsigned int IStartOffset(LayoutCubeMapBased::Faces f) const;
         unsigned int IEndOffset(LayoutCubeMapBased::Faces f) const;

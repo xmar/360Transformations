@@ -9,22 +9,41 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
     double i = (ni.m_normalizedFaceCoordinate.x - 0.5)*2.f;
     double j = (ni.m_normalizedFaceCoordinate.y - 0.5)*2.f;
     Coord3dCart point(1, i, -j);
-    return Rotation(point, m_rotQuaternion*FaceToRotQuaternion(f));
+    // return Rotation(point, m_rotQuaternion*FaceToRotQuaternion(f));
+    Coord3dCart v = Rotation(point, FaceToRotQuaternion(f));
+    v = v/v.Norm();
+    if (m_vectorOffsetRatio != 0)
+    {
+      auto x = v.GetX();
+      //We compute the norm of the original vector V0 (we know that after the addition of m_vectorOffsetRatio*(1,0,0) the norm of the vector should be 1)
+      auto norm = -m_vectorOffsetRatio*x + std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio*(x*x-1)+1);
+      v = norm*v + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+    }
+    // if (f == Faces::Front && i < 0.9 && j == 0)
+    // {
+    //   std::cout << "V = " << v/v.Norm() << " p = " << Coord3dCart(Rotation(point, FaceToRotQuaternion(f)))/Rotation(point, FaceToRotQuaternion(f)).Norm() << std::endl;
+    // }
+    return Rotation(v, m_rotQuaternion);
 }
 
 
 Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
     //First we find the face with which we intersect
-    Coord3dSpherical p = Rotation(sphericalCoord, m_rotQuaternion.Inv());
+    Coord3dSpherical p = Coord3dCart(Rotation(sphericalCoord, m_rotQuaternion.Inv())) - m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+    p = Coord3dCart(p)/p.Norm();
+
+
+    // if (Coord3dCart(p).GetX() > 0.99999)
+    // std::cout << "V = " << Coord3dCart(sphericalCoord) << " P = " << Coord3dCart(p) << std::endl;
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FromFaceToPlan(f);};
-    auto rtr = IntersectionCart(lambda, p);
+    auto rtr = IntersectionCart(lambda, Coord3dCart(p)/p.Norm());
     Coord3dCart inter = std::get<0>(rtr);
     Faces f = std::get<1>(rtr);
 
     Coord3dCart canonicPoint ( Rotation(inter, FaceToRotQuaternion(f).Inv()) );
-    Layout::NormalizedFaceInfo ni (CoordF((canonicPoint.GetY()+1.0)/2.0, (canonicPoint.GetZ()+1.0)/2.0),
+    Layout::NormalizedFaceInfo ni (CoordF((canonicPoint.GetY()+1.0)/2.0, 1-(canonicPoint.GetZ()+1.0)/2.0),
                                     static_cast<int>(f));
     return ni;
 }

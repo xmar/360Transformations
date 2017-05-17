@@ -20,8 +20,8 @@ class Quaternion
 public:
   constexpr Quaternion(void): m_w(0), m_v(), m_isNormalized(false) {}
   constexpr Quaternion(const SCALAR& w, const VectorCartesian& v): m_w(w), m_v(v), m_isNormalized(false) {}
-  constexpr Quaternion(const SCALAR& w): m_w(w), m_v(), m_isNormalized(false) {}
-  constexpr Quaternion(const VectorCartesian& v): m_w(0), m_v(v), m_isNormalized(false) {}
+  constexpr explicit Quaternion(const SCALAR& w): m_w(w), m_v(), m_isNormalized(false) {}
+  constexpr explicit Quaternion(const VectorCartesian& v): m_w(0), m_v(v), m_isNormalized(false) {}
   static Quaternion FromEuler(const SCALAR& yaw, const SCALAR& pitch, const SCALAR& roll)
   {
     double t0 = std::cos(yaw * 0.5);
@@ -47,6 +47,8 @@ public:
   {
     return Quaternion(m_w+q.m_w, m_v+q.m_v);
   }
+  constexpr Quaternion operator+(const VectorCartesian& v) const
+  { return this->operator+(Quaternion(v)); }
   constexpr Quaternion operator-(const Quaternion& q) const
   {
     return Quaternion(m_w-q.m_w, m_v-q.m_v);
@@ -55,11 +57,15 @@ public:
   {
     return Quaternion(-m_w, -m_v);
   }
+  constexpr Quaternion operator-(const VectorCartesian& v) const
+  { return this->operator-(Quaternion(v)); }
   constexpr Quaternion operator*(const Quaternion& q) const
   {
     return Quaternion((m_w*q.m_w) - (m_v*q.m_v),
                       (m_w*q.m_v) + (q.m_w*m_v) + (m_v ^ q.m_v));
   }
+  constexpr Quaternion operator*(const VectorCartesian& v) const
+  { return this->operator*(Quaternion(v)); }
   constexpr Quaternion operator*(SCALAR s) const
   {
     return Quaternion(m_w*s, m_v*s);
@@ -138,8 +144,8 @@ public:
   static SCALAR OrthodromicDistance(const Quaternion& q1, const Quaternion& q2)
   {
     auto origine = VectorCartesian(1, 0, 0);
-    Quaternion p1 = q1.Rotation(origine);
-    Quaternion p2 = q2.Rotation(origine);
+    Quaternion p1 = Quaternion(q1.Rotation(origine));
+    Quaternion p2 = Quaternion(q2.Rotation(origine));
     auto p = p1 * p2;
     // p1 and p2 are pur so -p.m_w is the dot product and p.m_v is the vector product of p1 and p2
     return std::atan2(p.m_v.Norm(), -p.m_w);
@@ -179,7 +185,7 @@ public:
       {
         q1.Normalize();
       }
-      q1 = q1.Rotation(VectorCartesian(1, 0, 0));
+      q1 = Quaternion(q1.Rotation(VectorCartesian(1, 0, 0)));
     }
     if (!q2.IsPur())
     {
@@ -187,7 +193,7 @@ public:
       {
         q2.Normalize();
       }
-      q2 = q2.Rotation(VectorCartesian(1, 0, 0));
+      q2 = Quaternion(q2.Rotation(VectorCartesian(1, 0, 0)));
     }
     auto deltaQ = q2 - q1;
     auto W = (deltaQ * (2.0 / deltaT))*q1.Inv();

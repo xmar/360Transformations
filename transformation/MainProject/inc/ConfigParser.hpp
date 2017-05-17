@@ -336,11 +336,12 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         if (layoutType == "equirectangular")
         {
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+            double vectorOffsetRation = ptree.get<double>(layoutSection+".offsetRatio");
             if (isInput)
             {
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
-                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion));
+                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion, vectorOffsetRation));
             }
             else
             {
@@ -348,11 +349,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 double relativeHeight = ptree.get<double>(layoutSection+".height");
                 if (infer)
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion, vectorOffsetRation));
                 }
                 else
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion, vectorOffsetRation));
                 }
             }
 
@@ -365,6 +366,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
+            double vectorOffsetRation = ptree.get<double>(layoutSection+".offsetRatio");
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
@@ -382,11 +384,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "cubeMap2")
@@ -397,6 +399,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
+            double vectorOffsetRation = ptree.get<double>(layoutSection+".offsetRatio");
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
@@ -414,11 +417,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "flatFixed")

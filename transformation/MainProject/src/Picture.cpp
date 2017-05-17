@@ -312,7 +312,7 @@ std::tuple<double, double> Picture::ComputeSSIM(const cv::Mat& img1_ori, const c
     sigma12 -= mu1_mu2;
 
     // cs_map = (2*sigma12 + C2)./(sigma1_sq + sigma2_sq + C2);
-    tmp1 = 2*sigma12 + m_ssim_c2;
+    tmp1 = cv::Mat(2*sigma12) + m_ssim_c2;
     tmp2 = sigma1_sq + sigma2_sq + m_ssim_c2;
     cv::divide(tmp1, tmp2, cs_map);
     // ssim_map = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))./((mu1_sq + mu2_sq + C1).*(sigma1_sq + sigma2_sq + C2));

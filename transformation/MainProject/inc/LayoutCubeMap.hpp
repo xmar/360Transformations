@@ -8,17 +8,17 @@ namespace IMT {
 class LayoutCubeMap: public LayoutCubeMapBased
 {
     public:
-      static std::shared_ptr<LayoutCubeMap> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::array<unsigned int,6> pixelEdges)
+      static std::shared_ptr<LayoutCubeMap> GenerateLayout(Quaternion rotationQuaternion, bool useTile, double vectorOffsetRation, std::array<unsigned int,6> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
 	        auto offsetArraysTuple = Init(fr);
-            return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap( rotationQuaternion, useTile,
+            return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap( rotationQuaternion, useTile, vectorOffsetRation,
                 std::get<0>(offsetArraysTuple)[0] + std::get<0>(offsetArraysTuple)[1] + std::get<0>(offsetArraysTuple)[2],
                 std::get<1>(offsetArraysTuple)[0] + std::get<1>(offsetArraysTuple)[1],
                 fr, offsetArraysTuple));
 	    }
-        LayoutCubeMap(unsigned int pixelEdge, bool useTile):
-               LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge, Quaternion(1), useTile,
+        LayoutCubeMap(unsigned int pixelEdge, bool useTile, double vectorOffsetRation):
+               LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge, Quaternion(1), useTile, vectorOffsetRation,
                            {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}}),
                m_maxOffsetCols({{pixelEdge,pixelEdge,pixelEdge}}), m_maxOffsetRows({{pixelEdge,pixelEdge}})
                {}
@@ -54,8 +54,8 @@ class LayoutCubeMap: public LayoutCubeMapBased
         ColsOffsetArray m_maxOffsetCols;
         RowsOffsetArray m_maxOffsetRows;
 
-        LayoutCubeMap(Quaternion rotationQuaternion, bool useTile, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t):
-            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, fr), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)) {}
+        LayoutCubeMap(Quaternion rotationQuaternion, bool useTile, double vectorOffsetRation, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t):
+            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorOffsetRation, fr), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)) {}
 
         static std::tuple<ColsOffsetArray, RowsOffsetArray> Init(const FaceResolutions& fr)
         {

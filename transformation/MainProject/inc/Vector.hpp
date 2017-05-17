@@ -1,4 +1,6 @@
 #pragma once
+#include <cmath>
+#include <limits>
 
 typedef  double SCALAR;
 
@@ -16,11 +18,23 @@ public:
 
 class VectorSpherical;
 
+template<class T>
+static constexpr typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
+    AlmostEqual(T x, T y, int ulp = 5)
+{
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return std::abs(x-y) < std::numeric_limits<T>::epsilon() * std::abs(std::min(x,y)) * ulp
+    // unless the result is subnormal
+           || std::abs(x-y) < std::numeric_limits<T>::min();
+}
+
 class VectorCartesian: public Vector
 {
 public:
   constexpr VectorCartesian(void): Vector(), m_x(0), m_y(0), m_z(0) {}
   constexpr VectorCartesian(SCALAR x, SCALAR y, SCALAR z): Vector(), m_x(x), m_y(y), m_z(z) {}
+  constexpr VectorCartesian(const VectorSpherical& v);
   ~VectorCartesian(void) = default;
 
   constexpr SCALAR DotProduct(const VectorCartesian& v) const {return m_x*v.m_x + m_y*v.m_y + m_z*v.m_z;}
@@ -40,7 +54,7 @@ public:
 
   constexpr bool operator==(const VectorCartesian& v) const
   {
-    return m_x == v.m_x && m_y == v.m_y &&  m_z == v.m_z;
+    return AlmostEqual(m_x, v.m_x) && AlmostEqual(m_y, v.m_y) &&  AlmostEqual(m_z, v.m_z);
   }
   constexpr bool operator!=(const VectorCartesian& v) const
   {
@@ -89,7 +103,7 @@ public:
   constexpr VectorSpherical(const VectorCartesian& v): VectorSpherical(v.Norm(), std::atan2(v.GetY(), v.GetX()), std::acos(v.GetZ()/v.Norm())) {}
   ~VectorSpherical(void) = default;
 
-  constexpr operator VectorCartesian() const { return ToCartesian();}
+  // constexpr operator VectorCartesian() const { return ToCartesian();}
 
   constexpr SCALAR Norm(void) const {return GetRho();}
 
@@ -100,14 +114,18 @@ public:
   void SetTheta(const SCALAR& theta) {m_theta = theta;}
   void SetPhi(const SCALAR& phi) {m_phi = phi;}
 
+  constexpr VectorSpherical operator*(const SCALAR& s) const { return VectorSpherical(m_r*s, m_theta, m_phi); }
+  constexpr VectorSpherical operator/(const SCALAR& s) const { return VectorSpherical(m_r/s, m_theta, m_phi); }
+  constexpr bool operator==(const VectorSpherical& v) const { return AlmostEqual(m_r, v.m_r) && AlmostEqual(m_theta, v.m_theta) &&  AlmostEqual(m_phi, v.m_phi); }
+
   constexpr VectorCartesian ToCartesian(void) const
   {
-    return VectorCartesian(std::sin(m_phi)*std::cos(m_theta), std::sin(m_phi)*std::sin(m_theta), std::cos(m_phi));
+    return VectorCartesian(m_r*std::sin(m_phi)*std::cos(m_theta), m_r*std::sin(m_phi)*std::sin(m_theta), m_r*std::cos(m_phi));
   }
 
   virtual std::ostream& operator<<(std::ostream& o) const override
   {
-    o << "(" << m_r << ", "  << m_theta << ", " <<  m_phi << ")";
+    o << "(spherical: " << m_r << ", "  << m_theta << ", " <<  m_phi << ")";
     return o;
   }
 private:
@@ -116,5 +134,13 @@ private:
   SCALAR m_phi;
 };
 
-
+constexpr VectorCartesian::VectorCartesian(const VectorSpherical& v): VectorCartesian(v.GetRho()*std::sin(v.GetPhi())*std::cos(v.GetTheta()), v.GetRho()*std::sin(v.GetPhi())*std::sin(v.GetTheta()), v.GetRho()*std::cos(v.GetPhi())){}
+constexpr VectorCartesian operator+(const VectorSpherical& v1, const VectorCartesian& v2) {return VectorCartesian(v1)+v2;}
+constexpr VectorCartesian operator-(const VectorSpherical& v1, const VectorCartesian& v2) {return VectorCartesian(v1)-v2;}
+//dot product
+constexpr SCALAR operator*(const VectorSpherical& v1, const VectorCartesian& v2) {return VectorCartesian(v1) * v2;}
+template<class T, typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type> constexpr VectorCartesian operator*(const T& s, const VectorCartesian& v) {return v*s;}
+//Vector product
+constexpr VectorCartesian operator^(const VectorSpherical& v1, const VectorCartesian& v2) { return VectorCartesian(v1)^v2; }
+constexpr VectorCartesian operator-(const VectorSpherical& v1) {return -VectorCartesian(v1);}
 }

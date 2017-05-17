@@ -12,9 +12,10 @@ class LayoutCubeMapBased : public Layout
     public:
         enum class Faces: int {Front, Back, Right, Left, Top, Bottom, Black, Last, First=Front};
         LayoutCubeMapBased(unsigned int outWidth, unsigned int outHeight, Quaternion rotationQuaternion, bool useTile,
+                           double vectorOffsetRation,
                            FaceResolutions fr):
             Layout(outWidth, outHeight), m_fr(std::move(fr)), m_rotQuaternion(rotationQuaternion),
-            m_faceRotations(), m_useTile(useTile)
+            m_faceRotations(), m_useTile(useTile), m_vectorOffsetRatio(vectorOffsetRation)
             {InitFaceRotations();};
         virtual ~LayoutCubeMapBased(void) = default;
 
@@ -97,6 +98,7 @@ class LayoutCubeMapBased : public Layout
         Quaternion m_rotQuaternion;//GlobalRotation
         std::array<Quaternion,6> m_faceRotations;
         bool m_useTile;
+        double m_vectorOffsetRatio;
 
         void InitFaceRotations(void);
 };

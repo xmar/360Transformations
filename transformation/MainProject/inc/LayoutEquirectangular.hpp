@@ -6,8 +6,8 @@ namespace IMT {
 class LayoutEquirectangular: public Layout
 {
     public:
-        LayoutEquirectangular(unsigned int width, unsigned int height, Quaternion rotationQuaternion):
-            Layout(width, height),  m_rotationQuaternion(rotationQuaternion) {}
+        LayoutEquirectangular(unsigned int width, unsigned int height, Quaternion rotationQuaternion, double vectorOffsetRatio):
+            Layout(width, height),  m_rotationQuaternion(rotationQuaternion), m_vectorOffsetRatio(vectorOffsetRatio) {}
         virtual ~LayoutEquirectangular(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -26,14 +26,44 @@ class LayoutEquirectangular: public Layout
         }
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            Coord3dSpherical rotCoord = Rotation(sphericalCoord, m_rotationQuaternion.Inv());
-            return NormalizedFaceInfo(CoordF(0.5+rotCoord.GetTheta()/ (2.0*PI()), rotCoord.GetPhi() / PI()), 0);
+          // Coord3dSpherical rotCoord = Rotation(sphericalCoord, m_rotationQuaternion.Inv());
+            Coord3dSpherical rotCoord = Rotation(Coord3dCart(sphericalCoord/sphericalCoord.Norm())-m_vectorOffsetRatio*Coord3dCart(1, 0, 0), m_rotationQuaternion.Inv());
+            // if (m_vectorOffsetRatio != 0)
+            // {
+            //   auto theta = rotCoord.GetTheta();
+            //   auto phi = rotCoord.GetPhi();
+            //   double thetaBis = std::atan2(std::sin(phi)*std::sin(theta), -m_vectorOffsetRatio + std::sin(phi)*std::cos(theta));
+            //   double phiBis = std::acos(std::cos(phi)/std::sqrt(m_vectorOffsetRatio*(m_vectorOffsetRatio - std::sin(phi)*std::cos(theta))+1));
+            //   return NormalizedFaceInfo(CoordF(0.5+thetaBis/ (2.0*PI()), phiBis/ PI()), 0);
+            // }
+            // else
+            // {
+              return NormalizedFaceInfo(CoordF(0.5+rotCoord.GetTheta()/ (2.0*PI()), rotCoord.GetPhi() / PI()), 0);
+            // }
         }
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override
         {
-            double theta = (ni.m_normalizedFaceCoordinate.x-0.5)*2.0*PI();
-            double phi = (ni.m_normalizedFaceCoordinate.y)*PI();
-            return Rotation(Coord3dSpherical(1, theta, phi), m_rotationQuaternion);
+            double theta = 2.0*PI()*(ni.m_normalizedFaceCoordinate.x-0.5);
+            double phi = PI()*(ni.m_normalizedFaceCoordinate.y);
+            // Coord3dSpherical p(1, theta, phi);
+            // Coord3dSpherical v = Coord3dCart(p)+m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+            // double thetaBis = std::atan2(std::sin(phi)*std::sin(theta), m_vectorOffsetRatio + std::sin(phi)*std::cos(theta));
+            // double phiBis = std::acos(std::cos(phi)/std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio + m_vectorOffsetRatio*std::sin(phi)*std::cos(theta)+1));
+            // std::cout << Rotation(Coord3dSpherical(1, theta, phi)+m_vectorOffsetRatio*Coord3dCart(1, 0, 0), m_rotationQuaternion) << "; "<< Rotation(Coord3dSpherical(1, thetaBis, phiBis), m_rotationQuaternion) << std::endl;
+            // return Rotation(Coord3dSpherical(1, thetaBis, phiBis), m_rotationQuaternion);
+            Coord3dSpherical v0 = Coord3dSpherical(1, theta, phi);
+            // + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+
+            if (m_vectorOffsetRatio != 0)
+            {
+              auto x = std::sin(phi)*std::cos(theta);
+              //We compute the norm of the original vector V0 (we know that after the addition of m_vectorOffsetRatio*(1,0,0) the norm of the vector should be 1)
+              auto norm = -m_vectorOffsetRatio*x + std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio*(x*x-1)+1);
+              v0 = norm*v0 + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+            }
+
+            auto v = Rotation(v0, m_rotationQuaternion);
+            return v;
         }
 
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override
@@ -68,5 +98,6 @@ class LayoutEquirectangular: public Layout
         }
     private:
         Quaternion m_rotationQuaternion;
+        double m_vectorOffsetRatio;
 };
 }
