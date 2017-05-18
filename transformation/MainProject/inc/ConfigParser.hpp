@@ -75,7 +75,7 @@ namespace IMT {
   for(auto& vr: vRatios) {vr /= sumV;}\
   auto tilesRatios = std::make_tuple(std::move(hRatios),std::move(vRatios));\
   auto orignalRes = std::make_tuple(inputWidth, inputHeight);\
-  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), rotationQuaternion, orignalRes, useTile, upscale);
+  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), rotationQuaternion, orignalRes, useTile, upscale, vectorOffsetRatio);
 ///END MACRO GENERATE_EQUI_TILED_LAYOUT
 
 #define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
@@ -336,12 +336,12 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         if (layoutType == "equirectangular")
         {
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            double vectorOffsetRation = ptree.get<double>(layoutSection+".offsetRatio");
+            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
             if (isInput)
             {
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
-                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion, vectorOffsetRation));
+                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion, vectorOffsetRatio));
             }
             else
             {
@@ -349,11 +349,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 double relativeHeight = ptree.get<double>(layoutSection+".height");
                 if (infer)
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion, vectorOffsetRation));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion, vectorOffsetRatio));
                 }
                 else
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion, vectorOffsetRation));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion, vectorOffsetRatio));
                 }
             }
 
@@ -366,7 +366,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            double vectorOffsetRation = ptree.get<double>(layoutSection+".offsetRatio");
+            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
@@ -384,11 +384,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "cubeMap2")
@@ -399,7 +399,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            double vectorOffsetRation = ptree.get<double>(layoutSection+".offsetRatio");
+            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
@@ -417,11 +417,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRation, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "flatFixed")
@@ -464,6 +464,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
+            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -480,11 +481,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, pyramidBaseEdgeLength*inputWidth/4);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, pyramidBaseEdgeLength*inputWidth/4);
             }
             else
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, pyramidBaseEdgeLength);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, pyramidBaseEdgeLength);
             }
         }
         if (layoutType == "pyramid2")
@@ -496,6 +497,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
+            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -512,11 +514,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
             }
         }
         if (layoutType == "rhombicDodeca")
@@ -556,6 +558,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             bool upscale = ptree.get<bool>(layoutSection+".upscale");
+            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
 
             unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
             unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");

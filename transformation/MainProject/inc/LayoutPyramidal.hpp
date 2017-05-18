@@ -26,8 +26,8 @@ class LayoutPyramidal: public LayoutPyramidalBased
          * \param pixelBaseEdge unsigned int Number of pixel of the edge of the base
          *
          */
-        LayoutPyramidal(double baseEdge,Quaternion rotationQuaternion, bool useTile, unsigned int pixelBaseEdge):
-          LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, pixelBaseEdge, useTile, {{pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge}}) {}
+        LayoutPyramidal(double baseEdge,Quaternion rotationQuaternion, bool useTile, double vectorOffsetRatio, unsigned int pixelBaseEdge):
+          LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, pixelBaseEdge, useTile, vectorOffsetRatio, {{pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge}}) {}
         virtual ~LayoutPyramidal(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override

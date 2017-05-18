@@ -9,7 +9,7 @@ double LayoutPyramidalBased::UsePlanEquation(double x) const //Use the plan equa
 
 Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    Coord3dSpherical p = Rotation(sphericalCoord, m_rotQuaternion.Inv());
+    Coord3dSpherical p = Rotation(sphericalCoord, m_rotQuaternion.Inv()) - m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
     auto rtr = IntersectionCart(lambda, p);
@@ -55,44 +55,54 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
     const CoordF& coord (ni.m_normalizedFaceCoordinate);
     const double& normalizedI (coord.x);
     const double& normalizedJ (coord.y);
+    Coord3dCart v;
     switch (f)
     {
     case Faces::Base:
         {
             Coord3dCart inter(1, (normalizedI-0.5)*m_baseEdge, (0.5 - normalizedJ)*m_baseEdge);
-            return Rotation(inter, m_rotQuaternion);
+            return v = std::move(inter);
         }
     case Faces::Left:
         {
             double z = -normalizedI*(normalizedJ-0.5) * m_baseEdge;
             double x = (m_pyramidHeight+1.0)*normalizedI-m_pyramidHeight;
             double y = -UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
+            v = Coord3dCart(x,y,z);
         }
     case Faces::Top:
         {
             double y = (normalizedI-0.5)*normalizedJ * m_baseEdge;
             double x =  (m_pyramidHeight+1.0)*normalizedJ-m_pyramidHeight;
             double z = UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
+            v = Coord3dCart(x,y,z);
         }
     case Faces::Right:
         {
             double z = -((normalizedJ-0.5)*(1-normalizedI)) * m_baseEdge;
             double x = -(m_pyramidHeight+1.0)*normalizedI+1;
             double y = UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
+            v = Coord3dCart(x,y,z);
         }
     case Faces::Bottom:
         {
             double y = ((normalizedI-0.5)*(1-normalizedJ)) * m_baseEdge;
             double x = -(m_pyramidHeight+1.0)*normalizedJ+1;
             double z = -UsePlanEquation(x);
-            return Rotation(Coord3dCart(x,y,z), m_rotQuaternion);
+            v = Coord3dCart(x,y,z);
         }
     case Faces::Last:
         throw std::invalid_argument("FromNormalizedInfoTo3d: Last is not a valid face");
     case Faces::Black:
         return Coord3dCart(0,0,0);
     }
+    if (m_vectorOffsetRatio != 0)
+    {
+      v = v/v.Norm();
+      auto x = v.GetX();
+      //We compute the norm of the original vector V0 (we know that after the addition of m_vectorOffsetRatio*(1,0,0) the norm of the vector should be 1)
+      auto norm = -m_vectorOffsetRatio*x + std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio*(x*x-1)+1);
+      v = norm*v + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+    }
+    return Rotation(v, m_rotQuaternion);
 }
