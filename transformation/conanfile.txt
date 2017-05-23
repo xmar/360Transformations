@@ -1,7 +1,7 @@
 [requires]                                                            
 OpenCV/3.2.0@xmar/stable                                              
 Boost/1.60.0@lasote/stable                                            
-ffmpeg/3.2.4@genvidtech/1.4.0
+ffmpeg/3.2.4@xmar/1.4.0
 
 [options]
 OpenCV:with_gtk=True
