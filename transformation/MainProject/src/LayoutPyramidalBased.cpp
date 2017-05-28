@@ -61,7 +61,8 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
     case Faces::Base:
         {
             Coord3dCart inter(1, (normalizedI-0.5)*m_baseEdge, (0.5 - normalizedJ)*m_baseEdge);
-            return v = std::move(inter);
+            v = std::move(inter);
+            break;
         }
     case Faces::Left:
         {
@@ -69,6 +70,7 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
             double x = (m_pyramidHeight+1.0)*normalizedI-m_pyramidHeight;
             double y = -UsePlanEquation(x);
             v = Coord3dCart(x,y,z);
+            break;
         }
     case Faces::Top:
         {
@@ -76,6 +78,7 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
             double x =  (m_pyramidHeight+1.0)*normalizedJ-m_pyramidHeight;
             double z = UsePlanEquation(x);
             v = Coord3dCart(x,y,z);
+            break;
         }
     case Faces::Right:
         {
@@ -83,6 +86,7 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
             double x = -(m_pyramidHeight+1.0)*normalizedI+1;
             double y = UsePlanEquation(x);
             v = Coord3dCart(x,y,z);
+            break;
         }
     case Faces::Bottom:
         {
@@ -90,6 +94,7 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
             double x = -(m_pyramidHeight+1.0)*normalizedJ+1;
             double z = -UsePlanEquation(x);
             v = Coord3dCart(x,y,z);
+            break;
         }
     case Faces::Last:
         throw std::invalid_argument("FromNormalizedInfoTo3d: Last is not a valid face");

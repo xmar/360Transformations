@@ -42,14 +42,14 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
 	    static std::shared_ptr<LayoutPyramidal2> GenerateLayout(double baseEdge, Quaternion rotationQuaternion, bool useTile, double vectorOffsetRatio, std::array<unsigned int,5> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
-            return std::shared_ptr<LayoutPyramidal2>(new LayoutPyramidal2(baseEdge, rotationQuaternion, useTile, vectorOffsetRatio,
+            return std::shared_ptr<LayoutPyramidal2>(new LayoutPyramidal2(baseEdge, rotationQuaternion, useTile,
                 fr.GetRes(Faces::Left)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Right),
-                fr.GetRes(Faces::Top)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Bottom),
+                fr.GetRes(Faces::Top)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Bottom), vectorOffsetRatio,
                 fr));
 	    }
 
         LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, double vectorOffsetRatio, unsigned int pixelBaseEdge):
-            LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, 3*pixelBaseEdge, useTile, vectorOffsetRatio, {{pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {};
+            LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, 3*pixelBaseEdge, useTile, vectorOffsetRatio, {{pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {std::cout << 3*pixelBaseEdge<<std::endl;};
         virtual ~LayoutPyramidal2(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
