@@ -165,9 +165,23 @@ Run inside the example folder (or inside the /vagrant folder inside the VM)::
 
   trans -c Config_7.ini
 
-Static viewport extraction. Vewport extracted at the same position from two different projections.
+Static viewport extraction. Viewport extracted at the same position from two different projections.
 
 Outputs::
 
   output7_1FlatFixed.mp4 -> from the original Equirectangular projection
   output7_2FlatFixed.mp4 -> from the 4x3 cubemap projection
+
+Scenario 8:
+___________
+
+Run inside the example folder (or inside the /vagrant folder inside the VM)::
+
+  trans -c Config_8.ini
+
+Dynamic viewport extraction. Viewport extracted using a Head Movement trajectory from the head movement dataset available here: http://dash.ipv6.enstb.fr/headMovements/ .
+
+Outputs::
+
+  output8_1FlatFixed.mp4 -> from the original Equirectangular projection
+  output8_2FlatFixed.mp4 -> from an offset Equirectangular projection

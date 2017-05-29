@@ -34,7 +34,7 @@ void DynamicPosition::SetNextPosition(double relatifTimestamp)
         std::istringstream ss(line);
         std::string value;
         unsigned int counter(0);
-        while (getline( ss, value, ',' ))
+        while (getline( ss, value, ' ' ))
         {
           if (counter == 0)
           {
