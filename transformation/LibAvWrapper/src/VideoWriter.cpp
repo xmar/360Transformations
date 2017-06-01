@@ -120,7 +120,8 @@ void VideoWriter::EncodeAndWrite(const cv::Mat& pict, int streamId)
     src.linesize[1] = 0;
     src.linesize[2] = 0;
 
-    frame->format = AV_PIX_FMT_YUV420P;
+    // frame->format = AV_PIX_FMT_YUV420P;
+    frame->format = m_codec_ctx[streamId]->pix_fmt;
     frame->width = m_codec_ctx[streamId]->width;
     frame->height = m_codec_ctx[streamId]->height;
     int buffSize = av_image_alloc(frame->data, frame->linesize, frame->width, frame->height, (enum AVPixelFormat)frame->format, 1);

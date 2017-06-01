@@ -75,6 +75,8 @@ The **Global** section contains the global configuration of the test.
   displayFinalPict=true
   ;Path to the output video file. If empty no output video is recorded.The flow id and the name of the last layout is used as an id for the generated output file
   videoOutputName=
+  ;codec ffmpeg should use (as known by ffmpeg). If empty or not available libx265 (HEVC) will be used. The container is selected from the extension set in the videoOutputName
+  videoOutputCodec=libx265
   ; bitrate in kbps of the output videos (0 if default crf)
   videoOutputBitRate=0
   ;Path to the quality output file. If empty no quality is computed. The flow id and the name of the last layout is used as an id for the generated output file

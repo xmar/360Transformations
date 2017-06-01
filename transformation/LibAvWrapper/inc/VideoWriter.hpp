@@ -100,7 +100,26 @@ namespace LibAv
                     m_codec_ctx[id]->time_base.num = 1;
                     m_codec_ctx[id]->time_base.den = fps;
                     m_codec_ctx[id]->gop_size = gop_size;
-                    m_codec_ctx[id]->pix_fmt = AV_PIX_FMT_YUV420P;
+                    bool supportAV_PIX_FMT_RGB24 = false;
+                    bool supportAV_PIX_FMT_YUV420P = false;
+                    if (codec->pix_fmts != nullptr)
+                    {
+                      unsigned i = 0;
+                      while(codec->pix_fmts[i] != -1)
+                      {
+                        supportAV_PIX_FMT_RGB24 = supportAV_PIX_FMT_RGB24 | (codec->pix_fmts[i] == AV_PIX_FMT_RGB24);
+                        supportAV_PIX_FMT_YUV420P = supportAV_PIX_FMT_YUV420P | (codec->pix_fmts[i] == AV_PIX_FMT_YUV420P);
+                        ++i;
+                      }
+                    }
+                    if (supportAV_PIX_FMT_YUV420P)
+                    {
+                      m_codec_ctx[id]->pix_fmt = AV_PIX_FMT_YUV420P;
+                    }
+                    else if (supportAV_PIX_FMT_RGB24)
+                    {
+                      m_codec_ctx[id]->pix_fmt = AV_PIX_FMT_RGB24;
+                    }
                     m_codec_ctx[id]->max_b_frames = 2;
                     m_codec_ctx[id]->refcounted_frames = 1;
                     m_vstream[id]->time_base.num = 1;

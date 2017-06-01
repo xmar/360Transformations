@@ -161,6 +161,12 @@ int main( int argc, const char* argv[] )
 
       //Parse the rest of the Global Section from the configuration file
       std::string pathToOutputVideo = ptree.get<std::string>("Global.videoOutputName");
+      auto outputVideoCodecOpt = ptree.get_optional<std::string>("Global.videoOutputCodec");
+      std::string outputVideoCodec = "libx265";
+      if (outputVideoCodecOpt && outputVideoCodecOpt.get().size() > 0)
+      {
+        outputVideoCodec = outputVideoCodecOpt.get();
+      }
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
@@ -221,7 +227,7 @@ int main( int argc, const char* argv[] )
               std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
 
               auto bitrate = GetBitrateVector(lfsv.back(), ptree, videoOutputBitRate);
-              l->InitOutputVideo(path, "libx265", fps, int(fps/2), bitrate);
+              l->InitOutputVideo(path, outputVideoCodec, fps, int(fps/2), bitrate);
               ++j;
           }
       }
