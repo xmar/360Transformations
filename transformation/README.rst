@@ -14,6 +14,9 @@ For now the FoV extraction is static: i.e. the FoV center cannot move during the
 How To Compile
 --------------
 
+First way: using conan
+______________________
+
 Requirements
 ............
 
@@ -44,6 +47,39 @@ Still inside the virtualenv, use conan to get the **OpenCV**, **Boost** and **li
 
 Generate the Makefile::
 
+    cmake -DUSE_CONAN=true ..
+
+Compile the software::
+
+    make
+
+Now a software named **trans** should be in your build repository
+
+Second way: installing yourself the depencies
+_____________________________________________
+
+Requirements
+............
+
+* A **C++11** compiler (for instance gcc version 5 or more recent)
+* **CMake** version 3 or more recent
+* **opencv** at least version 3
+* **ffmpeg livav**
+* **boost**
+
+OpenCV, libav ffmpeg (with the lastest API) and boost are supposed installed on you computer.
+If cmake cannot find those libs it will print an error message.
+
+Compilation steps
+.................
+
+Create the build repository and move into it::
+
+    mkdir build
+    cd build
+
+Generate the Makefile::
+
     cmake ..
 
 Compile the software::
@@ -51,6 +87,7 @@ Compile the software::
     make
 
 Now a software named **trans** should be in your build repository
+
 
 How To Use
 ----------
