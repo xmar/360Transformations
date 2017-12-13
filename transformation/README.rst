@@ -11,11 +11,8 @@ The projection tool can read a 360-degree video projected on any known 2D layout
 For now the FoV extraction is static: i.e. the FoV center cannot move during the video.
 
 
-How To Compile
---------------
-
-First way: using conan
-______________________
+How To Compile: First way, using conan
+--------------------------------------
 
 Requirements
 ............
@@ -55,8 +52,8 @@ Compile the software::
 
 Now a software named **trans** should be in your build repository
 
-Second way: installing yourself the depencies
-_____________________________________________
+How To Compile: Second way, installing the depencies yourself
+------------------------------------------------------------
 
 Requirements
 ............
