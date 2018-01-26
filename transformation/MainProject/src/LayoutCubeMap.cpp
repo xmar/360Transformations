@@ -10,15 +10,15 @@ unsigned int LayoutCubeMap::IStartOffset(LayoutCubeMapBased::Faces f) const
     switch(f)
     {
         case Faces::Front:
-            return (m_maxOffsetCols[0]-GetRes(f))/2;
+            return m_maxOffsetCols[0]+(m_maxOffsetCols[1]-GetRes(f))/2;
         case Faces::Back:
-            return (m_maxOffsetCols[0]-GetRes(f))/2;
+            return m_maxOffsetCols[0]+(m_maxOffsetCols[1]-GetRes(f))/2;
         case Faces::Right:
-            return m_maxOffsetCols[0]+(m_maxOffsetCols[1]-GetRes(f))/2;
+            return (m_maxOffsetCols[1]-GetRes(f))/2;
         case Faces::Left:
-            return m_maxOffsetCols[0]+(m_maxOffsetCols[1]-GetRes(f))/2;
-        case Faces::Top:
             return m_maxOffsetCols[0]+m_maxOffsetCols[1]+(m_maxOffsetCols[2]-GetRes(f))/2;
+        case Faces::Top:
+            return (m_maxOffsetCols[0]-GetRes(f))/2;
         case Faces::Bottom:
             return m_maxOffsetCols[0]+m_maxOffsetCols[1]+(m_maxOffsetCols[2]-GetRes(f))/2;
         case Faces::Last:
@@ -31,15 +31,15 @@ unsigned int LayoutCubeMap::IEndOffset(LayoutCubeMapBased::Faces f) const
     switch(f)
     {
         case Faces::Front:
-            return m_maxOffsetCols[0]-(m_maxOffsetCols[0]-GetRes(f))/2;
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]-(m_maxOffsetCols[1]-GetRes(f))/2;
         case Faces::Back:
-            return m_maxOffsetCols[0]-(m_maxOffsetCols[0]-GetRes(f))/2;
+            return m_maxOffsetCols[0]+m_maxOffsetCols[1]-(m_maxOffsetCols[1]-GetRes(f))/2;
         case Faces::Right:
-            return m_maxOffsetCols[0]+m_maxOffsetCols[1]-(m_maxOffsetCols[1]-GetRes(f))/2;
+            return m_maxOffsetCols[0]-(m_maxOffsetCols[0]-GetRes(f))/2;
         case Faces::Left:
-            return m_maxOffsetCols[0]+m_maxOffsetCols[1]-(m_maxOffsetCols[1]-GetRes(f))/2;
-        case Faces::Top:
             return m_maxOffsetCols[0]+m_maxOffsetCols[1]+m_maxOffsetCols[2]-(m_maxOffsetCols[2]-GetRes(f))/2;
+        case Faces::Top:
+            return m_maxOffsetCols[0]-(m_maxOffsetCols[0]-GetRes(f))/2;
         case Faces::Bottom:
             return m_maxOffsetCols[0]+m_maxOffsetCols[1]+m_maxOffsetCols[2]-(m_maxOffsetCols[2]-GetRes(f))/2;
         case Faces::Last:
@@ -52,15 +52,15 @@ unsigned int LayoutCubeMap::JStartOffset(LayoutCubeMapBased::Faces f) const
     switch(f)
     {
         case Faces::Front:
-            return (m_maxOffsetRows[0]-GetRes(f))/2;
-        case Faces::Back:
             return m_maxOffsetRows[0]+(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Back:
+            return (m_maxOffsetRows[0]-GetRes(f))/2;
         case Faces::Right:
             return (m_maxOffsetRows[0]-GetRes(f))/2;;
         case Faces::Left:
-            return m_maxOffsetRows[0]+(m_maxOffsetRows[1]-GetRes(f))/2;
+            return (m_maxOffsetRows[0]-GetRes(f))/2;
         case Faces::Top:
-            return (m_maxOffsetRows[0]-GetRes(f))/2;;
+            return m_maxOffsetRows[0]+(m_maxOffsetRows[1]-GetRes(f))/2;;
         case Faces::Bottom:
             return m_maxOffsetRows[0]+(m_maxOffsetRows[1]-GetRes(f))/2;
         case Faces::Last:
@@ -73,15 +73,15 @@ unsigned int LayoutCubeMap::JEndOffset(LayoutCubeMapBased::Faces f) const
     switch(f)
     {
         case Faces::Front:
-            return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;
-        case Faces::Back:
             return m_maxOffsetRows[0]+m_maxOffsetRows[1]-(m_maxOffsetRows[1]-GetRes(f))/2;
+        case Faces::Back:
+            return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;
         case Faces::Right:
             return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;;
         case Faces::Left:
-            return m_maxOffsetRows[0]+m_maxOffsetRows[1]-(m_maxOffsetRows[1]-GetRes(f))/2;
+            return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;
         case Faces::Top:
-            return m_maxOffsetRows[0]-(m_maxOffsetRows[0]-GetRes(f))/2;;
+            return m_maxOffsetRows[0]+m_maxOffsetRows[1]-(m_maxOffsetRows[1]-GetRes(f))/2;;
         case Faces::Bottom:
             return m_maxOffsetRows[0]+m_maxOffsetRows[1]-(m_maxOffsetRows[1]-GetRes(f))/2;
         case Faces::Last:
@@ -109,9 +109,18 @@ Layout::NormalizedFaceInfo LayoutCubeMap::From2dToNormalizedFaceInfo(const Coord
     {
         return Layout::NormalizedFaceInfo(CoordF(0,0), static_cast<int>(f));
     }
-    double i = double(pixel.x - IStartOffset(f))/GetRes(f);
-    double j = double(pixel.y - JStartOffset(f))/GetRes(f);
-    return Layout::NormalizedFaceInfo(CoordF(i,j), static_cast<int>(f));
+    if (f == Faces::Front || f == Faces::Top || f == Faces::Bottom)
+    {
+        double j = double(pixel.x - IStartOffset(f))/GetRes(f);
+        double i = double(pixel.y - JStartOffset(f))/GetRes(f);
+        return Layout::NormalizedFaceInfo(CoordF(i,j), static_cast<int>(f));
+    }
+    else
+    {
+        double i = double(pixel.x - IStartOffset(f))/GetRes(f);
+        double j = double(pixel.y - JStartOffset(f))/GetRes(f);
+        return Layout::NormalizedFaceInfo(CoordF(i,j), static_cast<int>(f));
+    }
 }
 
 #define BORDER(x) (MAX(1.0, MIN(GetRes(f)-1,x)))
@@ -122,7 +131,14 @@ CoordF LayoutCubeMap::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& n
     const CoordF& coord (ni.m_normalizedFaceCoordinate);
     if (f != Faces::Last && f != Faces::Black)
     {
-        return CoordF(BORDER(GetRes(f)*coord.x)+IStartOffset(f), BORDER(GetRes(f)*coord.y)+JStartOffset(f));
+        if (f == Faces::Front || f == Faces::Top || f == Faces::Bottom)
+        {
+            return CoordF(BORDER(GetRes(f)*coord.y)+IStartOffset(f), BORDER(GetRes(f)*coord.x)+JStartOffset(f));
+        }
+        else
+        {
+            return CoordF(BORDER(GetRes(f)*coord.x)+IStartOffset(f), BORDER(GetRes(f)*coord.y)+JStartOffset(f));
+        }
     }
     else
     {
