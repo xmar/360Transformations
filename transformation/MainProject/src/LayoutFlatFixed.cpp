@@ -28,6 +28,7 @@ Coord3dCart LayoutFlatFixed::FromNormalizedInfoTo3d(const Layout::NormalizedFace
     // Coord3dCart coordBefRot(1.f, (coord.x-0.5)*m_maxHDist, (coord.y-0.5)*m_maxVDist);//coordinate in the plan x=1
     Coord3dSpherical coordBefRot(1.f, (coord.x-0.5)*m_horizontalAngleOfVision, PI()/2+(coord.y-0.5)*m_verticalAngleOfVision);
     const Quaternion& rotationMat = m_dynamicPosition.GetNextPosition();
+    auto p = Rotation(coordBefRot, rotationMat);
     return Rotation(coordBefRot, rotationMat);
 }
 

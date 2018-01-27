@@ -112,7 +112,7 @@ Layout::NormalizedFaceInfo LayoutCubeMap::From2dToNormalizedFaceInfo(const Coord
     if (f == Faces::Front || f == Faces::Top || f == Faces::Bottom)
     {
         double j = double(pixel.x - IStartOffset(f))/GetRes(f);
-        double i = double(pixel.y - JStartOffset(f))/GetRes(f);
+        double i = 1-(double(pixel.y - JStartOffset(f))/GetRes(f));
         return Layout::NormalizedFaceInfo(CoordF(i,j), static_cast<int>(f));
     }
     else
@@ -133,7 +133,7 @@ CoordF LayoutCubeMap::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& n
     {
         if (f == Faces::Front || f == Faces::Top || f == Faces::Bottom)
         {
-            return CoordF(BORDER(GetRes(f)*coord.y)+IStartOffset(f), BORDER(GetRes(f)*coord.x)+JStartOffset(f));
+            return CoordF(BORDER(GetRes(f)*coord.y)+IStartOffset(f), BORDER(GetRes(f)*(1-coord.x))+JStartOffset(f));
         }
         else
         {

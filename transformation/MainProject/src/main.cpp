@@ -275,8 +275,8 @@ int main( int argc, const char* argv[] )
             for (unsigned int i = 1; i < lf.size(); ++i)
             {
                 std::cout << " -> " << layoutFlowSections[j][i];
-                pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
                 lf[i]->NextStep(double(count-startFrame)/fps);
+                pictOut = lf[i]->FromLayout(*pictOut, *lf[i-1]);
             }
             std::cout << std::endl;
             if (firstPict == nullptr)

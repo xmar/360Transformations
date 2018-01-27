@@ -22,13 +22,13 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
     }
     cv::Mat picMat = cv::Mat::zeros(destLayout.m_outHeight, destLayout.m_outWidth, layoutPic.GetMat().type());
     auto pic = std::make_shared<Picture>(picMat);
-    #pragma omp parallel for collapse(2) shared(pic, layoutPic, destLayout) schedule(dynamic)
+    //#pragma omp parallel for collapse(2) shared(pic, layoutPic, destLayout) schedule(dynamic)
     for (auto i = 0; i < pic->GetMat().cols; ++i)
     {
         for (auto j = 0; j < pic->GetMat().rows; ++j)
         {
             Coord3dSpherical thisPixel3dPolar = destLayout.From2dTo3d(CoordI(i,j)); // coordinate of the pixel (i, j) in the output picture in the 3d space
-            if (thisPixel3dPolar.Norm() != 0)
+            if (thisPixel3dPolar.Norm() != 0 && !std::isnan(thisPixel3dPolar.Norm()))
             {//Keep the pixel black (i.e. do nothing) if == 0
                 auto coordPixelOriginalPic = FromSphereTo2d(thisPixel3dPolar); //coordinate of the corresponding pixel in the input picture
                 if (inInterval(coordPixelOriginalPic.x, 0, layoutPic.GetMat().cols) && inInterval(coordPixelOriginalPic.y, 0, layoutPic.GetMat().rows))
@@ -37,7 +37,7 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
                 }
                 else
                 {
-//                std::cout << "(i,j)= (" << i << "(max = "<< pic->GetMat().cols << "), "<<j <<") : theta = " << thisPixel3dPolar.y << "; phi=" << thisPixel3dPolar.z << "; iOrr = " << coordPixelOriginalPic.x << "; jOrr = " << coordPixelOriginalPic.y << "Max (i,j)orr = " << layoutPic.GetMat().cols << ", " << layoutPic.GetMat().rows << std::endl;
+                //std::cout << "(i,j)= (" << i << "(max = "<< pic->GetMat().cols << "), "<<j <<") : theta = " << thisPixel3dPolar.GetTheta() << "; phi=" << thisPixel3dPolar.GetPhi() << "; iOrr = " << coordPixelOriginalPic.x << "; jOrr = " << coordPixelOriginalPic.y << "Max (i,j)orr = " << layoutPic.GetMat().cols << ", " << layoutPic.GetMat().rows << std::endl;
                 }
             }
         }

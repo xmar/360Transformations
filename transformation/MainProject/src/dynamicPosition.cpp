@@ -25,7 +25,7 @@ void DynamicPosition::SetNextPosition(double relatifTimestamp)
     {
       double timestamp(0.0);
       unsigned int frameId(0);
-      SCALAR w(0), x(0), y(0), z(0);
+      SCALAR w(1), x(0), y(0), z(0);
       //Read one line from the trace (formated like for this dataset: dash.ipv6.enstb.fr/headMovements/)
       // timestamp frameId w x y z
       std::string line;
@@ -44,7 +44,7 @@ void DynamicPosition::SetNextPosition(double relatifTimestamp)
                 m_firstTimestamp = timestamp;
               }
               timestamp -= m_firstTimestamp;
-              if (relatifTimestamp < timestamp)
+              if (relatifTimestamp < timestamp && m_rotQuaternion != Quaternion(0))
               {
                 m_inputPositionsTrace.seekg(-line.size()-1,m_inputPositionsTrace.cur);
                 return;
