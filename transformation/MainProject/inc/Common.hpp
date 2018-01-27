@@ -320,4 +320,48 @@ std::tuple<Coord3dCart, FaceType> IntersectionCart(FaceToPlanFct<FaceType> FaceT
     return std::make_tuple( Coord3dCart(minR*cosT*sinP, minR*sinT*sinP, minR*cosP),  interFace);
 }
 
+template<typename Stream, typename T>                                        
+void print_time(Stream& out, T duration_in_ms)                               
+{                                                                            
+    auto const msecs = duration_in_ms % 1000;                                
+    duration_in_ms /= 1000;                                                  
+    auto const secs = duration_in_ms % 60;                                   
+    duration_in_ms /= 60;                                                    
+    auto const mins = duration_in_ms % 60;                                   
+    duration_in_ms /= 60;                                                    
+    auto const hours = duration_in_ms % 24;                                  
+    duration_in_ms /= 24;                                                    
+    auto const days = duration_in_ms;                                        
+                                                                             
+    bool printed_earlier = false;                                            
+    if (days >= 1) {                                                         
+        printed_earlier = true;                                              
+        out << days << (1 != days ? " days" : " day") << ' ';                
+    }                                                                        
+    if (printed_earlier || hours >= 1) {                                     
+        printed_earlier = true;                                              
+        out << hours << (1 != hours ? " hours" : " hour") << ' ';            
+    }                                                                        
+    if (printed_earlier || mins >= 1) {                                      
+        printed_earlier = true;                                              
+        out << mins << (1 != mins ? " minutes" : " minute") << ' ';          
+    }                                                                        
+    if (printed_earlier || secs >= 1) {                                      
+        printed_earlier = true;                                              
+        out << secs << (1 != secs ? " seconds" : " second") << ' ';          
+    }                                                                        
+    if (printed_earlier || msecs >= 1) {                                     
+        printed_earlier = true;                                              
+        out << msecs << (1 != msecs ? " milliseconds" : " millisecond");     
+    }                                                                        
+}                                                                            
+                                                                             
+template<typename T>                                                         
+std::string print_time(T duration_in_ms)                                     
+{                                                                            
+    std::ostringstream ss;                                                   
+    print_time(ss, duration_in_ms);                                          
+    return ss.str();                                                         
+}
+
 }
