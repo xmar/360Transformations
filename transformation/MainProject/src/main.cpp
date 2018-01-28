@@ -167,6 +167,12 @@ int main( int argc, const char* argv[] )
       {
         outputVideoCodec = outputVideoCodecOpt.get();
       }
+      auto processingStepOpt = ptree.get_optional<int>("Global.processingStep");
+      int processingStep = 1;
+      if (processingStepOpt && processingStepOpt.get() > 1)
+      {
+          processingStep = processingStepOpt.get();
+      }
       std::string pathToOutputQuality = ptree.get<std::string>("Global.qualityOutputName");
       bool displayFinalPict = ptree.get<bool>("Global.displayFinalPict");
       auto nbFrames = ptree.get<unsigned int>("Global.nbFrames");
@@ -227,7 +233,7 @@ int main( int argc, const char* argv[] )
               std::cout << "Output video path for flow "<< j+1 <<": " << path << std::endl;
 
               auto bitrate = GetBitrateVector(lfsv.back(), ptree, videoOutputBitRate);
-              l->InitOutputVideo(path, outputVideoCodec, fps, int(fps/2), bitrate);
+              l->InitOutputVideo(path, outputVideoCodec, fps/processingStep, int(fps/(2*processingStep)), bitrate);
               ++j;
           }
       }
@@ -267,7 +273,7 @@ int main( int argc, const char* argv[] )
         for(auto& lf: layoutFlowVect)
         {
           std::shared_ptr<Picture> pict = lf[0]->ReadNextPictureFromVideo();
-          if (count >= startFrame)
+          if (count >= startFrame && (count - startFrame)%processingStep == 0)
           {//start processing when count >= startFrame
 
             auto pictOut = pict;
@@ -466,7 +472,7 @@ int main( int argc, const char* argv[] )
 
         if (count >= startFrame)
         {
-          if (displayFinalPict)
+          if (displayFinalPict && (count - startFrame)%processingStep == 0)
           {
             cv::waitKey(0);
             cv::destroyAllWindows();
