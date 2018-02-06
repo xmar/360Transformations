@@ -333,6 +333,16 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 throw e;
             }
         }
+        else
+        {
+            auto widthO = ptree.get_optional<double>(layoutSection+".refWidth");
+            auto heightO = ptree.get_optional<double>(layoutSection+".refHeight");
+            if (widthO && heightO)
+            {
+                inputWidth = widthO.get();
+                inputHeight = heightO.get();
+            } 
+        }
         if (layoutType == "equirectangular")
         {
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
