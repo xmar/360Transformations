@@ -27,7 +27,7 @@ class LayoutEquirectangular: public Layout
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
           // Coord3dSpherical rotCoord = Rotation(sphericalCoord, m_rotationQuaternion.Inv());
-            Coord3dSpherical rotCoord = Rotation(Coord3dCart(sphericalCoord/sphericalCoord.Norm())-m_vectorOffsetRatio*Coord3dCart(1, 0, 0), m_rotationQuaternion.Inv());
+            Coord3dSpherical rotCoord = Rotation(Coord3dCart(sphericalCoord/sphericalCoord.Norm()), m_rotationQuaternion.Inv())-m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
             // if (m_vectorOffsetRatio != 0)
             // {
             //   auto theta = rotCoord.GetTheta();
