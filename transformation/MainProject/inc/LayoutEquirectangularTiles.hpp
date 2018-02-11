@@ -88,7 +88,7 @@ class LayoutEquirectangularTiles : public Layout
 
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationQuaternion.Inv()) - m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+            Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationQuaternion.Inv());
             double i = 0.5+rotCoord.GetTheta()/ (2.0*PI());
             double j = rotCoord.GetPhi() / PI();
             //Find tile id:
@@ -140,14 +140,6 @@ class LayoutEquirectangularTiles : public Layout
             }
             phi += PI()*ni.m_normalizedFaceCoordinate.y*GetVTileRatio(std::get<1>(ti));
             Coord3dCart v = Coord3dSpherical(1, theta, phi);
-            if (m_vectorOffsetRatio != 0)
-            {
-              //v = v/v.Norm();
-              auto x = v.GetX();
-              //We compute the norm of the original vector V0 (we know that after the addition of m_vectorOffsetRatio*(1,0,0) the norm of the vector should be 1)
-              auto norm = -m_vectorOffsetRatio*x + std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio*(x*x-1)+1);
-              v = norm*v + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
-            }
             return Rotation(v, m_rotationQuaternion);
         }
 
@@ -416,15 +408,13 @@ class LayoutEquirectangularTiles : public Layout
         std::tuple<unsigned int, unsigned int> m_originalRes;
         bool m_useTile;
         bool m_upscale;
-        double m_vectorOffsetRatio;
 
     public:
 
-        LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, Quaternion rotationQuaternion, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale, double vectorOffsetRatio):
-          Layout(), m_tr(),
+        LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, Quaternion rotationQuaternion, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale, std::shared_ptr<VectorialTrans> vectorialTrans):
+          Layout(vectorialTrans), m_tr(),
           m_scaleTile(std::move(scaleTile)), m_tileRatios(std::move(tileRatios)), m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
-          m_rotationQuaternion(rotationQuaternion), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale),
-          m_vectorOffsetRatio(vectorOffsetRatio)
+          m_rotationQuaternion(rotationQuaternion), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
           {};
 
 

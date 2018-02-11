@@ -39,17 +39,17 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
          * \return LayoutPyramidal2 The LayoutPyramidal2 object generated
          *
          */
-	    static std::shared_ptr<LayoutPyramidal2> GenerateLayout(double baseEdge, Quaternion rotationQuaternion, bool useTile, double vectorOffsetRatio, std::array<unsigned int,5> pixelEdges)
+	    static std::shared_ptr<LayoutPyramidal2> GenerateLayout(double baseEdge, Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::array<unsigned int,5> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
             return std::shared_ptr<LayoutPyramidal2>(new LayoutPyramidal2(baseEdge, rotationQuaternion, useTile,
                 fr.GetRes(Faces::Left)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Right),
-                fr.GetRes(Faces::Top)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Bottom), vectorOffsetRatio,
+                fr.GetRes(Faces::Top)+fr.GetRes(Faces::Base)+fr.GetRes(Faces::Bottom), vectorialTrans,
                 fr));
 	    }
 
-        LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, double vectorOffsetRatio, unsigned int pixelBaseEdge):
-            LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, 3*pixelBaseEdge, useTile, vectorOffsetRatio, {{pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {std::cout << 3*pixelBaseEdge<<std::endl;};
+        LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int pixelBaseEdge):
+            LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, 3*pixelBaseEdge, useTile, vectorialTrans, {{pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge,pixelBaseEdge}}) {std::cout << 3*pixelBaseEdge<<std::endl;};
         virtual ~LayoutPyramidal2(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -74,8 +74,8 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
         virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) override;
         virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override;
     private:
-        LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, unsigned int width, unsigned int height, double vectorOffsetRatio, const FaceResolutions& fr):
-                LayoutPyramidalBased(baseEdge, rotationQuaternion, width, height, useTile, vectorOffsetRatio, fr) {}
+        LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, unsigned int width, unsigned int height, std::shared_ptr<VectorialTrans> vectorialTrans, const FaceResolutions& fr):
+                LayoutPyramidalBased(baseEdge, rotationQuaternion, width, height, useTile, vectorialTrans, fr) {}
 
         unsigned int IStartOffset(LayoutPyramidalBased::Faces f, unsigned int j) const;
 

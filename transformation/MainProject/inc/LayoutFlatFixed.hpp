@@ -7,7 +7,7 @@ class LayoutFlatFixed: public Layout
 {
     public:
         //yaw pitch = theta and phi of the center of the view port; horizontalAngleOfVision (in radian) is the total angle view by this view port. Vertical deduced from the width, height and horizontalAngleOfVision with the hypothesis we keep the same ratio angle per pixel for the vertical
-        LayoutFlatFixed(DynamicPosition dynamicPosition, unsigned int width, unsigned int height, double horizontalAngleOfVision, double verticalAngleOfVision): Layout(width,height),
+        LayoutFlatFixed(DynamicPosition dynamicPosition, unsigned int width, unsigned int height, double horizontalAngleOfVision, double verticalAngleOfVision): Layout(width,height, std::make_shared<VectorialTrans>()),
             m_dynamicPosition(std::move(dynamicPosition)), m_horizontalAngleOfVision(horizontalAngleOfVision),
             m_verticalAngleOfVision(verticalAngleOfVision), m_maxHDist(2.f*std::tan(m_horizontalAngleOfVision/2)),
             m_maxVDist(2.f*std::tan(m_verticalAngleOfVision/2)) {}

@@ -6,8 +6,8 @@ namespace IMT {
 class LayoutEquirectangular: public Layout
 {
     public:
-        LayoutEquirectangular(unsigned int width, unsigned int height, Quaternion rotationQuaternion, double vectorOffsetRatio):
-            Layout(width, height),  m_rotationQuaternion(rotationQuaternion), m_vectorOffsetRatio(vectorOffsetRatio) {}
+        LayoutEquirectangular(unsigned int width, unsigned int height, Quaternion rotationQuaternion, std::shared_ptr<VectorialTrans> vectorialTrans):
+            Layout(width, height, vectorialTrans),  m_rotationQuaternion(rotationQuaternion) {}
         virtual ~LayoutEquirectangular(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -27,7 +27,7 @@ class LayoutEquirectangular: public Layout
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
           // Coord3dSpherical rotCoord = Rotation(sphericalCoord, m_rotationQuaternion.Inv());
-            Coord3dSpherical rotCoord = Rotation(Coord3dCart(sphericalCoord/sphericalCoord.Norm()), m_rotationQuaternion.Inv())-m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+            Coord3dSpherical rotCoord = Rotation(Coord3dCart(sphericalCoord/sphericalCoord.Norm()), m_rotationQuaternion.Inv());
             // if (m_vectorOffsetRatio != 0)
             // {
             //   auto theta = rotCoord.GetTheta();
@@ -53,14 +53,6 @@ class LayoutEquirectangular: public Layout
             // return Rotation(Coord3dSpherical(1, thetaBis, phiBis), m_rotationQuaternion);
             Coord3dSpherical v0 = Coord3dSpherical(1, theta, phi);
             // + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
-
-            if (m_vectorOffsetRatio != 0)
-            {
-              auto x = std::sin(phi)*std::cos(theta);
-              //We compute the norm of the original vector V0 (we know that after the addition of m_vectorOffsetRatio*(1,0,0) the norm of the vector should be 1)
-              auto norm = -m_vectorOffsetRatio*x + std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio*(x*x-1)+1);
-              v0 = norm*v0 + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
-            }
 
             auto v = Rotation(v0, m_rotationQuaternion);
             return v;
@@ -98,6 +90,5 @@ class LayoutEquirectangular: public Layout
         }
     private:
         Quaternion m_rotationQuaternion;
-        double m_vectorOffsetRatio;
 };
 }

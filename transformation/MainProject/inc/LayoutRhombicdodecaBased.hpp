@@ -64,7 +64,7 @@ class LayoutRhombicdodecaBased: public Layout
                 std::array<unsigned int, 12> m_faces;
         };
 
-        LayoutRhombicdodecaBased(Quaternion rotationQuaternion, bool useTile, FaceResolutions fr): Layout(), m_fr(std::move(fr)),
+        LayoutRhombicdodecaBased(Quaternion rotationQuaternion, std::shared_ptr<VectorialTrans> vectorialTrans, bool useTile, FaceResolutions fr): Layout(vectorialTrans), m_fr(std::move(fr)),
           m_rotQuaternion(rotationQuaternion), m_faceRotations(), m_useTile(useTile) {InitFaceRotations();}
         Plan FaceToPlan(Faces f) const
         {

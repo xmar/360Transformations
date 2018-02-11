@@ -6,6 +6,7 @@
 #include "Picture.hpp"
 #include "VideoReader.hpp"
 #include "VideoWriter.hpp"
+#include "VectorialTrans.hpp"
 
 #include "Common.hpp"
 
@@ -22,8 +23,9 @@ class Layout
             CoordF m_normalizedFaceCoordinate;
             int m_faceId;
         };
-        Layout(void): m_outWidth(0), m_outHeight(0), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
-        Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
+        Layout(void): m_outWidth(0), m_outHeight(0), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr), m_vectorialTrans(nullptr) {};
+        explicit Layout(std::shared_ptr<VectorialTrans> vectorialTrans): m_outWidth(0), m_outHeight(0), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr), m_vectorialTrans(vectorialTrans) {};
+        Layout(unsigned int outWidth, unsigned int outHeight, std::shared_ptr<VectorialTrans> vectorialTrans = std::make_shared<VectorialTrans>()): m_outWidth(outWidth), m_outHeight(outHeight), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr), m_vectorialTrans(vectorialTrans) {};
         virtual ~Layout(void) = default;
 
         /*Return the 3D coordinate cartesian of the point corresponding to the pixel with coordinate pixelCoord on the 2d layout*/
@@ -96,6 +98,7 @@ class Layout
         bool m_isInit;
         std::shared_ptr<IMT::LibAv::VideoReader> m_inputVideoPtr;
         std::shared_ptr<IMT::LibAv::VideoWriter> m_outputVideoPtr;
+        std::shared_ptr<VectorialTrans> m_vectorialTrans;
 
         /** \brief Protected function called by Init to initialized the layout object. Can be override. By default do nothing.
          */

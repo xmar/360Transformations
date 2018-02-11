@@ -9,7 +9,7 @@ double LayoutPyramidalBased::UsePlanEquation(double x) const //Use the plan equa
 
 Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    Coord3dSpherical p = Rotation(sphericalCoord, m_rotQuaternion.Inv()) - m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+    Coord3dSpherical p = Rotation(sphericalCoord, m_rotQuaternion.Inv());
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
     auto rtr = IntersectionCart(lambda, p);
@@ -100,14 +100,6 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
         throw std::invalid_argument("FromNormalizedInfoTo3d: Last is not a valid face");
     case Faces::Black:
         return Coord3dCart(0,0,0);
-    }
-    if (m_vectorOffsetRatio != 0)
-    {
-      v = v/v.Norm();
-      auto x = v.GetX();
-      //We compute the norm of the original vector V0 (we know that after the addition of m_vectorOffsetRatio*(1,0,0) the norm of the vector should be 1)
-      auto norm = -m_vectorOffsetRatio*x + std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio*(x*x-1)+1);
-      v = norm*v + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
     }
     return Rotation(v, m_rotQuaternion);
 }

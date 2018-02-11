@@ -12,13 +12,6 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
     // return Rotation(point, m_rotQuaternion*FaceToRotQuaternion(f));
     Coord3dCart v = Rotation(point, FaceToRotQuaternion(f));
     v = v/v.Norm();
-    if (m_vectorOffsetRatio != 0)
-    {
-      auto x = v.GetX();
-      //We compute the norm of the original vector V0 (we know that after the addition of m_vectorOffsetRatio*(1,0,0) the norm of the vector should be 1)
-      auto norm = -m_vectorOffsetRatio*x + std::sqrt(m_vectorOffsetRatio*m_vectorOffsetRatio*(x*x-1)+1);
-      v = norm*v + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
-    }
     // if (f == Faces::Front && i < 0.9 && j == 0)
     // {
     //   std::cout << "V = " << v/v.Norm() << " p = " << Coord3dCart(Rotation(point, FaceToRotQuaternion(f)))/Rotation(point, FaceToRotQuaternion(f)).Norm() << std::endl;
@@ -30,7 +23,7 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
 Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
     //First we find the face with which we intersect
-    Coord3dSpherical p = Coord3dCart(Rotation(sphericalCoord, m_rotQuaternion.Inv())) - m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
+    Coord3dSpherical p = Coord3dCart(Rotation(sphericalCoord, m_rotQuaternion.Inv()));
     p = Coord3dCart(p)/p.Norm();
 
 

@@ -17,6 +17,7 @@
 #include "LayoutPyramidal.hpp"
 #include "LayoutPyramidal2.hpp"
 #include "LayoutRhombicdodeca.hpp"
+#include "OffsetTrans.hpp"
 
 
 namespace IMT {
@@ -75,7 +76,7 @@ namespace IMT {
   for(auto& vr: vRatios) {vr /= sumV;}\
   auto tilesRatios = std::make_tuple(std::move(hRatios),std::move(vRatios));\
   auto orignalRes = std::make_tuple(inputWidth, inputHeight);\
-  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), rotationQuaternion, orignalRes, useTile, upscale, vectorOffsetRatio);
+  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), rotationQuaternion, orignalRes, useTile, upscale, vectorialTrans);
 ///END MACRO GENERATE_EQUI_TILED_LAYOUT
 
 #define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
@@ -301,6 +302,86 @@ Quaternion ParseRotationJSON(std::string s)
   return Quaternion(0);
 }
 
+Coord3dCart ParseVectorJSON(std::string s)
+{
+  std::stringstream ss(s);
+  pt::ptree ptree_json;
+
+  pt::json_parser::read_json(ss, ptree_json);
+
+  auto& v = ptree_json.get_child("type");
+
+  if (v.data() == "vectorCart")
+  {
+    auto vv = ptree_json.get_child("x");
+    auto x = std::stod(vv.data());
+
+    vv = ptree_json.get_child("y");
+    auto y =  std::stod(vv.data());
+
+    vv = ptree_json.get_child("z");
+    auto z = std::stod(vv.data());
+    return Coord3dCart(x, y, z);
+  }
+  else if (v.data() == "vectorSpherical")
+  {
+    auto vv = ptree_json.get_child("rho");
+    auto rho = std::stod(vv.data());
+
+    vv = ptree_json.get_child("theta");
+    auto theta =  std::stod(vv.data())*PI()/180.f;
+
+    vv = ptree_json.get_child("phi");
+    auto phi = std::stod(vv.data())*PI()/180.f;
+    return Coord3dSpherical(rho, theta, phi);
+  }
+  else if (v.data() == "rotation")
+  {
+    auto vv = ptree_json.get_child("rotation");
+    std::ostringstream outSs;
+    pt::json_parser::write_json(outSs, vv);
+    auto q = ParseRotationJSON(outSs.str());
+    return q.Rotation(Coord3dCart(1, 0, 0));
+  }
+  return Coord3dCart(0, 0, 0);
+}
+
+std::shared_ptr<VectorialTrans> GetVectorialTransformation(std::string transSection, pt::ptree& ptree, const Quaternion& layoutRotation)
+{
+    if (transSection.empty())
+    {
+        return std::make_shared<VectorialTrans>();
+    }
+    std::string transType;
+    try
+    {
+        transType = ptree.get<std::string>(transSection+".vectorSpaceTransformationType");
+        if (transType == "offsetTrans")
+        {
+            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
+            auto vector_b_conf = ptree.get_optional<std::string>(transSection+".emphDirection");
+            Coord3dCart b(0, 0, 0);
+            if (vector_b_conf)
+            {
+                b = ParseVectorJSON(vector_b_conf.get());
+                b = b/b.Norm();
+            }
+            else
+            {
+                b = layoutRotation.Rotation(Coord3dCart(1, 0, 0));
+            }
+            std::cout << "offsetTrans -> alpha = " << offsetRatio << "; b = " << b << std::endl;
+            return std::make_shared<OffsetTrans>(offsetRatio, std::move(b));
+        }
+    }
+    catch (std::exception &e)                                                    
+    {                                                                            
+        std::cout << "Error while parsing in configuration file the "<<transSection<<" Vectorial Transformation: " << e.what() << std::endl;
+        throw e;                                                                 
+    }                                                                            
+    throw std::invalid_argument("Not supported type: "+transType);
+}
+
 enum class LayoutStatus
 {
   Input, /// indicates that the layout is an input layout and so will have an input video
@@ -346,12 +427,18 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
         if (layoutType == "equirectangular")
         {
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
+            std::string vectTrans;
+            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+            if (vectTransOptional)
+            {
+                vectTrans = vectTransOptional.get();
+            }
+            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
             if (isInput)
             {
                 inputWidth = refRes.x;
                 inputHeight = refRes.y;
-                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion, vectorOffsetRatio));
+                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion, vectorialTrans));
             }
             else
             {
@@ -359,11 +446,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 double relativeHeight = ptree.get<double>(layoutSection+".height");
                 if (infer)
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion, vectorOffsetRatio));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion, vectorialTrans));
                 }
                 else
                 {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion, vectorOffsetRatio));
+                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion, vectorialTrans));
                 }
             }
 
@@ -376,8 +463,14 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+            std::string vectTrans;
+            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+            if (vectTransOptional)
+            {
+                vectTrans = vectTransOptional.get();
+            }
+            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -394,11 +487,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "cubeMap2")
@@ -409,8 +502,14 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+            std::string vectTrans;
+            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+            if (vectTransOptional)
+            {
+                vectTrans = vectTransOptional.get();
+            }
+            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -427,11 +526,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{unsigned(edgeFront*inputWidth/4), unsigned(edgeBack*inputWidth/4), unsigned(edgeLeft*inputWidth/4), unsigned(edgeRight*inputWidth/4), unsigned(edgeTop*inputWidth/4), unsigned(edgeBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
+                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{unsigned(edgeFront), unsigned(edgeBack), unsigned(edgeLeft), unsigned(edgeRight), unsigned(edgeTop), unsigned(edgeBottom)}});
             }
         }
         if (layoutType == "flatFixed")
@@ -474,7 +573,13 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
-            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
+            std::string vectTrans;
+            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+            if (vectTransOptional)
+            {
+                vectTrans = vectTransOptional.get();
+            }
+            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -491,11 +596,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, pyramidBaseEdgeLength*inputWidth/4);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, pyramidBaseEdgeLength*inputWidth/4);
             }
             else
             {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, pyramidBaseEdgeLength);
+                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, pyramidBaseEdgeLength);
             }
         }
         if (layoutType == "pyramid2")
@@ -507,7 +612,13 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
             double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
             double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
-            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
+            std::string vectTrans;
+            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+            if (vectTransOptional)
+            {
+                vectTrans = vectTransOptional.get();
+            }
+            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             if (isInput)
             {
@@ -524,11 +635,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
             }
             else
             {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorOffsetRatio, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
+                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
             }
         }
         if (layoutType == "rhombicDodeca")
@@ -537,6 +648,14 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             std::array<double, 12> faceResScale;
             std::array<unsigned int, 12> faceRes;
+            std::string vectTrans;
+            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+            if (vectTransOptional)
+            {
+                vectTrans = vectTransOptional.get();
+            }
+            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+
             for (unsigned int i = 0; i < 12; ++i)
             {
                 faceResScale[i] = ptree.get<double>(layoutSection+".rhombEdgeLengthFace"+std::to_string(i+1));
@@ -560,7 +679,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 faceRes[i] = (infer ? inputWidth/8.0 : 1)*faceResScale[i];
             }
 
-            return LayoutRhombicdodeca::GenerateLayout(rotationQuaternion, useTile, faceRes);
+            return LayoutRhombicdodeca::GenerateLayout(rotationQuaternion, vectorialTrans, useTile, faceRes);
         }
         if (layoutType == "equirectangularTiled")
         {
@@ -568,7 +687,14 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
             bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
             bool upscale = ptree.get<bool>(layoutSection+".upscale");
-            double vectorOffsetRatio = ptree.get<double>(layoutSection+".offsetRatio");
+            std::string vectTrans;
+            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+            if (vectTransOptional)
+            {
+                vectTrans = vectTransOptional.get();
+            }
+            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+
 
             unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
             unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");

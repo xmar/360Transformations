@@ -6,12 +6,12 @@ using namespace IMT;
 
 Coord3dCart Layout::From2dTo3d(const CoordI& pixelCoord) const
 {
-    return FromNormalizedInfoTo3d(From2dToNormalizedFaceInfo(pixelCoord));
+    return m_vectorialTrans->FromBeforeTrans3dToAfterTrans3d(FromNormalizedInfoTo3d(From2dToNormalizedFaceInfo(pixelCoord)));
 }
 
 CoordF Layout::FromSphereTo2d(const Coord3dSpherical& sphericalCoord) const
 {
-    return FromNormalizedInfoTo2d(From3dToNormalizedFaceInfo(sphericalCoord));
+    return FromNormalizedInfoTo2d(From3dToNormalizedFaceInfo(m_vectorialTrans->FromAfterTrans3dToBeforeTrans3d(sphericalCoord)));
 }
 
 std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout& destLayout) const

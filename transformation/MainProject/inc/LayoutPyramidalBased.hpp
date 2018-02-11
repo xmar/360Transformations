@@ -10,8 +10,8 @@ class LayoutPyramidalBased : public Layout
         struct FaceResolutions;//Forward declaration
     public:
         enum class Faces: int {Base, Left, Right, Top, Bottom, Black, Last, First = Base};
-        LayoutPyramidalBased(double baseEdge, Quaternion rotationQuaternion, unsigned int width, unsigned int height, double useTile, double vectorOffsetRatio, FaceResolutions fr):
-            Layout(width,height),
+        LayoutPyramidalBased(double baseEdge, Quaternion rotationQuaternion, unsigned int width, unsigned int height, double useTile, std::shared_ptr<VectorialTrans> vectorialTrans, FaceResolutions fr):
+            Layout(width,height,vectorialTrans),
              m_baseEdge(baseEdge), m_alpha(baseEdge/2.0),
              m_canonicTopPlan((1-std::pow(m_alpha,2))/(2*m_alpha), 0, 1, -(1+std::pow(m_alpha,2))/(2*m_alpha)),
              m_top(-m_canonicTopPlan[3]/m_canonicTopPlan[0], 0, 0),
@@ -20,8 +20,7 @@ class LayoutPyramidalBased : public Layout
              m_topHeight((m_top-Coord3dCart(1,0,m_alpha)).Norm()),
              m_intersectionHeight((m_interTop-Coord3dCart(1,0,m_alpha)).Norm()), m_fr(std::move(fr)),
              m_rotQuaternion(rotationQuaternion),
-             m_useTile(useTile),
-             m_vectorOffsetRatio(vectorOffsetRatio)
+             m_useTile(useTile)
              {}
 
     const bool& UseTile(void) const {return m_useTile;}
@@ -103,7 +102,6 @@ class LayoutPyramidalBased : public Layout
       double m_topHeight; //Height of the top face (from (1, 0, m_alpha) to m_top
       double m_intersectionHeight; //Distance between (1, 0, m_alpha) and m_interTop
       bool m_useTile;
-      double m_vectorOffsetRatio;
 
       double UsePlanEquation(double x) const; //compute the value of z knowing the value of x (for the top plan in the canonic pyramid)
       FaceResolutions m_fr;

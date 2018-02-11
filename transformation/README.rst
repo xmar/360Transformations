@@ -487,3 +487,29 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   equirectangularTileBitrate_7_7=0.25
   ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
   bitrate=1
+
+
+**Transformation on the Sphere**
+
+For all layout except for the FlatFixed layout, it is possible to plug a transformation the change the viewing direction corresponding to each pixel, and create a kind of warp on the projection.
+For instance, this is what Facebook Offset Cubemap projection do.
+
+To plug a spherical transformation add on the layout configuration the field:
+                                                                                 
+.. code-block:: ini
+    ;Offset is the name of the Section containing the description of the transformation
+    vectorSpaceTransformation=Offset
+
+For the **offset** transformation:
+
+.. code-block:: ini
+    [Offset]                                                                         
+    ;Vector space transformation type is "offsetTrans"
+    vectorSpaceTransformationType=offsetTrans                                        
+    ;offsetRatio is the amplitude of the offset vector applied on each viewing direction
+    offsetRatio=0.6                                                                  
+    ;The emphDirection field is optional, and is used to define the emphasized direction (the center of the emphasized region) it is also the offset vector (normalized)
+    ;emphDirection type can be: vectorCart, vectorSpherical or rotation (if emphDirection does not exist, will be centered on the layout center)
+    ;emphDirection={"type":"vectorCart", "x": 1, "y":0, "z":0}                       
+    ;emphDirection={"type":"vectorSpherical", "rho": 1, "theta":-90, "phi":90}       
+    ;emphDirection={"type":"rotation", "rotation":{"type":"euler", "yaw":-90.0, "pitch":0.0, "roll":0.0}}
