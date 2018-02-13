@@ -49,6 +49,7 @@ namespace LibAv
             template<int nbStreams>
             void Init(std::string codecName, std::array<unsigned, nbStreams>  widthVect, std::array<unsigned, nbStreams> heightVect, unsigned fps, unsigned gop_size, std::array<unsigned, nbStreams> bit_rateVect)
             {
+                m_codecName = codecName;
                 //av_log_set_level(AV_LOG_DEBUG);
                 PRINT_DEBUG_VideoWrite("Start init video writer")
                 if (m_isInit)
@@ -112,12 +113,14 @@ namespace LibAv
                         ++i;
                       }
                     }
-                    if (supportAV_PIX_FMT_YUV420P)
+                    if (supportAV_PIX_FMT_YUV420P || codecName == "rawvideo")
                     {
+                      PRINT_DEBUG_VideoWrite("PIX FMT = YUV420P")
                       m_codec_ctx[id]->pix_fmt = AV_PIX_FMT_YUV420P;
                     }
                     else if (supportAV_PIX_FMT_RGB24)
                     {
+                      PRINT_DEBUG_VideoWrite("PIX FMT = RGB24")
                       m_codec_ctx[id]->pix_fmt = AV_PIX_FMT_RGB24;
                     }
                     m_codec_ctx[id]->max_b_frames = 2;
@@ -130,11 +133,14 @@ namespace LibAv
                     PRINT_DEBUG_VideoWrite("Open the codec")
                     AVDictionary* voptions = nullptr;
                     //av_dict_set(&voptions, "profile", "baseline", 0);
-                    if (avcodec_open2(m_codec_ctx[id], codec, nullptr/*&voptions*/) < 0)
+                    if (codecName != "rawvideo" || true)
                     {
-                        throw std::runtime_error("Cannot open "+codecName);
+                        if (avcodec_open2(m_codec_ctx[id], codec, nullptr/*&voptions*/) < 0)
+                        {
+                            throw std::runtime_error("Cannot open "+codecName);
+                        }
+                        outformat->video_codec = codec->id;
                     }
-                    outformat->video_codec = codec->id;
                     m_lastFramesQueue.push_back(std::queue<AVFrame*>());
                 }
 
@@ -180,6 +186,7 @@ namespace LibAv
             std::vector<AVStream*> m_vstream;
             std::vector<std::queue<AVFrame*>> m_lastFramesQueue;
             unsigned m_pts;
+            std::string m_codecName;
 
             bool m_isInit;
 
