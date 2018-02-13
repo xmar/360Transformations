@@ -513,3 +513,14 @@ For the **offset** transformation:
     ;emphDirection={"type":"vectorCart", "x": 1, "y":0, "z":0}                       
     ;emphDirection={"type":"vectorSpherical", "rho": 1, "theta":-90, "phi":90}       
     ;emphDirection={"type":"rotation", "rotation":{"type":"euler", "yaw":-90.0, "pitch":0.0, "roll":0.0}}
+
+For the **horizontalOffset** transformation (perform the offset only in the horizontal plan. Pixels corresponding to viewing direction with the same longitude before the projection will also have the same longitude after the projection [i.e. preserve "vertical" lines]):
+
+.. code-block:: ini
+    [Offset]                                                                         
+    ;Vector space transformation type is "horizontalOffsetTrans"
+    vectorSpaceTransformationType=horizontalOffsetTrans                                        
+    ;offsetRatio is the amplitude of the offset vector applied on each viewing direction
+    offsetRatio=0.6
+    ;orientation indicates the rotation perform before considering what is the horizontal. If not set, we considere the rotation performed by the layout that use this transformation. For instance: orientation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":90.0}  will perform a vertical Offset transformation.
+    ;orientation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":0.0}

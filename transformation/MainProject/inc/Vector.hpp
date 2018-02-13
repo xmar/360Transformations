@@ -45,6 +45,8 @@ public:
   constexpr VectorCartesian operator-(const VectorCartesian& v) const {return VectorCartesian(m_x-v.m_x, m_y-v.m_y, m_z-v.m_z);}
   constexpr VectorCartesian operator*(const SCALAR& s) const {return VectorCartesian(s*m_x, s*m_y, s*m_z);}
   constexpr VectorCartesian operator/(const SCALAR& s) const {return VectorCartesian(m_x/s, m_y/s, m_z/s);}
+  VectorCartesian& operator/=(const SCALAR& s) { m_x/=s; m_y/=s; m_z/=s; return *this;}
+  VectorCartesian& operator*=(const SCALAR& s) { m_x*=s; m_y*=s; m_z*=s; return *this;}
   //dot product
   constexpr SCALAR operator*(const VectorCartesian& v) const {return DotProduct(v);}
   //Vector product

@@ -18,6 +18,7 @@
 #include "LayoutPyramidal2.hpp"
 #include "LayoutRhombicdodeca.hpp"
 #include "OffsetTrans.hpp"
+#include "HorizontalOffsetTrans.hpp"
 
 
 namespace IMT {
@@ -373,6 +374,23 @@ std::shared_ptr<VectorialTrans> GetVectorialTransformation(std::string transSect
             std::cout << "offsetTrans -> alpha = " << offsetRatio << "; b = " << b << std::endl;
             return std::make_shared<OffsetTrans>(offsetRatio, std::move(b));
         }
+        if (transType == "horizontalOffsetTrans")
+        {
+            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
+            auto orientation_conf = ptree.get_optional<std::string>(transSection+".orientation");
+            Quaternion q;
+            if (orientation_conf)
+            {
+                q = ParseRotationJSON(orientation_conf.get());
+            }
+            else
+            {
+                q = layoutRotation;
+            }
+            std::cout << "horizontalOffsetTrans -> alpha = " << offsetRatio << "; q = " << q << std::endl;
+            return std::make_shared<HorizontalOffsetTrans>(offsetRatio, std::move(q));
+        }
+
     }
     catch (std::exception &e)                                                    
     {                                                                            
