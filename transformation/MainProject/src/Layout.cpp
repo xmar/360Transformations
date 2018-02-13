@@ -33,7 +33,7 @@ std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout
                 auto coordPixelOriginalPic = FromSphereTo2d(thisPixel3dPolar); //coordinate of the corresponding pixel in the input picture
                 if (inInterval(coordPixelOriginalPic.x, 0, layoutPic.GetMat().cols) && inInterval(coordPixelOriginalPic.y, 0, layoutPic.GetMat().rows))
                 {
-                    pic->SetValue(CoordI(i,j), layoutPic.GetInterPixel(coordPixelOriginalPic));
+                    pic->SetValue(CoordI(i,j), layoutPic.GetInterPixel(coordPixelOriginalPic, m_interpol));
                 }
                 else
                 {

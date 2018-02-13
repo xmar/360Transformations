@@ -179,6 +179,27 @@ int main( int argc, const char* argv[] )
       auto startFrame = ptree.get<unsigned int>("Global.startFrame");
       auto videoOutputBitRate = ptree.get<unsigned int>("Global.videoOutputBitRate")*1000;
       double fps = ptree.get<double>("Global.fps");
+      auto interpolTechOpt = ptree.get_optional<std::string>("Global.interpolation");
+      Picture::InterpolationTech interpol = Picture::InterpolationTech::BILINEAR;
+      if (interpolTechOpt && interpolTechOpt.get().size() > 0)
+      {
+        if (interpolTechOpt.get() == "NEAREST_NEIGHTBOOR")
+        {
+            interpol = Picture::InterpolationTech::NEAREST_NEIGHTBOOR;
+        }
+        else if (interpolTechOpt.get() == "BILINEAR")
+        {
+            interpol = Picture::InterpolationTech::BILINEAR;
+        }
+        else if (interpolTechOpt.get() == "BICUBIC")
+        {
+            interpol = Picture::InterpolationTech::BICUBIC;
+        }
+        else
+        {
+            std::cout << "Interpolation " << interpolTechOpt.get() << " not recognized; BILINEAR interpolation will be used instead" << std::endl;
+        }
+      }
 
       //This vector contains the shared pointer of each layout named in the LayoutFlowSections
       std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
@@ -195,6 +216,7 @@ int main( int argc, const char* argv[] )
           {
               layoutFlowVect.back().push_back(InitialiseLayout(lfs, ptree, layoutStatus, refResolution.x, refResolution.y));
               layoutFlowVect.back().back()->Init();
+              layoutFlowVect.back().back()->SetInterpolationTech(interpol);
               refResolution = layoutFlowVect.back().back()->GetReferenceResolution();
               ++k;
               if (layoutStatus == LayoutStatus::Input)
