@@ -502,9 +502,9 @@ int main( int argc, const char* argv[] )
 
           auto endTime = std::chrono::high_resolution_clock::now();
           auto duration = std::chrono::duration_cast<std::chrono::microseconds>( endTime - startTime ).count();
-          averageDuration = (averageDuration*count + duration)/(count+1);
+          averageDuration = (averageDuration*(count-startFrame) + duration)/((count-startFrame)+1);
           std::cout << "Elapsed time for this picture: "<< print_time(long(float(duration)/1000.f)) << " "
-            "estimated remaining time = " << print_time(long((nbFrames-count-1)*averageDuration/1000.f)) << " "  << std::endl;
+            "estimated remaining time = " << print_time(long((nbFrames-(count-startFrame)-1)*averageDuration/1000.f)) << " "  << std::endl;
         }
         if (++count >= nbFrames+startFrame)
         {
