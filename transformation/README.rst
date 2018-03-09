@@ -10,8 +10,75 @@ The folder *Scripts* contains a Python3 script used to test our streaming archit
 The projection tool can read a 360-degree video projected on any known 2D layout, can project this video onto any known 2D layout and can extract any Field of View (FoV) from the 360-degree video.
 For now the FoV extraction is static: i.e. the FoV center cannot move during the video.
 
+How To Compile: First way, using the docker container
+-----------------------------------------------------
 
-How To Compile: First way, using conan
+Requirements
+............
+
+You need a recent version of docker installed and running on your machine.
+
+Compilation steps
+.................
+
+Inside the transformation repository, run the following command to build the docker image::
+
+    docker build -t trans360 .
+
+You now have a docker image named trans360 that contains a basic archlinux installation with a software named  **trans** located stored inside the /bin repository.
+
+You have to run the build command each time you change a source file.
+
+How to use the docker container?
+................................
+
+You have to mount the folder that contains the configuration file and the folder that contains the video inside the container.
+Paths inside the configuration file should be paths inside the container, not inside your machine.
+Output files should be writing to mounted folder if you want to get them on your host machine.
+The container working directory is /home/trans360.
+
+For instance, to run the examples scripts, the configuration files and the input videos are inside the PATH_TO_TRANS_FOLDER/examples folder.
+The following command will mount the examples fodler into the working directory of the container, creates and starts the trans360 container,
+and finaly run the **trans** software on the configuration file named Config_1.ini::
+
+    docker run -v PATH_TO_TRANS_FOLDER/examples:/home/trans360 trans360 trans -c Config_1.ini
+
+Cf. How To Use Section for more information on the configuration file.
+
+How To Compile: Second way, installing the depencies yourself
+------------------------------------------------------------
+
+Requirements
+............
+
+* A **C++11** compiler (for instance gcc version 5 or more recent)
+* **CMake** version 3 or more recent
+* **opencv** at least version 3
+* **ffmpeg livav**
+* **boost**
+
+OpenCV, libav ffmpeg (with the lastest API) and boost are supposed installed on you computer.
+If cmake cannot find those libs it will print an error message.
+
+Compilation steps
+.................
+
+Create the build repository and move into it::
+
+    mkdir build
+    cd build
+
+Generate the Makefile::
+
+    cmake ..
+
+Compile the software::
+
+    make
+
+Now a software named **trans** should be in your build repository
+
+How To Compile: Third way, using conan
 --------------------------------------
 
 Requirements
@@ -52,38 +119,6 @@ Compile the software::
 
 Now a software named **trans** should be in your build repository
 
-How To Compile: Second way, installing the depencies yourself
-------------------------------------------------------------
-
-Requirements
-............
-
-* A **C++11** compiler (for instance gcc version 5 or more recent)
-* **CMake** version 3 or more recent
-* **opencv** at least version 3
-* **ffmpeg livav**
-* **boost**
-
-OpenCV, libav ffmpeg (with the lastest API) and boost are supposed installed on you computer.
-If cmake cannot find those libs it will print an error message.
-
-Compilation steps
-.................
-
-Create the build repository and move into it::
-
-    mkdir build
-    cd build
-
-Generate the Makefile::
-
-    cmake ..
-
-Compile the software::
-
-    make
-
-Now a software named **trans** should be in your build repository
 
 
 How To Use
