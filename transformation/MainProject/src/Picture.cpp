@@ -441,26 +441,26 @@ double Picture::GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& lay
   #pragma omp parallel for shared(vRef, vArg, pic, layoutThisPict, layoutArgPic) schedule(dynamic)
   for (unsigned long p = 0; p < nbOfUniformPointOneSphere; ++p)
   {
-    Coord3dSpherical pointOnTheSphere(1, uniformPointOneSphere[2*p + 1], uniformPointOneSphere[2*p]);
+    Coord3dSpherical pointOnTheSphere(1, uniformPointOneSphere[2*p + 1]*PI()/180.f, uniformPointOneSphere[2*p]*PI()/180.f);
     CoordI pixelCoordOnRefPic = layoutThisPict.FromSphereTo2d(pointOnTheSphere);
     CoordI pixelCoordOnArgPic = layoutArgPic.FromSphereTo2d(pointOnTheSphere);
 
     if (inInterval(pixelCoordOnRefPic.x, 0, this->GetMat().cols) && inInterval(pixelCoordOnRefPic.y, 0,  this->GetMat().rows))
     {
-      vRef.at<Pixel>(p/2, 0) = GetInterPixel(pixelCoordOnRefPic, it);
+      vRef.at<Pixel>(p, 0) = GetInterPixel(pixelCoordOnRefPic, it);
     }
     else
     {
-      vRef.at<Pixel>(p/2, 0) = Pixel(0,0,0);
+      vRef.at<Pixel>(p, 0) = Pixel(0,0,0);
     }
 
     if (inInterval(pixelCoordOnArgPic.x, 0, pic.GetMat().cols) && inInterval(pixelCoordOnArgPic.y, 0,  pic.GetMat().rows))
     {
-      vArg.at<Pixel>(p/2, 0) = GetInterPixel(pixelCoordOnArgPic, it);
+      vArg.at<Pixel>(p, 0) = GetInterPixel(pixelCoordOnArgPic, it);
     }
     else
     {
-      vArg.at<Pixel>(p/2, 0) = Pixel(0,0,0);
+      vArg.at<Pixel>(p, 0) = Pixel(0,0,0);
     }
   }
 
