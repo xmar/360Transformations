@@ -1,5 +1,7 @@
-FROM archimg/base-devel:latest as builder
-RUN pacman -q --noconfirm -Syyuu gcc cmake ffmpeg opencv boost hdf5 openmp
+FROM debian:buster as builder
+RUN apt-get update && apt-get upgrade -y && apt-get install -y ffmpeg libopencv-dev libboost-all-dev
+RUN apt-get install -y build-essential
+RUN apt-get install -y cmake libgomp1
 WORKDIR /tmp
 COPY . /tmp
 RUN rm -rf build && mkdir build
@@ -7,7 +9,7 @@ WORKDIR /tmp/build
 RUN cmake ..
 RUN make
 
-FROM archimg/base:latest as worker
-RUN pacman -q --noconfirm -Syyuu ffmpeg opencv boost hdf5 openmp
+FROM debian:buster as worker
+RUN apt-get update && apt-get upgrade -y && apt-get install -y ffmpeg libopencv-dev libboost-all-dev
 WORKDIR /home/trans360
 COPY --from=builder /tmp/build/MainProject/trans /bin

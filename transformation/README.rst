@@ -25,7 +25,8 @@ Inside the transformation repository, run the following command to build the doc
 
     docker build -t trans360 .
 
-You now have a docker image named trans360 that contains a basic archlinux installation with a software named  **trans** located stored inside the /bin repository.
+You now have a docker image named trans360 that contains a debian buster installation with the  **trans** executable located stored inside the /bin repository.
+The dockfile contains two stages: a build stage and stage that keeps only the minimum needed.
 
 You have to run the build command each time you change a source file.
 
@@ -41,7 +42,7 @@ For instance, to run the examples scripts, the configuration files and the input
 The following command will mount the examples fodler into the working directory of the container, creates and starts the trans360 container,
 and finaly run the **trans** software on the configuration file named Config_1.ini::
 
-    docker run -v PATH_TO_TRANS_FOLDER/examples:/home/trans360 trans360 trans -c Config_1.ini
+    docker run --rm -v PATH_TO_TRANS_FOLDER/examples:/home/trans360 trans360 trans -c Config_1.ini
 
 Cf. How To Use Section for more information on the configuration file.
 
