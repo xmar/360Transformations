@@ -47,7 +47,7 @@ namespace LibAv
             ~VideoWriter(void);
 
             template<int nbStreams>
-            void Init(std::string codecName, std::array<unsigned, nbStreams>  widthVect, std::array<unsigned, nbStreams> heightVect, unsigned fps, unsigned gop_size, std::array<unsigned, nbStreams> bit_rateVect)
+            void Init(std::string codecName, std::array<unsigned, nbStreams>  widthVect, std::array<unsigned, nbStreams> heightVect, unsigned fps, unsigned gop_size, std::array<int, nbStreams> bit_rateVect)
             {
                 m_codecName = codecName;
                 //av_log_set_level(AV_LOG_DEBUG);
@@ -93,7 +93,14 @@ namespace LibAv
                     m_vstream[id]->id = id;
                     m_codec_ctx.push_back(m_vstream[id]->codec);
                     avcodec_get_context_defaults3(m_codec_ctx[id], codec);
-                    m_codec_ctx[id]->bit_rate = bit_rate;
+                    if (bit_rate >= 0)
+                    {
+                        m_codec_ctx[id]->bit_rate = bit_rate;
+                    }
+                    else
+                    {
+                        m_codec_ctx[id]->bit_rate = -1;
+                    }
                     m_codec_ctx[id]->sample_aspect_ratio.num = 1;
                     m_codec_ctx[id]->sample_aspect_ratio.den = 1;
                     m_codec_ctx[id]->width = width;
@@ -132,10 +139,14 @@ namespace LibAv
                     //Open codec
                     PRINT_DEBUG_VideoWrite("Open the codec")
                     AVDictionary* voptions = nullptr;
+                    if (bit_rate < 0 && codecName == "libx265")
+                    {
+                        av_dict_set(&voptions, "x265-params", "lossless=1", 0);
+                    }
                     //av_dict_set(&voptions, "profile", "baseline", 0);
                     if (codecName != "rawvideo" || true)
                     {
-                        if (avcodec_open2(m_codec_ctx[id], codec, nullptr/*&voptions*/) < 0)
+                        if (avcodec_open2(m_codec_ctx[id], codec, &voptions) < 0)
                         {
                             throw std::runtime_error("Cannot open "+codecName);
                         }

@@ -116,10 +116,10 @@ namespace IMT {
 
 
 namespace pt = boost::property_tree;
-std::vector<unsigned> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, unsigned bitrateGoal)
+std::vector<int> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, int bitrateGoal)
 {
     std::string layoutType;
-    std::vector<unsigned> bitrateVect;
+    std::vector<int> bitrateVect;
     try {
         layoutType = ptree.get<std::string>(layoutSection+".type");
         if (layoutType == "equirectangular")

@@ -206,12 +206,12 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutCubeMap::InitInputVideoImpl(std::
     return vrPtr;
 }
 
-std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
+std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect)
 {
   std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
   if (UseTile())
   {
-    std::array<unsigned, 6> br;
+    std::array<int, 6> br;
     std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 6, br.begin());
     std::array<unsigned, 6> resArr;
     for (unsigned i = 0; i < 6; ++i)
@@ -222,7 +222,7 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std:
   }
   else
   {
-    std::array<unsigned, 1> br;
+    std::array<int, 1> br;
     std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
     std::array<unsigned, 1> resArrV;
     std::array<unsigned, 1> resArrH;

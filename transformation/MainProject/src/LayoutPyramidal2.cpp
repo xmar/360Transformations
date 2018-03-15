@@ -353,12 +353,12 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutPyramidal2::InitInputVideoImpl(st
     return vrPtr;
 }
 
-std::shared_ptr<IMT::LibAv::VideoWriter> LayoutPyramidal2::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
+std::shared_ptr<IMT::LibAv::VideoWriter> LayoutPyramidal2::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect)
 {
     std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
     if (UseTile())
     {
-      std::array<unsigned, 5> br;
+      std::array<int, 5> br;
       std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 5, br.begin());
       std::array<unsigned, 5> widthArr;
       std::array<unsigned, 5> heightArr;
@@ -373,7 +373,7 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutPyramidal2::InitOutputVideoImpl(s
     }
     else
     {
-      std::array<unsigned, 1> br;
+      std::array<int, 1> br;
       std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
       std::array<unsigned, 1> widthArr;
       std::array<unsigned, 1> heightArr;

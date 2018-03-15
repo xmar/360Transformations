@@ -72,7 +72,7 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override;
         virtual void WritePictureToVideoImpl(std::shared_ptr<Picture>) override;
         virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) override;
-        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect) override;
     private:
         LayoutPyramidal2(double baseEdge, Quaternion rotationQuaternion, bool useTile, unsigned int width, unsigned int height, std::shared_ptr<VectorialTrans> vectorialTrans, const FaceResolutions& fr):
                 LayoutPyramidalBased(baseEdge, rotationQuaternion, width, height, useTile, vectorialTrans, fr) {}

@@ -219,8 +219,12 @@ double Picture::GetMSE(const Picture& pic) const
     {
         throw std::invalid_argument("MSE computation require pictures to have the same width and height");
     }
-    cv::Mat tmp(cv::Mat::zeros(GetHeight(), GetWidth(), m_pictMat.type()));
-    cv::subtract(m_pictMat, pic.m_pictMat, tmp);
+    //cv::Mat tmp(cv::Mat::zeros(GetHeight(), GetWidth(), m_pictMat.type()));
+    cv::Mat tmp(cv::Mat::zeros(GetHeight(), GetWidth(), CV_32F));
+    cv::Mat tmp2(cv::Mat::zeros(GetHeight(), GetWidth(), CV_32F));
+    cv::cvtColor(m_pictMat, tmp, cv::COLOR_BGR2YCrCb);
+    cv::cvtColor(pic.m_pictMat, tmp2, cv::COLOR_BGR2YCrCb);
+    cv::subtract(tmp, tmp2, tmp);
     cv::multiply(tmp, tmp, tmp);
     return cv::mean(tmp).val[0];
 }
@@ -464,8 +468,18 @@ double Picture::GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& lay
     }
   }
 
-  cv::Mat tmp(nbOfUniformPointOneSphere, 1, m_pictMat.type());
-  cv::subtract(vRef, vArg, tmp);
+  cv::Mat vRefYUV;
+  cv::Mat vArgYUV;
+  cv::cvtColor(vRef, vRefYUV, cv::COLOR_BGR2YCrCb);
+  cv::cvtColor(vArg, vArgYUV, cv::COLOR_BGR2YCrCb);
+  cv::Mat channels[3];
+  cv::Mat channels2[3];
+  cv::split(vRefYUV, channels);
+  cv::split(vArgYUV, channels2);
+  //cv::Mat tmp(nbOfUniformPointOneSphere, 1, m_pictMat.type());
+  cv::Mat tmp(nbOfUniformPointOneSphere, 1, CV_32F);
+  cv::subtract(channels[0], channels2[0], tmp);
+  //cv::subtract(vRefYUV, vArgYUV, tmp);
   cv::multiply(tmp, tmp, tmp);
 
   auto mse = cv::mean(tmp).val[0];

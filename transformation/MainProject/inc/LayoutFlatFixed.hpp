@@ -31,7 +31,7 @@ class LayoutFlatFixed: public Layout
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override;
         virtual void WritePictureToVideoImpl(std::shared_ptr<Picture>) override;
         virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) override;
-        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override;
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect) override;
     private:
         DynamicPosition m_dynamicPosition;
         double m_horizontalAngleOfVision;

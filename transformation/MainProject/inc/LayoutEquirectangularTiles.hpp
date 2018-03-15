@@ -211,12 +211,12 @@ class LayoutEquirectangularTiles : public Layout
             return vrPtr;
         }
 
-        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) override
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect) override
         {
             std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
             if (m_useTile)
             {
-              std::array<unsigned, nbHTiles*nbVTiles> br;
+              std::array<int, nbHTiles*nbVTiles> br;
               std::copy_n(std::make_move_iterator(bit_rateVect.begin()), nbHTiles*nbVTiles, br.begin());
               std::array<unsigned, nbHTiles*nbVTiles> widthArr;
               std::array<unsigned, nbHTiles*nbVTiles> heightArr;
@@ -233,7 +233,7 @@ class LayoutEquirectangularTiles : public Layout
             }
             else
             {
-              std::array<unsigned, 1> br;
+              std::array<int, 1> br;
               std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
               std::array<unsigned, 1> widthArr;
               std::array<unsigned, 1> heightArr;

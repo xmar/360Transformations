@@ -66,7 +66,7 @@ class Layout
                 m_inputVideoPtr = InitInputVideoImpl(pathToInputVideo, nbFrame);
             }
         }
-        void InitOutputVideo(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect)
+        void InitOutputVideo(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect)
         {
             if (m_outputVideoPtr == nullptr)
             {
@@ -108,7 +108,7 @@ class Layout
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void)  = 0;
         virtual void WritePictureToVideoImpl(std::shared_ptr<Picture>)  = 0;
         virtual std::shared_ptr<IMT::LibAv::VideoReader> InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame) = 0;
-        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<unsigned> bit_rateVect) = 0;
+        virtual std::shared_ptr<IMT::LibAv::VideoWriter> InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect) = 0;
         void SetWidth(unsigned int w) {m_outWidth = w;}
         void SetHeight(unsigned int h) {m_outHeight = h;}
 
