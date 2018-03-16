@@ -219,20 +219,24 @@ double Picture::GetMSE(const Picture& pic) const
     {
         throw std::invalid_argument("MSE computation require pictures to have the same width and height");
     }
-    //cv::Mat tmp(cv::Mat::zeros(GetHeight(), GetWidth(), m_pictMat.type()));
-    cv::Mat tmp(cv::Mat::zeros(GetHeight(), GetWidth(), CV_32F));
-    cv::Mat tmp2(cv::Mat::zeros(GetHeight(), GetWidth(), CV_32F));
-    cv::cvtColor(m_pictMat, tmp, cv::COLOR_BGR2YCrCb);
-    cv::cvtColor(pic.m_pictMat, tmp2, cv::COLOR_BGR2YCrCb);
-    cv::subtract(tmp, tmp2, tmp);
-    cv::multiply(tmp, tmp, tmp);
-    return cv::mean(tmp).val[0];
+    cv::Mat s1;
+    cv::Mat vRefYUV;
+    cv::Mat vArgYUV;
+    cv::cvtColor(m_pictMat, vRefYUV, cv::COLOR_BGR2YUV);
+    cv::cvtColor(pic.m_pictMat, vArgYUV, cv::COLOR_BGR2YUV);
+    cv::absdiff(vRefYUV, vArgYUV, s1);
+    s1.convertTo(s1, CV_32F);
+    s1 = s1.mul(s1);
+    cv::Scalar s = cv::sum(s1);
+
+    return cv::mean(s1).val[0];
+
 }
 
 double Picture::GetPSNR(const Picture& pic) const
 {
     auto mse = GetMSE(pic);
-    return mse != 0 ? 10.0*std::log10(255*255/mse) : 100.0;
+    return mse != 0 ? 10.0*std::log10((255*255)/mse) : 100.0;
 }
 
 // Smoothing using a Gaussian kernel of size ksize with standard deviation sigma
@@ -256,81 +260,55 @@ std::tuple<double, double> Picture::ComputeSSIM(const cv::Mat& img1_ori, const c
         throw std::invalid_argument("SSIM computation require pictures to have the same width and height");
     }
 
-    cv::Mat img1, img2;
-    if (img1_ori.type() != CV_32F)
-    {
-         img1_ori.convertTo(img1, CV_32F);
-    }
-    else
-    {
-        img1 = img1_ori;
-    }
-    if (img2_ori.type() != CV_32F)
-    {
-         img2_ori.convertTo(img2, CV_32F);
-    }
-    else
-    {
-        img2 = img2_ori;
-    }
+    /***************************** INITS **********************************/
+    int d = CV_32F;
 
-    int ht = img1.rows;
-    int wt = img1.cols;
-    int w = wt - 10;
-    int h = ht - 10;
+    cv::Mat I1, I2;
+    img1_ori.convertTo(I1, d);            // cannot calculate on one byte large values
+    img2_ori.convertTo(I2, d);
 
-    cv::Mat mu1(h,w,CV_32F), mu2(h,w,CV_32F);
-    cv::Mat mu1_sq(h,w,CV_32F), mu2_sq(h,w,CV_32F), mu1_mu2(h,w,CV_32F);
-    cv::Mat img1_sq(ht,wt,CV_32F), img2_sq(ht,wt,CV_32F), img1_img2(ht,wt,CV_32F);
-    cv::Mat sigma1_sq(h,w,CV_32F), sigma2_sq(h,w,CV_32F), sigma12(h,w,CV_32F);
-    cv::Mat tmp1(h,w,CV_32F), tmp2(h,w,CV_32F), tmp3(h,w,CV_32F);
-    cv::Mat ssim_map(h,w,CV_32F), cs_map(h,w,CV_32F);
+    cv::Mat I2_2   = I2.mul(I2);        // I2^2
+    cv::Mat I1_2   = I1.mul(I1);        // I1^2
+    cv::Mat I1_I2  = I1.mul(I2);        // I1 * I2
 
-    // mu1 = filter2(window, img1, 'valid');
-    ApplyGaussianBlur(img1, mu1, 11, 1.5);
+    /*************************** END INITS **********************************/
 
-    // mu2 = filter2(window, img2, 'valid');
-    ApplyGaussianBlur(img2, mu2, 11, 1.5);
+    cv::Mat mu1, mu2;                   // PRELIMINARY COMPUTING
+    cv::GaussianBlur(I1, mu1, cv::Size(11, 11), 1.5);
+    cv::GaussianBlur(I2, mu2, cv::Size(11, 11), 1.5);
 
-    // mu1_sq = mu1.*mu1;
-    cv::multiply(mu1, mu1, mu1_sq);
-    // mu2_sq = mu2.*mu2;
-    cv::multiply(mu2, mu2, mu2_sq);
-    // mu1_mu2 = mu1.*mu2;
-    cv::multiply(mu1, mu2, mu1_mu2);
+    cv::Mat mu1_2   =   mu1.mul(mu1);
+    cv::Mat mu2_2   =   mu2.mul(mu2);
+    cv::Mat mu1_mu2 =   mu1.mul(mu2);
 
-    cv::multiply(img1, img1, img1_sq);
-    cv::multiply(img2, img2, img2_sq);
-    cv::multiply(img1, img2, img1_img2);
+    cv::Mat sigma1_2, sigma2_2, sigma12;
 
-    // sigma1_sq = filter2(window, img1.*img1, 'valid') - mu1_sq;
-    ApplyGaussianBlur(img1_sq, sigma1_sq, 11, 1.5);
-    sigma1_sq -= mu1_sq;
+    cv::GaussianBlur(I1_2, sigma1_2, cv::Size(11, 11), 1.5);
+    sigma1_2 -= mu1_2;
 
-    // sigma2_sq = filter2(window, img2.*img2, 'valid') - mu2_sq;
-    ApplyGaussianBlur(img2_sq, sigma2_sq, 11, 1.5);
-    sigma2_sq -= mu2_sq;
+    cv::GaussianBlur(I2_2, sigma2_2, cv::Size(11, 11), 1.5);
+    sigma2_2 -= mu2_2;
 
-    // sigma12 = filter2(window, img1.*img2, 'valid') - mu1_mu2;
-    ApplyGaussianBlur(img1_img2, sigma12, 11, 1.5);
+    cv::GaussianBlur(I1_I2, sigma12, cv::Size(11, 11), 1.5);
     sigma12 -= mu1_mu2;
 
-    // cs_map = (2*sigma12 + C2)./(sigma1_sq + sigma2_sq + C2);
-    tmp1 = cv::Mat(2*sigma12) + m_ssim_c2;
-    tmp2 = sigma1_sq + sigma2_sq + m_ssim_c2;
-    cv::divide(tmp1, tmp2, cs_map);
-    // ssim_map = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))./((mu1_sq + mu2_sq + C1).*(sigma1_sq + sigma2_sq + C2));
-    tmp3 = 2*mu1_mu2 + m_ssim_c1;
-    cv::multiply(tmp1, tmp3, tmp1);
-    tmp3 = mu1_sq + mu2_sq + m_ssim_c1;
-    cv::multiply(tmp2, tmp3, tmp2);
-    cv::divide(tmp1, tmp2, ssim_map);
+    ///////////////////////////////// FORMULA ////////////////////////////////
+    cv::Mat t1, t2, t3, t4;
 
-    // mssim = mean2(ssim_map);
-    double mssim = cv::mean(ssim_map).val[0];
-    // mcs = mean2(cs_map);
-    double mcs = cv::mean(cs_map).val[0];
+    t1 = 2 * mu1_mu2 + m_ssim_c1;
+    t2 = 2 * sigma12 + m_ssim_c2;
+    t3 = t1.mul(t2);                 // t3 = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))
 
+    t1 = mu1_2 + mu2_2 + m_ssim_c1;
+    t4 = sigma1_2 + sigma2_2 + m_ssim_c2;
+    t1 = t1.mul(t4);                 // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
+
+    cv::Mat ssim_map, mcs_map;
+    cv::divide(t3, t1, ssim_map);        // ssim_map =  t3./t1;
+    cv::divide(t2, t4, mcs_map);
+
+    double mssim = cv::mean(ssim_map)[0];   // mssim = average of ssim map
+    double mcs = cv::mean(mcs_map)[0];
     return std::make_tuple(mssim, mcs);
 }
 
@@ -445,7 +423,7 @@ double Picture::GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& lay
   #pragma omp parallel for shared(vRef, vArg, pic, layoutThisPict, layoutArgPic) schedule(dynamic)
   for (unsigned long p = 0; p < nbOfUniformPointOneSphere; ++p)
   {
-    Coord3dSpherical pointOnTheSphere(1, uniformPointOneSphere[2*p + 1]*PI()/180.f, uniformPointOneSphere[2*p]*PI()/180.f);
+    Coord3dSpherical pointOnTheSphere(1, uniformPointOneSphere[2*p + 1]*PI()/180.f, uniformPointOneSphere[2*p]*PI()/180.f +PI()/2);
     CoordI pixelCoordOnRefPic = layoutThisPict.FromSphereTo2d(pointOnTheSphere);
     CoordI pixelCoordOnArgPic = layoutArgPic.FromSphereTo2d(pointOnTheSphere);
 
@@ -460,7 +438,7 @@ double Picture::GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& lay
 
     if (inInterval(pixelCoordOnArgPic.x, 0, pic.GetMat().cols) && inInterval(pixelCoordOnArgPic.y, 0,  pic.GetMat().rows))
     {
-      vArg.at<Pixel>(p, 0) = GetInterPixel(pixelCoordOnArgPic, it);
+      vArg.at<Pixel>(p, 0) = pic.GetInterPixel(pixelCoordOnArgPic, it);
     }
     else
     {
@@ -468,20 +446,16 @@ double Picture::GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& lay
     }
   }
 
+  cv::Mat s1;
   cv::Mat vRefYUV;
   cv::Mat vArgYUV;
   cv::cvtColor(vRef, vRefYUV, cv::COLOR_BGR2YCrCb);
   cv::cvtColor(vArg, vArgYUV, cv::COLOR_BGR2YCrCb);
-  cv::Mat channels[3];
-  cv::Mat channels2[3];
-  cv::split(vRefYUV, channels);
-  cv::split(vArgYUV, channels2);
-  //cv::Mat tmp(nbOfUniformPointOneSphere, 1, m_pictMat.type());
-  cv::Mat tmp(nbOfUniformPointOneSphere, 1, CV_32F);
-  cv::subtract(channels[0], channels2[0], tmp);
-  //cv::subtract(vRefYUV, vArgYUV, tmp);
-  cv::multiply(tmp, tmp, tmp);
 
-  auto mse = cv::mean(tmp).val[0];
-  return mse != 0 ? 10.0*std::log10(255*255/mse) : 100.0;
+  cv::absdiff(vRefYUV, vArgYUV, s1);
+  s1.convertTo(s1, CV_32F);
+  s1 = s1.mul(s1);
+
+  auto mse = cv::mean(s1).val[0]; //mean square error on componant Y
+  return mse != 0 ? 10.0*std::log10((255*255)/mse) : 100.0;
 }
