@@ -263,9 +263,12 @@ std::tuple<double, double> Picture::ComputeSSIM(const cv::Mat& img1_ori, const c
     /***************************** INITS **********************************/
     int d = CV_32F;
 
+    cv::Mat img1YUV, img2YUV;
+    cv::cvtColor(img1_ori, img1YUV, cv::COLOR_BGR2YUV);
+    cv::cvtColor(img2_ori, img2YUV, cv::COLOR_BGR2YUV);
     cv::Mat I1, I2;
-    img1_ori.convertTo(I1, d);            // cannot calculate on one byte large values
-    img2_ori.convertTo(I2, d);
+    img1YUV.convertTo(I1, d);            // cannot calculate on one byte large values
+    img2YUV.convertTo(I2, d);
 
     cv::Mat I2_2   = I2.mul(I2);        // I2^2
     cv::Mat I1_2   = I1.mul(I1);        // I1^2
