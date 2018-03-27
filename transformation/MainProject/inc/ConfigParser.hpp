@@ -14,6 +14,7 @@
 #include "LayoutEquirectangular.hpp"
 #include "LayoutEquirectangularTiles.hpp"
 #include "LayoutFlatFixed.hpp"
+#include "LayoutViewport.hpp"
 #include "LayoutPyramidal.hpp"
 #include "LayoutPyramidal2.hpp"
 #include "LayoutRhombicdodeca.hpp"
@@ -157,6 +158,11 @@ std::vector<int> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, i
             }
         }
         if (layoutType == "flatFixed")
+        {
+            bitrateVect.push_back(bitrateGoal);
+            return bitrateVect;
+        }
+        if (layoutType == "viewport")
         {
             bitrateVect.push_back(bitrateGoal);
             return bitrateVect;
@@ -587,6 +593,38 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width, height, horizontalAngleVision, verticalAngleOfVision);
             }
         }
+        if (layoutType == "viewport")
+        {
+            bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");
+            Quaternion rotationQuaternion;
+            std::string pathToPositionTrace;
+            if (!dynamicPositions) {
+              rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+            }
+            else
+            {
+              std::cout << "DEBUG dynamic position set" << std::endl;
+              pathToPositionTrace = ptree.get<std::string>(layoutSection+".positionTrace");
+            }
+            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);
+            double width = ptree.get<double>(layoutSection+".width");
+            double height = ptree.get<double>(layoutSection+".height");
+            double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
+            double verticalAngleOfVision = ptree.get<double>(layoutSection+".verticalAngleOfVision")*PI()/180;
+            if (isInput)
+            {
+                throw std::invalid_argument("Viewport  layout cannot be the input of the transformation flow");
+            }
+            if (infer)
+            {
+                return std::make_shared<LayoutViewport>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision, verticalAngleOfVision);
+            }
+            else
+            {
+                return std::make_shared<LayoutViewport>(std::move(dynamicPosition), width, height, horizontalAngleVision, verticalAngleOfVision);
+            }
+        }
+
         if (layoutType == "pyramid")
         {
             Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));

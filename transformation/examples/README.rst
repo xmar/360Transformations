@@ -169,8 +169,8 @@ Static viewport extraction. Viewport extracted at the same position from two dif
 
 Outputs::
 
-  output7_1FlatFixed.mp4 -> from the original Equirectangular projection
-  output7_2FlatFixed.mp4 -> from the 4x3 cubemap projection
+  output7_1Viewport.mp4 -> from the original Equirectangular projection
+  output7_2Viewport.mp4 -> from the 4x3 cubemap projection
 
 Scenario 8:
 ___________
@@ -183,5 +183,5 @@ Dynamic viewport extraction. Viewport extracted using a Head Movement trajectory
 
 Outputs::
 
-  output8_1FlatFixed.mp4 -> from the original Equirectangular projection
-  output8_2FlatFixed.mp4 -> from an offset Equirectangular projection
+  output8_1Viewport.mp4 -> from the original Equirectangular projection
+  output8_2Viewport.mp4 -> from an offset Equirectangular projection
