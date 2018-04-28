@@ -245,14 +245,55 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   cubeEdgeLengthBack=1
   ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the bitrateFront, bitrateLeft, etc. parameters
   ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
-  useTile=true
+  useTile=false
   ;Relative bitrate of each face (if final layout encoded). A ratio r means r*videoOutputBitRate/6
   bitrateFront=1
-  bitrateLeft=0.25
-  bitrateRight=0.25
-  bitrateTop=0.25
-  bitrateBottom=0.25
-  bitrateBack=0.25
+  bitrateLeft=1
+  bitrateRight=1
+  bitrateTop=1
+  bitrateBottom=1
+  bitrateBack=1
+  ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
+  bitrate=1
+  ;indicate the position and the orientation of each face in the packed picture. position 1 is top left, 2 top right, 3 bottom left and 5 bottom right. Rotation can be 0, 90, -90 or 180.
+  facesPosition={"face1":"right", "face1Rotation":0, "face2":"back", "face2Rotation":0, "face3":"left", "face3Rotation":0, "face4":"top", "face4Rotation":-90, "face5":"front", "face5Rotation":-90, "face6":"bottom", "face6Rotation":-90}
+
+**equal-area cubemap: EAC** layout
+
+.. code-block:: ini
+
+  [CubeMapEqualArea]
+  ;type of the layout: cube map layout
+  type=EAC
+  ;Size of the reference cube map video (ie if all faces have a size ratio of 1)
+  refWidth=4096
+  refHeight=2048
+  ;use relative resolution for the face resolutions
+  relativeResolution=true
+  ;The rotation used to get the center of the front face: type = "euler" or "quaternion" or "angleAxis".
+  ; if type is "euler" you have to give the yaw, pitch and roll angle in degree
+  ; if type is "quaternion" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software.
+  ; if type is "angleAxis" you have to give an "angle" in degree and a direction vector x, y, z that generates the rotation axis (this vector should not be (0, 0, 0)).
+  rotation= {"type":"euler", "yaw":0.0, "pitch":0.0, "roll":0.0}
+  ;rotation= {"type":"quaternion", "w":1.0, "x":0.0, "y":0.0, "z":0.0}
+  ;rotation= {"type":"angleAxis", "angle":90, "x":0, "y":0, "z":1}
+  ;the edge of each face. If relativeResolution, ratio compared to the reference input video, otherwise size in pixel.
+  cubeEdgeLengthFront=1
+  cubeEdgeLengthLeft=1
+  cubeEdgeLengthRight=1
+  cubeEdgeLengthTop=1
+  cubeEdgeLengthBottom=1
+  cubeEdgeLengthBack=1
+  ;if useTile is set to true, each face will be encoded into an independent video with a target bitrate set by the bitrateFront, bitrateLeft, etc. parameters
+  ;if useTile is set to false, the whole projection will be encoded into a unique video (all faces on the same frame) and a global bitrate target set by the bitrate parameter
+  useTile=false
+  ;Relative bitrate of each face (if final layout encoded). A ratio r means r*videoOutputBitRate/6
+  bitrateFront=1
+  bitrateLeft=1
+  bitrateRight=1
+  bitrateTop=1
+  bitrateBottom=1
+  bitrateBack=1
   ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
   bitrate=1
   ;indicate the position and the orientation of each face in the packed picture. position 1 is top left, 2 top right, 3 bottom left and 5 bottom right. Rotation can be 0, 90, -90 or 180.

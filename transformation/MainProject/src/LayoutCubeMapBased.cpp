@@ -8,6 +8,11 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
     if (f == Faces::Black) {return Coord3dCart(0,0,0);}
     double i = (ni.m_normalizedFaceCoordinate.x - 0.5)*2.f;
     double j = (ni.m_normalizedFaceCoordinate.y - 0.5)*2.f;
+    if (m_equalArea)
+    {
+        i = tan( (PI()/2.0)*(ni.m_normalizedFaceCoordinate.x - 0.5));
+        j = tan( (PI()/2.0)*(ni.m_normalizedFaceCoordinate.y - 0.5));
+    }
     Coord3dCart point(1, i, -j);
     // return Rotation(point, m_rotQuaternion*FaceToRotQuaternion(f));
     Coord3dCart v = Rotation(point, FaceToRotQuaternion(f));
@@ -36,7 +41,20 @@ Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const 
     Faces f = std::get<1>(rtr);
 
     Coord3dCart canonicPoint ( Rotation(inter, FaceToRotQuaternion(f).Inv()) );
-    Layout::NormalizedFaceInfo ni (CoordF((canonicPoint.GetY()+1.0)/2.0, 1-(canonicPoint.GetZ()+1.0)/2.0),
+    double u(-1), v(-1);
+    if (m_equalArea)
+    {
+        u = (2.0*atan(canonicPoint.GetY())/PI()) + 0.5;
+        //canonicPoint.SetX(2.0*2.0*atan(canonicPoint.GetX())/PI());
+        v = (2.0*atan(canonicPoint.GetZ())/PI()) + 0.5;
+        //canonicPoint.SetY(2.0*2.0*atan(canonicPoint.GetY())/PI());
+    }
+    else
+    {
+        u = (canonicPoint.GetY()+1.0)/2.0;
+        v = (canonicPoint.GetZ()+1.0)/2.0;
+    }
+    Layout::NormalizedFaceInfo ni (CoordF(u, 1-v),
                                     static_cast<int>(f));
     return ni;
 }

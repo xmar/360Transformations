@@ -12,7 +12,7 @@ class LayoutCubeMap: public LayoutCubeMapBased
 {
     struct FacePosition;
     public:
-      static std::shared_ptr<LayoutCubeMap> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::string facesPositionString, std::array<std::array<unsigned int, 2>,6> pixelEdges)
+      static std::shared_ptr<LayoutCubeMap> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::string facesPositionString, std::array<std::array<unsigned int, 2>,6> pixelEdges, bool useEqualArea)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
             std::stringstream ss(facesPositionString);
@@ -64,7 +64,7 @@ class LayoutCubeMap: public LayoutCubeMapBased
             return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap( rotationQuaternion, useTile, vectorialTrans,
                 std::get<0>(offsetArraysTuple)[0] + std::get<0>(offsetArraysTuple)[1] + std::get<0>(offsetArraysTuple)[2],
                 std::get<1>(offsetArraysTuple)[0] + std::get<1>(offsetArraysTuple)[1],
-                fr, offsetArraysTuple, std::move(fp)));
+                fr, offsetArraysTuple, std::move(fp), useEqualArea));
 	    }
         LayoutCubeMap(unsigned int pixelEdge, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans):
                LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge, Quaternion(1), useTile, vectorialTrans,
@@ -177,8 +177,8 @@ class LayoutCubeMap: public LayoutCubeMapBased
         RowsOffsetArray m_maxOffsetRows;
         FacePosition m_fp;
 
-        LayoutCubeMap(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t, FacePosition fp):
-            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorialTrans, fr), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)), m_fp(std::move(fp)) {}
+        LayoutCubeMap(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t, FacePosition fp, bool useEqualArea):
+            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorialTrans, fr, useEqualArea), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)), m_fp(std::move(fp)) {}
 
         static std::tuple<ColsOffsetArray, RowsOffsetArray> Init(const FaceResolutions& fr, const FacePosition& fp)
         {

@@ -130,7 +130,7 @@ std::vector<int> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, i
             bitrateVect.push_back(bitrateGoal * bitrate);
             return bitrateVect;
         }
-        if (layoutType == "cubeMap" || layoutType == "cubeMap2")
+        if (layoutType == "cubeMap" || layoutType == "cubeMap2" || layoutType == "EAC")
         {
             auto useTile = ptree.get<bool>(layoutSection+".useTile");
             if (useTile)
@@ -484,7 +484,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
 
         }
-        if (layoutType == "cubeMap")
+        if (layoutType == "cubeMap" || layoutType == "EAC")
         {
             double edgeFront = ptree.get<double>(layoutSection+".cubeEdgeLengthFront");
             double edgeBack = ptree.get<double>(layoutSection+".cubeEdgeLengthBack");
@@ -493,6 +493,7 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
             double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
             auto facesPositionStringOpt = ptree.get_optional<std::string>(layoutSection+".facesPosition");
+            bool useEqualArea = layoutType == "EAC";
             std::string facesPositionString;
             if (facesPositionStringOpt)
             {
@@ -526,12 +527,11 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
             }
             if (infer)
             {
-                std::cout << inputWidth << " " << inputHeight << std::endl;
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/3), unsigned(edgeFront*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/3), unsigned(edgeBack*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/3), unsigned(edgeLeft*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/3), unsigned(edgeRight*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/3),unsigned(edgeTop*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/3),unsigned(edgeBottom*inputHeight/2)}}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/3), unsigned(edgeFront*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/3), unsigned(edgeBack*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/3), unsigned(edgeLeft*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/3), unsigned(edgeRight*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/3),unsigned(edgeTop*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/3),unsigned(edgeBottom*inputHeight/2)}}}, useEqualArea);
             }
             else
             {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}});
+                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}}, useEqualArea);
             }
         }
 ////Commented from now

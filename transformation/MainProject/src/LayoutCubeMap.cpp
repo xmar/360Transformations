@@ -205,7 +205,6 @@ std::shared_ptr<IMT::LibAv::VideoReader> LayoutCubeMap::InitInputVideoImpl(std::
 std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect)
 {
   std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
-  std::cout << "TESTEST1" << std::endl;
   if (UseTile())
   {
     std::array<int, 6> br;
@@ -225,9 +224,7 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std:
     std::array<unsigned, 1> resArrH;
     resArrV[0] = m_outHeight;
     resArrH[0] = m_outWidth;
-    std::cout << "TESTEST2: " << m_outWidth << " " << m_outHeight << " " << codecId << std::endl;
     vwPtr->Init<1>(codecId, resArrH, resArrV, fps, gop_size, br);
-    std::cout << "TESTEST3" << std::endl;
   }
   return vwPtr;
 }

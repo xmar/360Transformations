@@ -13,9 +13,9 @@ class LayoutCubeMapBased : public Layout
         enum class Faces: int {Front, Back, Right, Left, Top, Bottom, Black, Last, First=Front};
         LayoutCubeMapBased(unsigned int outWidth, unsigned int outHeight, Quaternion rotationQuaternion, bool useTile,
                            std::shared_ptr<VectorialTrans> vectorialTrans,
-                           FaceResolutions fr):
+                           FaceResolutions fr, bool useEqualArea = false):
             Layout(outWidth, outHeight, vectorialTrans), m_fr(std::move(fr)), m_rotQuaternion(rotationQuaternion),
-            m_faceRotations(), m_useTile(useTile)
+            m_faceRotations(), m_useTile(useTile), m_equalArea(useEqualArea)
             {InitFaceRotations();};
         virtual ~LayoutCubeMapBased(void) = default;
 
@@ -121,6 +121,7 @@ class LayoutCubeMapBased : public Layout
         Quaternion m_rotQuaternion;//GlobalRotation
         std::array<Quaternion,6> m_faceRotations;
         bool m_useTile;
+        bool m_equalArea;
 
         void InitFaceRotations(void);
 };
