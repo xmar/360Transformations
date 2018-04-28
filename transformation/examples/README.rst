@@ -76,11 +76,11 @@ Run inside the example folder (or inside the /vagrant folder inside the VM)::
   trans -c Config_1.ini
 
 This scenario reads the input.mp4 equirectangular video and transforms it into
-a 4x3 Cubemap video.
+a 3x2 Cubemap video.
 
 Outputs::
 
-  output1_1CubeMap.mp4  -> an HEVC 4x3 cubemap 360-degree video
+  output1_1CubeMap.mp4  -> an HEVC 3x2 cubemap 360-degree video
 
 Scenario 2:
 ___________
@@ -105,11 +105,11 @@ Run inside the example folder (or inside the /vagrant folder inside the VM)::
 
   trans -c Config_3.ini
 
-Project back the 4x3 Cubemap video into an Equirectangular video.
+Project back the 3x2 Cubemap video into an Equirectangular video.
 
 Outputs::
 
-  output3_1Equirectangular.mp4 -> an HEVC 4x3 cubemap 360-degree video
+  output3_1Equirectangular.mp4 -> an HEVC 3x2 cubemap 360-degree video
 
 Scenario 4:
 ___________
@@ -125,10 +125,9 @@ Outputs::
 
   output4_1Equirectangular.mp4
   output4_2CubeMap.mp4
-  output4_3CubeMapCompact.mp4
-  output4_4Pyramid.mp4
-  output4_6RhombicDodeca.mp4
-  output4_7EquirectangularTiled.mp4
+  output4_3Pyramid.mp4
+  output4_4RhombicDodeca.mp4
+  output4_5EquirectangularTiled.mp4
 
 Scenario 5:
 ___________
@@ -170,7 +169,7 @@ Static viewport extraction. Viewport extracted at the same position from two dif
 Outputs::
 
   output7_1Viewport.mp4 -> from the original Equirectangular projection
-  output7_2Viewport.mp4 -> from the 4x3 cubemap projection
+  output7_2Viewport.mp4 -> from the 3x2 cubemap projection
 
 Scenario 8:
 ___________

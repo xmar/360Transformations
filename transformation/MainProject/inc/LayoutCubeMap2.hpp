@@ -14,14 +14,14 @@ class LayoutCubeMap2: public LayoutCubeMapBased
          * \return LayoutCubeMap2 The LayoutCubeMap2 object generated
          *
          */
-	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::array<unsigned int,6> pixelEdges)
+	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::array<std::array<unsigned int, 2>,6> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
-	        auto maxOffsetTFB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Top), fr.GetRes(Faces::Bottom)));
-	        auto maxOffsetLFRB = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Left), MAX(fr.GetRes(Faces::Right), fr.GetRes(Faces::Back))));
+	        auto maxOffsetTFB = MAX(fr.GetResV(Faces::Front), MAX(fr.GetResV(Faces::Top), fr.GetResV(Faces::Bottom)));
+	        auto maxOffsetLFRB = MAX(fr.GetResH(Faces::Front), MAX(fr.GetResH(Faces::Left), MAX(fr.GetResH(Faces::Right), fr.GetResH(Faces::Back))));
             return std::shared_ptr<LayoutCubeMap2>( new LayoutCubeMap2(rotationQuaternion, useTile, vectorialTrans,
-                fr.GetRes(Faces::Left)+maxOffsetTFB+fr.GetRes(Faces::Right)+fr.GetRes(Faces::Back),
-                fr.GetRes(Faces::Top)+maxOffsetLFRB+fr.GetRes(Faces::Bottom),
+                fr.GetResH(Faces::Left)+maxOffsetTFB+fr.GetResH(Faces::Right)+fr.GetResH(Faces::Back),
+                fr.GetResV(Faces::Top)+maxOffsetLFRB+fr.GetResV(Faces::Bottom),
                 fr, maxOffsetTFB, maxOffsetLFRB));
 	    }
 

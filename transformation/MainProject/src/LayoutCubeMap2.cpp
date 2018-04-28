@@ -7,17 +7,17 @@ unsigned int LayoutCubeMap2::IStartOffset(LayoutCubeMapBased::Faces f) const
     switch(f)
     {
     case Faces::Front:
-        return GetRes(Faces::Left);
+        return GetResH(Faces::Left);
     case Faces::Left:
         return 0;
     case Faces::Right:
-        return GetRes(Faces::Left)+m_maxOffsetTFB;
+        return GetResH(Faces::Left)+m_maxOffsetTFB;
     case Faces::Top:
-        return GetRes(Faces::Left)+(m_maxOffsetTFB-GetRes(Faces::Top))/2;
+        return GetResH(Faces::Left)+(m_maxOffsetTFB-GetResH(Faces::Top))/2;
     case Faces::Bottom:
-        return GetRes(Faces::Left)+(m_maxOffsetTFB-GetRes(Faces::Bottom))/2;
+        return GetResH(Faces::Left)+(m_maxOffsetTFB-GetResH(Faces::Bottom))/2;
     case Faces::Back:
-        return GetRes(Faces::Left)+m_maxOffsetTFB+GetRes(Faces::Right);
+        return GetResH(Faces::Left)+m_maxOffsetTFB+GetResH(Faces::Right);
     case Faces::Black:
     case Faces::Last:
         std::invalid_argument("IStartOffset: Last is not a valid face");
@@ -35,11 +35,11 @@ unsigned int LayoutCubeMap2::IEndOffset(LayoutCubeMapBased::Faces f) const
     case Faces::Right:
         return IStartOffset(Faces::Back);
     case Faces::Top:
-        return GetRes(Faces::Left)+GetRes(Faces::Top)+(m_maxOffsetTFB-GetRes(Faces::Top))/2;
+        return GetResH(Faces::Left)+GetResH(Faces::Top)+(m_maxOffsetTFB-GetResH(Faces::Top))/2;
     case Faces::Bottom:
-        return GetRes(Faces::Left)+GetRes(Faces::Bottom)+(m_maxOffsetTFB-GetRes(Faces::Bottom))/2;
+        return GetResH(Faces::Left)+GetResH(Faces::Bottom)+(m_maxOffsetTFB-GetResH(Faces::Bottom))/2;
     case Faces::Back:
-        return GetRes(Faces::Left)+m_maxOffsetTFB+GetRes(Faces::Right)+GetRes(Faces::Back);
+        return GetResH(Faces::Left)+m_maxOffsetTFB+GetResH(Faces::Right)+GetResH(Faces::Back);
     case Faces::Black:
     case Faces::Last:
         std::invalid_argument("IEndOffset: Last is not a valid face");
@@ -51,17 +51,17 @@ unsigned int LayoutCubeMap2::JStartOffset(LayoutCubeMapBased::Faces f) const
     switch(f)
     {
     case Faces::Front:
-        return GetRes(Faces::Top)+(m_maxOffsetLFRB-GetRes(Faces::Front))/2;
+        return GetResV(Faces::Top)+(m_maxOffsetLFRB-GetResV(Faces::Front))/2;
     case Faces::Left:
-        return GetRes(Faces::Top)+(m_maxOffsetLFRB-GetRes(Faces::Left))/2;
+        return GetResV(Faces::Top)+(m_maxOffsetLFRB-GetResV(Faces::Left))/2;
     case Faces::Right:
-        return GetRes(Faces::Top)+(m_maxOffsetLFRB-GetRes(Faces::Right))/2;
+        return GetResV(Faces::Top)+(m_maxOffsetLFRB-GetResV(Faces::Right))/2;
     case Faces::Top:
         return 0;
     case Faces::Bottom:
-        return GetRes(Faces::Top)+m_maxOffsetLFRB;
+        return GetResV(Faces::Top)+m_maxOffsetLFRB;
     case Faces::Back:
-        return GetRes(Faces::Top)+(m_maxOffsetLFRB-GetRes(Faces::Back))/2;
+        return GetResV(Faces::Top)+(m_maxOffsetLFRB-GetResV(Faces::Back))/2;
     case Faces::Black:
     case Faces::Last:
         std::invalid_argument("JStartOffset: Last is not a valid face");
@@ -73,17 +73,17 @@ unsigned int LayoutCubeMap2::JEndOffset(LayoutCubeMapBased::Faces f) const
     switch(f)
     {
     case Faces::Front:
-        return JStartOffset(Faces::Bottom)-(m_maxOffsetLFRB-GetRes(Faces::Front))/2;
+        return JStartOffset(Faces::Bottom)-(m_maxOffsetLFRB-GetResV(Faces::Front))/2;
     case Faces::Left:
-        return GetRes(Faces::Top)+GetRes(Faces::Left)+(m_maxOffsetLFRB-GetRes(Faces::Left))/2;
+        return GetResV(Faces::Top)+GetResV(Faces::Left)+(m_maxOffsetLFRB-GetResV(Faces::Left))/2;
     case Faces::Right:
-        return GetRes(Faces::Top)+GetRes(Faces::Right)+(m_maxOffsetLFRB-GetRes(Faces::Right))/2;
+        return GetResV(Faces::Top)+GetResV(Faces::Right)+(m_maxOffsetLFRB-GetResV(Faces::Right))/2;
     case Faces::Top:
-        return JStartOffset(Faces::Front)-(m_maxOffsetLFRB-GetRes(Faces::Front))/2;
+        return JStartOffset(Faces::Front)-(m_maxOffsetLFRB-GetResV(Faces::Front))/2;
     case Faces::Bottom:
-        return GetRes(Faces::Top)+m_maxOffsetLFRB+GetRes(Faces::Bottom);
+        return GetResV(Faces::Top)+m_maxOffsetLFRB+GetResV(Faces::Bottom);
     case Faces::Back:
-        return GetRes(Faces::Top)+GetRes(Faces::Back)+(m_maxOffsetLFRB-GetRes(Faces::Back))/2;
+        return GetResV(Faces::Top)+GetResV(Faces::Back)+(m_maxOffsetLFRB-GetResV(Faces::Back))/2;
     case Faces::Black:
     case Faces::Last:
         std::invalid_argument("JEndOffset: Last is not a valid face");
@@ -122,7 +122,8 @@ LayoutCubeMapBased::Faces LayoutCubeMap2::From2dToFace(unsigned int i, unsigned 
     }
 }
 
-#define BORDER(x) (MAX(1.0, MIN(GetRes(f)-1,x)))
+#define BORDERH(x) (MAX(1.0, MIN(GetResH(f)-1,x)))
+#define BORDERV(x) (MAX(1.0, MIN(GetResV(f)-1,x)))
 
 CoordF LayoutCubeMap2::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& ni) const
 {
@@ -130,7 +131,7 @@ CoordF LayoutCubeMap2::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& 
     const CoordF& coord(ni.m_normalizedFaceCoordinate);
     if (f != Faces::Black && f != Faces::Last)
     {
-        return CoordF(BORDER(GetRes(f)*coord.x)+IStartOffset(f), BORDER(GetRes(f)*coord.y)+JStartOffset(f));
+        return CoordF(BORDERH(GetResH(f)*coord.x)+IStartOffset(f), BORDERV(GetResV(f)*coord.y)+JStartOffset(f));
     }
     else
     {
@@ -145,8 +146,8 @@ Layout::NormalizedFaceInfo LayoutCubeMap2::From2dToNormalizedFaceInfo(const Coor
     {
         return NormalizedFaceInfo(CoordF(0, 0), static_cast<int>(f));
     }
-    double normalizedI = double(pixel.x-IStartOffset(f))/GetRes(f);
-    double normalizedJ = double(pixel.y-JStartOffset(f))/GetRes(f);
+    double normalizedI = double(pixel.x-IStartOffset(f))/GetResH(f);
+    double normalizedJ = double(pixel.y-JStartOffset(f))/GetResV(f);
     return NormalizedFaceInfo(CoordF(normalizedI, normalizedJ), static_cast<int>(f));
 }
 
@@ -159,7 +160,7 @@ std::shared_ptr<Picture> LayoutCubeMap2::ReadNextPictureFromVideoImpl(void)
       for (unsigned i = 0; i < 6; ++i)
       {
           Faces f = static_cast<Faces>(i);
-          cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
+          cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetResH(f), GetResV(f) );
           auto facePictPtr = m_inputVideoPtr->GetNextPicture(i);
           //std::cout << "Expected Width: "<< GetRes(f) << "; Height " << GetRes(f)  << "; received width "<< facePictPtr->cols << " height "<< facePictPtr->rows << std::endl;
           if (!isInit)
@@ -187,7 +188,7 @@ void LayoutCubeMap2::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
     for (unsigned i = 0; i < 6; ++i)
     {
         Faces f = static_cast<Faces>(i);
-        cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetRes(f), GetRes(f) );
+        cv::Rect roi( IStartOffset(f),  JStartOffset(f), GetResH(f), GetResV(f) );
         cv::Mat facePictMat ( pict->GetMat(), roi);
         m_outputVideoPtr->Write( facePictMat, i);
     }
@@ -221,7 +222,7 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap2::InitOutputVideoImpl(std
     std::array<unsigned, 6> resArr;
     for (unsigned i = 0; i < 6; ++i)
     {
-        resArr[i] = GetRes(static_cast<Faces>(i));
+        resArr[i] = GetResH(static_cast<Faces>(i));
     }
     vwPtr->Init<6>(codecId, resArr, resArr, fps, gop_size, br);
     return vwPtr;

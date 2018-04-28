@@ -2,25 +2,75 @@
 
 #include "LayoutCubeMapBased.hpp"
 
+#include <boost/property_tree/json_parser.hpp>
+#include <sstream>
+
 
 namespace IMT {
 
 class LayoutCubeMap: public LayoutCubeMapBased
 {
+    struct FacePosition;
     public:
-      static std::shared_ptr<LayoutCubeMap> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::array<unsigned int,6> pixelEdges)
+      static std::shared_ptr<LayoutCubeMap> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::string facesPositionString, std::array<std::array<unsigned int, 2>,6> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
-	        auto offsetArraysTuple = Init(fr);
+            std::stringstream ss(facesPositionString);
+            namespace pt = boost::property_tree;
+            pt::ptree ptree_json;
+            pt::json_parser::read_json(ss, ptree_json);
+            std::array<Faces, 6> face;
+            std::array<int, 6> rotationFace;
+            for (int i = 0; i < 6; ++i)
+            {
+                auto v = ptree_json.get_child("face"+std::to_string(1+i));
+                if (v.data() == "front")
+                {
+                    face[i] = Faces::Front;
+                }
+                else if (v.data() == "back")
+                {
+                    face[i] = Faces::Back;
+                }
+                else if (v.data() == "left")
+                {
+                    face[i] = Faces::Left;
+                }
+                else if (v.data() == "right")
+                {
+                    face[i] = Faces::Right;
+                }
+                else if (v.data() == "top")
+                {
+                    face[i] = Faces::Top;
+                }
+                else if (v.data() == "bottom")
+                {
+                    face[i] = Faces::Bottom;
+                }
+                else if (v.data() == "black")
+                {
+                    face[i] = Faces::Black;
+                }
+                else 
+                {
+                    throw std::invalid_argument(v.data() + " is not a supported face name.");
+                }
+                auto vv = ptree_json.get_child("face"+std::to_string(1+i)+"Rotation");
+                rotationFace[i] = std::stoi(vv.data());
+            }
+            FacePosition fp(std::move(face), std::move(rotationFace));
+	        auto offsetArraysTuple = Init(fr, fp);
             return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap( rotationQuaternion, useTile, vectorialTrans,
                 std::get<0>(offsetArraysTuple)[0] + std::get<0>(offsetArraysTuple)[1] + std::get<0>(offsetArraysTuple)[2],
                 std::get<1>(offsetArraysTuple)[0] + std::get<1>(offsetArraysTuple)[1],
-                fr, offsetArraysTuple));
+                fr, offsetArraysTuple, std::move(fp)));
 	    }
         LayoutCubeMap(unsigned int pixelEdge, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans):
                LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge, Quaternion(1), useTile, vectorialTrans,
                            {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}}),
-               m_maxOffsetCols({{pixelEdge,pixelEdge,pixelEdge}}), m_maxOffsetRows({{pixelEdge,pixelEdge}})
+               m_maxOffsetCols({{pixelEdge,pixelEdge,pixelEdge}}), m_maxOffsetRows({{pixelEdge,pixelEdge}}),
+               m_fp({{Faces::Right, Faces::Back, Faces::Left, Faces::Top, Faces::Front, Faces::Bottom}}, {{0, 0, 0, -90, -90, -90}})
                {}
         virtual ~LayoutCubeMap(void) = default;
 
@@ -51,22 +101,91 @@ class LayoutCubeMap: public LayoutCubeMapBased
         typedef std::array<unsigned int, 3> ColsOffsetArray;
         typedef std::array<unsigned int, 2> RowsOffsetArray;
 
+        struct FacePosition
+        {
+            FacePosition(std::array<Faces, 6> faces, std::array<int, 6> rotationFace): m_face(std::move(faces)), m_rotationFace(std::move(rotationFace))
+            {
+                m_faceToId[Faces::Front]=-1; m_faceToId[Faces::Left]=-1; m_faceToId[Faces::Right]=-1; m_faceToId[Faces::Back]=-1; m_faceToId[Faces::Top]=-1; m_faceToId[Faces::Bottom]=-1;
+                for(int i = 0; i < 6; ++i)
+                {
+                    m_faceToId[m_face[i]] = i;
+                }
+            };
+
+            std::array<Faces, 6> m_face;
+            std::array<int, 6> m_rotationFace;
+            std::map<Faces, int> m_faceToId;
+            void InitMaxOffset(ColsOffsetArray& maxOffsetCols, RowsOffsetArray& maxOffsetRows, const FaceResolutions& fr) const
+            {
+                maxOffsetCols[0] = MAX(fr.GetResH(m_face[0]), fr.GetResH(m_face[3]));
+                maxOffsetCols[1] = MAX(fr.GetResH(m_face[1]), fr.GetResH(m_face[4]));
+                maxOffsetCols[2] = MAX(fr.GetResH(m_face[2]), fr.GetResH(m_face[5]));
+    
+                maxOffsetRows[0] = MAX(fr.GetResV(m_face[0]), MAX(fr.GetResV(m_face[1]), fr.GetResV(m_face[2])));
+                maxOffsetRows[1] = MAX(fr.GetResV(m_face[3]), MAX(fr.GetResV(m_face[4]), fr.GetResV(m_face[5])));
+            }
+            std::tuple<double, double> GetIJ2dToNorm(double u, double v, Faces f) const
+            {
+                int faceId = m_faceToId.at(f);
+                if (m_rotationFace[faceId] == 0)
+                {
+                    return std::make_tuple(u, v);
+                }
+                else if (m_rotationFace[faceId] == -90)
+                {
+                    return std::make_tuple(1-v, u);
+                }
+                else if (m_rotationFace[faceId] == 90)
+                {
+                    return std::make_tuple(v, 1-u);
+                }
+                else if (m_rotationFace[faceId] == 180 || m_rotationFace[faceId] == -180)
+                {
+                    return std::make_tuple(1-u, 1-v);
+                }
+                else
+                {
+                    throw std::invalid_argument("GetIJ2dToNorm: Not supported rotation: "+std::to_string(m_rotationFace[faceId]));
+                }
+            }
+            std::tuple<double, double> GetIJNormTo2d(double u, double v, Faces f) const
+            {
+                int faceId = m_faceToId.at(f);
+                if (m_rotationFace[faceId] == 0)
+                {
+                    return std::make_tuple(u, v);
+                }
+                else if (m_rotationFace[faceId] == -90)
+                {
+                    return std::make_tuple(v, 1-u);
+                }
+                else if (m_rotationFace[faceId] == 90)
+                {
+                    return std::make_tuple(1-v, u);
+                }
+                else if (m_rotationFace[faceId] == 180 || m_rotationFace[faceId] == -180)
+                {
+                    return std::make_tuple(1-u, 1-v);
+                }
+                else
+                {
+                    throw std::invalid_argument("GetIJNormTo2d: Not supported rotation: "+std::to_string(m_rotationFace[faceId])+" for facePosition "+std::to_string(faceId) + " for faceId " +std::to_string(static_cast<int>(f)));
+                }
+            }
+        };
         ColsOffsetArray m_maxOffsetCols;
         RowsOffsetArray m_maxOffsetRows;
+        FacePosition m_fp;
 
-        LayoutCubeMap(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t):
-            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorialTrans, fr), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)) {}
+        LayoutCubeMap(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t, FacePosition fp):
+            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorialTrans, fr), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)), m_fp(std::move(fp)) {}
 
-        static std::tuple<ColsOffsetArray, RowsOffsetArray> Init(const FaceResolutions& fr)
+        static std::tuple<ColsOffsetArray, RowsOffsetArray> Init(const FaceResolutions& fr, const FacePosition& fp)
         {
             ColsOffsetArray maxOffsetCols;
             RowsOffsetArray maxOffsetRows;
-            maxOffsetCols[0] = MAX(fr.GetRes(Faces::Front), fr.GetRes(Faces::Back));
-            maxOffsetCols[1] = MAX(fr.GetRes(Faces::Right), fr.GetRes(Faces::Left));
-            maxOffsetCols[2] = MAX(fr.GetRes(Faces::Top), fr.GetRes(Faces::Bottom));
+            fp.InitMaxOffset(maxOffsetCols, maxOffsetRows, fr);
 
-            maxOffsetRows[0] = MAX(fr.GetRes(Faces::Front), MAX(fr.GetRes(Faces::Right), fr.GetRes(Faces::Top)));
-            maxOffsetRows[1] = MAX(fr.GetRes(Faces::Back), MAX(fr.GetRes(Faces::Left), fr.GetRes(Faces::Bottom)));
             return std::make_tuple(std::move(maxOffsetCols), std::move(maxOffsetRows));
         }
 
@@ -79,6 +198,7 @@ class LayoutCubeMap: public LayoutCubeMapBased
         {
             return inInterval(i, IStartOffset(f), IEndOffset(f)) && inInterval(j, JStartOffset(f), JEndOffset(f));
         }
+
 };
 
 }

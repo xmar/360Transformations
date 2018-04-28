@@ -223,8 +223,8 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
 
   [CubeMapLower]
   ;type of the layout: cube map layout
-  type=cubeMap2
-  ;Size of the reference input equirectangular video
+  type=cubeMap
+  ;Size of the reference cube map video (ie if all faces have a size ratio of 1)
   refWidth=4096
   refHeight=2048
   ;use relative resolution for the face resolutions
@@ -255,6 +255,8 @@ Each section id named in the layoutFlow attribute should be defined in the ini f
   bitrateBack=0.25
   ;bitrate is used only if useTile=false. A ratio r means a bitrate of r*videoOutputBitRate
   bitrate=1
+  ;indicate the position and the orientation of each face in the packed picture. position 1 is top left, 2 top right, 3 bottom left and 5 bottom right. Rotation can be 0, 90, -90 or 180.
+  facesPosition={"face1":"right", "face1Rotation":0, "face2":"back", "face2Rotation":0, "face3":"left", "face3Rotation":0, "face4":"top", "face4Rotation":-90, "face5":"front", "face5Rotation":-90, "face6":"bottom", "face6Rotation":-90}
 
 **pyramid** layout
 

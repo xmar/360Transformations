@@ -27,26 +27,48 @@ class LayoutCubeMapBased : public Layout
                 FaceResolutions(void) = delete;
                 FaceResolutions(unsigned int front, unsigned int back, unsigned int right,
                                 unsigned int left, unsigned int top, unsigned int bottom):
-                         m_faces{{front, back, right, left, top, bottom}}   {}
-                FaceResolutions(std::array<unsigned int, 6> faceResVect)://front, back, left, right, top, bottom
+                         m_faces{{std::array<unsigned int,2>{front, front}, std::array<unsigned int,2>{back,back}, std::array<unsigned int,2>{right, right}, std::array<unsigned int,2>{left,left}, std::array<unsigned int,2>{top,top}, std::array<unsigned int,2>{bottom, bottom}}}   {}
+                FaceResolutions(std::array<std::array<unsigned int,2>, 6> faceResVect)://front, back, left, right, top, bottom
                     m_faces(std::move(faceResVect))
                     {}
-                unsigned int GetRes(const Faces& f) const
+                unsigned int GetResH(const Faces& f) const
                 {
                     switch(f)
                     {
                         case Faces::Front:
-                            return m_faces[0];
+                            return m_faces[0][0];
                         case Faces::Back:
-                            return m_faces[1];
+                            return m_faces[1][0];
                         case Faces::Top:
-                            return m_faces[4];
+                            return m_faces[4][0];
                         case Faces::Bottom:
-                            return m_faces[5];
+                            return m_faces[5][0];
                         case Faces::Right:
-                            return m_faces[3];
+                            return m_faces[3][0];
                         case Faces::Left:
-                            return m_faces[2];
+                            return m_faces[2][0];
+                        case Faces::Black:
+                            throw std::invalid_argument("GetRes: Black is not a valid face");
+                        case Faces::Last:
+                            throw std::invalid_argument("GetRes: Last is not a valid face");
+                    }
+                }
+                unsigned int GetResV(const Faces& f) const
+                {
+                    switch(f)
+                    {
+                        case Faces::Front:
+                            return m_faces[0][1];
+                        case Faces::Back:
+                            return m_faces[1][1];
+                        case Faces::Top:
+                            return m_faces[4][1];
+                        case Faces::Bottom:
+                            return m_faces[5][1];
+                        case Faces::Right:
+                            return m_faces[3][1];
+                        case Faces::Left:
+                            return m_faces[2][1];
                         case Faces::Black:
                             throw std::invalid_argument("GetRes: Black is not a valid face");
                         case Faces::Last:
@@ -54,7 +76,7 @@ class LayoutCubeMapBased : public Layout
                     }
                 }
             private:
-                std::array<unsigned int, 6> m_faces;
+                std::array<std::array<unsigned int,2>, 6> m_faces;
         };
 
         virtual NormalizedFaceInfo From2dToNormalizedFaceInfo(const CoordI& pixel) const = 0;
@@ -91,7 +113,8 @@ class LayoutCubeMapBased : public Layout
 
         const Quaternion& FaceToRotQuaternion(Faces f) const;
 
-        unsigned int GetRes(const Faces& f) const {return m_fr.GetRes(f);}
+        unsigned int GetResH(const Faces& f) const {return m_fr.GetResH(f);}
+        unsigned int GetResV(const Faces& f) const {return m_fr.GetResV(f);}
 
     private:
         FaceResolutions m_fr;
