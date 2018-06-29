@@ -171,7 +171,11 @@ namespace LibAv
                 {
                     for (auto& codec_ctx: m_codec_ctx)
                     {
+#ifdef CODEC_FLAG_GLOBAL_HEADER
                         codec_ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+#else
+                        codec_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+#endif
                     }
                 }
 

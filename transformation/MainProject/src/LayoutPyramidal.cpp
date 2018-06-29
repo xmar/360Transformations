@@ -81,3 +81,66 @@ CoordF LayoutPyramidal::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo&
     }
 }
 
+std::shared_ptr<Picture> LayoutPyramidal::ReadNextPictureFromVideoImpl(void)
+{
+    bool isInit = false;
+    cv::Mat outputMat;
+    if (UseTile())
+    {
+        std::cout << "Unsupported tile track for Pyramidal video" << std::endl;
+        return nullptr;
+    }
+    else
+    {
+      auto facePictPtr = m_inputVideoPtr->GetNextPicture(0);
+      facePictPtr->copyTo(outputMat);
+    }
+    return std::make_shared<Picture>(outputMat);
+}
+
+void LayoutPyramidal::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
+{
+    if (UseTile())
+    {
+        std::cout << "Unsupported tile track for Pyramidal video" << std::endl;
+        return;
+    }
+    else
+    {
+      m_outputVideoPtr->Write(pict->GetMat(),0);
+    }
+}
+
+std::shared_ptr<IMT::LibAv::VideoReader> LayoutPyramidal::InitInputVideoImpl(std::string pathToInputVideo, unsigned nbFrame)
+{
+    std::shared_ptr<IMT::LibAv::VideoReader> vrPtr = std::make_shared<IMT::LibAv::VideoReader>(pathToInputVideo);
+    vrPtr->Init(nbFrame);
+    if ((UseTile() && vrPtr->GetNbStream() != 5) || (vrPtr->GetNbStream() != 1))
+    {
+        std::cout << "Unsupported number of stream for Pyramidal input video: "<<vrPtr->GetNbStream() <<" instead of 5" << std::endl;
+        return nullptr;
+    }
+    //we could add some other check for instance on the width, height of each stream
+    return vrPtr;
+}
+
+std::shared_ptr<IMT::LibAv::VideoWriter> LayoutPyramidal::InitOutputVideoImpl(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect)
+{
+    std::shared_ptr<IMT::LibAv::VideoWriter> vwPtr = std::make_shared<IMT::LibAv::VideoWriter>(pathToOutputVideo);
+    if (UseTile())
+    {
+        std::cout << "Unsupported tile track for Pyramidal video" << std::endl;
+        return nullptr;
+    }
+    else
+    {
+      std::array<int, 1> br;
+      std::copy_n(std::make_move_iterator(bit_rateVect.begin()), 1, br.begin());
+      std::array<unsigned, 1> widthArr;
+      std::array<unsigned, 1> heightArr;
+      widthArr[0] = m_outWidth;
+      heightArr[0] = m_outHeight;
+      vwPtr->Init<1>(codecId, widthArr, heightArr, fps, gop_size, br);
+    }
+    return vwPtr;
+}
