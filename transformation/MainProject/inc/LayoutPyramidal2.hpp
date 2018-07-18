@@ -90,4 +90,25 @@ class LayoutPyramidal2 : public LayoutPyramidalBased
             return inInterval(i, IStartOffset(f, j), IEndOffset(f, j)) && inInterval(j, JStartOffset(f, i), JEndOffset(f, i));
         }
 };
+
+class LayoutConfigParserPyramid2: public LayoutConfigParserPyramidBase
+{
+    public:
+        LayoutConfigParserPyramid2(std::string key): LayoutConfigParserPyramidBase(key) {}
+
+        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+        {
+            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
+            auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);
+            auto inputWidth = m_width.GetValue(layoutSection, ptree);
+            auto pyramidBaseEdge = m_pyramidBaseEdge.GetValue(layoutSection, ptree);
+            auto pyramidBaseEdgeLength = m_pyramidBaseEdgeLength.GetValue(layoutSection, ptree);
+            auto pyramidHeightLeft = m_pyramidHeightLeft.GetValue(layoutSection, ptree);
+            auto pyramidHeightRight = m_pyramidHeightRight.GetValue(layoutSection, ptree);
+            auto pyramidHeightTop = m_pyramidHeightTop.GetValue(layoutSection, ptree);
+            auto pyramidHeightBottom = m_pyramidHeightBottom.GetValue(layoutSection, ptree);
+            return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rot, false, vectorialTrans, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
+        }
+};
+
 }

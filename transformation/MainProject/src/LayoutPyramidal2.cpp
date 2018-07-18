@@ -383,3 +383,5 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutPyramidal2::InitOutputVideoImpl(s
     }
     return vwPtr;
 }
+
+REGISTER_LAYOUT("pyramid2", LayoutConfigParserPyramid2);

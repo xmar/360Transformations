@@ -45,16 +45,16 @@ using namespace IMT;
 
 int main( int argc, const char* argv[] )
 {
-   std::cout << "DEBUG" << std::endl << std::endl;
-   std::cout << LayoutFactory::Instance().GetHelp() << std::endl;
-   return 0;
+//   std::cout << "DEBUG" << std::endl << std::endl;
+//   std::cout << LayoutFactory::Instance().GetHelp() << std::endl;
+//   return 0;
    namespace po = boost::program_options;
    namespace pt = boost::property_tree;
    po::options_description desc("Options");
    desc.add_options()
-      ("help,h", "Produce this help message")
+      ("help,h", po::value<std::string>()->implicit_value(""), "Produce this help message. Giving layout id return configuration parameters accepted by this layout.")
       //("inputVideo,i", po::value<std::string>(), "path to the input video")
-      ("config,c", po::value<std::string>(),"Path to the configuration file")
+      ("config,c", po::value<std::string>(),"Path to the configuration INI file")
       ;
 
    po::variables_map vm;
@@ -66,8 +66,17 @@ int main( int argc, const char* argv[] )
       //--help
       if ( vm.count("help") || !vm.count("config"))
       {
-         std::cout << "Help: trans -c config"<< std::endl
-            <<  desc << std::endl;
+         auto layoutId = vm.count("help") ? vm["help"].as<std::string>() : "";
+         if (layoutId.size() == 0)
+         {
+             std::cout << "Help: trans -c config"<< std::endl
+                <<  desc << std::endl;
+             std::cout << LayoutFactory::Instance().GetHelp() << std::endl;
+         }
+         else
+         {
+             std::cout << LayoutFactory::Instance().GetHelp(layoutId) << std::endl;
+         }
          return 0;
       }
 

@@ -6,85 +6,85 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/preprocessor.hpp>
-#include <boost/property_tree/json_parser.hpp>
+//#include <boost/property_tree/json_parser.hpp>
 
-#include "Layout.hpp"
+//#include "Layout.hpp"
 #include "LayoutFactory.hpp"
-#include "LayoutCubeMap.hpp"
-#include "LayoutCubeMap2.hpp"
-#include "LayoutEquirectangular.hpp"
-#include "LayoutEquirectangularTiles.hpp"
-#include "LayoutFlatFixed.hpp"
-#include "LayoutViewport.hpp"
-#include "LayoutPyramidal.hpp"
-#include "LayoutPyramidal2.hpp"
-#include "LayoutRhombicdodeca.hpp"
+//#include "LayoutCubeMap.hpp"
+//#include "LayoutCubeMap2.hpp"
+//#include "LayoutEquirectangular.hpp"
+//#include "LayoutEquirectangularTiles.hpp"
+//#include "LayoutFlatFixed.hpp"
+//#include "LayoutViewport.hpp"
+//#include "LayoutPyramidal.hpp"
+//#include "LayoutPyramidal2.hpp"
+//#include "LayoutRhombicdodeca.hpp"
 
 namespace IMT {
 
 #define RANGE_NB_H_TILES ((1) (2) (3) (4) (5) (8) (16))
 #define RANGE_NB_V_TILES ((1) (2) (3) (4) (5) (8) (16))
-//#define RANGE_NB_H_TILES ((3))
-//#define RANGE_NB_V_TILES ((3))
-
-#define GENERATE_EQUI_TILED_LAYOUT(nbHTiles,nbVTiles) \
-  LayoutEquirectangularTiles<nbHTiles,nbVTiles>::ScaleTilesMap scaleRes;\
-  for (unsigned int i = 0; i < nbHTiles; ++i)\
-  {\
-      for (unsigned int j = 0; j < nbVTiles; ++j)\
-      {\
-          auto scale = ptree.get<double>(layoutSection+".equirectangularTile_"+std::to_string(i)+"_"+std::to_string(j));\
-          scaleRes[i][j] = scale;\
-      }\
-  }\
-  if (isInput)\
-  {\
-      if (!infer)\
-      {\
-          throw std::invalid_argument("Input with static resolution not supported yet");\
-      }\
-      if (refRes == CoordI(0,0))\
-      {\
-          refRes = LayoutEquirectangularTiles<nbHTiles,nbVTiles>::GetReferenceResolution(inputWidth, inputHeight, scaleRes);\
-      }\
-      inputWidth = refRes.x;\
-      inputHeight = refRes.y;\
-  }\
-  /*LayoutEquirectangularTiles<nbHTiles,nbVTiles>::TilesMap tileRes;\
-  for (unsigned int i = 0; i < nbHTiles; ++i)\
-  {\
-      for (unsigned int j = 0; j < nbVTiles; ++j)\
-      {\
-          tileRes[i][j] = std::make_tuple(unsigned(scaleRes[i][j]*inputWidth/nbHTiles),unsigned(scaleRes[i][j]*inputHeight/nbVTiles));\
-      }\
-  }*/\
-  std::array<double, nbHTiles> hRatios;\
-  std::array<double, nbVTiles> vRatios;\
-  double sumH = 0;\
-  double sumV = 0;\
-  for (unsigned i = 0; i < nbHTiles; ++i)\
-  {\
-    hRatios[i] =  ptree.get<double>(layoutSection+".hTileRation_"+std::to_string(i));\
-    sumH += hRatios[i];\
-  }\
-  for (unsigned j = 0; j < nbVTiles; ++j)\
-  {\
-    vRatios[j] =  ptree.get<double>(layoutSection+".vTileRation_"+std::to_string(j));\
-    sumV += vRatios[j];\
-  }\
-  for(auto& hr: hRatios) {hr /= sumH;}\
-  for(auto& vr: vRatios) {vr /= sumV;}\
-  auto tilesRatios = std::make_tuple(std::move(hRatios),std::move(vRatios));\
-  auto orignalRes = std::make_tuple(inputWidth, inputHeight);\
-  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), rotationQuaternion, orignalRes, useTile, upscale, vectorialTrans);
-///END MACRO GENERATE_EQUI_TILED_LAYOUT
-
-#define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
-  if (nbHTiles == BOOST_PP_SEQ_ELEM(0,p) && nbVTiles == BOOST_PP_SEQ_ELEM(1,p))\
-  {\
-    GENERATE_EQUI_TILED_LAYOUT(BOOST_PP_SEQ_ELEM(0,p),BOOST_PP_SEQ_ELEM(1,p))\
-  }
-///END MACRO TEST_AND_GENERATE_EQUI_TILED_LAYOUT
+////#define RANGE_NB_H_TILES ((3))
+////#define RANGE_NB_V_TILES ((3))
+//
+//#define GENERATE_EQUI_TILED_LAYOUT(nbHTiles,nbVTiles) \
+//  LayoutEquirectangularTiles<nbHTiles,nbVTiles>::ScaleTilesMap scaleRes;\
+//  for (unsigned int i = 0; i < nbHTiles; ++i)\
+//  {\
+//      for (unsigned int j = 0; j < nbVTiles; ++j)\
+//      {\
+//          auto scale = ptree.get<double>(layoutSection+".equirectangularTile_"+std::to_string(i)+"_"+std::to_string(j));\
+//          scaleRes[i][j] = scale;\
+//      }\
+//  }\
+//  if (isInput)\
+//  {\
+//      if (!infer)\
+//      {\
+//          throw std::invalid_argument("Input with static resolution not supported yet");\
+//      }\
+//      if (refRes == CoordI(0,0))\
+//      {\
+//          refRes = LayoutEquirectangularTiles<nbHTiles,nbVTiles>::GetReferenceResolution(inputWidth, inputHeight, scaleRes);\
+//      }\
+//      inputWidth = refRes.x;\
+//      inputHeight = refRes.y;\
+//  }\
+//  /*LayoutEquirectangularTiles<nbHTiles,nbVTiles>::TilesMap tileRes;\
+//  for (unsigned int i = 0; i < nbHTiles; ++i)\
+//  {\
+//      for (unsigned int j = 0; j < nbVTiles; ++j)\
+//      {\
+//          tileRes[i][j] = std::make_tuple(unsigned(scaleRes[i][j]*inputWidth/nbHTiles),unsigned(scaleRes[i][j]*inputHeight/nbVTiles));\
+//      }\
+//  }*/\
+//  std::array<double, nbHTiles> hRatios;\
+//  std::array<double, nbVTiles> vRatios;\
+//  double sumH = 0;\
+//  double sumV = 0;\
+//  for (unsigned i = 0; i < nbHTiles; ++i)\
+//  {\
+//    hRatios[i] =  ptree.get<double>(layoutSection+".hTileRation_"+std::to_string(i));\
+//    sumH += hRatios[i];\
+//  }\
+//  for (unsigned j = 0; j < nbVTiles; ++j)\
+//  {\
+//    vRatios[j] =  ptree.get<double>(layoutSection+".vTileRation_"+std::to_string(j));\
+//    sumV += vRatios[j];\
+//  }\
+//  for(auto& hr: hRatios) {hr /= sumH;}\
+//  for(auto& vr: vRatios) {vr /= sumV;}\
+//  auto tilesRatios = std::make_tuple(std::move(hRatios),std::move(vRatios));\
+//  auto orignalRes = std::make_tuple(inputWidth, inputHeight);\
+//  return std::make_shared<LayoutEquirectangularTiles<nbHTiles,nbVTiles>>(std::move(scaleRes), std::move(tilesRatios), rotationQuaternion, orignalRes, useTile, upscale, vectorialTrans);
+/////END MACRO GENERATE_EQUI_TILED_LAYOUT
+//
+//#define TEST_AND_GENERATE_EQUI_TILED_LAYOUT(r, p)\
+//  if (nbHTiles == BOOST_PP_SEQ_ELEM(0,p) && nbVTiles == BOOST_PP_SEQ_ELEM(1,p))\
+//  {\
+//    GENERATE_EQUI_TILED_LAYOUT(BOOST_PP_SEQ_ELEM(0,p),BOOST_PP_SEQ_ELEM(1,p))\
+//  }
+/////END MACRO TEST_AND_GENERATE_EQUI_TILED_LAYOUT
 
 #define GET_BITRATE_VECT(nbHTiles, nbVTiles) \
   std::array<std::array<double, nbVTiles>, nbHTiles> faceBitrate;\
@@ -253,124 +253,75 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
 {
     std::string layoutType;
 
-    bool isInput = layoutStatus == LayoutStatus::Input;
-    bool isOutput = layoutStatus == LayoutStatus::Output;
+//    bool isInput = layoutStatus == LayoutStatus::Input;
+//    bool isOutput = layoutStatus == LayoutStatus::Output;
     try {
         layoutType = ptree.get<std::string>(layoutSection+".type");
-        bool infer = isInput ? true : ptree.get<bool>(layoutSection+".relativeResolution");
-        CoordI refRes(0,0);
-        if (isInput)
-        {
-            try
-            {
-                int width = ptree.get<double>(layoutSection+".refWidth");
-                int height = ptree.get<double>(layoutSection+".refHeight");
-                refRes = CoordI(width, height);
-            }
-            catch(std::exception &e)
-            {
-                std::cout << "Could not find " << layoutSection+".refWidth" << " or " << layoutSection+".refHeight" <<
-                    "for layoutSection=" << layoutSection << std::endl;
-                throw e;
-            }
-        }
-        else
-        {
-            auto widthO = ptree.get_optional<double>(layoutSection+".refWidth");
-            auto heightO = ptree.get_optional<double>(layoutSection+".refHeight");
-            if (widthO && heightO)
-            {
-                inputWidth = widthO.get();
-                inputHeight = heightO.get();
-            } 
-        }
-        if (layoutType == "equirectangular")
-        {
-            auto rotationOpt = ptree.get_optional<std::string>(layoutSection+".rotation");
-            Quaternion rotationQuaternion(1);
-            if (rotationOpt && rotationOpt.get().size() > 0)
-            {
-                rotationQuaternion = ParseRotationJSON(rotationOpt.get());
-            }
-            std::string vectTrans;
-            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
-            if (vectTransOptional)
-            {
-                vectTrans = vectTransOptional.get();
-            }
-            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
-            if (isInput)
-            {
-                inputWidth = refRes.x;
-                inputHeight = refRes.y;
-                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion, vectorialTrans));
-            }
-            else
-            {
-                double relativeWidth = ptree.get<double>(layoutSection+".width");
-                double relativeHeight = ptree.get<double>(layoutSection+".height");
-                if (infer)
-                {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion, vectorialTrans));
-                }
-                else
-                {
-                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion, vectorialTrans));
-                }
-            }
-
-        }
-        if (layoutType == "cubeMap" || layoutType == "EAC")
-        {
-            double edgeFront = ptree.get<double>(layoutSection+".cubeEdgeLengthFront");
-            double edgeBack = ptree.get<double>(layoutSection+".cubeEdgeLengthBack");
-            double edgeLeft = ptree.get<double>(layoutSection+".cubeEdgeLengthLeft");
-            double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
-            double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
-            double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            auto facesPositionStringOpt = ptree.get_optional<std::string>(layoutSection+".facesPosition");
-            bool useEqualArea = layoutType == "EAC";
-            std::string facesPositionString;
-            if (facesPositionStringOpt)
-            {
-                facesPositionString = facesPositionStringOpt.get();
-            }
-            else
-            {
-                facesPositionString = "{\"face1\":\"right\", \"face1Rotation\":0, \"face2\":\"back\", \"face2Rotation\":0, \"face3\":\"left\", \"face3Rotation\":0, \"face4\":\"top\", \"face4Rotation\":-90, \"face5\":\"front\", \"face5Rotation\":-90, \"face6\":\"bottom\", \"face6Rotation\":-90}";
-            }
-            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            std::string vectTrans;
-            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
-            if (vectTransOptional)
-            {
-                vectTrans = vectTransOptional.get();
-            }
-            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
-            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
-            if (isInput)
-            {
-                if (!infer)
-                {
-                    throw std::invalid_argument("Input with static resolution not supported yet");
-                }
-                if (refRes == CoordI(0,0))
-                {
-                    refRes = LayoutCubeMap::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
-                }
-                inputWidth = refRes.x;
-                inputHeight = refRes.y;
-            }
-            if (infer)
-            {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/3), unsigned(edgeFront*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/3), unsigned(edgeBack*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/3), unsigned(edgeLeft*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/3), unsigned(edgeRight*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/3),unsigned(edgeTop*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/3),unsigned(edgeBottom*inputHeight/2)}}}, useEqualArea);
-            }
-            else
-            {
-                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}}, useEqualArea);
-            }
-        }
-//        if (layoutType == "cubeMap2")
+        return LayoutFactory::Instance().Create(layoutSection, ptree);
+//        bool infer = isInput ? true : ptree.get<bool>(layoutSection+".relativeResolution");
+//        CoordI refRes(0,0);
+//        if (isInput)
+//        {
+//            try
+//            {
+//                int width = ptree.get<double>(layoutSection+".refWidth");
+//                int height = ptree.get<double>(layoutSection+".refHeight");
+//                refRes = CoordI(width, height);
+//            }
+//            catch(std::exception &e)
+//            {
+//                std::cout << "Could not find " << layoutSection+".refWidth" << " or " << layoutSection+".refHeight" <<
+//                    "for layoutSection=" << layoutSection << std::endl;
+//                throw e;
+//            }
+//        }
+//        else
+//        {
+//            auto widthO = ptree.get_optional<double>(layoutSection+".refWidth");
+//            auto heightO = ptree.get_optional<double>(layoutSection+".refHeight");
+//            if (widthO && heightO)
+//            {
+//                inputWidth = widthO.get();
+//                inputHeight = heightO.get();
+//            } 
+//        }
+//        if (layoutType == "equirectangular")
+//        {
+//            auto rotationOpt = ptree.get_optional<std::string>(layoutSection+".rotation");
+//            Quaternion rotationQuaternion(1);
+//            if (rotationOpt && rotationOpt.get().size() > 0)
+//            {
+//                rotationQuaternion = ParseRotationJSON(rotationOpt.get());
+//            }
+//            std::string vectTrans;
+//            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+//            if (vectTransOptional)
+//            {
+//                vectTrans = vectTransOptional.get();
+//            }
+//            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+//            if (isInput)
+//            {
+//                inputWidth = refRes.x;
+//                inputHeight = refRes.y;
+//                return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(inputWidth, inputHeight, rotationQuaternion, vectorialTrans));
+//            }
+//            else
+//            {
+//                double relativeWidth = ptree.get<double>(layoutSection+".width");
+//                double relativeHeight = ptree.get<double>(layoutSection+".height");
+//                if (infer)
+//                {
+//                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth*inputWidth, relativeHeight*inputHeight, rotationQuaternion, vectorialTrans));
+//                }
+//                else
+//                {
+//                    return std::shared_ptr<Layout>(std::make_shared<LayoutEquirectangular>(relativeWidth, relativeHeight, rotationQuaternion, vectorialTrans));
+//                }
+//            }
+//
+//        }
+//        if (layoutType == "cubeMap" || layoutType == "EAC")
 //        {
 //            double edgeFront = ptree.get<double>(layoutSection+".cubeEdgeLengthFront");
 //            double edgeBack = ptree.get<double>(layoutSection+".cubeEdgeLengthBack");
@@ -378,6 +329,17 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
 //            double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
 //            double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
 //            double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
+//            auto facesPositionStringOpt = ptree.get_optional<std::string>(layoutSection+".facesPosition");
+//            bool useEqualArea = layoutType == "EAC";
+//            std::string facesPositionString;
+//            if (facesPositionStringOpt)
+//            {
+//                facesPositionString = facesPositionStringOpt.get();
+//            }
+//            else
+//            {
+//                facesPositionString = "{\"face1\":\"right\", \"face1Rotation\":0, \"face2\":\"back\", \"face2Rotation\":0, \"face3\":\"left\", \"face3Rotation\":0, \"face4\":\"top\", \"face4Rotation\":-90, \"face5\":\"front\", \"face5Rotation\":-90, \"face6\":\"bottom\", \"face6Rotation\":-90}";
+//            }
 //            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
 //            std::string vectTrans;
 //            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
@@ -393,224 +355,263 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
 //                {
 //                    throw std::invalid_argument("Input with static resolution not supported yet");
 //                }
-//                //if (refRes == CoordI(0,0))
-//                //{
-//                //    refRes = LayoutCubeMap2::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
-//                //}
-//                //inputWidth = refRes.x;
-//                //inputHeight = refRes.y;
+//                if (refRes == CoordI(0,0))
+//                {
+//                    refRes = LayoutCubeMap::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+//                }
+//                inputWidth = refRes.x;
+//                inputHeight = refRes.y;
 //            }
 //            if (infer)
 //            {
-//                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/4), unsigned(edgeFront*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/4), unsigned(edgeBack*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/4), unsigned(edgeLeft*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/4), unsigned(edgeRight*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/4),unsigned(edgeTop*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/4),unsigned(edgeBottom*inputHeight/3)}}});
+//                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/3), unsigned(edgeFront*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/3), unsigned(edgeBack*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/3), unsigned(edgeLeft*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/3), unsigned(edgeRight*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/3),unsigned(edgeTop*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/3),unsigned(edgeBottom*inputHeight/2)}}}, useEqualArea);
 //            }
 //            else
 //            {
-//                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}});
+//                return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}}, useEqualArea);
 //            }
 //        }
-        if (layoutType == "flatFixed")
-        {
-            bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");
-            Quaternion rotationQuaternion;
-            std::string pathToPositionTrace;
-            if (!dynamicPositions) {
-              rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            }
-            else
-            {
-              std::cout << "DEBUG dynamic position set" << std::endl;
-              pathToPositionTrace = ptree.get<std::string>(layoutSection+".positionTrace");
-            }
-            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);
-            double width = ptree.get<double>(layoutSection+".width");
-            double height = ptree.get<double>(layoutSection+".height");
-            double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
-            double verticalAngleOfVision = ptree.get<double>(layoutSection+".verticalAngleOfVision")*PI()/180;
-            if (isInput)
-            {
-                throw std::invalid_argument("FlatFixed  layout cannot be the input of the transformation flow");
-            }
-            if (infer)
-            {
-                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision, verticalAngleOfVision);
-            }
-            else
-            {
-                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width, height, horizontalAngleVision, verticalAngleOfVision);
-            }
-        }
-        if (layoutType == "viewport")
-        {
-            bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");
-            Quaternion rotationQuaternion;
-            std::string pathToPositionTrace;
-            if (!dynamicPositions) {
-              rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            }
-            else
-            {
-              std::cout << "DEBUG dynamic position set" << std::endl;
-              pathToPositionTrace = ptree.get<std::string>(layoutSection+".positionTrace");
-            }
-            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);
-            double width = ptree.get<double>(layoutSection+".width");
-            double height = ptree.get<double>(layoutSection+".height");
-            double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
-            double verticalAngleOfVision = ptree.get<double>(layoutSection+".verticalAngleOfVision")*PI()/180;
-            if (isInput)
-            {
-                throw std::invalid_argument("Viewport  layout cannot be the input of the transformation flow");
-            }
-            if (infer)
-            {
-                return std::make_shared<LayoutViewport>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision, verticalAngleOfVision);
-            }
-            else
-            {
-                return std::make_shared<LayoutViewport>(std::move(dynamicPosition), width, height, horizontalAngleVision, verticalAngleOfVision);
-            }
-        }
-
-        if (layoutType == "pyramid")
-        {
-            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            double pyramidBaseEdge = ptree.get<double>(layoutSection+".pyramidBaseEdge");
-            double pyramidBaseEdgeLength = ptree.get<double>(layoutSection+".pyramidBaseEdgeLength");
-            double pyramidHeightTop = ptree.get<double>(layoutSection+".pyramidHeightTop");
-            double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
-            double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
-            double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
-            std::string vectTrans;
-            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
-            if (vectTransOptional)
-            {
-                vectTrans = vectTransOptional.get();
-            }
-            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
-            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
-            if (isInput)
-            {
-                if (!infer)
-                {
-                    throw std::invalid_argument("Input with static resolution not supported yet");
-                }
-                if (refRes == CoordI(0,0))
-                {
-                    refRes = LayoutPyramidal::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
-                }
-                inputWidth = refRes.x;
-                inputHeight = refRes.y;
-            }
-            if (infer)
-            {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, pyramidBaseEdgeLength*inputWidth/4);
-            }
-            else
-            {
-                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, pyramidBaseEdgeLength);
-            }
-        }
-        if (layoutType == "pyramid2")
-        {
-            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            double pyramidBaseEdge = ptree.get<double>(layoutSection+".pyramidBaseEdge");
-            double pyramidBaseEdgeLength = ptree.get<double>(layoutSection+".pyramidBaseEdgeLength");
-            double pyramidHeightTop = ptree.get<double>(layoutSection+".pyramidHeightTop");
-            double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
-            double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
-            double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
-            std::string vectTrans;
-            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
-            if (vectTransOptional)
-            {
-                vectTrans = vectTransOptional.get();
-            }
-            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
-            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
-            if (isInput)
-            {
-                if (!infer)
-                {
-                    throw std::invalid_argument("Input with static resolution not supported yet");
-                }
-                if (refRes == CoordI(0,0))
-                {
-                    refRes = LayoutPyramidal2::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
-                }
-                inputWidth = refRes.x;
-                inputHeight = refRes.y;
-            }
-            if (infer)
-            {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
-            }
-            else
-            {
-                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
-            }
-        }
-        if (layoutType == "rhombicDodeca")
-        {
-            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
-            std::array<double, 12> faceResScale;
-            std::array<unsigned int, 12> faceRes;
-            std::string vectTrans;
-            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
-            if (vectTransOptional)
-            {
-                vectTrans = vectTransOptional.get();
-            }
-            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
-
-            for (unsigned int i = 0; i < 12; ++i)
-            {
-                faceResScale[i] = ptree.get<double>(layoutSection+".rhombEdgeLengthFace"+std::to_string(i+1));
-            }
-            if (isInput)
-            {
-                if (!infer)
-                {
-                    throw std::invalid_argument("Input with static resolution not supported yet");
-                }
-                if (refRes == CoordI(0,0))
-                {
-                    refRes = LayoutRhombicdodeca::GetReferenceResolution(inputWidth, inputHeight, faceResScale);
-                }
-                inputWidth = refRes.x;
-                inputHeight = refRes.y;
-            }
-
-            for (unsigned int i = 0; i < 12; ++i)
-            {
-                faceRes[i] = (infer ? inputWidth/8.0 : 1)*faceResScale[i];
-            }
-
-            return LayoutRhombicdodeca::GenerateLayout(rotationQuaternion, vectorialTrans, useTile, faceRes);
-        }
-        if (layoutType == "equirectangularTiled")
-        {
-
-            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
-            bool upscale = ptree.get<bool>(layoutSection+".upscale");
-            std::string vectTrans;
-            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
-            if (vectTransOptional)
-            {
-                vectTrans = vectTransOptional.get();
-            }
-            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
-
-
-            unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
-            unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");
-
-            BOOST_PP_SEQ_FOR_EACH_PRODUCT(TEST_AND_GENERATE_EQUI_TILED_LAYOUT, RANGE_NB_H_TILES RANGE_NB_V_TILES)
-
-            throw std::invalid_argument("Not supported type: equirectangularTiled with nbHTiles = "+std::to_string(nbHTiles)+" and nbVTiles = "+std::to_string(nbVTiles));
-        }
+////        if (layoutType == "cubeMap2")
+////        {
+////            double edgeFront = ptree.get<double>(layoutSection+".cubeEdgeLengthFront");
+////            double edgeBack = ptree.get<double>(layoutSection+".cubeEdgeLengthBack");
+////            double edgeLeft = ptree.get<double>(layoutSection+".cubeEdgeLengthLeft");
+////            double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
+////            double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
+////            double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
+////            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+////            std::string vectTrans;
+////            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+////            if (vectTransOptional)
+////            {
+////                vectTrans = vectTransOptional.get();
+////            }
+////            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+////            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
+////            if (isInput)
+////            {
+////                if (!infer)
+////                {
+////                    throw std::invalid_argument("Input with static resolution not supported yet");
+////                }
+////                //if (refRes == CoordI(0,0))
+////                //{
+////                //    refRes = LayoutCubeMap2::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+////                //}
+////                //inputWidth = refRes.x;
+////                //inputHeight = refRes.y;
+////            }
+////            if (infer)
+////            {
+////                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/4), unsigned(edgeFront*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/4), unsigned(edgeBack*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/4), unsigned(edgeLeft*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/4), unsigned(edgeRight*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/4),unsigned(edgeTop*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/4),unsigned(edgeBottom*inputHeight/3)}}});
+////            }
+////            else
+////            {
+////                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}});
+////            }
+////        }
+//        if (layoutType == "flatFixed")
+//        {
+//            bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");
+//            Quaternion rotationQuaternion;
+//            std::string pathToPositionTrace;
+//            if (!dynamicPositions) {
+//              rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+//            }
+//            else
+//            {
+//              std::cout << "DEBUG dynamic position set" << std::endl;
+//              pathToPositionTrace = ptree.get<std::string>(layoutSection+".positionTrace");
+//            }
+//            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);
+//            double width = ptree.get<double>(layoutSection+".width");
+//            double height = ptree.get<double>(layoutSection+".height");
+//            double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
+//            double verticalAngleOfVision = ptree.get<double>(layoutSection+".verticalAngleOfVision")*PI()/180;
+//            if (isInput)
+//            {
+//                throw std::invalid_argument("FlatFixed  layout cannot be the input of the transformation flow");
+//            }
+//            if (infer)
+//            {
+//                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision, verticalAngleOfVision);
+//            }
+//            else
+//            {
+//                return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), width, height, horizontalAngleVision, verticalAngleOfVision);
+//            }
+//        }
+//        if (layoutType == "viewport")
+//        {
+//            bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");
+//            Quaternion rotationQuaternion;
+//            std::string pathToPositionTrace;
+//            if (!dynamicPositions) {
+//              rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+//            }
+//            else
+//            {
+//              std::cout << "DEBUG dynamic position set" << std::endl;
+//              pathToPositionTrace = ptree.get<std::string>(layoutSection+".positionTrace");
+//            }
+//            DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);
+//            double width = ptree.get<double>(layoutSection+".width");
+//            double height = ptree.get<double>(layoutSection+".height");
+//            double horizontalAngleVision = ptree.get<double>(layoutSection+".horizontalAngleOfVision")*PI()/180;
+//            double verticalAngleOfVision = ptree.get<double>(layoutSection+".verticalAngleOfVision")*PI()/180;
+//            if (isInput)
+//            {
+//                throw std::invalid_argument("Viewport  layout cannot be the input of the transformation flow");
+//            }
+//            if (infer)
+//            {
+//                return std::make_shared<LayoutViewport>(std::move(dynamicPosition), width*inputWidth, height*inputHeight, horizontalAngleVision, verticalAngleOfVision);
+//            }
+//            else
+//            {
+//                return std::make_shared<LayoutViewport>(std::move(dynamicPosition), width, height, horizontalAngleVision, verticalAngleOfVision);
+//            }
+//        }
+//
+//        if (layoutType == "pyramid")
+//        {
+//            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+//            double pyramidBaseEdge = ptree.get<double>(layoutSection+".pyramidBaseEdge");
+//            double pyramidBaseEdgeLength = ptree.get<double>(layoutSection+".pyramidBaseEdgeLength");
+//            double pyramidHeightTop = ptree.get<double>(layoutSection+".pyramidHeightTop");
+//            double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
+//            double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
+//            double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
+//            std::string vectTrans;
+//            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+//            if (vectTransOptional)
+//            {
+//                vectTrans = vectTransOptional.get();
+//            }
+//            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+//            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
+//            if (isInput)
+//            {
+//                if (!infer)
+//                {
+//                    throw std::invalid_argument("Input with static resolution not supported yet");
+//                }
+//                if (refRes == CoordI(0,0))
+//                {
+//                    refRes = LayoutPyramidal::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+//                }
+//                inputWidth = refRes.x;
+//                inputHeight = refRes.y;
+//            }
+//            if (infer)
+//            {
+//                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, pyramidBaseEdgeLength*inputWidth/4);
+//            }
+//            else
+//            {
+//                return std::make_shared<LayoutPyramidal>(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, pyramidBaseEdgeLength);
+//            }
+//        }
+//        if (layoutType == "pyramid2")
+//        {
+//            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+//            double pyramidBaseEdge = ptree.get<double>(layoutSection+".pyramidBaseEdge");
+//            double pyramidBaseEdgeLength = ptree.get<double>(layoutSection+".pyramidBaseEdgeLength");
+//            double pyramidHeightTop = ptree.get<double>(layoutSection+".pyramidHeightTop");
+//            double pyramidHeightBottom = ptree.get<double>(layoutSection+".pyramidHeightBottom");
+//            double pyramidHeightLeft = ptree.get<double>(layoutSection+".pyramidHeightLeft");
+//            double pyramidHeightRight = ptree.get<double>(layoutSection+".pyramidHeightRight");
+//            std::string vectTrans;
+//            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+//            if (vectTransOptional)
+//            {
+//                vectTrans = vectTransOptional.get();
+//            }
+//            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+//            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
+//            if (isInput)
+//            {
+//                if (!infer)
+//                {
+//                    throw std::invalid_argument("Input with static resolution not supported yet");
+//                }
+//                if (refRes == CoordI(0,0))
+//                {
+//                    refRes = LayoutPyramidal2::GetReferenceResolution(inputWidth, inputHeight, {{pyramidBaseEdgeLength, pyramidHeightLeft, pyramidHeightRight, pyramidHeightTop, pyramidHeightBottom}});
+//                }
+//                inputWidth = refRes.x;
+//                inputHeight = refRes.y;
+//            }
+//            if (infer)
+//            {
+//                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, {{unsigned(pyramidBaseEdgeLength*inputWidth/4), unsigned(pyramidHeightLeft*inputWidth/4), unsigned(pyramidHeightRight*inputWidth/4), unsigned(pyramidHeightTop*inputWidth/4), unsigned(pyramidHeightBottom*inputWidth/4)}});
+//            }
+//            else
+//            {
+//                return LayoutPyramidal2::GenerateLayout(pyramidBaseEdge, rotationQuaternion, useTile, vectorialTrans, {{unsigned(pyramidBaseEdgeLength), unsigned(pyramidHeightLeft), unsigned(pyramidHeightRight), unsigned(pyramidHeightTop), unsigned(pyramidHeightBottom)}});
+//            }
+//        }
+//        if (layoutType == "rhombicDodeca")
+//        {
+//            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+//            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
+//            std::array<double, 12> faceResScale;
+//            std::array<unsigned int, 12> faceRes;
+//            std::string vectTrans;
+//            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+//            if (vectTransOptional)
+//            {
+//                vectTrans = vectTransOptional.get();
+//            }
+//            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+//
+//            for (unsigned int i = 0; i < 12; ++i)
+//            {
+//                faceResScale[i] = ptree.get<double>(layoutSection+".rhombEdgeLengthFace"+std::to_string(i+1));
+//            }
+//            if (isInput)
+//            {
+//                if (!infer)
+//                {
+//                    throw std::invalid_argument("Input with static resolution not supported yet");
+//                }
+//                if (refRes == CoordI(0,0))
+//                {
+//                    refRes = LayoutRhombicdodeca::GetReferenceResolution(inputWidth, inputHeight, faceResScale);
+//                }
+//                inputWidth = refRes.x;
+//                inputHeight = refRes.y;
+//            }
+//
+//            for (unsigned int i = 0; i < 12; ++i)
+//            {
+//                faceRes[i] = (infer ? inputWidth/8.0 : 1)*faceResScale[i];
+//            }
+//
+//            return LayoutRhombicdodeca::GenerateLayout(rotationQuaternion, vectorialTrans, useTile, faceRes);
+//        }
+//        if (layoutType == "equirectangularTiled")
+//        {
+//
+//            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+//            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
+//            bool upscale = ptree.get<bool>(layoutSection+".upscale");
+//            std::string vectTrans;
+//            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+//            if (vectTransOptional)
+//            {
+//                vectTrans = vectTransOptional.get();
+//            }
+//            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+//
+//
+//            unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
+//            unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");
+//
+//            BOOST_PP_SEQ_FOR_EACH_PRODUCT(TEST_AND_GENERATE_EQUI_TILED_LAYOUT, RANGE_NB_H_TILES RANGE_NB_V_TILES)
+//
+//            throw std::invalid_argument("Not supported type: equirectangularTiled with nbHTiles = "+std::to_string(nbHTiles)+" and nbVTiles = "+std::to_string(nbVTiles));
+//        }
     }
     catch (std::exception &e)
     {

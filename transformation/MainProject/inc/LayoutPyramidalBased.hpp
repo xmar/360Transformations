@@ -1,5 +1,6 @@
 #pragma once
 #include "Layout.hpp"
+#include "LayoutFactory.hpp"
 #include <stdexcept>
 #include <array>
 
@@ -108,4 +109,25 @@ class LayoutPyramidalBased : public Layout
       Quaternion m_rotQuaternion;
 
 };
+
+class LayoutConfigParserPyramidBase: public LayoutConfigParser
+{
+    public:
+        LayoutConfigParserPyramidBase(std::string key): LayoutConfigParser(key),
+            m_pyramidBaseEdge(this, "pyramidBaseEdge", "(float) Length of the edge of the base face of the pyramid in the 3D space. [default = 2.5]", true, 2.5),
+            m_pyramidBaseEdgeLength(this, "pyramidBaseEdgeLength", "(float) Ratio of the edge resolution of the pyramid compared to the full resolution size [default = 1]", true, 1),
+            m_pyramidHeightTop(this, "pyramidHeightTop", "(float) Ratio of the height of the top face resolution of the pyramid. The face base size of the pyramid is the same of the base edge size [default = 1]", true, 1),
+            m_pyramidHeightBottom(this, "pyramidHeightBottom", "(float) Ratio of the height of the bottom face resolution of the pyramid. The face base size of the pyramid is the same of the base edge size [default = 1]", true, 1),
+            m_pyramidHeightLeft(this, "pyramidHeightLeft", "(float) Ratio of the height of the left face resolution of the pyramid. The face base size of the pyramid is the same of the base edge size [default = 1]", true, 1),
+            m_pyramidHeightRight(this, "pyramidHeightRight", "(float) Ratio of the height of the right face resolution of the pyramid. The face base size of the pyramid is the same of the base edge size [default = 1]", true, 1)
+        {}
+    protected:
+        KeyTypeDescription<SCALAR> m_pyramidBaseEdge;
+        KeyTypeDescription<SCALAR> m_pyramidBaseEdgeLength;
+        KeyTypeDescription<SCALAR> m_pyramidHeightTop;
+        KeyTypeDescription<SCALAR> m_pyramidHeightBottom;
+        KeyTypeDescription<SCALAR> m_pyramidHeightLeft;
+        KeyTypeDescription<SCALAR> m_pyramidHeightRight;
+};
+
 }

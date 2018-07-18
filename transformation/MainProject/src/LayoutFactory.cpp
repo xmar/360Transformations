@@ -30,6 +30,16 @@ std::string LayoutConfigParserBase::GetHelp(void) const
     return std::move(out);
 }
 
+std::shared_ptr<Layout> LayoutFactory::Create(std::string layoutSection, pt::ptree& ptree) const
+{
+    auto layoutType = ptree.get<std::string>(layoutSection+".type");
+    if (_makers.find(layoutType) == _makers.end())
+    {
+        throw std::invalid_argument("Layout type "+layoutType+" is not defined. Use help to see what layout exists");
+    }
+    return _makers.at(layoutType)->Create(layoutSection, ptree);
+}
+
 void LayoutConfigParserBase::AddKeyTypeDescription(KeyTypeDescriptionBase* ktd)
 {
     if (m_keyTypeDescriptionMap.find(ktd->GetLabel()) != m_keyTypeDescriptionMap.end())

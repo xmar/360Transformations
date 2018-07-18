@@ -62,4 +62,18 @@ class LayoutPyramidal: public LayoutPyramidalBased
 
 };
 
+class LayoutConfigParserPyramid: public LayoutConfigParserPyramidBase
+{
+    public:
+        LayoutConfigParserPyramid(std::string key): LayoutConfigParserPyramidBase(key) {}
+
+        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+        {
+            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
+            auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);
+            return std::make_shared<LayoutPyramidal>(m_pyramidBaseEdge.GetValue(layoutSection, ptree), rot, false, vectorialTrans, m_pyramidBaseEdgeLength.GetValue(layoutSection, ptree)*m_width.GetValue(layoutSection, ptree)/4);
+        }
+};
+
+
 }
