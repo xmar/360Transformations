@@ -126,4 +126,29 @@ class LayoutCubeMapBased : public Layout
         void InitFaceRotations(void);
 };
 
+class LayoutConfigParserCubemapBase: public LayoutConfigParser
+{                                                                                
+    public:                                                                      
+        LayoutConfigParserCubemapBase(std::string key, bool useEqualArea): LayoutConfigParser(key),
+            m_useEqualArea(useEqualArea),
+            //m_useTile(this, "useTile", "Set to true to use track tiles [default = false]", true, false),
+            m_edgeFront(this, "cubeEdgeLengthFront", "Relative size of the Front size (between 0 and 1) [default = 1]", true, 1),
+            m_edgeRight(this, "cubeEdgeLengthRight", "Relative size of the Right size (between 0 and 1) [default = 1]", true, 1),
+            m_edgeLeft(this, "cubeEdgeLengthLeft", "Relative size of the Left size (between 0 and 1) [default = 1]", true, 1),
+            m_edgeBack(this, "cubeEdgeLengthBack", "Relative size of the Back size (between 0 and 1) [default = 1]", true, 1),
+            m_edgeTop(this, "cubeEdgeLengthTop", "Relative size of the Top size (between 0 and 1) [default = 1]", true, 1),
+            m_edgeBottom(this, "cubeEdgeLengthBottom", "Relative size of the Bottom size (between 0 and 1) [default = 1]", true, 1)
+    {}                                                                           
+                                                                                 
+    protected:                                                                   
+        bool m_useEqualArea;
+        //KeyTypeDescription<bool> m_useTile;
+        KeyTypeDescription<SCALAR> m_edgeFront;
+        KeyTypeDescription<SCALAR> m_edgeRight;
+        KeyTypeDescription<SCALAR> m_edgeLeft;
+        KeyTypeDescription<SCALAR> m_edgeBack;
+        KeyTypeDescription<SCALAR> m_edgeTop;
+        KeyTypeDescription<SCALAR> m_edgeBottom;
+};
+
 }

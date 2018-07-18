@@ -14,7 +14,7 @@ class LayoutCubeMap2: public LayoutCubeMapBased
          * \return LayoutCubeMap2 The LayoutCubeMap2 object generated
          *
          */
-	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::array<std::array<unsigned int, 2>,6> pixelEdges)
+	    static std::shared_ptr<LayoutCubeMap2> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::array<std::array<unsigned int, 2>,6> pixelEdges, bool useEqualArea)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
 	        auto maxOffsetTFB = MAX(fr.GetResV(Faces::Front), MAX(fr.GetResV(Faces::Top), fr.GetResV(Faces::Bottom)));
@@ -22,7 +22,7 @@ class LayoutCubeMap2: public LayoutCubeMapBased
             return std::shared_ptr<LayoutCubeMap2>( new LayoutCubeMap2(rotationQuaternion, useTile, vectorialTrans,
                 fr.GetResH(Faces::Left)+maxOffsetTFB+fr.GetResH(Faces::Right)+fr.GetResH(Faces::Back),
                 fr.GetResV(Faces::Top)+maxOffsetLFRB+fr.GetResV(Faces::Bottom),
-                fr, maxOffsetTFB, maxOffsetLFRB));
+                fr, maxOffsetTFB, maxOffsetLFRB, useEqualArea));
 	    }
 
         /** \brief Layout with the same resolution for each faces
@@ -62,8 +62,8 @@ class LayoutCubeMap2: public LayoutCubeMapBased
         unsigned int m_maxOffsetTFB;
         unsigned int m_maxOffsetLFRB;
 
-        LayoutCubeMap2(Quaternion rotationQuaternion, double useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB):
-            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorialTrans, fr), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
+        LayoutCubeMap2(Quaternion rotationQuaternion, double useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int width, unsigned int height, const FaceResolutions& fr,unsigned int maxOffsetTFB, unsigned int maxOffsetLFRB, bool useEqualArea):
+            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorialTrans, fr, useEqualArea), m_maxOffsetTFB(maxOffsetTFB), m_maxOffsetLFRB(maxOffsetLFRB) {}
 
         unsigned int IStartOffset(LayoutCubeMapBased::Faces f) const;
         unsigned int IEndOffset(LayoutCubeMapBased::Faces f) const;
@@ -75,5 +75,29 @@ class LayoutCubeMap2: public LayoutCubeMapBased
             return inInterval(i, IStartOffset(f), IEndOffset(f)) && inInterval(j, JStartOffset(f), JEndOffset(f));
         }
 };
+
+class  LayoutConfigParserCubemap2: public LayoutConfigParserCubemapBase
+{
+    public:
+        LayoutConfigParserCubemap2(std::string key, bool useEqualArea): LayoutConfigParserCubemapBase(key, useEqualArea)
+        {}
+
+        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+        {
+            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
+            auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);
+            auto inputWidth = m_width.GetValue(layoutSection, ptree);
+            auto inputHeight = m_height.GetValue(layoutSection, ptree);
+            auto edgeFront = m_edgeFront.GetValue(layoutSection, ptree);
+            auto edgeRight = m_edgeRight.GetValue(layoutSection, ptree);
+            auto edgeLeft = m_edgeLeft.GetValue(layoutSection, ptree);
+            auto edgeBack = m_edgeBack.GetValue(layoutSection, ptree);
+            auto edgeTop = m_edgeTop.GetValue(layoutSection, ptree);
+            auto edgeBottom = m_edgeBottom.GetValue(layoutSection, ptree);
+            return LayoutCubeMap2::GenerateLayout(rot, false, std::move(vectorialTrans), {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/3), unsigned(edgeFront*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/3), unsigned(edgeBack*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/3), unsigned(edgeLeft*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/3), unsigned(edgeRight*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/3),unsigned(edgeTop*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/3),unsigned(edgeBottom*inputHeight/2)}}}, m_useEqualArea);
+        }
+    private:
+};
+
 
 }

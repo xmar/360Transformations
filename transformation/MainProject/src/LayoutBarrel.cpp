@@ -31,7 +31,7 @@ LayoutBarrel::NormalizedFaceInfo LayoutBarrel::From2dToNormalizedFaceInfo(const 
 
 CoordF LayoutBarrel::FromNormalizedInfoTo2d(const LayoutBarrel::NormalizedFaceInfo& ni) const
 {
-    Faces f = static_cast<LayoutCubeMapBased::Faces>(ni.m_faceId);
+    auto f = static_cast<LayoutBarrel::Faces>(ni.m_faceId);
     const CoordF& coord (ni.m_normalizedFaceCoordinate);
     if (f == Faces::Equirec)
     {
@@ -49,25 +49,43 @@ CoordF LayoutBarrel::FromNormalizedInfoTo2d(const LayoutBarrel::NormalizedFaceIn
 
 LayoutBarrel::NormalizedFaceInfo LayoutBarrel::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-   Coord3dSpherical p = Coord3dCart(Rotation(sphericalCoord, m_rotQuaternion.Inv())); 
+   Coord3dSpherical p = Coord3dCart(Rotation(sphericalCoord, m_rotationQuaternion.Inv())); 
    if (p.GetPhi() >= (PI() - PI()*m_equirecRatio)/2.0 && p.GetPhi() <= PI()-(PI() - PI()*m_equirecRatio)/2.0)
    {// EquiRec
-        NormalizedFaceInfo(CoordF(p.GetTheta()/(2*PI())+0.5, (p.GetPhi()-(PI() - PI()*m_equirecRatio)/2.0)/(PI()*m_equirecRatio)), static_cast<int>(Faces::Equirec));
+        return NormalizedFaceInfo(CoordF(p.GetTheta()/(2*PI())+0.5, (p.GetPhi()-(PI() - PI()*m_equirecRatio)/2.0)/(PI()*m_equirecRatio)), static_cast<int>(Faces::Equirec));
    }
    else if (p.GetPhi() < (PI() - PI()*m_equirecRatio)/2.0)
    {//Top
+        Coord3dCart pp = p/Coord3dCart(p).GetZ();
+        return NormalizedFaceInfo(CoordF(std::tan(m_equirecRatio*PI()/2)*pp.GetX()+0.5, std::tan(m_equirecRatio*PI()/2)*pp.GetY()+0.5), static_cast<int>(Faces::Top));
    }
    else
    {//Bottom
+        Coord3dCart pp = p/(-Coord3dCart(p).GetZ());
+        return NormalizedFaceInfo(CoordF(std::tan(m_equirecRatio*PI()/2)*pp.GetX()+0.5, std::tan(m_equirecRatio*PI()/2)*pp.GetY()+0.5), static_cast<int>(Faces::Bottom));
    }
 }
 
 Coord3dCart LayoutBarrel::FromNormalizedInfoTo3d(const LayoutBarrel::NormalizedFaceInfo& ni) const
 {
     Faces f = static_cast<Faces>(ni.m_faceId);
+    Coord3dCart v;
     if (f == Faces::Black) {return Coord3dCart(0,0,0);}
-    double i = (ni.m_normalizedFaceCoordinate.x - 0.5)*2.f;
-    double j = (ni.m_normalizedFaceCoordinate.y - 0.5)*2.f;
-
-    return Rotation(v, m_rotQuaternion);
+    if (f == Faces::Equirec)
+    {
+        v =  Coord3dSpherical(1, (ni.m_normalizedFaceCoordinate.x-0.5)*2*PI(), ni.m_normalizedFaceCoordinate.y*PI()*m_equirecRatio+(PI() - PI()*m_equirecRatio)/2.0);
+    }
+    if (f == Faces::Top)
+    {
+        v = Coord3dCart((ni.m_normalizedFaceCoordinate.x-0.5)/std::tan(m_equirecRatio*PI()/2), (ni.m_normalizedFaceCoordinate.y-0.5)/std::tan(m_equirecRatio*PI()/2), 1);
+        v /= v.Norm();
+    }
+    if (f == Faces::Bottom)
+    {
+        v = Coord3dCart((ni.m_normalizedFaceCoordinate.x-0.5)/std::tan(m_equirecRatio*PI()/2), (ni.m_normalizedFaceCoordinate.y-0.5)/std::tan(m_equirecRatio*PI()/2), -1);
+        v /= v.Norm();
+    }
+    return Rotation(v, m_rotationQuaternion);
 }
+
+REGISTER_LAYOUT("barrel", LayoutConfigParserBarrel);

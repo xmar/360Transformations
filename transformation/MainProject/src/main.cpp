@@ -32,6 +32,8 @@
 #include "VideoWriter.hpp"
 #include "VideoReader.hpp"
 
+#include "LayoutFactory.hpp"
+
 #define DEBUG 0
 #if DEBUG
 #define PRINT_DEBUG(x) std::cout << x << std::endl;
@@ -43,6 +45,9 @@ using namespace IMT;
 
 int main( int argc, const char* argv[] )
 {
+   std::cout << "DEBUG" << std::endl << std::endl;
+   std::cout << LayoutFactory::Instance().GetHelp() << std::endl;
+   return 0;
    namespace po = boost::program_options;
    namespace pt = boost::property_tree;
    po::options_description desc("Options");

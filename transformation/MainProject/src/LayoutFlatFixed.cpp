@@ -62,3 +62,5 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutFlatFixed::InitOutputVideoImpl(st
     vwPtr->Init<1>(codecId, {{m_outWidth}}, {{m_outHeight}}, fps, gop_size, {{bit_rateVect[0]}});
     return vwPtr;
 }
+
+REGISTER_LAYOUT("flatFixed", LayoutConfigParserFlatFixedView);

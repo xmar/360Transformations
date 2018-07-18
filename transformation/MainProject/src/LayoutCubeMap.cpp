@@ -228,3 +228,7 @@ std::shared_ptr<IMT::LibAv::VideoWriter> LayoutCubeMap::InitOutputVideoImpl(std:
   }
   return vwPtr;
 }
+
+static IMT::LayoutConfigParserCubemap maker("cubeMap", false);
+static IMT::LayoutConfigParserCubemap maker_eac("EAC", true);
+

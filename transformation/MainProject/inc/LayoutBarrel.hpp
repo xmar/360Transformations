@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layout.hpp"
+#include "LayoutFactory.hpp"
 
 namespace IMT {
 class LayoutBarrel: public Layout
@@ -61,4 +62,21 @@ class LayoutBarrel: public Layout
         CoordF m_centerTop;
         CoordF m_centerBottom;
 };
+
+class LayoutConfigParserBarrel: public LayoutConfigParser
+{
+    public:
+        LayoutConfigParserBarrel(std::string key): LayoutConfigParser(key)
+        //    m_equiRatio(this, "equiRatio", "(float) Vertical ratio of the equirectangular area. Default = 0.33", true)
+    {}
+
+        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+        {
+            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
+            return std::make_shared<LayoutBarrel>(m_width.GetValue(layoutSection, ptree), m_height.GetValue(layoutSection, ptree), rot, GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot));
+        }
+    private:
+        //KeyTypeDescription<SCALAR> m_equiRatio;
+};
+
 }

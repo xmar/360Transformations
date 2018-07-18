@@ -9,6 +9,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include "Layout.hpp"
+#include "LayoutFactory.hpp"
 #include "LayoutCubeMap.hpp"
 #include "LayoutCubeMap2.hpp"
 #include "LayoutEquirectangular.hpp"
@@ -18,9 +19,6 @@
 #include "LayoutPyramidal.hpp"
 #include "LayoutPyramidal2.hpp"
 #include "LayoutRhombicdodeca.hpp"
-#include "OffsetTrans.hpp"
-#include "HorizontalOffsetTrans.hpp"
-
 
 namespace IMT {
 
@@ -242,169 +240,7 @@ std::vector<int> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, i
     throw std::invalid_argument("Not supported type: "+layoutType);
 }
 
-Quaternion ParseRotationJSON(std::string s)
-{
-  std::stringstream ss(s);
-  pt::ptree ptree_json;
 
-  pt::json_parser::read_json(ss, ptree_json);
-
-  auto& v = ptree_json.get_child("type");
-
-  if (v.data() == "euler")
-  {
-    auto vv = ptree_json.get_child("yaw");
-    auto y = std::stod(vv.data())*PI()/180;
-
-    vv = ptree_json.get_child("pitch");
-    auto p =  std::stod(vv.data())*PI()/180;
-
-    vv = ptree_json.get_child("roll");
-    auto r = std::stod(vv.data())*PI()/180;
-    return Quaternion::FromEuler(y, p, r);
-  }
-  else if (v.data() == "quaternion")
-  {
-    auto vv = ptree_json.get_child("w");
-    auto w = std::stod(vv.data());
-
-    vv = ptree_json.get_child("x");
-    auto x =  std::stod(vv.data());
-
-    vv = ptree_json.get_child("y");
-    auto y = std::stod(vv.data());
-
-    vv = ptree_json.get_child("z");
-    auto z = std::stod(vv.data());
-    auto q = Quaternion(w, VectorCartesian(x, y, z));
-    q.Normalize();
-    return q;
-  }
-  else if (v.data() == "angleAxis")
-  {
-    auto vv = ptree_json.get_child("angle");
-    auto theta = std::stod(vv.data())*PI()/180;
-
-    vv = ptree_json.get_child("x");
-    auto x =  std::stod(vv.data());
-
-    vv = ptree_json.get_child("y");
-    auto y = std::stod(vv.data());
-
-    vv = ptree_json.get_child("z");
-    auto z = std::stod(vv.data());
-
-    VectorCartesian v(x, y, z);
-    auto q = Quaternion(std::cos(theta/2.0), std::cos(theta/2.0)*v/v.Norm());
-    q.Normalize();
-    return q;
-  }
-
-  // BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child("particles.electron"))
-  // {
-  //     assert(v.first.empty()); // array elements have no names
-  //     std::cout << v.second.data() << std::endl;
-  //     // etc
-  // }
-  return Quaternion(0);
-}
-
-Coord3dCart ParseVectorJSON(std::string s)
-{
-  std::stringstream ss(s);
-  pt::ptree ptree_json;
-
-  pt::json_parser::read_json(ss, ptree_json);
-
-  auto& v = ptree_json.get_child("type");
-
-  if (v.data() == "vectorCart")
-  {
-    auto vv = ptree_json.get_child("x");
-    auto x = std::stod(vv.data());
-
-    vv = ptree_json.get_child("y");
-    auto y =  std::stod(vv.data());
-
-    vv = ptree_json.get_child("z");
-    auto z = std::stod(vv.data());
-    return Coord3dCart(x, y, z);
-  }
-  else if (v.data() == "vectorSpherical")
-  {
-    auto vv = ptree_json.get_child("rho");
-    auto rho = std::stod(vv.data());
-
-    vv = ptree_json.get_child("theta");
-    auto theta =  std::stod(vv.data())*PI()/180.f;
-
-    vv = ptree_json.get_child("phi");
-    auto phi = std::stod(vv.data())*PI()/180.f;
-    return Coord3dSpherical(rho, theta, phi);
-  }
-  else if (v.data() == "rotation")
-  {
-    auto vv = ptree_json.get_child("rotation");
-    std::ostringstream outSs;
-    pt::json_parser::write_json(outSs, vv);
-    auto q = ParseRotationJSON(outSs.str());
-    return q.Rotation(Coord3dCart(1, 0, 0));
-  }
-  return Coord3dCart(0, 0, 0);
-}
-
-std::shared_ptr<VectorialTrans> GetVectorialTransformation(std::string transSection, pt::ptree& ptree, const Quaternion& layoutRotation)
-{
-    if (transSection.empty())
-    {
-        return std::make_shared<VectorialTrans>();
-    }
-    std::string transType;
-    try
-    {
-        transType = ptree.get<std::string>(transSection+".vectorSpaceTransformationType");
-        if (transType == "offsetTrans")
-        {
-            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
-            auto vector_b_conf = ptree.get_optional<std::string>(transSection+".emphDirection");
-            Coord3dCart b(0, 0, 0);
-            if (vector_b_conf)
-            {
-                b = ParseVectorJSON(vector_b_conf.get());
-                b = b/b.Norm();
-            }
-            else
-            {
-                b = layoutRotation.Rotation(Coord3dCart(1, 0, 0));
-            }
-            std::cout << "offsetTrans -> alpha = " << offsetRatio << "; b = " << b << std::endl;
-            return std::make_shared<OffsetTrans>(offsetRatio, std::move(b));
-        }
-        if (transType == "horizontalOffsetTrans")
-        {
-            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
-            auto orientation_conf = ptree.get_optional<std::string>(transSection+".orientation");
-            Quaternion q;
-            if (orientation_conf)
-            {
-                q = ParseRotationJSON(orientation_conf.get());
-            }
-            else
-            {
-                q = layoutRotation;
-            }
-            std::cout << "horizontalOffsetTrans -> alpha = " << offsetRatio << "; q = " << q << std::endl;
-            return std::make_shared<HorizontalOffsetTrans>(offsetRatio, std::move(q));
-        }
-
-    }
-    catch (std::exception &e)                                                    
-    {                                                                            
-        std::cout << "Error while parsing in configuration file the "<<transSection<<" Vectorial Transformation: " << e.what() << std::endl;
-        throw e;                                                                 
-    }                                                                            
-    throw std::invalid_argument("Not supported type: "+transType);
-}
 
 enum class LayoutStatus
 {
@@ -534,45 +370,45 @@ std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& p
                 return LayoutCubeMap::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, facesPositionString, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}}, useEqualArea);
             }
         }
-        if (layoutType == "cubeMap2")
-        {
-            double edgeFront = ptree.get<double>(layoutSection+".cubeEdgeLengthFront");
-            double edgeBack = ptree.get<double>(layoutSection+".cubeEdgeLengthBack");
-            double edgeLeft = ptree.get<double>(layoutSection+".cubeEdgeLengthLeft");
-            double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
-            double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
-            double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
-            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
-            std::string vectTrans;
-            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
-            if (vectTransOptional)
-            {
-                vectTrans = vectTransOptional.get();
-            }
-            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
-            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
-            if (isInput)
-            {
-                if (!infer)
-                {
-                    throw std::invalid_argument("Input with static resolution not supported yet");
-                }
-                //if (refRes == CoordI(0,0))
-                //{
-                //    refRes = LayoutCubeMap2::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
-                //}
-                //inputWidth = refRes.x;
-                //inputHeight = refRes.y;
-            }
-            if (infer)
-            {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/4), unsigned(edgeFront*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/4), unsigned(edgeBack*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/4), unsigned(edgeLeft*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/4), unsigned(edgeRight*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/4),unsigned(edgeTop*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/4),unsigned(edgeBottom*inputHeight/3)}}});
-            }
-            else
-            {
-                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}});
-            }
-        }
+//        if (layoutType == "cubeMap2")
+//        {
+//            double edgeFront = ptree.get<double>(layoutSection+".cubeEdgeLengthFront");
+//            double edgeBack = ptree.get<double>(layoutSection+".cubeEdgeLengthBack");
+//            double edgeLeft = ptree.get<double>(layoutSection+".cubeEdgeLengthLeft");
+//            double edgeRight = ptree.get<double>(layoutSection+".cubeEdgeLengthRight");
+//            double edgeTop = ptree.get<double>(layoutSection+".cubeEdgeLengthTop");
+//            double edgeBottom = ptree.get<double>(layoutSection+".cubeEdgeLengthBottom");
+//            Quaternion rotationQuaternion = ParseRotationJSON(ptree.get<std::string>(layoutSection+".rotation"));
+//            std::string vectTrans;
+//            auto vectTransOptional = ptree.get_optional<std::string>(layoutSection+".vectorSpaceTransformation");
+//            if (vectTransOptional)
+//            {
+//                vectTrans = vectTransOptional.get();
+//            }
+//            auto vectorialTrans = GetVectorialTransformation(vectTrans, ptree, rotationQuaternion);
+//            bool useTile = (isInput || isOutput) ? ptree.get<bool>(layoutSection+".useTile"): false;
+//            if (isInput)
+//            {
+//                if (!infer)
+//                {
+//                    throw std::invalid_argument("Input with static resolution not supported yet");
+//                }
+//                //if (refRes == CoordI(0,0))
+//                //{
+//                //    refRes = LayoutCubeMap2::GetReferenceResolution(inputWidth, inputHeight, {{edgeFront, edgeBack, edgeLeft, edgeRight, edgeTop, edgeBottom}});
+//                //}
+//                //inputWidth = refRes.x;
+//                //inputHeight = refRes.y;
+//            }
+//            if (infer)
+//            {
+//                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/4), unsigned(edgeFront*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/4), unsigned(edgeBack*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/4), unsigned(edgeLeft*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/4), unsigned(edgeRight*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/4),unsigned(edgeTop*inputHeight/3)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/4),unsigned(edgeBottom*inputHeight/3)}}});
+//            }
+//            else
+//            {
+//                return LayoutCubeMap2::GenerateLayout(rotationQuaternion, useTile, vectorialTrans, {{std::array<unsigned int,2>{unsigned(edgeFront),unsigned(edgeFront)}, std::array<unsigned int,2>{unsigned(edgeBack), unsigned(edgeBack)}, std::array<unsigned int,2>{unsigned(edgeLeft), unsigned(edgeLeft)}, std::array<unsigned int,2>{unsigned(edgeRight), unsigned(edgeRight)}, std::array<unsigned int,2>{unsigned(edgeTop), unsigned(edgeTop)}, std::array<unsigned int,2>{unsigned(edgeBottom), unsigned(edgeBottom)}}});
+//            }
+//        }
         if (layoutType == "flatFixed")
         {
             bool dynamicPositions = ptree.get<bool>(layoutSection+".dynamicPositions");

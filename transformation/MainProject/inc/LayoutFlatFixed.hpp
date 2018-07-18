@@ -39,4 +39,26 @@ class LayoutFlatFixed: public Layout
         double m_maxHDist;
         double m_maxVDist;
 };
+
+class LayoutConfigParserFlatFixedView: public LayoutConfigParser
+{
+    public:
+        LayoutConfigParserFlatFixedView(std::string key): LayoutConfigParser(key),
+            m_horizontalAngleOfVision(this, "horizontalAngleOfVision", "(Float) Angle in degree of the horizontal Field of View of the viewport", false),
+            m_verticalAngleOfVision(this, "verticalAngleOfVision", "(Float) Angle in degree of the vertical Field of View of the viewport", false)
+        {}
+
+        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+        {
+            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
+            //DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);
+            DynamicPosition dynamicPosition = DynamicPosition(rot);
+            return std::make_shared<LayoutFlatFixed>(std::move(dynamicPosition), m_width.GetValue(layoutSection, ptree), m_height.GetValue(layoutSection, ptree), m_horizontalAngleOfVision.GetValue(layoutSection, ptree), m_verticalAngleOfVision.GetValue(layoutSection, ptree));
+        }
+    private:
+        KeyTypeDescription<SCALAR> m_horizontalAngleOfVision;
+        KeyTypeDescription<SCALAR> m_verticalAngleOfVision;
+};
+
+
 }

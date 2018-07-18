@@ -8,6 +8,7 @@
 #include "VideoWriter.hpp"
 #include "VectorialTrans.hpp"
 
+#include "LayoutFactory.hpp"
 #include "Common.hpp"
 
 namespace IMT {
@@ -142,6 +143,23 @@ class Layout
          */
         virtual Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const = 0;
     private:
+};
+
+class LayoutConfigParser: public LayoutConfigParserBase
+{
+    public:
+        LayoutConfigParser(std::string key): LayoutConfigParserBase(key),
+            m_width(this, "width", "(unsigned int) width of the planar rectangular picture", false),
+            m_height(this, "height", "(unsigned int) height of the planar rectangular picture", false),
+            m_rotationQuaternion(this, "rotation", "Rotation applied on the projection. [Default = no rotation]", true, Quaternion(1)),
+            m_vectTransOptional(this, "vectorSpaceTransformation", "(string) Section name of the vector space transformation to apply on the layout [default =none]", true, "")
+    {}
+
+    protected:
+        KeyTypeDescription<unsigned int> m_width;
+        KeyTypeDescription<unsigned int> m_height;
+        KeyRotationDescription m_rotationQuaternion;
+        KeyTypeDescription<std::string> m_vectTransOptional;
 };
 
 
