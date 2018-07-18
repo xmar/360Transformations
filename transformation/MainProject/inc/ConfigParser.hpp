@@ -120,117 +120,119 @@ std::vector<int> GetBitrateVector(std::string layoutSection, pt::ptree& ptree, i
     std::string layoutType;
     std::vector<int> bitrateVect;
     try {
-        layoutType = ptree.get<std::string>(layoutSection+".type");
-        if (layoutType == "equirectangular")
-        {
-            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+        bitrateVect.push_back(bitrateGoal);
+        return bitrateVect;
+        //layoutType = ptree.get<std::string>(layoutSection+".type");
+        //if (layoutType == "equirectangular")
+        //{
+        //    auto bitrate = ptree.get<double>(layoutSection+".bitrate");
 
-            bitrateVect.push_back(bitrateGoal * bitrate);
-            return bitrateVect;
-        }
-        if (layoutType == "cubeMap" || layoutType == "cubeMap2" || layoutType == "EAC")
-        {
-            auto useTile = ptree.get<bool>(layoutSection+".useTile");
-            if (useTile)
-            {
-              auto bitrateFront = ptree.get<double>(layoutSection+".bitrateFront");
-              auto bitrateBack = ptree.get<double>(layoutSection+".bitrateBack");
-              auto bitrateLeft = ptree.get<double>(layoutSection+".bitrateLeft");
-              auto bitrateRight = ptree.get<double>(layoutSection+".bitrateRight");
-              auto bitrateTop = ptree.get<double>(layoutSection+".bitrateTop");
-              auto bitrateBottom = ptree.get<double>(layoutSection+".bitrateBottom");
-              double sum = bitrateFront+bitrateBack+bitrateLeft+bitrateRight+bitrateTop+bitrateBottom;
-              bitrateVect.push_back(bitrateGoal*bitrateFront/sum);
-              bitrateVect.push_back(bitrateGoal*bitrateBack/sum);
-              bitrateVect.push_back(bitrateGoal*bitrateLeft/sum);
-              bitrateVect.push_back(bitrateGoal*bitrateRight/sum);
-              bitrateVect.push_back(bitrateGoal*bitrateTop/sum);
-              bitrateVect.push_back(bitrateGoal*bitrateBottom/sum);
-              return bitrateVect;
-            }
-            else
-            {
-              auto bitrate = ptree.get<double>(layoutSection+".bitrate");
-              bitrateVect.push_back(bitrateGoal * bitrate);
-              return bitrateVect;
-            }
-        }
-        if (layoutType == "flatFixed")
-        {
-            bitrateVect.push_back(bitrateGoal);
-            return bitrateVect;
-        }
-        if (layoutType == "viewport")
-        {
-            bitrateVect.push_back(bitrateGoal);
-            return bitrateVect;
-        }
-        if (layoutType == "pyramid" || layoutType == "pyramid2")
-        {
-          auto useTile = ptree.get<bool>(layoutSection+".useTile");
-          if (useTile)
-          {
-            double pyramidBaseBitrate = ptree.get<double>(layoutSection+".pyramidBaseBitrate");
-            double pyramidTopBitrate = ptree.get<double>(layoutSection+".pyramidTopBitrate");
-            double pyramidBottomBitrate = ptree.get<double>(layoutSection+".pyramidBottomBitrate");
-            double pyramidLeftBitrate = ptree.get<double>(layoutSection+".pyramidLeftBitrate");
-            double pyramidRightBitrate = ptree.get<double>(layoutSection+".pyramidRightBitrate");
-            double sum = pyramidBaseBitrate+pyramidTopBitrate+pyramidBottomBitrate+pyramidLeftBitrate+pyramidRightBitrate;
-            bitrateVect.push_back(bitrateGoal*pyramidBaseBitrate/sum);
-            bitrateVect.push_back(bitrateGoal*pyramidTopBitrate/sum);
-            bitrateVect.push_back(bitrateGoal*pyramidBottomBitrate/sum);
-            bitrateVect.push_back(bitrateGoal*pyramidLeftBitrate/sum);
-            bitrateVect.push_back(bitrateGoal*pyramidRightBitrate/sum);
-            return bitrateVect;
-          }
-          else
-          {
-            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
-            bitrateVect.push_back(bitrateGoal * bitrate);
-            return bitrateVect;
-          }
-        }
-        if (layoutType == "rhombicDodeca")
-        {
-          auto useTile = ptree.get<bool>(layoutSection+".useTile");
-          if (useTile)
-          {
-            std::array<double, 12> faceBitrate;
-            for (unsigned int i = 0; i < 12; ++i)
-            {
-                faceBitrate[i] = ptree.get<double>(layoutSection+".rhombFace"+std::to_string(i+1)+"Bitrate");
-            }
-            double sum = 0;
-            for (auto b: faceBitrate) {sum += b;}
-            for (auto b: faceBitrate) { bitrateVect.push_back(bitrateGoal*b/sum); }
-            return bitrateVect;
-          }
-          else
-          {
-            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
-            bitrateVect.push_back(bitrateGoal * bitrate);
-            return bitrateVect;
-          }
-        }
-        if (layoutType == "equirectangularTiled")
-        {
-          auto useTile = ptree.get<bool>(layoutSection+".useTile");
-          if (useTile)
-          {
-            unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
-            unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");
+        //    bitrateVect.push_back(bitrateGoal * bitrate);
+        //    return bitrateVect;
+        //}
+        //if (layoutType == "cubeMap" || layoutType == "cubeMap2" || layoutType == "EAC")
+        //{
+        //    auto useTile = ptree.get<bool>(layoutSection+".useTile");
+        //    if (useTile)
+        //    {
+        //      auto bitrateFront = ptree.get<double>(layoutSection+".bitrateFront");
+        //      auto bitrateBack = ptree.get<double>(layoutSection+".bitrateBack");
+        //      auto bitrateLeft = ptree.get<double>(layoutSection+".bitrateLeft");
+        //      auto bitrateRight = ptree.get<double>(layoutSection+".bitrateRight");
+        //      auto bitrateTop = ptree.get<double>(layoutSection+".bitrateTop");
+        //      auto bitrateBottom = ptree.get<double>(layoutSection+".bitrateBottom");
+        //      double sum = bitrateFront+bitrateBack+bitrateLeft+bitrateRight+bitrateTop+bitrateBottom;
+        //      bitrateVect.push_back(bitrateGoal*bitrateFront/sum);
+        //      bitrateVect.push_back(bitrateGoal*bitrateBack/sum);
+        //      bitrateVect.push_back(bitrateGoal*bitrateLeft/sum);
+        //      bitrateVect.push_back(bitrateGoal*bitrateRight/sum);
+        //      bitrateVect.push_back(bitrateGoal*bitrateTop/sum);
+        //      bitrateVect.push_back(bitrateGoal*bitrateBottom/sum);
+        //      return bitrateVect;
+        //    }
+        //    else
+        //    {
+        //      auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+        //      bitrateVect.push_back(bitrateGoal * bitrate);
+        //      return bitrateVect;
+        //    }
+        //}
+        //if (layoutType == "flatFixed")
+        //{
+        //    bitrateVect.push_back(bitrateGoal);
+        //    return bitrateVect;
+        //}
+        //if (layoutType == "viewport")
+        //{
+        //    bitrateVect.push_back(bitrateGoal);
+        //    return bitrateVect;
+        //}
+        //if (layoutType == "pyramid" || layoutType == "pyramid2")
+        //{
+        //  auto useTile = ptree.get<bool>(layoutSection+".useTile");
+        //  if (useTile)
+        //  {
+        //    double pyramidBaseBitrate = ptree.get<double>(layoutSection+".pyramidBaseBitrate");
+        //    double pyramidTopBitrate = ptree.get<double>(layoutSection+".pyramidTopBitrate");
+        //    double pyramidBottomBitrate = ptree.get<double>(layoutSection+".pyramidBottomBitrate");
+        //    double pyramidLeftBitrate = ptree.get<double>(layoutSection+".pyramidLeftBitrate");
+        //    double pyramidRightBitrate = ptree.get<double>(layoutSection+".pyramidRightBitrate");
+        //    double sum = pyramidBaseBitrate+pyramidTopBitrate+pyramidBottomBitrate+pyramidLeftBitrate+pyramidRightBitrate;
+        //    bitrateVect.push_back(bitrateGoal*pyramidBaseBitrate/sum);
+        //    bitrateVect.push_back(bitrateGoal*pyramidTopBitrate/sum);
+        //    bitrateVect.push_back(bitrateGoal*pyramidBottomBitrate/sum);
+        //    bitrateVect.push_back(bitrateGoal*pyramidLeftBitrate/sum);
+        //    bitrateVect.push_back(bitrateGoal*pyramidRightBitrate/sum);
+        //    return bitrateVect;
+        //  }
+        //  else
+        //  {
+        //    auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+        //    bitrateVect.push_back(bitrateGoal * bitrate);
+        //    return bitrateVect;
+        //  }
+        //}
+        //if (layoutType == "rhombicDodeca")
+        //{
+        //  auto useTile = ptree.get<bool>(layoutSection+".useTile");
+        //  if (useTile)
+        //  {
+        //    std::array<double, 12> faceBitrate;
+        //    for (unsigned int i = 0; i < 12; ++i)
+        //    {
+        //        faceBitrate[i] = ptree.get<double>(layoutSection+".rhombFace"+std::to_string(i+1)+"Bitrate");
+        //    }
+        //    double sum = 0;
+        //    for (auto b: faceBitrate) {sum += b;}
+        //    for (auto b: faceBitrate) { bitrateVect.push_back(bitrateGoal*b/sum); }
+        //    return bitrateVect;
+        //  }
+        //  else
+        //  {
+        //    auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+        //    bitrateVect.push_back(bitrateGoal * bitrate);
+        //    return bitrateVect;
+        //  }
+        //}
+        //if (layoutType == "equirectangularTiled")
+        //{
+        //  auto useTile = ptree.get<bool>(layoutSection+".useTile");
+        //  if (useTile)
+        //  {
+        //    unsigned int nbHTiles = ptree.get<unsigned int>(layoutSection+".nbHTiles");
+        //    unsigned int nbVTiles = ptree.get<unsigned int>(layoutSection+".nbVTiles");
 
-            BOOST_PP_SEQ_FOR_EACH_PRODUCT(TEST_AND_GET_BITRATE_VECT, RANGE_NB_H_TILES RANGE_NB_V_TILES)
+        //    BOOST_PP_SEQ_FOR_EACH_PRODUCT(TEST_AND_GET_BITRATE_VECT, RANGE_NB_H_TILES RANGE_NB_V_TILES)
 
-            return bitrateVect;
-          }
-          else
-          {
-            auto bitrate = ptree.get<double>(layoutSection+".bitrate");
-            bitrateVect.push_back(bitrateGoal * bitrate);
-            return bitrateVect;
-          }
-        }
+        //    return bitrateVect;
+        //  }
+        //  else
+        //  {
+        //    auto bitrate = ptree.get<double>(layoutSection+".bitrate");
+        //    bitrateVect.push_back(bitrateGoal * bitrate);
+        //    return bitrateVect;
+        //  }
+        //}
     }
     catch (std::exception &e)
     {
