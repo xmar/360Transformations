@@ -3,6 +3,12 @@
 #include <opencv2/opencv.hpp>
 #include <cmath>
 #include <memory>
+#include <sstream>
+
+#include <boost/property_tree/ptree.hpp>                                         
+#include <boost/property_tree/json_parser.hpp>                                   
+#include <boost/foreach.hpp>
+
 #include "Picture.hpp"
 #include "VideoReader.hpp"
 #include "VideoWriter.hpp"
@@ -152,14 +158,29 @@ class LayoutConfigParser: public LayoutConfigParserBase
             m_width(this, "width", "(unsigned int) width of the planar rectangular picture", false),
             m_height(this, "height", "(unsigned int) height of the planar rectangular picture", false),
             m_rotationQuaternion(this, "rotation", "Rotation applied on the projection. [Default = no rotation]", true, Quaternion(1)),
-            m_vectTransOptional(this, "vectorSpaceTransformation", "(string) Section name of the vector space transformation to apply on the layout [default =none]", true, "")
+            m_vectTransOptional(this, "vectorSpaceTransformation", "(string) Section name of the vector space transformation to apply on the layout [default =none]", true, ""),
+            m_decoratorList(this, "decorators", "(string - json array) Ordered list of section name of decorator to apply on the layout [Default = []]", true, "[]")
     {}
 
+    std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const final
+    {
+        auto baseLayout = CreateImpl(layoutSection, ptree);
+        std::stringstream decoratorListStr ( m_decoratorList.GetValue(layoutSection, ptree) );
+        pt::ptree ptree_json;
+        pt::json_parser::read_json(decoratorListStr, ptree_json);
+        BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
+        {
+            baseLayout = LayoutFactory::Instance().Decorate(baseLayout, v.second.data(), ptree);
+        }
+        return baseLayout;
+    }
     protected:
         KeyTypeDescription<unsigned int> m_width;
         KeyTypeDescription<unsigned int> m_height;
         KeyRotationDescription m_rotationQuaternion;
         KeyTypeDescription<std::string> m_vectTransOptional;
+        KeyTypeDescription<std::string> m_decoratorList;
+        virtual std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const = 0;
 };
 
 

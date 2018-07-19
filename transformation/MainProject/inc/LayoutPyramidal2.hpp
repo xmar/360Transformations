@@ -96,7 +96,8 @@ class LayoutConfigParserPyramid2: public LayoutConfigParserPyramidBase
     public:
         LayoutConfigParserPyramid2(std::string key): LayoutConfigParserPyramidBase(key) {}
 
-        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+    protected:
+        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
             Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
             auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);

@@ -39,7 +39,9 @@ class KeyTypeDescriptionBase
         bool m_optional;
 };
 
+//Forward declaration
 class LayoutConfigParserBase;
+class DecoratorConfigParserBase;
 
 class LayoutFactory
 {//singleton class used to build concret layouts
@@ -49,42 +51,72 @@ class LayoutFactory
 
         //create a new layout by parsing the configuration file
         std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const; 
+        //Decorate a layout by parsing the configuration file
+        std::shared_ptr<Layout> Decorate(std::shared_ptr<Layout>, std::string layoutSection, pt::ptree& ptree) const; 
         //register a new layout maker
         void RegisterMaker(const std::string& key, LayoutConfigParserBase* maker);
+        void RegisterDecoratorMaker(const std::string& key, DecoratorConfigParserBase* maker);
         std::string GetHelp(void) const;
         std::string GetHelp(std::string key) const;
     private:
         std::map<std::string, LayoutConfigParserBase*> _makers;
+        std::map<std::string, DecoratorConfigParserBase*> _decoratorMakers;
+};
+
+class ConfigParserBase
+{
+    public:
+        ConfigParserBase(void): m_keyTypeDescriptionMap() {}
+        
+        void AddKeyTypeDescription(KeyTypeDescriptionBase* ktd);
+    protected:
+        std::map<std::string, KeyTypeDescriptionBase*> m_keyTypeDescriptionMap;
 };
 
 //Layout maker base abstract class
-class LayoutConfigParserBase
+class LayoutConfigParserBase: public ConfigParserBase
 {
     public:
-        virtual std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const = 0;
-        std::string GetHelp(void) const;
         virtual ~LayoutConfigParserBase(void) = default;
 
-        void AddKeyTypeDescription(KeyTypeDescriptionBase* ktd);
+        virtual std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const = 0;
+        std::string GetHelp(void) const;
     protected:
-        LayoutConfigParserBase(const std::string& key): m_keyTypeDescriptionMap(), m_layoutConfigParserId(key)
+        LayoutConfigParserBase(const std::string& key): ConfigParserBase(), m_layoutConfigParserId(key)
         {
 
             LayoutFactory::Instance().RegisterMaker(key, this);
         }
     private:
-        std::map<std::string, KeyTypeDescriptionBase*> m_keyTypeDescriptionMap;
+        std::string m_layoutConfigParserId;
+};
+
+//Layout maker base abstract class
+class DecoratorConfigParserBase: public ConfigParserBase
+{
+    public:
+        virtual ~DecoratorConfigParserBase(void) = default;
+
+        virtual std::shared_ptr<Layout> Create(std::shared_ptr<Layout> baseLayout, std::string layoutSection, pt::ptree& ptree) const = 0;
+        std::string GetHelp(void) const;
+    protected:
+        DecoratorConfigParserBase(const std::string& key): ConfigParserBase(), m_layoutConfigParserId(key)
+        {
+            LayoutFactory::Instance().RegisterDecoratorMaker(key, this);
+        }
+    private:
         std::string m_layoutConfigParserId;
 };
 
 //Macro to register a new layout config parser (require the parser to be defined first)
 #define REGISTER_LAYOUT(key, LayoutConfigParser) static IMT::LayoutConfigParser maker(key);
+#define REGISTER_LAYOUT_DECORATOR(key, DecoratorConfigParser) static IMT::DecoratorConfigParser decorator_maker(key);
 
 template<typename T>
 class KeyTypeDescription: public KeyTypeDescriptionBase
 {
     public:
-        KeyTypeDescription(LayoutConfigParserBase* lcpb, std::string label, std::string description, bool optional, T defVal = T()):
+        KeyTypeDescription(ConfigParserBase* lcpb, std::string label, std::string description, bool optional, T defVal = T()):
             KeyTypeDescriptionBase(label, description, optional),
             m_defVal(std::move(defVal))
         { lcpb->AddKeyTypeDescription(this); }

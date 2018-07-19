@@ -97,7 +97,8 @@ class LayoutConfigParserEquirectangular: public LayoutConfigParser
     public:
         LayoutConfigParserEquirectangular(std::string key): LayoutConfigParser(key) {}
 
-        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+    protected:
+        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
             Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
             return std::make_shared<LayoutEquirectangular>(m_width.GetValue(layoutSection, ptree),

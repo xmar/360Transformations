@@ -48,7 +48,8 @@ class LayoutConfigParserFlatFixedView: public LayoutConfigParser
             m_verticalAngleOfVision(this, "verticalAngleOfVision", "(Float) Angle in degree of the vertical Field of View of the viewport", false)
         {}
 
-        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+    protected:
+        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
             Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
             //DynamicPosition dynamicPosition = dynamicPositions ? DynamicPosition(pathToPositionTrace)  :DynamicPosition(rotationQuaternion);

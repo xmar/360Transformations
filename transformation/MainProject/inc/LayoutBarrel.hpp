@@ -70,7 +70,8 @@ class LayoutConfigParserBarrel: public LayoutConfigParser
         //    m_equiRatio(this, "equiRatio", "(float) Vertical ratio of the equirectangular area. Default = 0.33", true)
     {}
 
-        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+    protected:
+        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
             Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
             return std::make_shared<LayoutBarrel>(m_width.GetValue(layoutSection, ptree), m_height.GetValue(layoutSection, ptree), rot, GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot));

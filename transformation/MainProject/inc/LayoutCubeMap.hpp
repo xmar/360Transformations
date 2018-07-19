@@ -208,7 +208,8 @@ class  LayoutConfigParserCubemap: public LayoutConfigParserCubemapBase
             m_facesPositionString(this, "facesPosition", "JSON describing the face position and orientation. [default={\"face1\":\"right\", \"face1Rotation\":0, \"face2\":\"back\", \"face2Rotation\":0, \"face3\":\"left\", \"face3Rotation\":0, \"face4\":\"top\", \"face4Rotation\":-90, \"face5\":\"front\", \"face5Rotation\":-90, \"face6\":\"bottom\", \"face6Rotation\":-90}]", true, "{\"face1\":\"right\", \"face1Rotation\":0, \"face2\":\"back\", \"face2Rotation\":0, \"face3\":\"left\", \"face3Rotation\":0, \"face4\":\"top\", \"face4Rotation\":-90, \"face5\":\"front\", \"face5Rotation\":-90, \"face6\":\"bottom\", \"face6Rotation\":-90}")
         {}
 
-        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+    protected:
+        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
             Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
             auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);

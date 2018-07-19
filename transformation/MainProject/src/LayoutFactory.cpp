@@ -20,9 +20,28 @@ void LayoutFactory::RegisterMaker(const std::string& key, LayoutConfigParserBase
     _makers[key] = maker;
 }
 
+void LayoutFactory::RegisterMaker(const std::string& key, DecoratorConfigParserBase* maker)
+{
+    if (_decoratorMakers.find(key) != _decoratorMakers.end())
+    {
+        throw std::invalid_argument("Multiple decorator makers for the same key: "+ key);
+    }
+    _decoratorMakers[key] = decoratorMaker;
+}
+
 std::string LayoutConfigParserBase::GetHelp(void) const
 {
     std::string out ("type = "+m_layoutConfigParserId+"\n");
+    for (auto ktd: m_keyTypeDescriptionMap)
+    {
+        out += "\t\e[1m"+std::get<0>(ktd) + "\e[0m: " + std::string(std::get<1>(ktd)->IsOptional() ? "[\e[4mOptional\e[0m]" : "") + std::get<1>(ktd)->GetDescription()+"\n";
+    }
+    return std::move(out);
+}
+
+std::string DecoratorConfigParserBase::GetHelp(void) const
+{
+    std::string out ("decorator type = "+m_layoutConfigParserId+"\n");
     for (auto ktd: m_keyTypeDescriptionMap)
     {
         out += "\t\e[1m"+std::get<0>(ktd) + "\e[0m: " + std::string(std::get<1>(ktd)->IsOptional() ? "[\e[4mOptional\e[0m]" : "") + std::get<1>(ktd)->GetDescription()+"\n";
@@ -40,7 +59,17 @@ std::shared_ptr<Layout> LayoutFactory::Create(std::string layoutSection, pt::ptr
     return _makers.at(layoutType)->Create(layoutSection, ptree);
 }
 
-void LayoutConfigParserBase::AddKeyTypeDescription(KeyTypeDescriptionBase* ktd)
+std::shared_ptr<Layout> LayoutFactory::Decorate(std::shared_ptr<Layout> baseLayout, std::string layoutSection, pt::ptree& ptree) const
+{
+    auto layoutType = ptree.get<std::string>(layoutSection+".type");
+    if (_decoratorMakers.find(layoutType) == _decoratorMakers.end())
+    {
+        throw std::invalid_argument("Layout decorator type "+layoutType+" is not defined. Use help to see what layout decorator exists");
+    }
+    return _decoratorMakers.at(layoutType)->Create(baseLayout, layoutSection, ptree);
+}
+
+void ConfigParserBase::AddKeyTypeDescription(KeyTypeDescriptionBase* ktd)
 {
     if (m_keyTypeDescriptionMap.find(ktd->GetLabel()) != m_keyTypeDescriptionMap.end())
     {
@@ -51,12 +80,19 @@ void LayoutConfigParserBase::AddKeyTypeDescription(KeyTypeDescriptionBase* ktd)
 
 std::string LayoutFactory::GetHelp(void) const
 {
-    std::string out;
+    std::string out("Layouts:\n");
     for (auto& kv: _makers)
     {
         out += "#######\n";
-        out += std::get<1>(kv)->GetHelp() + "\n";
-        out += "*******\n";
+        out += std::get<1>(kv)->GetHelp();
+        out += "*******\n\n";
+    }
+    out += "Decorators:\n";
+    for (auto& kv: _decoratorMakers)
+    {
+        out += "#######\n";
+        out += std::get<1>(kv)->GetHelp();
+        out += "*******\n\n";
     }
     return out;
 }

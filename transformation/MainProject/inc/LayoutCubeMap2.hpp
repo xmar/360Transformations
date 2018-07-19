@@ -82,7 +82,8 @@ class  LayoutConfigParserCubemap2: public LayoutConfigParserCubemapBase
         LayoutConfigParserCubemap2(std::string key, bool useEqualArea): LayoutConfigParserCubemapBase(key, useEqualArea)
         {}
 
-        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const override
+    protected:
+        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
             Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
             auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);
