@@ -21,14 +21,14 @@ Coord3dCart LayoutCubeMapBased::FromNormalizedInfoTo3d(const Layout::NormalizedF
     // {
     //   std::cout << "V = " << v/v.Norm() << " p = " << Coord3dCart(Rotation(point, FaceToRotQuaternion(f)))/Rotation(point, FaceToRotQuaternion(f)).Norm() << std::endl;
     // }
-    return Rotation(v, m_rotQuaternion);
+    return v;
 }
 
 
 Layout::NormalizedFaceInfo LayoutCubeMapBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
     //First we find the face with which we intersect
-    Coord3dSpherical p = Coord3dCart(Rotation(sphericalCoord, m_rotQuaternion.Inv()));
+    Coord3dSpherical p = sphericalCoord;
     p = Coord3dCart(p)/p.Norm();
 
 

@@ -20,7 +20,7 @@ void LayoutFactory::RegisterMaker(const std::string& key, LayoutConfigParserBase
     _makers[key] = maker;
 }
 
-void LayoutFactory::RegisterMaker(const std::string& key, DecoratorConfigParserBase* maker)
+void LayoutFactory::RegisterDecoratorMaker(const std::string& key, DecoratorConfigParserBase* decoratorMaker)
 {
     if (_decoratorMakers.find(key) != _decoratorMakers.end())
     {
@@ -49,7 +49,7 @@ std::string DecoratorConfigParserBase::GetHelp(void) const
     return std::move(out);
 }
 
-std::shared_ptr<Layout> LayoutFactory::Create(std::string layoutSection, pt::ptree& ptree) const
+std::shared_ptr<LayoutView> LayoutFactory::Create(std::string layoutSection, pt::ptree& ptree) const
 {
     auto layoutType = ptree.get<std::string>(layoutSection+".type");
     if (_makers.find(layoutType) == _makers.end())
@@ -59,7 +59,7 @@ std::shared_ptr<Layout> LayoutFactory::Create(std::string layoutSection, pt::ptr
     return _makers.at(layoutType)->Create(layoutSection, ptree);
 }
 
-std::shared_ptr<Layout> LayoutFactory::Decorate(std::shared_ptr<Layout> baseLayout, std::string layoutSection, pt::ptree& ptree) const
+std::shared_ptr<LayoutView> LayoutFactory::Decorate(std::shared_ptr<LayoutView> baseLayout, std::string layoutSection, pt::ptree& ptree) const
 {
     auto layoutType = ptree.get<std::string>(layoutSection+".type");
     if (_decoratorMakers.find(layoutType) == _decoratorMakers.end())

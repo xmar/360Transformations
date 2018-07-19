@@ -5,7 +5,7 @@ using namespace IMT;
 
 Layout::NormalizedFaceInfo LayoutRhombicdodecaBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    Coord3dSpherical sc = Rotation(sphericalCoord, m_rotQuaternion.Inv()); //Go back to the normalized rhombic
+    Coord3dSpherical sc = sphericalCoord; //Go back to the normalized rhombic
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
     auto rtr = IntersectionCart(lambda, sc);
@@ -29,7 +29,7 @@ Coord3dCart LayoutRhombicdodecaBased::FromNormalizedInfoTo3d(const Layout::Norma
         return Coord3dCart(0,0,0);
     }
     Coord3dCart canonicCoordinates = Coord3dCart(1,0,-1) + Coord3dCart(0, -std::sqrt(2)/2, 1) * normalizedI + Coord3dCart(0, std::sqrt(2)/2, 1) * normalizedJ;
-    return Rotation(canonicCoordinates, m_rotQuaternion*FaceToRotQuaternion(f));
+    return Rotation(canonicCoordinates, FaceToRotQuaternion(f));
 }
 
 void LayoutRhombicdodecaBased::InitFaceRotations(void)

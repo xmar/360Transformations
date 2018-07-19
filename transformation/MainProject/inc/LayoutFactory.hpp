@@ -19,7 +19,7 @@ namespace IMT {
 namespace pt = boost::property_tree;
 
 //Forward declaration
-class Layout;
+class LayoutView;
 
 class KeyTypeDescriptionBase
 {
@@ -50,9 +50,9 @@ class LayoutFactory
         static LayoutFactory& Instance(void);
 
         //create a new layout by parsing the configuration file
-        std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const; 
+        std::shared_ptr<LayoutView> Create(std::string layoutSection, pt::ptree& ptree) const; 
         //Decorate a layout by parsing the configuration file
-        std::shared_ptr<Layout> Decorate(std::shared_ptr<Layout>, std::string layoutSection, pt::ptree& ptree) const; 
+        std::shared_ptr<LayoutView> Decorate(std::shared_ptr<LayoutView>, std::string layoutSection, pt::ptree& ptree) const; 
         //register a new layout maker
         void RegisterMaker(const std::string& key, LayoutConfigParserBase* maker);
         void RegisterDecoratorMaker(const std::string& key, DecoratorConfigParserBase* maker);
@@ -79,7 +79,7 @@ class LayoutConfigParserBase: public ConfigParserBase
     public:
         virtual ~LayoutConfigParserBase(void) = default;
 
-        virtual std::shared_ptr<Layout> Create(std::string layoutSection, pt::ptree& ptree) const = 0;
+        virtual std::shared_ptr<LayoutView> Create(std::string layoutSection, pt::ptree& ptree) const = 0;
         std::string GetHelp(void) const;
     protected:
         LayoutConfigParserBase(const std::string& key): ConfigParserBase(), m_layoutConfigParserId(key)
@@ -97,7 +97,7 @@ class DecoratorConfigParserBase: public ConfigParserBase
     public:
         virtual ~DecoratorConfigParserBase(void) = default;
 
-        virtual std::shared_ptr<Layout> Create(std::shared_ptr<Layout> baseLayout, std::string layoutSection, pt::ptree& ptree) const = 0;
+        virtual std::shared_ptr<LayoutView> Create(std::shared_ptr<LayoutView> baseLayout, std::string layoutSection, pt::ptree& ptree) const = 0;
         std::string GetHelp(void) const;
     protected:
         DecoratorConfigParserBase(const std::string& key): ConfigParserBase(), m_layoutConfigParserId(key)
@@ -154,7 +154,7 @@ std::shared_ptr<VectorialTrans> GetVectorialTransformation(std::string transSect
 class KeyRotationDescription: public KeyTypeDescription<std::string>
 {
     public:
-        KeyRotationDescription(LayoutConfigParserBase* lcpb, std::string label, std::string description, bool optional, Quaternion defVal = Quaternion(1)):
+        KeyRotationDescription(ConfigParserBase* lcpb, std::string label, std::string description, bool optional, Quaternion defVal = Quaternion(1)):
             KeyTypeDescription<std::string>(lcpb, label,
                     "(json) "+description+" format: \e[2mif type is \"euler\" you have to give the yaw, pitch and roll angle in degree {\"type\":\"euler\", \"yaw\":0.0, \"pitch\":0.0, \"roll\":0.0} ; else if type is \"quaternion\" you have to give the w, x, y, z value of the quaternion that represente the rotation. A normalization is performed by the software. {\"type\":\"quaternion\", \"w\":1.0, \"x\":0.0, \"y\":0.0, \"z\":0.0} ; else if type is \"angleAxis\" you have to give an \"angle\" in degree and a direction vector x, y, z that generates the rotation axis (this vector should not be (0, 0, 0)). {\"type\":\"angleAxis\", \"angle\":90, \"x\":0, \"y\":0, \"z\":1}\e[0m",
                     optional, ""),

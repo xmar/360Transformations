@@ -4,23 +4,25 @@
 
 using namespace IMT;
 
-Coord3dCart Layout::From2dTo3d(const CoordI& pixelCoord) const
+Coord3dCart LayoutView::From2dTo3d(const CoordI& pixelCoord) const
 {
-    return m_vectorialTrans->FromBeforeTrans3dToAfterTrans3d(FromNormalizedInfoTo3d(From2dToNormalizedFaceInfo(pixelCoord)));
+    //return m_vectorialTrans->FromBeforeTrans3dToAfterTrans3d(FromNormalizedInfoTo3d(From2dToNormalizedFaceInfo(pixelCoord)));
+    return FromNormalizedInfoTo3d(From2dToNormalizedFaceInfo(pixelCoord));
 }
 
-CoordF Layout::FromSphereTo2d(const Coord3dSpherical& sphericalCoord) const
+CoordF LayoutView::FromSphereTo2d(const Coord3dSpherical& sphericalCoord) const
 {
-    return FromNormalizedInfoTo2d(From3dToNormalizedFaceInfo(m_vectorialTrans->FromAfterTrans3dToBeforeTrans3d(sphericalCoord)));
+    //return FromNormalizedInfoTo2d(From3dToNormalizedFaceInfo(m_vectorialTrans->FromAfterTrans3dToBeforeTrans3d(sphericalCoord)));
+    return FromNormalizedInfoTo2d(From3dToNormalizedFaceInfo(sphericalCoord));
 }
 
-std::shared_ptr<Picture> Layout::ToLayout(const Picture& layoutPic, const Layout& destLayout) const
+std::shared_ptr<Picture> LayoutView::ToLayout(const Picture& layoutPic, const LayoutView& destLayout) const
 {
-    if (!m_isInit)
-    {
-        throw std::logic_error("Layout have to be initialized first before using it");
-    }
-    cv::Mat picMat = cv::Mat::zeros(destLayout.m_outHeight, destLayout.m_outWidth, layoutPic.GetMat().type());
+    //if (!m_isInit)
+    //{
+    //    throw std::logic_error("Layout have to be initialized first before using it");
+    //}
+    cv::Mat picMat = cv::Mat::zeros(destLayout.GetHeight(), destLayout.GetWidth(), layoutPic.GetMat().type());
     auto pic = std::make_shared<Picture>(picMat);
     #pragma omp parallel for collapse(2) shared(pic, layoutPic, destLayout) schedule(dynamic)
     for (auto i = 0; i < pic->GetMat().cols; ++i)

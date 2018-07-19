@@ -8,12 +8,12 @@ namespace IMT {
 class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
 {
     public:
-        static std::shared_ptr<LayoutRhombicdodeca> GenerateLayout(Quaternion rotationQuaternion, std::shared_ptr<VectorialTrans> vectorialTrans, bool useTile, std::array<unsigned int,12> pixelEdges)
+        static std::shared_ptr<LayoutRhombicdodeca> GenerateLayout(bool useTile, std::array<unsigned int,12> pixelEdges)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
-            return std::shared_ptr<LayoutRhombicdodeca>( new LayoutRhombicdodeca(rotationQuaternion, vectorialTrans, useTile, std::move(fr)) );
+            return std::shared_ptr<LayoutRhombicdodeca>( new LayoutRhombicdodeca(useTile, std::move(fr)) );
 	    }
-        LayoutRhombicdodeca(unsigned int height, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans): LayoutRhombicdodecaBased(Quaternion(1), vectorialTrans, useTile,{{height,height,height,height,
+        LayoutRhombicdodeca(unsigned int height, bool useTile): LayoutRhombicdodecaBased(useTile,{{height,height,height,height,
             height,height,height,height,height,height,height,height}}), m_colsMaxOffset(), m_rowsMaxOffset() {}
         virtual ~LayoutRhombicdodeca(void) = default;
 
@@ -33,7 +33,7 @@ class LayoutRhombicdodeca: public LayoutRhombicdodecaBased
         virtual CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override;
 
 
-        LayoutRhombicdodeca(Quaternion rotationQuaternion, std::shared_ptr<VectorialTrans> vectorialTrans, bool useTile, FaceResolutions&& fr): LayoutRhombicdodecaBased(rotationQuaternion, vectorialTrans, useTile, fr), m_colsMaxOffset(), m_rowsMaxOffset() {}
+        LayoutRhombicdodeca(bool useTile, FaceResolutions&& fr): LayoutRhombicdodecaBased(useTile, fr), m_colsMaxOffset(), m_rowsMaxOffset() {}
 
         Faces LayoutToFace(unsigned int i, unsigned int j) const;
 

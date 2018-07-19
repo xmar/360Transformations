@@ -6,8 +6,8 @@ namespace IMT {
 class LayoutEquirectangular: public Layout
 {
     public:
-        LayoutEquirectangular(unsigned int width, unsigned int height, Quaternion rotationQuaternion, std::shared_ptr<VectorialTrans> vectorialTrans):
-            Layout(width, height, vectorialTrans),  m_rotationQuaternion(rotationQuaternion) {}
+        LayoutEquirectangular(unsigned int width, unsigned int height):
+            Layout(width, height)  {}
         virtual ~LayoutEquirectangular(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -27,7 +27,7 @@ class LayoutEquirectangular: public Layout
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
           // Coord3dSpherical rotCoord = Rotation(sphericalCoord, m_rotationQuaternion.Inv());
-            Coord3dSpherical rotCoord = Rotation(Coord3dCart(sphericalCoord/sphericalCoord.Norm()), m_rotationQuaternion.Inv());
+            Coord3dSpherical rotCoord = sphericalCoord/sphericalCoord.Norm();
             // if (m_vectorOffsetRatio != 0)
             // {
             //   auto theta = rotCoord.GetTheta();
@@ -54,8 +54,7 @@ class LayoutEquirectangular: public Layout
             Coord3dSpherical v0 = Coord3dSpherical(1, theta, phi);
             // + m_vectorOffsetRatio*Coord3dCart(1, 0, 0);
 
-            auto v = Rotation(v0, m_rotationQuaternion);
-            return v;
+            return v0;
         }
 
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override
@@ -89,7 +88,6 @@ class LayoutEquirectangular: public Layout
             return vwPtr;
         }
     private:
-        Quaternion m_rotationQuaternion;
 };
 
 class LayoutConfigParserEquirectangular: public LayoutConfigParser
@@ -98,11 +96,10 @@ class LayoutConfigParserEquirectangular: public LayoutConfigParser
         LayoutConfigParserEquirectangular(std::string key): LayoutConfigParser(key) {}
 
     protected:
-        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
+        std::shared_ptr<LayoutView> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
-            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
             return std::make_shared<LayoutEquirectangular>(m_width.GetValue(layoutSection, ptree),
-                    m_height.GetValue(layoutSection, ptree), rot, GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot));
+                    m_height.GetValue(layoutSection, ptree));
         }
     private:
 

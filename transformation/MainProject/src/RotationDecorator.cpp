@@ -12,4 +12,4 @@ Coord3dCart RotationDecorator::FromNormalizedInfoTo3d(const RotationDecorator::N
     return Rotation(LayoutDecorator::FromNormalizedInfoTo3d(ni), m_rotationQuaternion);
 }
 
-REGISTER_LAYOUT_DECORATOR("rotation", RotationDecorator);
+REGISTER_LAYOUT_DECORATOR("rotation", DecoratorConfigParserRotation);

@@ -216,14 +216,14 @@ int main( int argc, const char* argv[] )
       }
 
       //This vector contains the shared pointer of each layout named in the LayoutFlowSections
-      std::vector<std::vector<std::shared_ptr<Layout>>> layoutFlowVect;
+      std::vector<std::vector<std::shared_ptr<LayoutView>>> layoutFlowVect;
 
       //Populate the layoutFlowVect. Will read the configuration file to get information about each layout named in the LayoutFlowSections
       unsigned j = 0;
       for(auto& lfsv: layoutFlowSections)
       {
           LayoutStatus layoutStatus = LayoutStatus::Input;
-          layoutFlowVect.push_back(std::vector<std::shared_ptr<Layout>>());
+          layoutFlowVect.push_back(std::vector<std::shared_ptr<LayoutView>>());
           CoordI refResolution ( 0, 0 );
           unsigned k = 0;
           for(auto& lfs: lfsv)

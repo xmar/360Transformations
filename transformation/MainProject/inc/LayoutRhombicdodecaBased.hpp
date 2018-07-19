@@ -64,8 +64,8 @@ class LayoutRhombicdodecaBased: public Layout
                 std::array<unsigned int, 12> m_faces;
         };
 
-        LayoutRhombicdodecaBased(Quaternion rotationQuaternion, std::shared_ptr<VectorialTrans> vectorialTrans, bool useTile, FaceResolutions fr): Layout(vectorialTrans), m_fr(std::move(fr)),
-          m_rotQuaternion(rotationQuaternion), m_faceRotations(), m_useTile(useTile) {InitFaceRotations();}
+        LayoutRhombicdodecaBased(bool useTile, FaceResolutions fr): Layout(), m_fr(std::move(fr)),
+          m_faceRotations(), m_useTile(useTile) {InitFaceRotations();}
         Plan FaceToPlan(Faces f) const
         {
             switch(f)
@@ -106,7 +106,6 @@ class LayoutRhombicdodecaBased: public Layout
         unsigned int GetRes(Faces f) const {return m_fr.GetRes(f);}
     private:
         FaceResolutions m_fr;
-        Quaternion m_rotQuaternion;
         std::array<Quaternion,12> m_faceRotations;
         bool m_useTile;
 

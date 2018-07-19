@@ -12,7 +12,7 @@ class LayoutCubeMap: public LayoutCubeMapBased
 {
     struct FacePosition;
     public:
-      static std::shared_ptr<LayoutCubeMap> GenerateLayout(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, std::string facesPositionString, std::array<std::array<unsigned int, 2>,6> pixelEdges, bool useEqualArea)
+      static std::shared_ptr<LayoutCubeMap> GenerateLayout(bool useTile, std::string facesPositionString, std::array<std::array<unsigned int, 2>,6> pixelEdges, bool useEqualArea)
 	    {
 	        FaceResolutions fr(std::move(pixelEdges));
             std::stringstream ss(facesPositionString);
@@ -61,13 +61,13 @@ class LayoutCubeMap: public LayoutCubeMapBased
             }
             FacePosition fp(std::move(face), std::move(rotationFace));
 	        auto offsetArraysTuple = Init(fr, fp);
-            return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap( rotationQuaternion, useTile, vectorialTrans,
+            return std::shared_ptr<LayoutCubeMap>( new LayoutCubeMap( useTile,
                 std::get<0>(offsetArraysTuple)[0] + std::get<0>(offsetArraysTuple)[1] + std::get<0>(offsetArraysTuple)[2],
                 std::get<1>(offsetArraysTuple)[0] + std::get<1>(offsetArraysTuple)[1],
                 fr, offsetArraysTuple, std::move(fp), useEqualArea));
 	    }
         LayoutCubeMap(unsigned int pixelEdge, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans):
-               LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge, Quaternion(1), useTile, vectorialTrans,
+               LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge, useTile,
                            {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}}),
                m_maxOffsetCols({{pixelEdge,pixelEdge,pixelEdge}}), m_maxOffsetRows({{pixelEdge,pixelEdge}}),
                m_fp({{Faces::Right, Faces::Back, Faces::Left, Faces::Top, Faces::Front, Faces::Bottom}}, {{0, 0, 0, -90, -90, -90}})
@@ -177,8 +177,8 @@ class LayoutCubeMap: public LayoutCubeMapBased
         RowsOffsetArray m_maxOffsetRows;
         FacePosition m_fp;
 
-        LayoutCubeMap(Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t, FacePosition fp, bool useEqualArea):
-            LayoutCubeMapBased(width, height, rotationQuaternion, useTile, vectorialTrans, fr, useEqualArea), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)), m_fp(std::move(fp)) {}
+        LayoutCubeMap(bool useTile, unsigned int width, unsigned int height, const FaceResolutions& fr, const std::tuple<ColsOffsetArray, RowsOffsetArray>& t, FacePosition fp, bool useEqualArea):
+            LayoutCubeMapBased(width, height, useTile, fr, useEqualArea), m_maxOffsetCols(std::get<0>(t)), m_maxOffsetRows(std::get<1>(t)), m_fp(std::move(fp)) {}
 
         static std::tuple<ColsOffsetArray, RowsOffsetArray> Init(const FaceResolutions& fr, const FacePosition& fp)
         {
@@ -209,10 +209,8 @@ class  LayoutConfigParserCubemap: public LayoutConfigParserCubemapBase
         {}
 
     protected:
-        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
+        std::shared_ptr<LayoutView> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
-            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
-            auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);
             auto inputWidth = m_width.GetValue(layoutSection, ptree);
             auto inputHeight = m_height.GetValue(layoutSection, ptree);
             auto edgeFront = m_edgeFront.GetValue(layoutSection, ptree);
@@ -221,7 +219,7 @@ class  LayoutConfigParserCubemap: public LayoutConfigParserCubemapBase
             auto edgeBack = m_edgeBack.GetValue(layoutSection, ptree);
             auto edgeTop = m_edgeTop.GetValue(layoutSection, ptree);
             auto edgeBottom = m_edgeBottom.GetValue(layoutSection, ptree);
-            return LayoutCubeMap::GenerateLayout(rot, false, std::move(vectorialTrans), m_facesPositionString.GetValue(layoutSection, ptree), {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/3), unsigned(edgeFront*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/3), unsigned(edgeBack*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/3), unsigned(edgeLeft*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/3), unsigned(edgeRight*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/3),unsigned(edgeTop*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/3),unsigned(edgeBottom*inputHeight/2)}}}, m_useEqualArea);
+            return LayoutCubeMap::GenerateLayout(false, m_facesPositionString.GetValue(layoutSection, ptree), {{std::array<unsigned int,2>{unsigned(edgeFront*inputWidth/3), unsigned(edgeFront*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBack*inputWidth/3), unsigned(edgeBack*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeLeft*inputWidth/3), unsigned(edgeLeft*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeRight*inputWidth/3), unsigned(edgeRight*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeTop*inputWidth/3),unsigned(edgeTop*inputHeight/2)}, std::array<unsigned int,2>{unsigned(edgeBottom*inputWidth/3),unsigned(edgeBottom*inputHeight/2)}}}, m_useEqualArea);
         }
     private:
         KeyTypeDescription<std::string> m_facesPositionString;

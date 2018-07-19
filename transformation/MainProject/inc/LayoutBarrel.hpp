@@ -7,8 +7,8 @@ namespace IMT {
 class LayoutBarrel: public Layout
 {
     public:
-        LayoutBarrel(unsigned int width, unsigned int height, Quaternion rotationQuaternion, std::shared_ptr<VectorialTrans> vectorialTrans):
-            Layout(width, height, vectorialTrans),  m_rotationQuaternion(rotationQuaternion), m_equirecRatio(1.0/3.0), m_circleRadius(SCALAR(height)/4.0), m_centerTop(width-m_circleRadius,m_circleRadius),
+        LayoutBarrel(unsigned int width, unsigned int height):
+            Layout(width, height), m_equirecRatio(1.0/3.0), m_circleRadius(SCALAR(height)/4.0), m_centerTop(width-m_circleRadius,m_circleRadius),
             m_centerBottom(width-m_circleRadius,3*m_circleRadius) {}
         virtual ~LayoutBarrel(void) = default;
 
@@ -56,7 +56,6 @@ class LayoutBarrel: public Layout
             return vwPtr;
         }
     private:
-        Quaternion m_rotationQuaternion;
         SCALAR m_circleRadius;
         SCALAR m_equirecRatio;
         CoordF m_centerTop;
@@ -71,10 +70,9 @@ class LayoutConfigParserBarrel: public LayoutConfigParser
     {}
 
     protected:
-        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
+        std::shared_ptr<LayoutView> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
-            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
-            return std::make_shared<LayoutBarrel>(m_width.GetValue(layoutSection, ptree), m_height.GetValue(layoutSection, ptree), rot, GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot));
+            return std::make_shared<LayoutBarrel>(m_width.GetValue(layoutSection, ptree), m_height.GetValue(layoutSection, ptree));
         }
     private:
         //KeyTypeDescription<SCALAR> m_equiRatio;

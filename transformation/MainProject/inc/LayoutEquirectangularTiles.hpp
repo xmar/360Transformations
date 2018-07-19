@@ -88,7 +88,7 @@ class LayoutEquirectangularTiles : public Layout
 
         virtual NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const override
         {
-            Coord3dSpherical rotCoord = Rotation(sphericalCoord , m_rotationQuaternion.Inv());
+            Coord3dSpherical rotCoord = sphericalCoord;
             double i = 0.5+rotCoord.GetTheta()/ (2.0*PI());
             double j = rotCoord.GetPhi() / PI();
             //Find tile id:
@@ -140,7 +140,7 @@ class LayoutEquirectangularTiles : public Layout
             }
             phi += PI()*ni.m_normalizedFaceCoordinate.y*GetVTileRatio(std::get<1>(ti));
             Coord3dCart v = Coord3dSpherical(1, theta, phi);
-            return Rotation(v, m_rotationQuaternion);
+            return v;
         }
 
         virtual std::shared_ptr<Picture> ReadNextPictureFromVideoImpl(void) override
@@ -404,17 +404,16 @@ class LayoutEquirectangularTiles : public Layout
         std::array<unsigned int, nbVTiles> m_rowsMaxSize;
         std::array<unsigned int, nbHTiles> m_colsMaxSize;
         std::array<std::array<CoordI, nbVTiles>, nbHTiles> m_offsets;
-        Quaternion m_rotationQuaternion;
         std::tuple<unsigned int, unsigned int> m_originalRes;
         bool m_useTile;
         bool m_upscale;
 
     public:
 
-        LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, Quaternion rotationQuaternion, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale, std::shared_ptr<VectorialTrans> vectorialTrans):
-          Layout(vectorialTrans), m_tr(),
+        LayoutEquirectangularTiles(ScaleTilesMap scaleTile, TileRatios tileRatios, std::tuple<unsigned int, unsigned int> originalRes, bool useTile, bool upscale):
+          Layout(), m_tr(),
           m_scaleTile(std::move(scaleTile)), m_tileRatios(std::move(tileRatios)), m_rowsMaxSize(), m_colsMaxSize(), m_offsets(),
-          m_rotationQuaternion(rotationQuaternion), m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
+          m_originalRes(std::move(originalRes)), m_useTile(useTile), m_upscale(upscale)
           {};
 
 

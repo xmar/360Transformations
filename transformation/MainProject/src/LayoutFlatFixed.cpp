@@ -16,8 +16,7 @@ CoordF LayoutFlatFixed::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo&
 }
 Layout::NormalizedFaceInfo LayoutFlatFixed::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    const Quaternion& rotationMat = m_dynamicPosition.GetNextPosition();
-    Coord3dSpherical cardPosition = Rotation(sphericalCoord, rotationMat.Inv());
+    Coord3dSpherical cardPosition = sphericalCoord;
     cardPosition.SetTheta(0.5+cardPosition.GetTheta()/m_horizontalAngleOfVision);
     cardPosition.SetPhi(0.5+(cardPosition.GetPhi() - PI()/2)/m_verticalAngleOfVision);
     return Layout::NormalizedFaceInfo(CoordF(cardPosition.GetTheta(), cardPosition.GetPhi()), 0);
@@ -27,9 +26,7 @@ Coord3dCart LayoutFlatFixed::FromNormalizedInfoTo3d(const Layout::NormalizedFace
     const CoordF& coord(ni.m_normalizedFaceCoordinate);
     // Coord3dCart coordBefRot(1.f, (coord.x-0.5)*m_maxHDist, (coord.y-0.5)*m_maxVDist);//coordinate in the plan x=1
     Coord3dSpherical coordBefRot(1.f, (coord.x-0.5)*m_horizontalAngleOfVision, PI()/2+(coord.y-0.5)*m_verticalAngleOfVision);
-    const Quaternion& rotationMat = m_dynamicPosition.GetNextPosition();
-    auto p = Rotation(coordBefRot, rotationMat);
-    return Rotation(coordBefRot, rotationMat);
+    return coordBefRot;
 }
 
 std::shared_ptr<Picture> LayoutFlatFixed::ReadNextPictureFromVideoImpl(void)

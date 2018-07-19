@@ -5,7 +5,7 @@
 #include "Common.hpp"
 
 namespace IMT {
-class Layout;
+class LayoutView;
 class Picture {
     public:
         enum class InterpolationTech {
@@ -58,9 +58,9 @@ class Picture {
         /** \brief compute a weighted PSNR for each pixel of the two output weighted with the surface of each pixel on the sphere.
         *   The two picture should have the same size
         **/
-        double GetWSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic) const;
+        double GetWSPSNR(const Picture& pic, LayoutView& layoutThisPict, LayoutView& layoutArgPic) const;
         /** \brief compute the PSNR from a uniform sampling in the spherical domain. The two input pictures do not need to have the same size **/
-        double GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic, InterpolationTech it) const;
+        double GetSPSNR(const Picture& pic, LayoutView& layoutThisPict, LayoutView& layoutArgPic, InterpolationTech it) const;
 
         const int& GetWidth(void) const {return m_pictMat.cols;}
         const int& GetHeight(void) const {return m_pictMat.rows;}

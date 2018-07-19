@@ -9,7 +9,7 @@ double LayoutPyramidalBased::UsePlanEquation(double x) const //Use the plan equa
 
 Layout::NormalizedFaceInfo LayoutPyramidalBased::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    Coord3dSpherical p = Rotation(sphericalCoord, m_rotQuaternion.Inv());
+    Coord3dSpherical p = sphericalCoord;
 
     FaceToPlanFct<Faces> lambda = [this] (Faces f) {return this->FaceToPlan(f);};
     auto rtr = IntersectionCart(lambda, p);
@@ -101,5 +101,5 @@ Coord3dCart LayoutPyramidalBased::FromNormalizedInfoTo3d(const NormalizedFaceInf
     case Faces::Black:
         return Coord3dCart(0,0,0);
     }
-    return Rotation(v, m_rotQuaternion);
+    return v;
 }

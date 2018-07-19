@@ -388,7 +388,7 @@ double Picture::GetMSSSIM(const Picture& pic) const
 }
 
 
-double Picture::GetWSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic) const
+double Picture::GetWSPSNR(const Picture& pic, LayoutView& layoutThisPict, LayoutView& layoutArgPic) const
 {
   if (pic.GetHeight()!= GetHeight() && pic.GetWidth() != GetWidth())
   {
@@ -419,7 +419,7 @@ double Picture::GetWSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& la
   return mse != 0 ? 10.0*std::log10(255*255/mse) : 100.0;
 }
 
-double Picture::GetSPSNR(const Picture& pic, Layout& layoutThisPict, Layout& layoutArgPic, InterpolationTech it) const
+double Picture::GetSPSNR(const Picture& pic, LayoutView& layoutThisPict, LayoutView& layoutArgPic, InterpolationTech it) const
 {
   cv::Mat vRef(nbOfUniformPointOneSphere, 1, m_pictMat.type());
   cv::Mat vArg(nbOfUniformPointOneSphere, 1, m_pictMat.type());

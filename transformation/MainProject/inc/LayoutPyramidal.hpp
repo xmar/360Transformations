@@ -26,8 +26,8 @@ class LayoutPyramidal: public LayoutPyramidalBased
          * \param pixelBaseEdge unsigned int Number of pixel of the edge of the base
          *
          */
-        LayoutPyramidal(double baseEdge,Quaternion rotationQuaternion, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans, unsigned int pixelBaseEdge):
-          LayoutPyramidalBased(baseEdge, rotationQuaternion, 3*pixelBaseEdge, pixelBaseEdge, useTile, vectorialTrans, {{pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge}}) {}
+        LayoutPyramidal(double baseEdge, bool useTile, unsigned int pixelBaseEdge):
+          LayoutPyramidalBased(baseEdge, 3*pixelBaseEdge, pixelBaseEdge, useTile, {{pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge, pixelBaseEdge}}) {}
         virtual ~LayoutPyramidal(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -68,11 +68,9 @@ class LayoutConfigParserPyramid: public LayoutConfigParserPyramidBase
         LayoutConfigParserPyramid(std::string key): LayoutConfigParserPyramidBase(key) {}
 
     protected:
-        std::shared_ptr<Layout> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
+        std::shared_ptr<LayoutView> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
-            Quaternion rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
-            auto vectorialTrans = GetVectorialTransformation(m_vectTransOptional.GetValue(layoutSection, ptree), ptree, rot);
-            return std::make_shared<LayoutPyramidal>(m_pyramidBaseEdge.GetValue(layoutSection, ptree), rot, false, vectorialTrans, m_pyramidBaseEdgeLength.GetValue(layoutSection, ptree)*m_width.GetValue(layoutSection, ptree)/4);
+            return std::make_shared<LayoutPyramidal>(m_pyramidBaseEdge.GetValue(layoutSection, ptree), false, m_pyramidBaseEdgeLength.GetValue(layoutSection, ptree)*m_width.GetValue(layoutSection, ptree)/4);
         }
 };
 

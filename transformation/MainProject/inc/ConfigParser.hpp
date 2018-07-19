@@ -251,7 +251,7 @@ enum class LayoutStatus
   Output /// indicates that the layout is an output layout and so may have an output video
 };
 
-std::shared_ptr<Layout> InitialiseLayout(std::string layoutSection, pt::ptree& ptree, LayoutStatus layoutStatus, unsigned int inputWidth, unsigned int inputHeight)
+std::shared_ptr<LayoutView> InitialiseLayout(std::string layoutSection, pt::ptree& ptree, LayoutStatus layoutStatus, unsigned int inputWidth, unsigned int inputHeight)
 {
     std::string layoutType;
 

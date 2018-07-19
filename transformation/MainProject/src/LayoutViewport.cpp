@@ -16,8 +16,7 @@ CoordF LayoutViewport::FromNormalizedInfoTo2d(const Layout::NormalizedFaceInfo& 
 }
 Layout::NormalizedFaceInfo LayoutViewport::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-    const Quaternion& rotationMat = m_dynamicPosition.GetNextPosition();
-    Coord3dCart cardPosition = Rotation(sphericalCoord, rotationMat.Inv());
+    Coord3dCart cardPosition = sphericalCoord;
     double i(-1), j(-1);
     if (cardPosition.GetX() > 0)
     {
@@ -35,8 +34,7 @@ Coord3dCart LayoutViewport::FromNormalizedInfoTo3d(const Layout::NormalizedFaceI
     double v = (0.5-coord.y)*(2*m_maxVDist);
     Coord3dCart coordBefRot(1, u, v);
     coordBefRot /= coordBefRot.Norm();
-    const Quaternion& rotationMat = m_dynamicPosition.GetNextPosition();
-    return Rotation(coordBefRot, rotationMat);
+    return coordBefRot;
 }
 
 std::shared_ptr<Picture> LayoutViewport::ReadNextPictureFromVideoImpl(void)

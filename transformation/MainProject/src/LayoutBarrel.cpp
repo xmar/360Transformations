@@ -49,7 +49,7 @@ CoordF LayoutBarrel::FromNormalizedInfoTo2d(const LayoutBarrel::NormalizedFaceIn
 
 LayoutBarrel::NormalizedFaceInfo LayoutBarrel::From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const
 {
-   Coord3dSpherical p = Coord3dCart(Rotation(sphericalCoord, m_rotationQuaternion.Inv())); 
+   Coord3dSpherical p = sphericalCoord; 
    if (p.GetPhi() >= (PI() - PI()*m_equirecRatio)/2.0 && p.GetPhi() <= PI()-(PI() - PI()*m_equirecRatio)/2.0)
    {// EquiRec
         return NormalizedFaceInfo(CoordF(p.GetTheta()/(2*PI())+0.5, (p.GetPhi()-(PI() - PI()*m_equirecRatio)/2.0)/(PI()*m_equirecRatio)), static_cast<int>(Faces::Equirec));
@@ -85,7 +85,7 @@ Coord3dCart LayoutBarrel::FromNormalizedInfoTo3d(const LayoutBarrel::NormalizedF
         v = Coord3dCart((ni.m_normalizedFaceCoordinate.x-0.5)/std::tan(m_equirecRatio*PI()/2), (ni.m_normalizedFaceCoordinate.y-0.5)/std::tan(m_equirecRatio*PI()/2), -1);
         v /= v.Norm();
     }
-    return Rotation(v, m_rotationQuaternion);
+    return v;
 }
 
 REGISTER_LAYOUT("barrel", LayoutConfigParserBarrel);
