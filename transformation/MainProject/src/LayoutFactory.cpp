@@ -222,55 +222,55 @@ Coord3dCart IMT::ParseVectorJSON(std::string s)
   return Coord3dCart(0, 0, 0);
 }
 
-std::shared_ptr<VectorialTrans> IMT::GetVectorialTransformation(std::string transSection, pt::ptree& ptree, const Quaternion& layoutRotation)
-{
-    if (transSection.empty())
-    {
-        return std::make_shared<VectorialTrans>();
-    }
-    std::string transType;
-    try
-    {
-        transType = ptree.get<std::string>(transSection+".vectorSpaceTransformationType");
-        if (transType == "offsetTrans")
-        {
-            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
-            auto vector_b_conf = ptree.get_optional<std::string>(transSection+".emphDirection");
-            Coord3dCart b(0, 0, 0);
-            if (vector_b_conf)
-            {
-                b = ParseVectorJSON(vector_b_conf.get());
-                b = b/b.Norm();
-            }
-            else
-            {
-                b = layoutRotation.Rotation(Coord3dCart(1, 0, 0));
-            }
-            std::cout << "offsetTrans -> alpha = " << offsetRatio << "; b = " << b << std::endl;
-            return std::make_shared<OffsetTrans>(offsetRatio, std::move(b));
-        }
-        if (transType == "horizontalOffsetTrans")
-        {
-            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
-            auto orientation_conf = ptree.get_optional<std::string>(transSection+".orientation");
-            Quaternion q;
-            if (orientation_conf)
-            {
-                q = ParseRotationJSON(orientation_conf.get());
-            }
-            else
-            {
-                q = layoutRotation;
-            }
-            std::cout << "horizontalOffsetTrans -> alpha = " << offsetRatio << "; q = " << q << std::endl;
-            return std::make_shared<HorizontalOffsetTrans>(offsetRatio, std::move(q));
-        }
-
-    }
-    catch (std::exception &e)                                                    
-    {                                                                            
-        std::cout << "Error while parsing in configuration file the "<<transSection<<" Vectorial Transformation: " << e.what() << std::endl;
-        throw e;                                                                 
-    }                                                                            
-    throw std::invalid_argument("Not supported type: "+transType);
-}
+//std::shared_ptr<VectorialTrans> IMT::GetVectorialTransformation(std::string transSection, pt::ptree& ptree, const Quaternion& layoutRotation)
+//{
+//    if (transSection.empty())
+//    {
+//        return std::make_shared<VectorialTrans>();
+//    }
+//    std::string transType;
+//    try
+//    {
+//        transType = ptree.get<std::string>(transSection+".vectorSpaceTransformationType");
+//        if (transType == "offsetTrans")
+//        {
+//            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
+//            auto vector_b_conf = ptree.get_optional<std::string>(transSection+".emphDirection");
+//            Coord3dCart b(0, 0, 0);
+//            if (vector_b_conf)
+//            {
+//                b = ParseVectorJSON(vector_b_conf.get());
+//                b = b/b.Norm();
+//            }
+//            else
+//            {
+//                b = layoutRotation.Rotation(Coord3dCart(1, 0, 0));
+//            }
+//            std::cout << "offsetTrans -> alpha = " << offsetRatio << "; b = " << b << std::endl;
+//            return std::make_shared<OffsetTrans>(offsetRatio, std::move(b));
+//        }
+//        if (transType == "horizontalOffsetTrans")
+//        {
+//            auto offsetRatio = ptree.get<double>(transSection+".offsetRatio");
+//            auto orientation_conf = ptree.get_optional<std::string>(transSection+".orientation");
+//            Quaternion q;
+//            if (orientation_conf)
+//            {
+//                q = ParseRotationJSON(orientation_conf.get());
+//            }
+//            else
+//            {
+//                q = layoutRotation;
+//            }
+//            std::cout << "horizontalOffsetTrans -> alpha = " << offsetRatio << "; q = " << q << std::endl;
+//            return std::make_shared<HorizontalOffsetTrans>(offsetRatio, std::move(q));
+//        }
+//
+//    }
+//    catch (std::exception &e)                                                    
+//    {                                                                            
+//        std::cout << "Error while parsing in configuration file the "<<transSection<<" Vectorial Transformation: " << e.what() << std::endl;
+//        throw e;                                                                 
+//    }                                                                            
+//    throw std::invalid_argument("Not supported type: "+transType);
+//}

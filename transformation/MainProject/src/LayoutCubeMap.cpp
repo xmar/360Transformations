@@ -173,8 +173,6 @@ std::shared_ptr<Picture> LayoutCubeMap::ReadNextPictureFromVideoImpl(void)
 
 void LayoutCubeMap::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
 {
-    std::cout << "W=" << GetWidth() << "; " << GetHeight() << std::endl;
-    std::cout << "W2=" << pict->GetMat().cols << "; " << pict->GetMat().rows << std::endl;
   if (UseTile())
   {
     for (unsigned i = 0; i < 6; ++i)
@@ -187,7 +185,6 @@ void LayoutCubeMap::WritePictureToVideoImpl(std::shared_ptr<Picture> pict)
   }
   else
   {
-    std::cout << m_outputVideoPtr << std::endl;
     m_outputVideoPtr->Write(pict->GetMat(), 0);
   }
 }

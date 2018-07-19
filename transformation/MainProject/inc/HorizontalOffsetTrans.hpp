@@ -7,10 +7,17 @@ namespace IMT {
 class HorizontalOffsetTrans: public VectorialTrans
 {
     public:
-        HorizontalOffsetTrans(SCALAR amplitude, Quaternion orientation): m_amplitude(amplitude), m_orientation(orientation),
+        HorizontalOffsetTrans(std::shared_ptr<LayoutView> baseLayout, SCALAR amplitude, Quaternion orientation): VectorialTrans(baseLayout), m_amplitude(amplitude), m_orientation(orientation),
             m_xP(orientation.Rotation(Coord3dCart(1,0,0))), m_yP(orientation.Rotation(Coord3dCart(0,1,0))), m_zP(orientation.Rotation(Coord3dCart(0,0,1))) {}
 
-        virtual Coord3dCart FromBeforeTrans3dToAfterTrans3d(Coord3dCart vectBefore) override
+    private:
+        SCALAR m_amplitude;
+        Quaternion m_orientation;
+        Coord3dCart m_xP;
+        Coord3dCart m_yP;
+        Coord3dCart m_zP;
+
+        virtual Coord3dCart FromBeforeTrans3dToAfterTrans3d(Coord3dCart vectBefore) const override
         {//Apply offset on the horizontal plan
             Coord3dCart verticalComponent = vectBefore.DotProduct(m_zP)*m_zP;
             Coord3dCart v = vectBefore - verticalComponent;
@@ -28,7 +35,7 @@ class HorizontalOffsetTrans: public VectorialTrans
             return v + verticalComponent;
         }
 
-        virtual Coord3dCart FromAfterTrans3dToBeforeTrans3d(Coord3dCart vectAfter) override
+        virtual Coord3dCart FromAfterTrans3dToBeforeTrans3d(Coord3dCart vectAfter) const override
         {
             Coord3dCart verticalComponent = vectAfter.DotProduct(m_zP)*m_zP;
             Coord3dCart v = vectAfter - verticalComponent;
@@ -44,11 +51,6 @@ class HorizontalOffsetTrans: public VectorialTrans
             }
             return v + verticalComponent;
         } 
-    private:
-        SCALAR m_amplitude;
-        Quaternion m_orientation;
-        Coord3dCart m_xP;
-        Coord3dCart m_yP;
-        Coord3dCart m_zP;
+
 };
 }

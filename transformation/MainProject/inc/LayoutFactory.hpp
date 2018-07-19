@@ -11,9 +11,6 @@
 #include "Quaternion.hpp"
 #include "Common.hpp"
 
-#include "OffsetTrans.hpp"
-#include "HorizontalOffsetTrans.hpp"
-
 namespace IMT {
 
 namespace pt = boost::property_tree;
@@ -149,7 +146,7 @@ Quaternion ParseRotationJSON(std::string s);
 
 Coord3dCart ParseVectorJSON(std::string s);
 
-std::shared_ptr<VectorialTrans> GetVectorialTransformation(std::string transSection, pt::ptree& ptree, const Quaternion& layoutRotation);
+//std::shared_ptr<VectorialTrans> GetVectorialTransformation(std::string transSection, pt::ptree& ptree, const Quaternion& layoutRotation);
 
 class KeyRotationDescription: public KeyTypeDescription<std::string>
 {

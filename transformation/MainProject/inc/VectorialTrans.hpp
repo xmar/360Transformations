@@ -1,25 +1,30 @@
 #pragma once
 
 #include "Common.hpp"
+#include "LayoutDecorator.hpp"
 
 namespace IMT {
-class VectorialTrans
+class VectorialTrans: public LayoutDecorator
 {
     public:
-        VectorialTrans(void) {};
+        VectorialTrans(std::shared_ptr<LayoutView> baseLayout): LayoutDecorator(baseLayout) {};
         virtual ~VectorialTrans(void) = default;
 
-        //FromBeforeTrans3dToAfterTrans3d From 2D to 3D
-        virtual Coord3dCart FromBeforeTrans3dToAfterTrans3d(Coord3dCart vectBefore)
-        {//default transformation do nothing
-            return std::move(vectBefore);
+    protected:
+        NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const  final
+        {
+            return LayoutDecorator::From3dToNormalizedFaceInfo(FromAfterTrans3dToBeforeTrans3d(sphericalCoord));
         }
-        //FromAfterTrans3dToBeforeTrans3d From 3D to 2D
-        virtual Coord3dCart FromAfterTrans3dToBeforeTrans3d(Coord3dCart vectAfter)
-        {//default transformation do nothing
-            return std::move(vectAfter);
+        Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const final
+        {
+            return FromBeforeTrans3dToAfterTrans3d(LayoutDecorator::FromNormalizedInfoTo3d(ni));
         }
 
     private:
+        //FromBeforeTrans3dToAfterTrans3d From 2D to 3D
+        virtual Coord3dCart FromBeforeTrans3dToAfterTrans3d(Coord3dCart vectBefore) const = 0;
+        //FromAfterTrans3dToBeforeTrans3d From 3D to 2D
+        virtual Coord3dCart FromAfterTrans3dToBeforeTrans3d(Coord3dCart vectAfter) const = 0;
+
 };
 }

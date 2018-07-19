@@ -12,7 +12,6 @@
 #include "Picture.hpp"
 #include "VideoReader.hpp"
 #include "VideoWriter.hpp"
-#include "VectorialTrans.hpp"
 
 #include "LayoutFactory.hpp"
 #include "Common.hpp"
@@ -76,8 +75,7 @@ class Layout: public LayoutView
     /* This virtual class is used to define any kind of output layout */
     public:
         Layout(void): m_outWidth(0), m_outHeight(0), m_interpol(Picture::InterpolationTech::BILINEAR), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
-        explicit Layout(std::shared_ptr<VectorialTrans> vectorialTrans): m_outWidth(0), m_outHeight(0), m_interpol(Picture::InterpolationTech::BILINEAR), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
-        Layout(unsigned int outWidth, unsigned int outHeight, std::shared_ptr<VectorialTrans> vectorialTrans = std::make_shared<VectorialTrans>()): m_outWidth(outWidth), m_outHeight(outHeight), m_interpol(Picture::InterpolationTech::BILINEAR), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
+        Layout(unsigned int outWidth, unsigned int outHeight): m_outWidth(outWidth), m_outHeight(outHeight), m_interpol(Picture::InterpolationTech::BILINEAR), m_isInit(false), m_inputVideoPtr(nullptr), m_outputVideoPtr(nullptr) {};
         virtual ~Layout(void) = default;
 
         /** \brief Function called to init the layout object (have to be called before using the layout object). Call the private virtual function InitImpl.
@@ -110,7 +108,6 @@ class Layout: public LayoutView
         }
         void InitOutputVideo(std::string pathToOutputVideo, std::string codecId, unsigned fps, unsigned gop_size, std::vector<int> bit_rateVect) final
         {
-            std::cout << "INIT video " << std::endl;
             if (m_outputVideoPtr == nullptr)
             {
                 m_outputVideoPtr = InitOutputVideoImpl(pathToOutputVideo, codecId, fps, gop_size, bit_rateVect);
@@ -202,8 +199,10 @@ class LayoutConfigParser: public LayoutConfigParserBase
         pt::json_parser::read_json(decoratorListStr, ptree_json);
         BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
         {
+            std::cout << " -> " << v.second.data();
             baseLayout = LayoutFactory::Instance().Decorate(baseLayout, v.second.data(), ptree);
         }
+        std::cout << std::endl;
         return baseLayout;
     }
     protected:

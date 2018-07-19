@@ -66,7 +66,7 @@ class LayoutCubeMap: public LayoutCubeMapBased
                 std::get<1>(offsetArraysTuple)[0] + std::get<1>(offsetArraysTuple)[1],
                 fr, offsetArraysTuple, std::move(fp), useEqualArea));
 	    }
-        LayoutCubeMap(unsigned int pixelEdge, bool useTile, std::shared_ptr<VectorialTrans> vectorialTrans):
+        LayoutCubeMap(unsigned int pixelEdge, bool useTile):
                LayoutCubeMapBased(3*pixelEdge, 2*pixelEdge, useTile,
                            {{pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge, pixelEdge}}),
                m_maxOffsetCols({{pixelEdge,pixelEdge,pixelEdge}}), m_maxOffsetRows({{pixelEdge,pixelEdge}}),
