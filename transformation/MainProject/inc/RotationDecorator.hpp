@@ -27,7 +27,6 @@ class DecoratorConfigParserRotation: public DecoratorConfigParserBase
         std::shared_ptr<LayoutView> Create(std::shared_ptr<LayoutView> baseLayout, std::string layoutSection, pt::ptree& ptree) const override
         {
             auto rot = m_rotationQuaternion.GetRotation(layoutSection, ptree);
-            std::cout << "Create rotation decorator with rot " << rot << std::endl;
             return std::make_shared<RotationDecorator>(baseLayout, m_rotationQuaternion.GetRotation(layoutSection, ptree));
         }
     private:

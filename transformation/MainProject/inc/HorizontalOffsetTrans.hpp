@@ -53,4 +53,23 @@ class HorizontalOffsetTrans: public VectorialTrans
         } 
 
 };
+
+class DecoratorConfigHorizontalOffsetTrans: public DecoratorConfigParserBase
+{
+    public:
+        DecoratorConfigHorizontalOffsetTrans(std::string key): DecoratorConfigParserBase(key),
+            m_offsetRatio(this, "offsetRatio", "Ratio of the offset transformation.", false),
+            m_rotationQuaternion(this, "rotation", "Rotation applied on the transformation (determine the horizontal and the emphasized direction b=(1,0,0) by default). [Default = no rotation]", true, Quaternion(1))
+         {}
+
+        std::shared_ptr<LayoutView> Create(std::shared_ptr<LayoutView> baseLayout, std::string layoutSection, pt::ptree& ptree) const override
+        {
+            return std::make_shared<HorizontalOffsetTrans>(baseLayout, m_offsetRatio.GetValue(layoutSection, ptree), m_rotationQuaternion.GetRotation(layoutSection, ptree));
+        }
+    private:
+        KeyTypeDescription<SCALAR> m_offsetRatio;
+        KeyRotationDescription m_rotationQuaternion;
+};
+
+
 }

@@ -197,9 +197,10 @@ class LayoutConfigParser: public LayoutConfigParserBase
         std::stringstream decoratorListStr ( m_decoratorList.GetValue(layoutSection, ptree) );
         pt::ptree ptree_json;
         pt::json_parser::read_json(decoratorListStr, ptree_json);
-        BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
+        //BOOST_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
+        BOOST_REVERSE_FOREACH(boost::property_tree::ptree::value_type &v, ptree_json.get_child(""))
         {
-            std::cout << " -> " << v.second.data();
+            std::cout << " <- " << v.second.data();
             baseLayout = LayoutFactory::Instance().Decorate(baseLayout, v.second.data(), ptree);
         }
         std::cout << std::endl;
