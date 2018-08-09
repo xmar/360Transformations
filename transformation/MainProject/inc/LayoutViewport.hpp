@@ -9,8 +9,8 @@ class LayoutViewport: public Layout
         //yaw pitch = theta and phi of the center of the view port; horizontalAngleOfVision (in radian) is the total angle view by this view port. Vertical deduced from the width, height and horizontalAngleOfVision with the hypothesis we keep the same ratio angle per pixel for the vertical
         LayoutViewport(unsigned int width, unsigned int height, double horizontalAngleOfVision, double verticalAngleOfVision): Layout(width,height),
             m_horizontalAngleOfVision(horizontalAngleOfVision),
-            m_verticalAngleOfVision(verticalAngleOfVision), m_maxHDist(2.f*std::tan(m_horizontalAngleOfVision/2)),
-            m_maxVDist(2.f*std::tan(m_verticalAngleOfVision/2)) {}
+            m_verticalAngleOfVision(verticalAngleOfVision), m_maxHDist(std::tan(m_horizontalAngleOfVision/2)),
+            m_maxVDist(std::tan(m_verticalAngleOfVision/2)) {}
         virtual ~LayoutViewport(void) = default;
 
         virtual CoordI GetReferenceResolution(void) override
@@ -46,7 +46,7 @@ class LayoutConfigParserViewport: public LayoutConfigParser
     protected:
         std::shared_ptr<LayoutView> CreateImpl(std::string layoutSection, pt::ptree& ptree) const override
         {
-            return std::make_shared<LayoutViewport>(m_width.GetValue(layoutSection, ptree), m_height.GetValue(layoutSection, ptree), m_horizontalAngleOfVision.GetValue(layoutSection, ptree), m_verticalAngleOfVision.GetValue(layoutSection, ptree));
+            return std::make_shared<LayoutViewport>(m_width.GetValue(layoutSection, ptree), m_height.GetValue(layoutSection, ptree), m_horizontalAngleOfVision.GetValue(layoutSection, ptree)*PI()/180.f, m_verticalAngleOfVision.GetValue(layoutSection, ptree)*PI()/180.f);
         }
     private:
         KeyTypeDescription<SCALAR> m_horizontalAngleOfVision;

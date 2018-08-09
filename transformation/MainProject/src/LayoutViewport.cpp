@@ -30,8 +30,8 @@ Layout::NormalizedFaceInfo LayoutViewport::From3dToNormalizedFaceInfo(const Coor
 Coord3dCart LayoutViewport::FromNormalizedInfoTo3d(const Layout::NormalizedFaceInfo& ni) const
 {
     const CoordF& coord(ni.m_normalizedFaceCoordinate);
-    double u = (coord.x-0.5)*(2*m_maxHDist);
-    double v = (0.5-coord.y)*(2*m_maxVDist);
+    double u = 2*(coord.x-0.5)*(m_maxHDist);
+    double v = 2*(0.5-coord.y)*(m_maxVDist);
     Coord3dCart coordBefRot(1, u, v);
     coordBefRot /= coordBefRot.Norm();
     return coordBefRot;
