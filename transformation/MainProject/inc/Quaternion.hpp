@@ -22,22 +22,37 @@ public:
   constexpr Quaternion(const SCALAR& w, const VectorCartesian& v): m_w(w), m_v(v), m_isNormalized(false) {}
   constexpr explicit Quaternion(const SCALAR& w): m_w(w), m_v(), m_isNormalized(false) {}
   constexpr explicit Quaternion(const VectorCartesian& v): m_w(0), m_v(v), m_isNormalized(false) {}
-  static Quaternion FromEuler(const SCALAR& yaw, const SCALAR& pitch, const SCALAR& roll)
+  static Quaternion FromEulerXYZ(const SCALAR& yaw, const SCALAR& pitch, const SCALAR& roll)
   {
-    double t0 = std::cos(yaw * 0.5);
-  	double t1 = std::sin(yaw * 0.5);
-  	double t2 = std::cos(roll * 0.5);
-  	double t3 = std::sin(roll * 0.5);
-  	// double t4 = std::cos( (pitch - PI_L/2.0) * 0.5);
-  	// double t5 = std::sin( (pitch - PI_L/2.0) * 0.5);
-    double t4 = std::cos( pitch * 0.5);
-  	double t5 = std::sin( pitch * 0.5);
+    //double t0 = std::cos(yaw * 0.5);
+  	//double t1 = std::sin(yaw * 0.5);
+  	//double t2 = std::cos(roll * 0.5);
+  	//double t3 = std::sin(roll * 0.5);
+  	//// double t4 = std::cos( (pitch - PI_L/2.0) * 0.5);
+  	//// double t5 = std::sin( (pitch - PI_L/2.0) * 0.5);
+    //double t4 = std::cos( pitch * 0.5);
+  	//double t5 = std::sin( pitch * 0.5);
 
-    auto q = Quaternion(t0 * t2 * t4 + t1 * t3 * t5, VectorCartesian( t0 * t3 * t4 - t1 * t2 * t5,
-                                                                      t0 * t2 * t5 + t1 * t3 * t4,
-                                                                      t1 * t2 * t4 - t0 * t3 * t5));
-    q.Normalize();
-    return q;
+    //auto q = Quaternion(t0 * t2 * t4 + t1 * t3 * t5, VectorCartesian( t0 * t3 * t4 - t1 * t2 * t5,
+    //                                                                  t0 * t2 * t5 + t1 * t3 * t4,
+    //                                                                  t1 * t2 * t4 - t0 * t3 * t5));
+    //q.Normalize();
+    //return q;
+    Quaternion qx(std::cos(roll * 0.5), VectorCartesian(std::sin(roll * 0.5), 0, 0));
+    Quaternion qy(std::cos(pitch * 0.5), VectorCartesian(0, std::sin(pitch * 0.5), 0));
+    Quaternion qz(std::cos(yaw * 0.5), VectorCartesian(0, 0, std::sin(yaw * 0.5)));
+    auto qOut = qx*qy*qz;
+    qOut.Normalize();
+    return qOut;
+  }
+  static Quaternion FromEulerZYX(const SCALAR& yaw, const SCALAR& pitch, const SCALAR& roll)
+  {
+    Quaternion qx(std::cos(roll * 0.5), VectorCartesian(std::sin(roll * 0.5), 0, 0));
+    Quaternion qy(std::cos(pitch * 0.5), VectorCartesian(0, std::sin(pitch * 0.5), 0));
+    Quaternion qz(std::cos(yaw * 0.5), VectorCartesian(0, 0, std::sin(yaw * 0.5)));
+    auto qOut = qz*qy*qx;
+    qOut.Normalize();
+    return qOut;
   }
 
   constexpr SCALAR DotProduct(const Quaternion& q) const {return m_w*q.m_w + m_v.DotProduct(q.m_v);}

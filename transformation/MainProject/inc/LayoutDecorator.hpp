@@ -22,7 +22,7 @@ class LayoutDecorator: public LayoutView
 
         //Forward all other function to the base layout
         void Init(void) final {return m_baseLayout->Init();}
-        void NextStep(double relatifTimestamp) final {return m_baseLayout->NextStep(relatifTimestamp);}
+        void NextStep(double relatifTimestamp) final {NextStepImpl(relatifTimestamp); return m_baseLayout->NextStep(relatifTimestamp);}
         unsigned int GetWidth(void) const final {return m_baseLayout->GetWidth();}
         unsigned int GetHeight(void) const final {return m_baseLayout->GetHeight();}
         CoordI GetReferenceResolution(void) final {return m_baseLayout->GetReferenceResolution();}
@@ -39,6 +39,7 @@ class LayoutDecorator: public LayoutView
         NormalizedFaceInfo From3dToNormalizedFaceInfo(const Coord3dSpherical& sphericalCoord) const  override {return m_baseLayout->From3dToNormalizedFaceInfo(sphericalCoord);}
         CoordF FromNormalizedInfoTo2d(const NormalizedFaceInfo& ni) const override {return m_baseLayout->FromNormalizedInfoTo2d(ni);}
         Coord3dCart FromNormalizedInfoTo3d(const NormalizedFaceInfo& ni) const override {return m_baseLayout->FromNormalizedInfoTo3d(ni);}
+        virtual void NextStepImpl(double relatifTimestamp) {};
     private:
         std::shared_ptr<LayoutView> m_baseLayout;
 };

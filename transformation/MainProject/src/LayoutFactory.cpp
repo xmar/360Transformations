@@ -130,7 +130,31 @@ Quaternion IMT::ParseRotationJSON(std::string s)
 
     vv = ptree_json.get_child("roll");
     auto r = std::stod(vv.data())*PI()/180;
-    return Quaternion::FromEuler(y, p, r);
+    return Quaternion::FromEulerXYZ(y, p, r);
+  }
+  else if (v.data() == "eulerXYZ")
+  {
+    auto vv = ptree_json.get_child("yaw");
+    auto y = std::stod(vv.data())*PI()/180;
+
+    vv = ptree_json.get_child("pitch");
+    auto p =  std::stod(vv.data())*PI()/180;
+
+    vv = ptree_json.get_child("roll");
+    auto r = std::stod(vv.data())*PI()/180;
+    return Quaternion::FromEulerXYZ(y, p, r);
+  }
+  else if(v.data() == "eulerZYX")
+  {
+    auto vv = ptree_json.get_child("yaw");
+    auto y = std::stod(vv.data())*PI()/180;
+
+    vv = ptree_json.get_child("pitch");
+    auto p =  std::stod(vv.data())*PI()/180;
+
+    vv = ptree_json.get_child("roll");
+    auto r = std::stod(vv.data())*PI()/180;
+    return Quaternion::FromEulerZYX(y, p, r);
   }
   else if (v.data() == "quaternion")
   {

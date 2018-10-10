@@ -141,7 +141,7 @@ inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, const Quaternion& ro
 
 inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double pitch, double roll)
 {
-    return Rotation(coordBefRot, Quaternion::FromEuler(yaw,pitch,roll));
+    return Rotation(coordBefRot, Quaternion::FromEulerXYZ(yaw,pitch,roll));
 }
 
 // inline Coord3dSpherical Rotation(const Coord3dSpherical& coordBefRot, double yaw, double pitch, double roll)
@@ -149,7 +149,7 @@ inline Coord3dCart Rotation(const Coord3dCart& coordBefRot, double yaw, double p
 
 inline Plan Rotation(const Plan& p, double theta, double phi, double roll)
 {
-    Coord3dCart r = Rotation(Coord3dCart(p[0],p[1], p[2]), Quaternion::FromEuler(theta, phi, roll));
+    Coord3dCart r = Rotation(Coord3dCart(p[0],p[1], p[2]), Quaternion::FromEulerXYZ(theta, phi, roll));
     return Plan(r.GetX(), r.GetY(), r.GetZ(), p[3]);
 }
 
