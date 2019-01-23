@@ -1,7 +1,7 @@
 FROM debian:buster as builder
-RUN apt-get update && apt-get upgrade -y && apt-get install -y ffmpeg libopencv-dev libboost-all-dev
-RUN apt-get install -y build-essential
-RUN apt-get install -y cmake libgomp1
+RUN apt-get update && apt-get upgrade -y && apt-get install -y ffmpeg libopencv-dev libboost-all-dev && \
+ apt-get install -y build-essential && \
+ apt-get install -y cmake libgomp1
 WORKDIR /tmp
 COPY . /tmp
 RUN rm -rf build && mkdir build
